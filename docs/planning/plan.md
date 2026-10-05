@@ -19,7 +19,7 @@ Status legend: ⬜ not started · 🔄 in progress · ✅ self-check passed · �
 
 ---
 
-## Phase 0 — Discussion & Research 🔄
+## Phase 0 — Discussion & Research 🔒 (approved 2026-10-05 22:27)
 
 **Goal:** Agree constraints, stack, ownership, sprint cadence; stand up the docs system and branches.
 
@@ -40,7 +40,7 @@ Human gate — H says "GATE 0 APPROVED" after reading `workflow.md`, `decisions.
 
 ---
 
-## Phase 1 — Frontend scaffold ⬜
+## Phase 1 — Frontend scaffold 🔄
 
 **Goal:** A running Vite + React + TS + R3F + Tailwind shell with the three-panel layout and disclaimers, CI green.
 
