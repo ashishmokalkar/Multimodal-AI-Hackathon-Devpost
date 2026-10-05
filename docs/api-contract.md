@@ -119,12 +119,60 @@ paths:
                   synthetic: true
                   features:
                     Age: 67
+                    Weight: 75
+                    Length: 165
                     Sex: Female
-                    Typical Chest Pain: true
+                    BMI: 29
                     DM: true
                     HTN: true
+                    Current Smoker: false
+                    Ex-Smoker: false
+                    FH: true
+                    Obesity: false
+                    CRF: false
+                    CVA: false
+                    Airway: false
+                    Thyroid Disease: false
+                    CHF: false
+                    DLP: false
+                    BP: 148
+                    PR: 80
+                    Edema: false
+                    Weak Peripheral Pulse: false
+                    Lung rales: false
+                    Systolic Murmur: false
+                    Diastolic Murmur: false
+                    Typical Chest Pain: true
+                    Dyspnea: true
+                    Function Class: 2
+                    Atypical: false
+                    Nonanginal: false
+                    Exertional CP: false
+                    LowTH Ang: false
+                    Q Wave: false
+                    ST Elevation: false
+                    ST Depression: true
+                    T inversion: false
+                    LVH: false
+                    Poor R Progression: false
+                    BBB: false
+                    FBS: 155
+                    CR: 1
+                    TG: 150
+                    LDL: 142
+                    HDL: 45
+                    BUN: 18
+                    ESR: 12
+                    HB: 14
+                    K: 4.2
+                    Na: 140
+                    WBC: 7.5
+                    Lymph: 30
+                    Neut: 60
+                    PLT: 250
                     EF-TTE: 48
                     Region RWMA: 1
+                    VHD: false
                   ground_truth:
                     cad: true
                     vessels:
@@ -148,8 +196,56 @@ paths:
                 Typical Chest Pain: true
                 DM: true
                 HTN: true
+                Weight: 75
+                Length: 165
+                BMI: 29
+                Current Smoker: false
+                Ex-Smoker: false
+                FH: true
+                Obesity: false
+                CRF: false
+                CVA: false
+                Airway: false
+                Thyroid Disease: false
+                CHF: false
+                DLP: false
+                BP: 148
+                PR: 80
+                Edema: false
+                Weak Peripheral Pulse: false
+                Lung rales: false
+                Systolic Murmur: false
+                Diastolic Murmur: false
+                Dyspnea: true
+                Function Class: 2
+                Atypical: false
+                Nonanginal: false
+                Exertional CP: false
+                LowTH Ang: false
+                Q Wave: false
+                ST Elevation: false
+                ST Depression: true
+                T inversion: false
+                LVH: false
+                Poor R Progression: false
+                BBB: false
+                FBS: 155
+                CR: 1
+                TG: 150
+                LDL: 142
+                HDL: 45
+                BUN: 18
+                ESR: 12
+                HB: 14
+                K: 4.2
+                Na: 140
+                WBC: 7.5
+                Lymph: 30
+                Neut: 60
+                PLT: 250
                 EF-TTE: 48
                 Region RWMA: 1
+                VHD: false
       responses:
         "200":
           description: Predicted probabilities and mock feature contributions
