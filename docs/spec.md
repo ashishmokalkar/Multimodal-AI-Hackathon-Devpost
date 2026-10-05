@@ -103,7 +103,7 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 
 ## 9. Non-functional
 
-- Node 20 LTS, pnpm. `pnpm lint`, `pnpm typecheck`, `pnpm build` clean. Vitest for pure logic (`colorScale`, `vesselMap`, schema validation).
+- Node LTS (≥20, pinned in `.nvmrc` to the installed version), pnpm via corepack. `pnpm lint`, `pnpm typecheck`, `pnpm build` clean. Vitest for pure logic (`colorScale`, `vesselMap`, schema validation).
 - No GPU requirement; no external network calls other than the API.
 - Accessibility: keyboard focus on cards/tabs, ARIA labels on 3D canvas summary.
 

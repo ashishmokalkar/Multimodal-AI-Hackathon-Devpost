@@ -45,11 +45,12 @@ Human gate — H says "GATE 0 APPROVED" after reading `workflow.md`, `decisions.
 **Goal:** A running Vite + React + TS + R3F + Tailwind shell with the three-panel layout and disclaimers, CI green.
 
 Tasks
+0. [ ] Toolchain: Node is **not installed** on this machine. `winget install OpenJS.NodeJS.LTS --accept-source-agreements --accept-package-agreements`, then `corepack enable && corepack prepare pnpm@latest --activate`; verify `node -v`, `pnpm -v` in a fresh shell. Record versions in root README
 1. [ ] `frontend/`: `pnpm create vite` (react-ts); add deps `three @react-three/fiber @react-three/drei zustand @tanstack/react-query recharts zod`; dev deps `tailwindcss postcss autoprefixer eslint prettier vitest @types/three`
 2. [ ] Tailwind configured; `src/` tree exactly as `spec.md §4`, placeholder components exporting empty panels
 3. [ ] App shell: header (title, model-version slot, "Model metrics" button), 3-column grid, footer; `DisclaimerModal` (acknowledge → localStorage) + `DisclaimerBanner` with text from `spec.md §8`
 4. [ ] Empty R3F `<Canvas>` in the centre column with `OrbitControls` and a placeholder sphere; `frameloop="demand"`, `dpr={[1,1.5]}`
-5. [ ] Scripts: `dev`, `build`, `lint`, `typecheck`, `test`, `format`; `.nvmrc` (20), `.editorconfig`, root `.gitignore` (node, python, `.env*`, `dist`)
+5. [ ] Scripts: `dev`, `build`, `lint`, `typecheck`, `test`, `format`; `.nvmrc` (installed LTS major), `.editorconfig`, root `.gitignore` (node, python, `.env*`, `dist`)
 6. [ ] `.github/workflows/frontend-ci.yml`: on push/PR to `frontend`, `dev`, `main` → pnpm install, lint, typecheck, build
 7. [ ] Root `README.md`: one-paragraph overview, repo layout (D-009), "Run frontend" section; leave a "Run backend" placeholder for M
 8. [ ] One Vitest test (e.g. `lib/colorScale.test.ts` with a stub `colorScale(p)` returning hex) to prove the test runner works
