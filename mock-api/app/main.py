@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +10,7 @@ from app.features import FEATURES, default_feature_values
 from app.predictor_mock import MODEL_VERSION, predict
 from app.schemas import (
     FeatureSchema,
+    FeatureValue,
     HealthResponse,
     MetricsResponse,
     PredictionResponse,
@@ -57,12 +57,12 @@ PREDICT_BODY = Body(
 )
 
 
-def validate_features(features: dict[str, Any]) -> None:
+def validate_features(features: dict[str, FeatureValue]) -> None:
     feature_by_name = {feature.name: feature for feature in FEATURES}
     expected_names = set(feature_by_name)
     missing = sorted(expected_names - features.keys())
     unknown = sorted(features.keys() - expected_names)
-    errors: list[dict[str, Any]] = []
+    errors: list[dict[str, object]] = []
 
     for name in missing:
         errors.append(
@@ -95,9 +95,7 @@ def validate_features(features: dict[str, Any]) -> None:
                     f"Input should be greater than or equal to {feature.min}"
                 )
             elif feature.max is not None and value > feature.max:
-                invalid_message = (
-                    f"Input should be less than or equal to {feature.max}"
-                )
+                invalid_message = f"Input should be less than or equal to {feature.max}"
         elif feature.type == "boolean":
             if not isinstance(value, bool):
                 invalid_message = "Input should be a valid boolean"

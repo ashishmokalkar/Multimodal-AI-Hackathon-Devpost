@@ -72,6 +72,4 @@ def test_typical_chest_pain_increases_cad_probability() -> None:
             False if feature in {"DM", "HTN"} else features_with_pain[feature]
         )
         higher_risk = baseline | {feature: higher_risk_value}
-        assert predict(higher_risk).cad.probability > predict(
-            baseline
-        ).cad.probability
+        assert predict(higher_risk).cad.probability > predict(baseline).cad.probability

@@ -301,7 +301,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ValidationError"
+                $ref: "#/components/schemas/HTTPValidationError"
               example:
                 detail:
                   - loc: [body, features, Age]
@@ -381,25 +381,37 @@ components:
           type: string
           enum: [number, boolean, categorical]
         unit:
-          type: string
+          anyOf:
+            - type: string
+            - type: "null"
         min:
-          type: number
-        max:
-          type: number
-        default:
-          oneOf:
+          anyOf:
             - type: number
+            - type: "null"
+        max:
+          anyOf:
+            - type: number
+            - type: "null"
+        default:
+          anyOf:
             - type: boolean
+            - type: number
+            - type: integer
             - type: string
         options:
-          type: array
-          items:
-            oneOf:
-              - type: number
-              - type: boolean
-              - type: string
+          anyOf:
+            - type: array
+              items:
+                anyOf:
+                  - type: boolean
+                  - type: number
+                  - type: integer
+                  - type: string
+            - type: "null"
         description:
-          type: string
+          anyOf:
+            - type: string
+            - type: "null"
     SamplePatient:
       type: object
       additionalProperties: false
@@ -412,12 +424,15 @@ components:
         features:
           type: object
           additionalProperties:
-            oneOf:
-              - type: number
+            anyOf:
               - type: boolean
+              - type: number
+              - type: integer
               - type: string
         ground_truth:
-          $ref: "#/components/schemas/GroundTruth"
+          anyOf:
+            - $ref: "#/components/schemas/GroundTruth"
+            - type: "null"
         synthetic:
           type: boolean
     GroundTruth:
@@ -428,16 +443,7 @@ components:
         cad:
           type: boolean
         vessels:
-          type: object
-          additionalProperties: false
-          required: [LAD, LCX, RCA]
-          properties:
-            LAD:
-              type: boolean
-            LCX:
-              type: boolean
-            RCA:
-              type: boolean
+          $ref: "#/components/schemas/VesselGroundTruth"
     PredictRequest:
       type: object
       additionalProperties: false
@@ -445,10 +451,12 @@ components:
       properties:
         features:
           type: object
+          description: Exactly the input features returned by GET /features.
           additionalProperties:
-            oneOf:
-              - type: number
+            anyOf:
               - type: boolean
+              - type: number
+              - type: integer
               - type: string
     Target:
       type: object
@@ -473,9 +481,10 @@ components:
         feature:
           type: string
         value:
-          oneOf:
-            - type: number
+          anyOf:
             - type: boolean
+            - type: number
+            - type: integer
             - type: string
         contribution:
           type: number
@@ -495,6 +504,30 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Contribution"
+    VesselTargets:
+      type: object
+      additionalProperties: false
+      required: [LAD, LCX, RCA]
+      properties:
+        LAD:
+          $ref: "#/components/schemas/Target"
+        LCX:
+          $ref: "#/components/schemas/Target"
+        RCA:
+          $ref: "#/components/schemas/Target"
+    TargetExplanations:
+      type: object
+      additionalProperties: false
+      required: [cad, LAD, LCX, RCA]
+      properties:
+        cad:
+          $ref: "#/components/schemas/Explanation"
+        LAD:
+          $ref: "#/components/schemas/Explanation"
+        LCX:
+          $ref: "#/components/schemas/Explanation"
+        RCA:
+          $ref: "#/components/schemas/Explanation"
     PredictionResponse:
       type: object
       additionalProperties: false
@@ -508,29 +541,9 @@ components:
         cad:
           $ref: "#/components/schemas/Target"
         vessels:
-          type: object
-          additionalProperties: false
-          required: [LAD, LCX, RCA]
-          properties:
-            LAD:
-              $ref: "#/components/schemas/Target"
-            LCX:
-              $ref: "#/components/schemas/Target"
-            RCA:
-              $ref: "#/components/schemas/Target"
+          $ref: "#/components/schemas/VesselTargets"
         explanations:
-          type: object
-          additionalProperties: false
-          required: [cad, LAD, LCX, RCA]
-          properties:
-            cad:
-              $ref: "#/components/schemas/Explanation"
-            LAD:
-              $ref: "#/components/schemas/Explanation"
-            LCX:
-              $ref: "#/components/schemas/Explanation"
-            RCA:
-              $ref: "#/components/schemas/Explanation"
+          $ref: "#/components/schemas/TargetExplanations"
         risk_summary:
           type: string
         mock:
@@ -576,36 +589,55 @@ components:
           type: string
           format: date-time
         targets:
-          type: object
-          additionalProperties: false
-          required: [cad, LAD, LCX, RCA]
-          properties:
-            cad:
-              $ref: "#/components/schemas/TargetMetrics"
-            LAD:
-              $ref: "#/components/schemas/TargetMetrics"
-            LCX:
-              $ref: "#/components/schemas/TargetMetrics"
-            RCA:
-              $ref: "#/components/schemas/TargetMetrics"
+          $ref: "#/components/schemas/TargetMetricsMap"
         mock:
           type: boolean
+    TargetMetricsMap:
+      type: object
+      additionalProperties: false
+      required: [cad, LAD, LCX, RCA]
+      properties:
+        cad:
+          $ref: "#/components/schemas/TargetMetrics"
+        LAD:
+          $ref: "#/components/schemas/TargetMetrics"
+        LCX:
+          $ref: "#/components/schemas/TargetMetrics"
+        RCA:
+          $ref: "#/components/schemas/TargetMetrics"
+    VesselGroundTruth:
+      type: object
+      additionalProperties: false
+      required: [LAD, LCX, RCA]
+      properties:
+        LAD:
+          type: boolean
+        LCX:
+          type: boolean
+        RCA:
+          type: boolean
     ValidationError:
+      type: object
+      properties:
+        loc:
+          type: array
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+        msg:
+          type: string
+        type:
+          type: string
+        input: {}
+        ctx:
+          type: object
+      required: [loc, msg, type]
+    HTTPValidationError:
       type: object
       properties:
         detail:
           type: array
           items:
-            type: object
-            properties:
-              loc:
-                type: array
-                items:
-                  oneOf:
-                    - type: string
-                    - type: integer
-              msg:
-                type: string
-              type:
-                type: string
+            $ref: "#/components/schemas/ValidationError"
 ```
