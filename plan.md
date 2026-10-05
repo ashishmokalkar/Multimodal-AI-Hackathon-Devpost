@@ -29,8 +29,9 @@ We win by **(a) a real gain on LCX and RCA, and (b) validation rigour that stand
 - [ ] Every experiment uses the **same saved folds** (`data/processed/folds.csv`), so comparisons between models are paired.
 
 ### Decision rule
-Keep a change only if the **paired** ΔAUC (same folds) is greater than **1 standard error** of the per-fold differences.
-Fold SD is 0.03–0.06 (EDA §1 #9), so smaller gains are noise.
+Keep a change only if the **paired** ΔAUC (same folds) is greater than **1 corrected standard error** of the per-fold differences
+(`ml.evaluate.paired_compare`). Repeated-CV folds overlap, so we use the Nadeau–Bengio correction, var·(1/J + n_test/n_train).
+That makes the SE about 3.7× the naive SE. Fold SD is 0.03–0.06 (EDA §1 #9), so smaller gains are noise.
 Log every run to `reports/experiments.csv`: run id, target, feature set, model, strategy, AUC mean, SD, SE, Brier, git hash.
 
 ---
