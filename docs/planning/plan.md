@@ -10,7 +10,7 @@ Status legend: ⬜ not started · 🔄 in progress · ✅ self-check passed · �
 
 | Phase | Owner | Estimate | Actual | Notes |
 |---|---|---|---|---|
-| 0 Discussion & research | O+H | 300 | ~210 (at plan draft) | cold start 70 + 30 tool calls |
+| 0 Discussion & research | O+H | 300 | ~365 (at gate request) | cold start 70; doc-writing calls cost 10–30 each as context grew → **over estimate by ~20 %**, see retro action |
 | 1 Scaffold | X | 250 | | |
 | 2 API contract + mock | X | 350 | | |
 | 3 3D asset spike | X | 400 | | |
@@ -28,7 +28,7 @@ Tasks
 - [x] Decisions D-001 … D-012 logged
 - [x] `docs/workflow.md`, `docs/decisions.md`, `docs/spec.md`, `docs/planning/plan.md`, `docs/retro/` created
 - [x] Workspace initialised as repo; `dev` and `frontend` branches pushed
-- [ ] Docs committed on `frontend`
+- [x] Docs committed on `frontend` (31a6ba7)
 - [ ] Open questions Q1–Q3 (spec §12) sent to M by H
 
 Self-check gate
