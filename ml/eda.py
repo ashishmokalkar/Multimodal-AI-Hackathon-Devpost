@@ -11,9 +11,6 @@ import json
 import warnings
 from itertools import combinations
 
-import matplotlib
-
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -33,25 +30,14 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from xgboost import XGBClassifier
 
 from ml.data import FEATURE_GROUPS, FEATURES, ROOT, TARGETS, VESSELS, load_clean
+from ml.viz import C1, C2, C3, DIV_CMAP as DIV, GRID, INK, INK2, SEQ, apply_style
 
 warnings.filterwarnings("ignore")
 OUT = ROOT / "reports" / "eda"
 TAB, FIG = OUT / "tables", OUT / "figures"
 SEED = 42
 
-# Reference palette (dataviz skill): categorical slots, sequential blue, diverging blue<->red.
-C1, C2, C3 = "#2a78d6", "#eb6834", "#1baf7a"
-INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
-SEQ = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
-DIV = sns.blend_palette(["#184f95", "#3987e5", "#f0efec", "#e66767", "#b8302f"], as_cmap=True)
-
-plt.rcParams.update({
-    "figure.dpi": 110, "savefig.dpi": 150, "savefig.bbox": "tight", "font.size": 9,
-    "axes.edgecolor": GRID, "axes.labelcolor": INK2, "axes.titlecolor": INK, "axes.titlesize": 10,
-    "xtick.color": INK2, "ytick.color": INK2, "axes.grid": True, "grid.color": GRID,
-    "grid.linewidth": 0.6, "axes.spines.top": False, "axes.spines.right": False,
-    "legend.frameon": False,
-})
+apply_style()
 
 CONTINUOUS = ["age", "weight", "height", "bmi", "bp", "pr", "fbs", "cr", "tg", "ldl", "hdl", "bun",
               "esr", "hb", "k", "na", "wbc", "lymph", "neut", "plt", "ef_tte"]
