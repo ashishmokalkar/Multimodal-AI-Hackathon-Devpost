@@ -1,0 +1,37 @@
+{
+  "model_version": "mock-1.0.0",
+  "validation": "stratified 5-fold cross-validation",
+  "n_samples": 303,
+  "trained_at": "2026-10-05T00:00:00Z",
+  "targets": {
+    "cad": {
+      "accuracy": 0.84,
+      "precision": 0.82,
+      "recall": 0.86,
+      "f1": 0.84,
+      "roc_auc": 0.89
+    },
+    "LAD": {
+      "accuracy": 0.81,
+      "precision": 0.79,
+      "recall": 0.83,
+      "f1": 0.81,
+      "roc_auc": 0.86
+    },
+    "LCX": {
+      "accuracy": 0.78,
+      "precision": 0.76,
+      "recall": 0.8,
+      "f1": 0.78,
+      "roc_auc": 0.82
+    },
+    "RCA": {
+      "accuracy": 0.8,
+      "precision": 0.78,
+      "recall": 0.82,
+      "f1": 0.8,
+      "roc_auc": 0.85
+    }
+  },
+  "mock": true
+}
