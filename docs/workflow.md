@@ -1,0 +1,106 @@
+# Team Workflow — Frontend Track
+
+> Read this first in every new session. It is the contract between the human, the orchestrator agent and the executor agent.
+
+## 1. Roles
+
+| Role | Who | Responsibilities |
+|---|---|---|
+| **Human (H)** | Faizan | Owns product direction, approves human gates, forwards handovers to the executor, reports blockers from the ML colleague. |
+| **Orchestrator (O)** | Copilot agent in planning session | Research, brainstorming, sprint/phase planning, writing `plan.md`/`spec.md`/`decisions.md`, drafting executor handovers, reviewing executor output against gates, retros, budget tracking. **Does not implement features.** |
+| **Executor (X)** | Copilot agent in implementation session | Implements atomic tasks from a handover, runs lint/build/tests, commits to `frontend`, reports back with evidence against the self-check criteria. |
+| **ML colleague (M)** | Ashish | Owns dataset, models, FastAPI backend on `ml` branch. Signs off on the API contract. |
+
+All handovers O → X and X → O pass **through H in chat**. No agent spawns sub-agents without H's explicit approval.
+
+## 2. Hard constraints
+
+- **Deadline:** 14 Oct 2026, 20:45 CEST (Devpost: 15 Oct 00:15 IST). Oct 14 is submission-only buffer.
+- **Budget:** 7000 Copilot credits for O + X combined. Per-sprint caps live in `plan.md`. Exceeding a sprint cap requires an explicit H decision logged in `decisions.md`.
+- **Branches:** `main` ← `dev` ← `frontend` (ours) / `ml` (colleague). We only commit to `frontend`. Merges to `dev` happen at sprint end via PR after H approval.
+
+## 3. Artefacts
+
+```
+docs/
+  problem_statement.md   # the brief (read-only)
+  workflow.md            # this file
+  spec.md                # living product + technical spec; plan.md must stay in sync with it
+  decisions.md           # append-only decision log (D-xxx)
+  api-contract.md        # frontend <-> backend contract (created in S1)
+  planning/
+    plan.md              # CURRENT sprint plan only
+    sprint1.md ...       # archived plans (plan.md is renamed here at sprint end)
+  retro/
+    sprint1.md ...       # what went wrong / right per sprint, with actions
+```
+
+Rule: **if a change to `plan.md` affects scope or architecture, update `spec.md` in the same commit** and log the decision.
+
+## 4. Sprint lifecycle
+
+Four sprints of ~2 days (D-001). Every sprint has the same shape:
+
+1. **Phase 0 — Discussion & Research** (O + H). Re-read `spec.md`, `decisions.md`, last retro. Confirm or amend the tentative plan for this sprint. Output: `plan.md` for this sprint.
+2. **Phases 1..n — Delivery** (X, reviewed by O). Sizeable chunks of work, each with atomic tasks.
+3. **Final phase — Retro & Cleanup** (O + H). Write `retro/sprintN.md`, archive `plan.md` → `planning/sprintN.md`, reconcile budget, update `spec.md`, PR `frontend` → `dev` if stable.
+
+## 5. Phase lifecycle and gates
+
+Each phase in `plan.md` declares:
+
+- **Goal** (one sentence)
+- **Atomic tasks** (checkbox list; each independently verifiable)
+- **Self-check gate** — objective success criteria X must prove with evidence (command output, screenshot, file path). X may not declare a phase done without all criteria met.
+- **Human gate** — H reviews O's assessment + X's evidence and explicitly approves ("GATE APPROVED") before the next phase begins.
+- **Credit estimate** and **actual** (filled at gate time).
+
+No phase starts until the previous phase's human gate is approved. If a self-check fails twice, X stops and reports; O re-plans rather than X looping.
+
+## 6. Handover format (O → X)
+
+O produces a single chat block that H pastes into the executor session. It must be **self-contained** (X has no memory of previous phases beyond what is in the repo):
+
+```
+## Handover: Sprint N / Phase M — <title>
+Repo: C:\Users\faiza\workspace\MultimodalAIHack  Branch: frontend
+Read first: docs/workflow.md, docs/plan.md (Phase M), docs/spec.md §<sections>
+Goal: ...
+Tasks:
+  1. ...
+Constraints: ...
+Self-check gate (prove each with evidence): ...
+Deliver back: commit hash(es), evidence per criterion, deviations, open questions.
+Commit as you go; do not touch files outside: <paths>.
+```
+
+## 7. Report format (X → O)
+
+```
+## Report: Sprint N / Phase M
+Commits: <hashes>
+Gate evidence: criterion -> evidence
+Deviations from handover: ...
+Open questions / blockers: ...
+Estimated credits used: <from Copilot usage if visible>
+```
+
+## 8. Credit discipline (see D-008, D-011)
+
+- Every agent call carries a fixed ~55k-token context cost (~2–10 credits per tool call; ~70 credits for the first call of a fresh session). Therefore:
+  - Prefer **few, large, self-contained handovers** over many small ones.
+  - X should batch tool calls and avoid narrating; O should avoid re-reading files it already knows.
+  - Start a **fresh orchestrator session at each sprint's Phase 0** to reset context size; the docs carry all state.
+  - O tracks spend from Copilot usage data at every gate and records it in `plan.md` → Budget table.
+- Model choice: executor uses the default model unless a task is trivially mechanical.
+
+## 9. Engineering conventions
+
+- Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`), small and frequent, on `frontend` only.
+- Every commit must pass `pnpm lint && pnpm build` (frontend) and `ruff check` (mock-api) once those exist.
+- No secrets in the repo. No large binaries >10 MB without H approval (3D meshes go through `git lfs` or are downloaded by script).
+- Licenses of every third-party asset (meshes, icons, datasets) recorded in `docs/spec.md §Assets`.
+
+## 10. Definition of Done (project)
+
+All items in `docs/problem_statement.md §Expected Deliverables` that touch the frontend are demonstrable locally, documented in the 6-page doc, and shown in the demo video. Clinical disclaimer visible on every screen.
