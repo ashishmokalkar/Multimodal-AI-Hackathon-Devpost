@@ -95,7 +95,7 @@ Estimated credits used: <from Copilot usage if visible>
   - Prefer **few, large, self-contained handovers** over many small ones.
   - Context size drives per-call cost; H triggers `/compact` on O when context gets heavy; start a fresh O session at each sprint's Phase 0.
   - X batches tool calls and avoids narration.
-- Model choice: X uses the default (1×) model. O runs on a 1× model for routine gates/handovers; a premium model only for Phase 0 brainstorming if H opts in.
+- Model choice: X uses the default (1×) model. O model is H's call per sprint (D-014); whichever model, O keeps its call count low.
 
 ## 9. Engineering conventions
 

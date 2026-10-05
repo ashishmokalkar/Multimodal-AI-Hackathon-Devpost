@@ -60,7 +60,7 @@ Constraints: touch only `frontend/`, `.github/`, root `README.md`, `.gitignore`,
 Self-check gate (evidence required)
 - `pnpm install && pnpm lint && pnpm typecheck && pnpm test && pnpm build` all exit 0 (paste tail of output)
 - `pnpm dev` → screenshot of `localhost:5173` showing modal, banner, 3 columns, rotating placeholder sphere
-- `frontend-ci.yml` passes `actionlint` or at least `yamllint`/visual check; CI run green on GitHub after push
+- `frontend-ci.yml` is valid YAML and committed; CI status is informational only (D-013) — do not wait for or debug the GitHub run
 - Commit(s) on `frontend` with conventional messages
 
 Human gate — H confirms screenshot + CI green → "GATE 1 APPROVED".
