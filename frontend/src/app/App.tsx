@@ -1,14 +1,17 @@
 import { useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PatientPanel } from "../features/patient/PatientPanel";
 import { ResultsPanel } from "../features/results/ResultsPanel";
 import { DisclaimerBanner } from "../features/safety/DisclaimerBanner";
 import { DisclaimerModal } from "../features/safety/DisclaimerModal";
 import { DISCLAIMER_TEXT } from "../features/safety/disclaimer";
 import { ViewerPanel } from "../features/viewer/ViewerPanel";
+import { useMetrics } from "../api/hooks";
 
 const DISCLAIMER_STORAGE_KEY = "cad-risk-visualizer-disclaimer-acknowledged";
 
-export function App() {
+function AppContent() {
+  const metricsQuery = useMetrics();
   const [isDisclaimerAcknowledged, setIsDisclaimerAcknowledged] = useState(
     () => window.localStorage.getItem(DISCLAIMER_STORAGE_KEY) === "true",
   );
@@ -33,7 +36,11 @@ export function App() {
           </div>
           <div className="header-actions">
             <span className="model-version">
-              Model version: <strong>not connected</strong>
+              Model version:{" "}
+              <strong>
+                {metricsQuery.data?.model_version ??
+                  (metricsQuery.isPending ? "loading" : "unavailable")}
+              </strong>
             </span>
             <button
               className="metrics-button"
@@ -69,6 +76,16 @@ export function App() {
         <DisclaimerModal onAcknowledge={acknowledgeDisclaimer} />
       )}
     </div>
+  );
+}
+
+export function App() {
+  const [queryClient] = useState(() => new QueryClient());
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppContent />
+    </QueryClientProvider>
   );
 }
 
