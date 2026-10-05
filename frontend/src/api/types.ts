@@ -19,20 +19,29 @@ export const FeatureSchema = z.object({
   description: z.string().optional(),
 });
 
+export const HealthResponseSchema = z.object({
+  status: z.enum(["ok", "degraded"]),
+  model_version: z.string(),
+  contract_version: z.string(),
+  mock: z.boolean(),
+});
+
+export const VesselGroundTruthSchema = z.object({
+  LAD: z.boolean(),
+  LCX: z.boolean(),
+  RCA: z.boolean(),
+});
+
+export const GroundTruthSchema = z.object({
+  cad: z.boolean(),
+  vessels: VesselGroundTruthSchema,
+});
+
 export const SamplePatientSchema = z.object({
   id: z.string(),
   label: z.string(),
   features: z.record(z.string(), FeatureValueSchema),
-  ground_truth: z
-    .object({
-      cad: z.boolean(),
-      vessels: z.object({
-        LAD: z.boolean(),
-        LCX: z.boolean(),
-        RCA: z.boolean(),
-      }),
-    })
-    .optional(),
+  ground_truth: GroundTruthSchema.optional(),
   synthetic: z.boolean(),
 });
 
@@ -54,21 +63,25 @@ export const ExplanationSchema = z.object({
   contributions: z.array(ContributionSchema),
 });
 
+export const VesselTargetsSchema = z.object({
+  LAD: TargetSchema,
+  LCX: TargetSchema,
+  RCA: TargetSchema,
+});
+
+export const TargetExplanationsSchema = z.object({
+  cad: ExplanationSchema,
+  LAD: ExplanationSchema,
+  LCX: ExplanationSchema,
+  RCA: ExplanationSchema,
+});
+
 export const PredictionResponseSchema = z.object({
   request_id: z.string().uuid(),
   model_version: z.string(),
   cad: TargetSchema,
-  vessels: z.object({
-    LAD: TargetSchema,
-    LCX: TargetSchema,
-    RCA: TargetSchema,
-  }),
-  explanations: z.object({
-    cad: ExplanationSchema,
-    LAD: ExplanationSchema,
-    LCX: ExplanationSchema,
-    RCA: ExplanationSchema,
-  }),
+  vessels: VesselTargetsSchema,
+  explanations: TargetExplanationsSchema,
   risk_summary: z.string(),
   mock: z.boolean(),
 });
@@ -99,13 +112,30 @@ export const PredictRequestSchema = z.object({
   features: z.record(z.string(), FeatureValueSchema),
 });
 
+export const ValidationErrorItemSchema = z.object({
+  loc: z.array(z.union([z.string(), z.number().int()])),
+  msg: z.string(),
+  type: z.string(),
+});
+
+export const ValidationErrorSchema = z.object({
+  detail: z.array(ValidationErrorItemSchema),
+});
+
 export type FeatureValue = z.infer<typeof FeatureValueSchema>;
 export type FeatureDefinition = z.infer<typeof FeatureSchema>;
+export type HealthResponse = z.infer<typeof HealthResponseSchema>;
+export type VesselGroundTruth = z.infer<typeof VesselGroundTruthSchema>;
+export type GroundTruth = z.infer<typeof GroundTruthSchema>;
 export type SamplePatient = z.infer<typeof SamplePatientSchema>;
 export type Target = z.infer<typeof TargetSchema>;
 export type Contribution = z.infer<typeof ContributionSchema>;
 export type Explanation = z.infer<typeof ExplanationSchema>;
+export type VesselTargets = z.infer<typeof VesselTargetsSchema>;
+export type TargetExplanations = z.infer<typeof TargetExplanationsSchema>;
 export type PredictionResponse = z.infer<typeof PredictionResponseSchema>;
 export type TargetMetrics = z.infer<typeof TargetMetricsSchema>;
 export type MetricsResponse = z.infer<typeof MetricsResponseSchema>;
 export type PredictRequest = z.infer<typeof PredictRequestSchema>;
+export type ValidationErrorItem = z.infer<typeof ValidationErrorItemSchema>;
+export type ValidationError = z.infer<typeof ValidationErrorSchema>;

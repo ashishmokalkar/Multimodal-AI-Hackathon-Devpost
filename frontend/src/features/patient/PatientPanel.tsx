@@ -273,6 +273,9 @@ export function PatientPanel() {
               if (sample) {
                 setShowValidationErrors(false);
                 setFromSample(sample);
+              } else if (event.target.value === "" && defaultFeatures) {
+                setShowValidationErrors(false);
+                setFeatures(defaultFeatures);
               }
             }}
           >
