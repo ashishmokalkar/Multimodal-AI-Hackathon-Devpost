@@ -40,7 +40,7 @@ Human gate — H says "GATE 0 APPROVED" after reading `workflow.md`, `decisions.
 
 ---
 
-## Phase 1 — Frontend scaffold ✅ (self-check passed 2026-10-05 23:05; CI non-blocking per D-013)
+## Phase 1 — Frontend scaffold 🔒 (approved 2026-10-05 23:20; CI informational per D-013)
 
 **Goal:** A running Vite + React + TS + R3F + Tailwind shell with the three-panel layout and disclaimers, CI green.
 
@@ -67,7 +67,9 @@ Human gate — H confirms screenshot + CI green → "GATE 1 APPROVED".
 
 ---
 
-## Phase 2 — API contract + mock server + typed client ⬜
+## Phase 2 — API contract + mock server + typed client 🔄
+
+> **Next action (post-compact):** O drafts the Phase 2 handover. Include: fresh executor session (D-013/untracked-files note), Node/pnpm PATH-prepend one-liner (fresh shells spawned from the app don't see the new PATH — X must document the exact command in `frontend/README.md §Troubleshooting`), evidence to `docs/evidence/`, `git mv frontend/logs/s1p1-shell.png docs/evidence/`, run `python scripts/credits.py` in the report. M's answers to Q1–Q3: **pending**.
 
 **Goal:** `docs/api-contract.md` written, `mock-api/` serves it, frontend form is data-driven and calls `/predict`.
 
