@@ -55,7 +55,7 @@ Each phase in `plan.md` declares:
 - **Human gate** — H reviews O's assessment + X's evidence and explicitly approves ("GATE APPROVED") before the next phase begins.
 - **Credit estimate** and **actual** (filled at gate time).
 
-No phase starts until the previous phase's human gate is approved. If a self-check fails twice, X stops and reports; O re-plans rather than X looping.
+No phase starts until the previous phase's human gate is approved. If a self-check fails twice **for the same root cause after a genuine fix attempt**, X stops and reports; O re-plans rather than X looping. Auto-fixable lint/format errors never count as failures — X runs the fixer (`ruff check --fix && ruff format`, `pnpm format`, `pnpm lint --fix`) and re-checks (D-015). Before stopping for any reason, X commits and pushes all work that passes typecheck/tests, so nothing is left only in the working tree.
 
 ## 6. Handover format (O → X)
 
@@ -64,7 +64,7 @@ O produces a single chat block that H pastes into the executor session. It must 
 ```
 ## Handover: Sprint N / Phase M — <title>
 Repo: C:\Users\faiza\workspace\MultimodalAIHack  Branch: frontend
-Read first: docs/workflow.md, docs/plan.md (Phase M), docs/spec.md §<sections>
+Read first: docs/workflow.md, docs/planning/plan.md (Phase M), docs/spec.md §<sections>
 Goal: ...
 Tasks:
   1. ...

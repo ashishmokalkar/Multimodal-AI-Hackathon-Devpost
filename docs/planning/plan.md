@@ -69,7 +69,7 @@ Human gate — H confirms screenshot + CI green → "GATE 1 APPROVED".
 
 ## Phase 2 — API contract + mock server + typed client 🔄
 
-> **Next action (post-compact):** O drafts the Phase 2 handover. Include: fresh executor session (D-013/untracked-files note), Node/pnpm PATH-prepend one-liner (fresh shells spawned from the app don't see the new PATH — X must document the exact command in `frontend/README.md §Troubleshooting`), evidence to `docs/evidence/`, `git mv frontend/logs/s1p1-shell.png docs/evidence/`, run `python scripts/credits.py` in the report. M's answers to Q1–Q3: **pending**.
+> **Status 2026-10-05 23:35:** X delivered 6 commits (`57308f4`…`c28a198`) then halted on an auto-fixable ruff `I001` (see D-015). Criteria 1, 4-frontend, 5 passed; 2 and 3 passed pre-predictor-tweak (re-capture required); 4-mock-api and 6 incomplete (uncommitted: contract alignment, `types.ts`, `PatientPanel.tsx`, README troubleshooting, `.env.example`, screenshots, `main.py`). Samples are **synthetic** (UCI 404, Kaggle 403). Completion handover (Phase 2b) issued. M's answers to Q1–Q3: **pending**.
 
 **Goal:** `docs/api-contract.md` written, `mock-api/` serves it, frontend form is data-driven and calls `/predict`.
 
