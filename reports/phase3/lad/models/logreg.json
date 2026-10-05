@@ -1,0 +1,18 @@
+{
+  "row": {
+    "model": "logreg",
+    "auc_default": 0.826687265675501,
+    "auc_tune_r0r2": 0.8655428954487777,
+    "auc_tuned": 0.8578581684981684,
+    "tuned_vs_default": 0.031170902822667518,
+    "tuned_vs_default_se": 0.011189314251271502,
+    "tuning_kept": true,
+    "seconds": 26
+  },
+  "run": "p3_logreg_tuned",
+  "params": {
+    "C": 0.0024483299538464115,
+    "l1_ratio": 0.0059502765656211315,
+    "class_weight": "balanced"
+  }
+}

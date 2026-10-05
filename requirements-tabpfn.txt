@@ -1,0 +1,5 @@
+# Optional: TabPFN ensemble member. Install CPU PyTorch first:
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch
+# Then accept the TabPFN licence once (browser login on first fit) or set TABPFN_TOKEN.
+tabpfn==9.1.0
+torch==2.14.1+cpu

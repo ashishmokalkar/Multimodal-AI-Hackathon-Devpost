@@ -77,3 +77,12 @@ def test_run_cv_and_paired_compare(df, folds):
     age = run_cv(age_score, X, y, name="t_age", target="test", folds=folds, save=False, log=False, n_jobs=1)
     cmp = paired_compare(dummy.fold_metrics, age.fold_metrics)
     assert cmp["diff_mean"] > 0.1 and cmp["keep"]
+
+
+def test_run_cv_accepts_non_sklearn_estimators(df, folds):
+    # CatBoost implements fit/predict_proba without subclassing sklearn's BaseEstimator.
+    from catboost import CatBoostClassifier
+    model = CatBoostClassifier(iterations=20, depth=2, verbose=0, thread_count=1, allow_writing_files=False)
+    res = run_cv(model, df[FEATURES], df["cad"].values, name="t_cat", target="test", folds=folds[["r0"]],
+                 save=False, log=False, n_jobs=1)
+    assert res.summary["auc_mean"] > 0.75

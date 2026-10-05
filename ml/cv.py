@@ -105,8 +105,13 @@ class CVResult:
         return cls(name, target, z["oof"], pd.read_csv(d / f"{name}_folds.csv"), z["y"])
 
 
+def _is_estimator(model) -> bool:
+    # Duck-typed: CatBoost and similar libraries implement the sklearn API without subclassing BaseEstimator.
+    return hasattr(model, "fit") and hasattr(model, "predict_proba")
+
+
 def _fit_one(model: Model, X: pd.DataFrame, y: np.ndarray, tr: np.ndarray, te: np.ndarray) -> np.ndarray:
-    if isinstance(model, BaseEstimator):
+    if _is_estimator(model):
         m = clone(model).fit(X.iloc[tr], y[tr])
         return m.predict_proba(X.iloc[te])[:, 1]
     return np.asarray(model(X.iloc[tr], y[tr], X.iloc[te], tr, te), dtype=float)
@@ -159,7 +164,6 @@ def log_experiment(result: CVResult) -> None:
         "meta": json.dumps(result.meta, default=str),
     }
     EXPERIMENT_LOG.parent.mkdir(parents=True, exist_ok=True)
-    new = pd.DataFrame([row])
-    if EXPERIMENT_LOG.exists():
-        new = pd.concat([pd.read_csv(EXPERIMENT_LOG), new], ignore_index=True)
-    new.to_csv(EXPERIMENT_LOG, index=False, float_format="%.4f")
+    # Append a single line so concurrent experiment processes don't overwrite each other.
+    pd.DataFrame([row]).to_csv(EXPERIMENT_LOG, mode="a", header=not EXPERIMENT_LOG.exists(), index=False,
+                               float_format="%.4f")

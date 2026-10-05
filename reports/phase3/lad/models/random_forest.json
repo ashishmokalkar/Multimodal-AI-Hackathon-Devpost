@@ -1,0 +1,22 @@
+{
+  "row": {
+    "model": "random_forest",
+    "auc_default": 0.8482825885225884,
+    "auc_tune_r0r2": 0.8708762383585913,
+    "auc_tuned": 0.8528422552610789,
+    "tuned_vs_default": 0.004559666738490287,
+    "tuned_vs_default_se": 0.004378050847546429,
+    "tuning_kept": true,
+    "seconds": 56,
+    "auc_seedbag5": 0.8544034417869711,
+    "seedbag_vs_single": 0.001561186525892384
+  },
+  "run": "p3_random_forest_seedbag5",
+  "params": {
+    "n_estimators": 500,
+    "max_depth": 5,
+    "min_samples_leaf": 2,
+    "max_features": "sqrt",
+    "class_weight": null
+  }
+}

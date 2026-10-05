@@ -1,0 +1,26 @@
+{
+  "row": {
+    "model": "lightgbm",
+    "auc_default": 0.7071957569783656,
+    "auc_tune_r0r2": 0.7344886354611756,
+    "auc_tuned": 0.7333737733737735,
+    "tuned_vs_default": 0.02617801639540769,
+    "tuned_vs_default_se": 0.016447731324182813,
+    "tuning_kept": true,
+    "seconds": 16,
+    "auc_seedbag5": 0.7321060381815531,
+    "seedbag_vs_single": -0.0012677351922203161
+  },
+  "run": "p3_lightgbm_tuned",
+  "params": {
+    "n_estimators": 300,
+    "num_leaves": 8,
+    "learning_rate": 0.017382924631299434,
+    "min_child_samples": 37,
+    "subsample": 0.6324540443839857,
+    "subsample_freq": 1,
+    "colsample_bytree": 0.9395043201660462,
+    "reg_lambda": 0.002783551174974734,
+    "reg_alpha": 0.7471453789877531
+  }
+}

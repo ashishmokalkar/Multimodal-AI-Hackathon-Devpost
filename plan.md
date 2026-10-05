@@ -4,6 +4,16 @@ This plan builds on [reports/EDA.md](reports/EDA.md); section references such as
 Predictive performance is **30% of judging** ("classification performance, risk estimation quality, validation methodology").
 We win by **(a) a real gain on LCX and RCA, and (b) validation rigour that stands up to scrutiny.**
 
+## Progress
+
+| Phase | Status | Best AUC so far (CAD / LAD / LCX / RCA) | Write-up |
+|---|---|---|---|
+| Baseline (untuned, F0) | ✅ | 0.925 / 0.851 / 0.744 / 0.717 | [EDA.md](reports/EDA.md) |
+| P1 Harness | ✅ | reproduces the baselines | — |
+| P2 Features | ✅ | 0.932 / 0.849 / 0.764 / 0.736 | [PHASE2_FEATURES.md](reports/PHASE2_FEATURES.md) |
+| P3 Model zoo + tuning | ✅ | **0.939 / 0.861 / 0.772 / 0.752** | [PHASE3_MODELS.md](reports/PHASE3_MODELS.md) |
+| P4 Multi-label strategy | ⏳ next | | |
+
 ---
 
 ## 0. Goals and ground rules
