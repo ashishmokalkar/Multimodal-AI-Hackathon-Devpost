@@ -1,0 +1,9 @@
+a,b,spearman
+lymph,neut,-0.9123
+bmi,obesity,0.7964
+typical_chest_pain,atypical,-0.7228
+weight,bmi,0.7196
+height,sex_male,0.7157
+dm,fbs,0.6438
+htn,bp,0.6155
+weight,obesity,0.5723
