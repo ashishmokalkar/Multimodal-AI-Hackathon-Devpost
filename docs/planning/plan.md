@@ -12,8 +12,8 @@ Status legend: ⬜ not started · 🔄 in progress · ✅ self-check passed · �
 |---|---|---|---|---|
 | 0 Discussion & research | O+H | 300 | 380 | 15x orchestrator model; doc-writing calls 10-30 each |
 | 1 Scaffold | X | 250 | 13 (X) + ~280 (O review) | X on 1x model is ~0.15/call; O review dominated -> D-014 |
-| 2 API contract + mock | X | 350 | | |
-| 3 3D asset spike | X | 400 | | |
+| 2 API contract + mock | X | 350 | 21 (X) + ~370 (O) | O cost dominated by cache-miss calls after long pasted reports (~100 each); X halt on auto-fixable lint → D-015 |
+| 3 3D asset spike | X | 400 | | O budget for P3+P4 review: ≤250 total |
 | 4 Retro & cleanup | O+H | 100 | | |
 | **Total** | | **1400** | | cap 1500 → 100 slack |
 
@@ -67,9 +67,9 @@ Human gate — H confirms screenshot + CI green → "GATE 1 APPROVED".
 
 ---
 
-## Phase 2 — API contract + mock server + typed client 🔄
+## Phase 2 — API contract + mock server + typed client ✅ self-check passed (awaiting human gate)
 
-> **Status 2026-10-05 23:35:** X delivered 6 commits (`57308f4`…`c28a198`) then halted on an auto-fixable ruff `I001` (see D-015). Criteria 1, 4-frontend, 5 passed; 2 and 3 passed pre-predictor-tweak (re-capture required); 4-mock-api and 6 incomplete (uncommitted: contract alignment, `types.ts`, `PatientPanel.tsx`, README troubleshooting, `.env.example`, screenshots, `main.py`). Samples are **synthetic** (UCI 404, Kaggle 403). Completion handover (Phase 2b) issued. M's answers to Q1–Q3: **pending**.
+> **Status 2026-10-05 23:55:** Closed out in `4669abb`, `30082a5`, `9d9b5c2`, `0d1037e` (after 6 earlier commits `57308f4`…`c28a198`). All self-check criteria verified by O: 55 features; `/predict` 200 + validated; chest-pain delta 0.1298; ruff/pytest/lint/typecheck/test/build clean; screenshot `docs/evidence/s1p2-form.png` shows API-driven groups, sample, probabilities, contributions; `docs/api-contract.md` reviewed (5 paths, OpenAPI 3.1, v1.0.0, change process). Samples are **synthetic** (UCI 404, Kaggle 403). M acknowledgement of the contract and Q1–Q3: **pending** — tracked as open item, not blocking Phase 3. Carry-over to S2: mock vessels nearly identical probabilities & all-positive contributions — add vessel-specific weights + some negative contributions so 3D/chart work is testable.
 
 **Goal:** `docs/api-contract.md` written, `mock-api/` serves it, frontend form is data-driven and calls `/predict`.
 
