@@ -10,8 +10,8 @@ Status legend: ⬜ not started · 🔄 in progress · ✅ self-check passed · �
 
 | Phase | Owner | Estimate | Actual | Notes |
 |---|---|---|---|---|
-| 0 Discussion & research | O+H | 300 | ~365 (at gate request) | cold start 70; doc-writing calls cost 10–30 each as context grew → **over estimate by ~20 %**, see retro action |
-| 1 Scaffold | X | 250 | | |
+| 0 Discussion & research | O+H | 300 | 380 | 15x orchestrator model; doc-writing calls 10-30 each |
+| 1 Scaffold | X | 250 | 13 (X) + ~280 (O review) | X on 1x model is ~0.15/call; O review dominated -> D-014 |
 | 2 API contract + mock | X | 350 | | |
 | 3 3D asset spike | X | 400 | | |
 | 4 Retro & cleanup | O+H | 100 | | |
