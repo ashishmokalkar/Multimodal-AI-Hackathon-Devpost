@@ -40,7 +40,7 @@ Human gate — H says "GATE 0 APPROVED" after reading `workflow.md`, `decisions.
 
 ---
 
-## Phase 1 — Frontend scaffold 🔄
+## Phase 1 — Frontend scaffold ✅ (self-check passed 2026-10-05 23:05; CI non-blocking per D-013)
 
 **Goal:** A running Vite + React + TS + R3F + Tailwind shell with the three-panel layout and disclaimers, CI green.
 

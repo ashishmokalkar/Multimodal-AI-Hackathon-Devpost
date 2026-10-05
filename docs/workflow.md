@@ -70,7 +70,8 @@ Tasks:
   1. ...
 Constraints: ...
 Self-check gate (prove each with evidence): ...
-Deliver back: commit hash(es), evidence per criterion, deviations, open questions.
+Deliver back: commit hash(es), evidence per criterion, deviations, open questions,
+  output of `python scripts/credits.py`.
 Commit as you go; do not touch files outside: <paths>.
 ```
 
@@ -85,19 +86,22 @@ Open questions / blockers: ...
 Estimated credits used: <from Copilot usage if visible>
 ```
 
-## 8. Credit discipline (see D-008, D-011)
+## 8. Credit discipline (see D-008, D-011, D-014)
 
-- Every agent call carries a fixed ~55k-token context cost (~2–10 credits per tool call; ~70 credits for the first call of a fresh session). Therefore:
+- **Measure, don't guess:** `python scripts/credits.py` (all-time, per session) · `--since <sprint start>` for a sprint · `--by-day`. Both O and X run it at every gate and paste the TOTAL line in their report.
+- **Model economics (measured S1):** orchestrator on a 15× model ≈ 11 credits/call; executor on a 1× model ≈ 0.15 credits/call. **Orchestrator calls are the scarce resource.** Therefore:
+  - O verifies through X's evidence, not by re-running checks itself. If something needs checking, X does it (70 executor calls ≈ 1 orchestrator call).
+  - O keeps the chat planning-only; no exploratory file reads unless gating a decision.
   - Prefer **few, large, self-contained handovers** over many small ones.
-  - X should batch tool calls and avoid narrating; O should avoid re-reading files it already knows.
-  - Start a **fresh orchestrator session at each sprint's Phase 0** to reset context size; the docs carry all state.
-  - O tracks spend from Copilot usage data at every gate and records it in `plan.md` → Budget table.
-- Model choice: executor uses the default model unless a task is trivially mechanical.
+  - Context size drives per-call cost; H triggers `/compact` on O when context gets heavy; start a fresh O session at each sprint's Phase 0.
+  - X batches tool calls and avoids narration.
+- Model choice: X uses the default (1×) model. O runs on a 1× model for routine gates/handovers; a premium model only for Phase 0 brainstorming if H opts in.
 
 ## 9. Engineering conventions
 
 - Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`), small and frequent, on `frontend` only.
-- Every commit must pass `pnpm lint && pnpm build` (frontend) and `ruff check` (mock-api) once those exist.
+- Every commit must pass `pnpm lint && pnpm build` (frontend) and `ruff check` (mock-api) once those exist. GitHub Actions CI exists but is **non-blocking** (D-013): check it passively with `gh run list`, never spend agent time debugging runner/queue issues.
+- Gate evidence (screenshots, command logs) lives in `docs/evidence/sNpM-*.png|txt`.
 - No secrets in the repo. No large binaries >10 MB without H approval (3D meshes go through `git lfs` or are downloaded by script).
 - Licenses of every third-party asset (meshes, icons, datasets) recorded in `docs/spec.md §Assets`.
 
