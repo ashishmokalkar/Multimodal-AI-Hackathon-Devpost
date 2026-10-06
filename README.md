@@ -10,7 +10,7 @@
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-eb6834?logo=scikitlearn&logoColor=white)
 ![Gradient boosting](https://img.shields.io/badge/XGBoost%20%C2%B7%20LightGBM%20%C2%B7%20CatBoost-GBMs-1baf7a)
 ![Optuna](https://img.shields.io/badge/Optuna-tuning-4a3aa7)
-![Tests](https://img.shields.io/badge/tests-37%20passing-0ca30c)
+![Tests](https://img.shields.io/badge/tests-40%20passing-0ca30c)
 ![License](https://img.shields.io/badge/license-Apache%202.0-52514e)
 
 [Competition page](https://multimodal-ai-hackathon-2026-7.devpost.com/) · [Plan](plan.md) · [EDA report](reports/EDA.md) · [Feature report](reports/PHASE2_FEATURES.md) · [Model report](reports/PHASE3_MODELS.md)
@@ -146,8 +146,8 @@ Full report: **[reports/EDA.md](reports/EDA.md)**
 Scored only on CAD patients, vessel AUC drops close to chance.
 Separating healthy from diseased is the easy part; **localisation is the hard part**.
 
-➡️ Phase 4 models vessels **hierarchically**:
-`P(vessel) = P(CAD) × P(vessel | CAD)`.
+➡️ Phase 4 tested hierarchical `P(CAD) × P(vessel | CAD)` and label stacking: **no significant AUC gain**, but better calibration
+and guaranteed consistency (P(vessel) ≤ P(CAD)). Localisation needs *new data*, hence phase 5.
 The 3D view will show vessel risk as *relative likelihood*, not as a lesion location.
 
 </td>
@@ -282,8 +282,8 @@ Rigorous checks surfaced real problems before they reached the results:
 | P1 · Validation harness | ✅ | fixed folds, OOF store, metrics, CIs, corrected tests |
 | P2 · Feature engineering | ✅ | F1 cleaning, 12 candidates, per-target F2 |
 | P3 · Model zoo + tuning | ✅ | 10 families, Optuna, seed bagging, leaderboards |
-| P4 · Multi-label strategy | ⏳ | hierarchical `P(CAD)·P(v\|CAD)`, classifier chains |
-| P5 · External data | 🔜 | ~600 UCI patients with LAD/LCX/RCA labels |
+| P4 · Multi-label strategy | ✅ | hierarchical `P(CAD)·P(v\|CAD)` and stacking: no significant AUC gain, better calibration ([report](reports/PHASE4_STRATEGIES.md)) |
+| P5 · External data | ⏳ | ~600 UCI patients with LAD/LCX/RCA labels |
 | P6 · Feature selection | 🔜 | per-target, inside CV |
 | P7 · Ensembling | 🔜 | hill-climbing / stacking with nested CV |
 | P8 · Calibration + thresholds | 🔜 | Platt/beta, per-target thresholds, conformal uncertainty |
@@ -301,12 +301,13 @@ python -m venv .venv
 pip install -r requirements.txt
 
 python scripts/download_data.py             # fetch + checksum the UCI dataset
-pytest -q                                   # 37 tests
+pytest -q                                   # 40 tests
 
 python -m ml.eda                            # EDA tables + figures      (~12 min)
 python -m ml.run_baselines                  # P1 baselines              (~1 min)
 python -m ml.run_features                   # P2 feature ablation       (~15 min)
 python -m ml.run_models --target lcx        # P3 zoo + tuning, per target (~20 min)
+python -m ml.run_strategies                 # P4 multi-label strategies (~10 min)
 python -m ml.report_figures                 # README figures            (seconds)
 ```
 
@@ -325,11 +326,12 @@ Every scored run is appended to [`reports/experiments.csv`](reports/experiments.
 │   ├── features.py      # F1 cleaning + engineered features (pre-test probability, …)
 │   ├── preprocess.py    # fold-fitted linear preprocessing
 │   ├── models.py        # model registry, search spaces, seed bagging
+│   ├── strategies.py    # hierarchical + stacked multi-label strategies
 │   ├── cv.py            # fixed folds, CV runner, OOF store, experiment log
 │   ├── evaluate.py      # metrics, bootstrap CIs, calibration, corrected paired test
-│   ├── eda.py · run_baselines.py · run_features.py · run_models.py · report_figures.py
+│   ├── eda.py · run_baselines.py · run_features.py · run_models.py · run_strategies.py · report_figures.py
 │   └── viz.py           # shared chart style
-├── reports/             # EDA.md, PHASE2_FEATURES.md, PHASE3_MODELS.md, tables, figures, leaderboards
+├── reports/             # EDA.md, PHASE2–4 reports, tables, figures, leaderboards
 ├── scripts/download_data.py
 ├── tests/               # leakage, folds, metrics, features, models
 └── plan.md
