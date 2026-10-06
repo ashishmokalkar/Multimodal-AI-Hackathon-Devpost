@@ -1,0 +1,13 @@
+target,ext_model,n_uci,uci_prevalence,transfer_auc
+cad,logreg,899,0.5506,0.7142
+cad,lightgbm,899,0.5506,0.6778
+cad,within_zalizadeh_cv,0,,0.8378
+lad,logreg,605,0.4727,0.6444
+lad,lightgbm,605,0.4727,0.6325
+lad,within_zalizadeh_cv,0,,0.7377
+lcx,logreg,605,0.3884,0.6663
+lcx,lightgbm,605,0.3884,0.6323
+lcx,within_zalizadeh_cv,0,,0.7041
+rca,logreg,604,0.3891,0.6266
+rca,lightgbm,604,0.3891,0.5989
+rca,within_zalizadeh_cv,0,,0.7003

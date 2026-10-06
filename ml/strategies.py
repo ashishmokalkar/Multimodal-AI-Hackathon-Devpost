@@ -93,3 +93,38 @@ class Hierarchical:
         else:
             p_cad = clone(self.cad.model).fit(self.cad.X.iloc[tr], self.cad.y[tr]).predict_proba(self.cad.X.iloc[te])[:, 1]
         return p_cad * p_cond
+
+
+@dataclass
+class Pooled:
+    """Train on the Z-Alizadeh training fold plus external (UCI) patients; test on Z-Alizadeh only.
+
+    External rows are aligned to the training columns (NaN where they have no equivalent), flagged
+    with `source_uci = 1` and down-weighted by `weight`. Linear-family models get a median imputer
+    with missing-value indicators in front; tree models handle NaN natively.
+    """
+    model: object
+    X_ext: pd.DataFrame
+    y_ext: np.ndarray
+    weight: float = 0.5
+    impute: bool = False
+
+    def _with_source(self, X: pd.DataFrame, flag: int) -> pd.DataFrame:
+        return X.assign(source_uci=flag)
+
+    def __call__(self, X_tr, y_tr, X_te, tr, te) -> np.ndarray:
+        from sklearn.impute import SimpleImputer
+        from sklearn.pipeline import Pipeline
+
+        from ml.models import fit_weighted
+
+        ext = self.X_ext.reindex(columns=X_tr.columns)
+        X_fit = pd.concat([self._with_source(X_tr, 0), self._with_source(ext, 1)], ignore_index=True)
+        y_fit = np.concatenate([y_tr, self.y_ext])
+        w = np.concatenate([np.ones(len(y_tr)), np.full(len(self.y_ext), self.weight)])
+        model = clone(self.model)
+        if self.impute:
+            imputer = SimpleImputer(strategy="median", add_indicator=True, keep_empty_features=True)
+            model = Pipeline([("impute", imputer.set_output(transform="pandas")), ("est", model)])
+        fit_weighted(model, X_fit, y_fit, w)
+        return model.predict_proba(self._with_source(X_te, 0))[:, 1]

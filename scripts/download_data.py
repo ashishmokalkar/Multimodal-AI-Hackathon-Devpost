@@ -43,6 +43,21 @@ DATASETS: dict[str, Dataset] = {
         files={"extention of Z-Alizadeh sani dataset.xlsx": "z_alizadeh_sani_ext.xlsx"},
         file_sha256={"z_alizadeh_sani_ext.xlsx": "739343245c2ba578b541370217531750d8e936022f928b83e0d91756caa3ff0b"},
     ),
+    # External data (UCI id 45): raw 76-attribute files include per-vessel angiography columns.
+    "uci_heart_disease": Dataset(
+        url="https://archive.ics.uci.edu/static/public/45/heart+disease.zip",
+        zip_sha256="b17cd273da9ce1caa4710fce80227ea454d4dbf9fcbc8e6a9121672751563adc",
+        files={name: name for name in ["cleveland.data", "hungarian.data", "switzerland.data", "long-beach-va.data",
+                                       "heart-disease.names", "WARNING"]},
+        file_sha256={
+            "cleveland.data": "9278214845d1cf45cdce6404038b232ce23dedaf801709650712f6d145d1b7b7",
+            "hungarian.data": "b8e4bbd06b9bf9ec831c992ba397639f22815e525c43b489e1a6e75b3be29a75",
+            "switzerland.data": "fe1618a50ec2fc99f57ec1ca3fa93bd1fcad93b9daf92d49704476e3a3e4d0b2",
+            "long-beach-va.data": "16d44b28ccb139d07509ee17f22c51fcd568caea8beb607d1503e4a679133353",
+            "heart-disease.names": "ec7ed5aa4ed8321097808f47b836301c2a0c36f3bb09c40b8b43b622363e6b61",
+            "WARNING": "01ae7cb6ab43a387b206f7127ce81869639d9d3076d447c12d7df17ad583f954",
+        },
+    ),
 }
 
 

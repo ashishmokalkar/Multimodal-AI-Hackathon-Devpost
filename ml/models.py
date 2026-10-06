@@ -19,6 +19,7 @@ from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
 from ml.preprocess import linear_pipeline
@@ -43,15 +44,27 @@ class SeedBag(ClassifierMixin, BaseEstimator):
         self.params = params
         self.n_seeds = n_seeds
 
-    def fit(self, X, y):
+    def fit(self, X, y, sample_weight=None):
         spec = REGISTRY[self.name]
         seeds = range(self.n_seeds) if spec.stochastic else [0]
-        self.models_ = [spec.build(self.params, SEED + s).fit(X, y) for s in seeds]
+        self.models_ = [fit_weighted(spec.build(self.params, SEED + s), X, y, sample_weight) for s in seeds]
         self.classes_ = np.array([0, 1])
         return self
 
     def predict_proba(self, X):
         return np.mean([m.predict_proba(X) for m in self.models_], axis=0)
+
+
+def fit_weighted(model, X, y, sample_weight=None):
+    """Fit with per-row weights, routing them to the final estimator of (nested) Pipelines."""
+    if sample_weight is None:
+        return model.fit(X, y)
+    path, inner = [], model
+    while isinstance(inner, Pipeline):
+        name, inner = inner.steps[-1]
+        path.append(name)
+    key = "__".join(path + ["sample_weight"]) if path else "sample_weight"
+    return model.fit(X, y, **{key: sample_weight})
 
 
 def make(name: str, params: dict | None = None, n_seeds: int = 1):
@@ -106,7 +119,11 @@ def _catboost(p, seed):
 
 
 def _ebm(p, seed):
+    import warnings
+
     from interpret.glassbox import ExplainableBoostingClassifier
+    # Pooled external data has NaNs by design; EBM handles them but warns on every fit.
+    warnings.filterwarnings("ignore", message="Missing values detected", module="interpret")
     return ExplainableBoostingClassifier(**p, random_state=seed, n_jobs=1)
 
 

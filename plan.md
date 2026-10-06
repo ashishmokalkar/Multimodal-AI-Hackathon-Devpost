@@ -13,7 +13,8 @@ We win by **(a) a real gain on LCX and RCA, and (b) validation rigour that stand
 | P2 Features | ✅ | 0.932 / 0.849 / 0.764 / 0.736 | [PHASE2_FEATURES.md](reports/PHASE2_FEATURES.md) |
 | P3 Model zoo + tuning | ✅ | **0.939 / 0.861 / 0.772 / 0.752** | [PHASE3_MODELS.md](reports/PHASE3_MODELS.md) |
 | P4 Multi-label strategy | ✅ | no significant gain; S0 kept, S1 = calibrated, consistent ensemble candidate | [PHASE4_STRATEGIES.md](reports/PHASE4_STRATEGIES.md) |
-| P5 External data (UCI) | ⏳ next | | |
+| P5 External data (UCI) | ✅ | no gain: cohort shift (transfer AUC 0.63–0.71); pooling hurts, UCI-score feature neutral | [PHASE5_EXTERNAL.md](reports/PHASE5_EXTERNAL.md) |
+| P6/P7 Selection + ensembling | ⏳ next | | |
 
 ---
 
