@@ -33,4 +33,11 @@ Tasks
 - Confirm whether all five contract endpoints, including `/model/metrics`, will be served or whether metrics will be delivered as a static artifact. Experimental metrics must not be presented as final deployed-model metrics.
 - Samples remain synthetic; no real-model integration or backend sign-off is claimed. Carry the remaining parts of Q1–Q3 in `docs/spec.md` §12.
 
+**Self-check gate (planning evidence, not implementation):**
+
+- Record the S2 start timestamp and deduplicated O+X credit baseline; define phase estimates whose combined allocation fits the 1800-credit sprint cap and remaining project budget.
+- Write measurable acceptance criteria for prediction-driven vessel colours, viewer/results selection synchronisation, camera presets, legend, and selected-vessel detail, including loading/error/stale-result behaviour.
+- Record M's contract response and API delivery date, plus video/document owners, or explicitly identify unanswered items, owners, next actions, and affected dependencies. Missing answers are not sign-off; any required deferral needs H approval.
+- Update this plan and any affected specification/decisions with delivery phases, atomic tasks, evidence requirements, self-check gates, human gates, and a final retrospective/cleanup phase. No implementation starts during Phase 0.
+
 **Human gate:** H approves the Phase 0 scope, acceptance criteria, dependencies, estimates, and delivery gates before any S2 implementation begins. Gate 4 must be approved before Phase 0 starts.
