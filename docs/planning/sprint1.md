@@ -27,7 +27,7 @@ The Python credits command is blocked by Windows application control in both O's
 
 **Updated reported closeout:** 1301.3 total (O 1237.1, X 64.2), making X's Phase 3 delta 26.8. **Gate 3 review snapshot (latest recorded event 2026-10-08 20:14 UTC):** 1320.3 total (O 1255.2, X 65.1), leaving 179.7 under the Sprint 1 cap and 5679.7 overall, before subsequent calls. These are successive snapshots, not additional allocations. Phase-level O estimates above remain approximate; reconcile the sprint from the deduplicated aggregate, not their sum.
 
-**Final S1 closeout snapshot (latest recorded event 2026-10-08 20:26:55 UTC):** O 1282.1 credits; X 72.5 credits; combined 1354.6. This leaves 145.4 under the 1500-credit S1 cap and 5645.4 under the 7000-credit project budget. Read-only local telemetry was deduplicated using the fields and repository-path filter in `scripts/credits.py`; it is not account-billing reconciliation. Historical snapshots above are retained, and Phase 4 is not assigned an invented per-phase O cost.
+**Final S1 closeout snapshot (latest recorded event 2026-10-08 20:28:30 UTC):** O 1282.1 credits; X 74.6 credits; combined 1356.7. This leaves 143.3 under the 1500-credit S1 cap and 5643.3 under the 7000-credit project budget. Since the handover's 20:20 UTC checkpoint, X's deduplicated local session delta was 9.5 credits, within the 30-credit closeout target. Read-only local telemetry was deduplicated using the fields and repository-path filter in `scripts/credits.py`; it is not account-billing reconciliation. Historical snapshots above are retained, and Phase 4 is not assigned an invented per-phase O cost.
 
 ---
 

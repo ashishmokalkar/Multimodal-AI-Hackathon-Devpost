@@ -32,15 +32,15 @@ This leaves **179.7** under the 1500-credit Sprint 1 cap and **5679.7** under th
 
 X's reported Phase 3 closeout delta was **26.8**, below its 120-credit limit. Earlier per-phase O figures are estimates, not an exact partition of sprint spend. Do not invent phase actuals or infer the current model's pricing from historical multipliers.
 
-**Final S1 closeout snapshot (latest recorded event 2026-10-08 20:26:55 UTC):**
+**Final S1 closeout snapshot (latest recorded event 2026-10-08 20:28:30 UTC):**
 
 | Session | Deduplicated local credits |
 |---|---:|
 | O — Hackathon frontend planning | 1282.1 |
-| X — Frontend scaffold | 72.5 |
-| **Combined** | **1354.6** |
+| X — Frontend scaffold | 74.6 |
+| **Combined** | **1356.7** |
 
-The refreshed aggregate leaves **145.4** under the 1500-credit S1 cap and **5645.4** under the 7000-credit project budget. The read-only local query followed `scripts/credits.py`'s repository-path filter and event de-duplication fields. This is local telemetry, not account-billing reconciliation. Historical snapshots above and in `docs/planning/sprint1.md` are retained; Phase 4 has no separately attributed O actual.
+The refreshed aggregate leaves **143.3** under the 1500-credit S1 cap and **5643.3** under the 7000-credit project budget. Since the handover's 20:20 UTC checkpoint, X's deduplicated local session delta was **9.5** credits, within the 30-credit closeout target. The read-only local query followed `scripts/credits.py`'s repository-path filter and event de-duplication fields. This is local telemetry, not account-billing reconciliation. Historical snapshots above and in `docs/planning/sprint1.md` are retained; Phase 4 has no separately attributed O actual.
 
 ## Actions
 
