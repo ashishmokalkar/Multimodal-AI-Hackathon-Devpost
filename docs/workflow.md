@@ -9,7 +9,7 @@
 | **Human (H)** | Faizan | Owns product direction, approves human gates, forwards handovers to the executor, reports blockers from the ML colleague. |
 | **Orchestrator (O)** | Copilot agent in planning session | Research, brainstorming, sprint/phase planning, writing `plan.md`/`spec.md`/`decisions.md`, drafting executor handovers, reviewing executor output against gates, retros, budget tracking. **Does not implement features.** |
 | **Executor (X)** | Copilot agent in implementation session | Implements atomic tasks from a handover, runs lint/build/tests, commits to `frontend`, reports back with evidence against the self-check criteria. |
-| **ML colleague (M)** | Ashish | Owns dataset, models, FastAPI backend on `ml` branch. Signs off on the API contract. |
+| **ML colleague (M)** | Ashish | Owns dataset, models, FastAPI backend on `ML-dev` (the actual branch name verified Oct 8). Signs off on the API contract. |
 
 All handovers O → X and X → O pass **through H in chat**. No agent spawns sub-agents without H's explicit approval.
 
@@ -17,7 +17,7 @@ All handovers O → X and X → O pass **through H in chat**. No agent spawns su
 
 - **Deadline:** 14 Oct 2026, 20:45 CEST (Devpost: 15 Oct 00:15 IST). Oct 14 is submission-only buffer.
 - **Budget:** 7000 Copilot credits for O + X combined. Per-sprint caps live in `plan.md`. Exceeding a sprint cap requires an explicit H decision logged in `decisions.md`.
-- **Branches:** `main` ← `dev` ← `frontend` (ours) / `ml` (colleague). We only commit to `frontend`. Merges to `dev` happen at sprint end via PR after H approval.
+- **Branches:** `main` ← `dev` ← `frontend` (ours) / `ML-dev` (colleague). We only commit to `frontend`. Merges to `dev` happen at sprint end via PR after H approval.
 
 ## 3. Artefacts
 
@@ -91,13 +91,14 @@ Estimated credits used: <from Copilot usage if visible>
 ## 8. Credit discipline (see D-008, D-011, D-014)
 
 - **Measure, don't guess:** `python scripts/credits.py` (all-time, per session) · `--since <sprint start>` for a sprint · `--by-day`. Both O and X run it at every gate and paste the TOTAL line in their report.
-- **Model economics (measured S1):** orchestrator on a 15× model ≈ 11 credits/call; executor on a 1× model ≈ 0.15 credits/call. **Orchestrator calls are the scarce resource.** Therefore:
+- **Historical model economics (early S1, not current pricing):** orchestrator on a 15× model ≈ 11 credits/call; executor on a 1× model ≈ 0.15 credits/call. O accounts for approximately 95% of the Oct 8 gate-review snapshot; do not infer current model multipliers or call costs from those earlier measurements. **Orchestrator calls are the scarce resource.** Therefore:
   - O verifies through X's evidence, not by re-running checks itself. If something needs checking, X does it (70 executor calls ≈ 1 orchestrator call).
   - O keeps the chat planning-only; no exploratory file reads unless gating a decision.
   - Prefer **few, large, self-contained handovers** over many small ones.
   - Context size drives per-call cost; H triggers `/compact` on O when context gets heavy; start a fresh O session at each sprint's Phase 0.
   - X batches tool calls and avoids narration.
-- Model choice: X uses the default (1×) model. O model is H's call per sprint (D-014); whichever model, O keeps its call count low.
+- Model choice: X uses its configured default; the earlier 1× rate is historical. O model is H's call per sprint (D-014, D-020); H retained the current orchestrator for S2. Whichever model, O keeps its call count low and does not switch models automatically.
+- If application control blocks the Python credits command, use the permitted read-only local session-store interface with the script's deduplication fields and project filter. Do not retry the blocked interpreter or work around the policy. Report the snapshot timestamp and distinguish local telemetry from account billing.
 
 ## 9. Engineering conventions
 
