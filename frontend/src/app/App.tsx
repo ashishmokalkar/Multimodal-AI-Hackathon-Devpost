@@ -68,7 +68,16 @@ function AppContent() {
         <p>{DISCLAIMER_TEXT}</p>
         <div className="footer-credits">
           <div>Dataset credit: pending</div>
-          <div>Asset licences: pending</div>
+          <div>
+            Heart asset:{" "}
+            <a
+              href="/models/ATTRIBUTION.md"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Realistic Human Heart by neshallads (CC BY 4.0)
+            </a>
+          </div>
         </div>
       </footer>
 
