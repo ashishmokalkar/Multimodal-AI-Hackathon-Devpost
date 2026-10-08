@@ -15,7 +15,7 @@ Status legend: ⬜ not started · 🔄 in progress · ✅ self-check passed · �
 | 0 Discussion & research | O+H | 300 | 380 | 15x orchestrator model; doc-writing calls 10-30 each |
 | 1 Scaffold | X | 250 | 13 (X) + ~280 (O review) | X on 1x model is ~0.15/call; O review dominated -> D-014 |
 | 2 API contract + mock | X | 350 | 21 (X) + ~370 (O) | O cost dominated by cache-miss calls after long pasted reports (~100 each); X halt on auto-fixable lint → D-015 |
-| 3 3D asset spike | X | 400 | 20.6 | X local-telemetry delta from kickoff; O budget for P3+P4 review remains ≤250 and is not included. |
+| 3 3D asset spike | X | 400 | 24.3 | X local-telemetry delta from kickoff; O budget for P3+P4 review remains ≤250 and is not included. |
 | 4 Retro & cleanup | O+H | 100 | | |
 | **Total** | | **1400** | | cap 1500 → 100 slack |
 
@@ -23,7 +23,7 @@ Status legend: ⬜ not started · 🔄 in progress · ✅ self-check passed · �
 
 The Python credits command is blocked by Windows application control in both O's and X's shells. The snapshots below were obtained through the read-only local session-store tool, using the script's event-deduplication fields. Do not work around the application-control policy or retry the script; local telemetry is not a reconciliation against account billing.
 
-**Phase 3 kickoff refresh (2026-10-08):** 1258.9 credits total (O 1221.5, X 37.4), leaving 241.1 under the Sprint 1 cap. **Phase 3 closeout snapshot (2026-10-08 19:59 UTC):** 1295.1 total (O 1237.1, X 58.0); X's delta from kickoff is 20.6, within the 120-credit limit. Remaining Sprint 1 cap at this snapshot: 204.9 for the pending review and retrospective.
+**Phase 3 kickoff refresh (2026-10-08):** 1258.9 credits total (O 1221.5, X 37.4), leaving 241.1 under the Sprint 1 cap. **Phase 3 closeout snapshot (2026-10-08 20:00 UTC):** 1298.8 total (O 1237.1, X 61.7); X's delta from kickoff is 24.3, within the 120-credit limit. Remaining Sprint 1 cap at this snapshot: 201.2 for the pending review and retrospective.
 
 ---
 
