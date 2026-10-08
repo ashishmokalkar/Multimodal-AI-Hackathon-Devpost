@@ -95,7 +95,7 @@ Estimated credits used: <from Copilot usage if visible>
   - O verifies through X's evidence, not by re-running checks itself. If something needs checking, X does it (70 executor calls ≈ 1 orchestrator call).
   - O keeps the chat planning-only; no exploratory file reads unless gating a decision.
   - Prefer **few, large, self-contained handovers** over many small ones.
-  - Context size drives per-call cost; H triggers `/compact` on O when context gets heavy; start a fresh O session at each sprint's Phase 0.
+  - Context size drives per-call cost; H triggers `/compact` on O when context gets heavy; start a fresh O session at each sprint's Phase 0 unless H explicitly chooses a compacted continuation. D-023 authorises continuing this session for S2 after `/compact`.
   - X batches tool calls and avoids narration.
 - Model choice: X uses its configured default; the earlier 1× rate is historical. O model is H's call per sprint (D-014, D-020); H retained the current orchestrator for S2. Whichever model, O keeps its call count low and does not switch models automatically.
 - If application control blocks the Python credits command, use the permitted read-only local session-store interface with the script's deduplication fields and project filter. Do not retry the blocked interpreter or work around the policy. Report the snapshot timestamp and distinguish local telemetry from account billing.

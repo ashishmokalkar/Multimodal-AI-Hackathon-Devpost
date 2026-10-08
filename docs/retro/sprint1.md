@@ -1,6 +1,6 @@
 # Sprint 1 Retrospective - Foundation
 
-**Status:** Sprint 1 retrospective and executor closeout are complete, 2026-10-08. Gate 3 and the remaining calendar/S2 model choice are approved. The authorised baseline PR is open; Gate 4 remains pending H approval.
+**Status:** Sprint 1 is closed, 2026-10-08. Gate 4 is approved (D-022), along with Gate 3 and the calendar/S2 model choice. The baseline PR is open; H deferred merge until after discussions. S2 Phase 0 starts after `/compact` tonight in this same session (D-023); no S2 planning or delivery work has started yet.
 
 ## What went well
 
@@ -42,12 +42,14 @@ X's reported Phase 3 closeout delta was **26.8**, below its 120-credit limit. Ea
 
 The refreshed aggregate leaves **143.3** under the 1500-credit S1 cap and **5643.3** under the 7000-credit project budget. Since the handover's 20:20 UTC checkpoint, X's deduplicated local session delta was **9.5** credits, within the 30-credit closeout target. The read-only local query followed `scripts/credits.py`'s repository-path filter and event de-duplication fields. This is local telemetry, not account-billing reconciliation. Historical snapshots above and in `docs/planning/sprint1.md` are retained; Phase 4 has no separately attributed O actual.
 
+**Gate 4 transition snapshot (latest recorded event 2026-10-08 20:36:50 UTC):** O **1305.7**, X **75.5**, combined **1381.2**; **118.8** remain under the S1 cap and **5618.8** overall, before subsequent documentation/compaction-handoff calls. Refresh at the actual S2 start after `/compact`; record a timestamp and cumulative baseline rather than using whole-session O/X totals as S2 actuals.
+
 ## Actions
 
 | Action | Owner | When |
 |---|---|---|
 | Replace the stale app-footer asset-licence placeholder with the existing attribution/link | X | S1 cleanup (done) |
-| Retain the current orchestrator for S2 (D-020); use a fresh planning session and keep reports concise and reviews evidence-driven | H/O | S2 planning |
+| Retain the current orchestrator for S2 (D-020); H chose `/compact` and continuation in the existing session (D-023); keep reviews concise and evidence-driven | H/O | S2 planning |
 | Archive the S1 plan, prepare only S2 Phase 0, and reconcile final credits | O/X | Before Gate 4 (done) |
 | Open the stable `frontend` to `dev` PR authorised by H (D-021); no automatic merge | X/H | S1 closeout (done; no automatic merge) |
 | Obtain M's serving-contract acknowledgement and a concrete API delivery date | H/M | S2 Phase 0 |
@@ -58,6 +60,8 @@ The refreshed aggregate leaves **143.3** under the 1500-credit S1 cap and **5643
 ## Approved remaining calendar
 
 Approved by H on 2026-10-08 (D-019): preserve all phase gates and existing sprint caps; Oct 14 remains submission buffer.
+
+H advanced only S2 Phase 0 to Oct 8 after `/compact` and deferred the baseline PR merge until after discussions (D-023). Delivery remains planned for Oct 9 and needs the Phase 0 human gate.
 
 | Window | Work |
 |---|---|
@@ -75,11 +79,11 @@ Do not add another asset search or expand the feature scope. M's delivery timing
 - H retained the current orchestrator for S2 (D-020); no automatic model change.
 - H authorised X to open the baseline PR after cleanup (D-021), not to merge it.
 - H/M: agree backend delivery timing and submission owners.
-- H: approve Gate 4 only after closeout evidence and the baseline PR exist.
+- H approved Gate 4 after closeout evidence and the baseline PR existed (D-022); PR merge remains pending until after discussions (D-023).
 
 ## Final closeout state
 
 - The footer retains the clinical disclaimer and now links to the local attribution for *Realistic Human Heart* by neshallads (CC BY 4.0).
-- The S1 plan is archived at `docs/planning/sprint1.md`. `docs/planning/plan.md` contains the unstarted Sprint 2 Phase 0 skeleton only; it does not authorize Phase 0 or delivery.
+- The S1 plan is archived at `docs/planning/sprint1.md`. `docs/planning/plan.md` contains the unstarted Sprint 2 Phase 0 skeleton only, with both self-check and human gates. H authorised Phase 0 after `/compact` tonight, not delivery.
 - `docs/spec.md` contains no remaining `[TBD-S1]` markers. Its unresolved backend sign-off, feature-name/encoding/unit, threshold, explanation-scale, metrics-serving, and submission-ownership questions remain open; synthetic samples and the mock-only state are not described as real-model integration.
-- The stable baseline PR is open from `frontend` to `dev`, titled **Sprint 1: foundation**. H must approve Gate 4 before S2 Phase 0.
+- [Baseline PR #1](https://github.com/ashishmokalkar/Multimodal-AI-Hackathon-Devpost/pull/1) is open from `frontend` to `dev`, titled **Sprint 1: foundation**. Gate 4 is approved; H deferred PR merge until after discussions.

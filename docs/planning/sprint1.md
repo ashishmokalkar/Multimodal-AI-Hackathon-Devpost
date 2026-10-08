@@ -2,6 +2,8 @@
 
 Status legend: ⬜ not started · 🔄 in progress · ✅ self-check passed · 🔒 human gate approved
 
+**Closed 2026-10-08:** All phase human gates are approved, including Gate 4 (D-022). Baseline PR #1 is open from `frontend` into `dev`; H deferred its merge until after discussions. S2 Phase 0 is authorised after `/compact` tonight (D-023), with no delivery work started.
+
 **Resumed 2026-10-08:** The original sprint dates have elapsed. Finish the remaining asset spike and retrospective before starting Sprint 2; revise the remaining calendar at the retrospective without skipping gates or increasing the credit cap.
 
 **Sprint goal:** De-risk the project. Repo + docs system live, frontend scaffold runs, API contract agreed with a working mock, and the 3D heart asset question is answered (D-012).
@@ -28,6 +30,8 @@ The Python credits command is blocked by Windows application control in both O's
 **Updated reported closeout:** 1301.3 total (O 1237.1, X 64.2), making X's Phase 3 delta 26.8. **Gate 3 review snapshot (latest recorded event 2026-10-08 20:14 UTC):** 1320.3 total (O 1255.2, X 65.1), leaving 179.7 under the Sprint 1 cap and 5679.7 overall, before subsequent calls. These are successive snapshots, not additional allocations. Phase-level O estimates above remain approximate; reconcile the sprint from the deduplicated aggregate, not their sum.
 
 **Final S1 closeout snapshot (latest recorded event 2026-10-08 20:28:30 UTC):** O 1282.1 credits; X 74.6 credits; combined 1356.7. This leaves 143.3 under the 1500-credit S1 cap and 5643.3 under the 7000-credit project budget. Since the handover's 20:20 UTC checkpoint, X's deduplicated local session delta was 9.5 credits, within the 30-credit closeout target. Read-only local telemetry was deduplicated using the fields and repository-path filter in `scripts/credits.py`; it is not account-billing reconciliation. Historical snapshots above are retained, and Phase 4 is not assigned an invented per-phase O cost.
+
+**Gate 4 transition snapshot (latest recorded event 2026-10-08 20:36:50 UTC):** O 1305.7; X 75.5; combined 1381.2. Remaining S1 cap: 118.8; remaining project budget: 5618.8, before subsequent documentation/compaction-handoff calls. At the actual S2 start after `/compact`, refresh the cumulative total and record a timestamp/baseline so reused-session totals are not mistaken for S2 spend.
 
 ---
 
@@ -138,7 +142,7 @@ Human gate — **Approved by H on 2026-10-08:** "Approve Gate 3 and proceed to r
 
 ---
 
-## Phase 4 — Retro & cleanup ✅ self-check passed (awaiting human gate)
+## Phase 4 — Retro & cleanup 🔒 (approved 2026-10-08)
 
 **Goal:** Learn, archive, hand a clean baseline to Sprint 2.
 
@@ -153,9 +157,9 @@ Tasks
 - [x] Open the H-authorised `frontend` → `dev` PR (D-021; title "Sprint 1: foundation"); H merges after Gate 4. Local quality checks are the gate; CI remains informational per D-013
 
 Self-check gate: closeout documentation and footer are committed and pushed; local frontend checks pass; the authorised PR is open.
-Human gate — "GATE 4 APPROVED" closes the sprint. **Pending H approval; no Sprint 2 Phase 0 or delivery work has started.**
+Human gate — **Approved by H on 2026-10-08:** "Approve Gate 4 and record/push the transition" (D-022). No Sprint 2 Phase 0 or delivery work has started; Phase 0 begins after `/compact` per H (D-023).
 
-**Closeout outcome:** The retrospective, footer attribution, archived plan, and Phase 0-only Sprint 2 plan are complete. The final deduplicated local telemetry snapshot is recorded above and in `docs/retro/sprint1.md`. The authorised baseline PR is open; Gate 4 remains pending H approval. O's known planning/documentation edits were preserved in the closeout commit.
+**Closeout outcome:** The retrospective, footer attribution, archived plan, and Phase 0-only Sprint 2 plan are complete. O added and pushed the missing Phase 0 self-check definition in `1eb9917`. Deduplicated local telemetry snapshots are recorded above and in `docs/retro/sprint1.md`. [Baseline PR #1](https://github.com/ashishmokalkar/Multimodal-AI-Hackathon-Devpost/pull/1) is open; Gate 4 is approved, but H deferred merge until after discussions. O's known planning/documentation edits were preserved in the closeout commit.
 
 ---
 
