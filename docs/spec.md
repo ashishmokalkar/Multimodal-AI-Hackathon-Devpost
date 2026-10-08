@@ -43,6 +43,11 @@ Single-page app, desktop-first (≥1280 px), degrades to stacked layout on table
 
 First load shows a **modal disclaimer** that must be acknowledged. Banner and footer disclaimers are always visible.
 
+S2's approved sequencing (D-024) delivers readable CAD/vessel summaries and a
+selected-target top-driver/value list before the full gauge/tabs/charts/metrics
+experience in S3. Basic camera focus/reset supports the core demo flow; decorative
+controls and elaborate transitions are not priorities. Delivery remains gated.
+
 ## 4. Architecture
 
 ```
@@ -63,7 +68,14 @@ mock-api/ (FastAPI)
 docs/api-contract.md
 ```
 
-Data flow: form edit → `patientStore` → debounced `usePredict` (TanStack Query mutation) → `PredictionResponse` → (a) `results/*` render, (b) `viewer` maps `vessels[id].probability` → colour via `colorScale`, (c) selecting a vessel in either panel sets `uiStore.selectedVessel` so 3D and results stay in lock-step (brief: "consistent correspondence").
+Data flow: form edit → `patientStore` → debounced `usePredict` (TanStack Query mutation) → one fresh, validated `PredictionResponse` → (a) `results/*` render, (b) `viewer` maps `vessels[id].probability` → colour via `colorScale`, (c) selecting a vessel in either panel sets `uiStore.selectedVessel` so 3D, results and target explanations stay in lock-step (brief: "consistent correspondence"). CAD/clear resets the selected target to CAD. Selection itself does not reposition the camera.
+
+S2 acceptance requires a shared availability state: editing inputs or changing/resetting
+the sample clears prior prediction detail immediately; pending/retry/error states
+show no old probabilities or contributions, and unavailable vessels use a neutral
+colour rather than a success-shaped default. A selected anatomical target may
+persist without risk detail. Older request successes/errors must not overwrite a
+newer input revision or request, including during the debounce interval.
 
 Extensibility (brief §Technical Considerations): new feature → appears automatically via `GET /features`; new vessel → add entry to `vesselMap.ts` + mesh node name; new model → backend only, metrics drawer is schema-driven.
 
@@ -87,18 +99,20 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 
 - Heart asset: `frontend/public/models/heart.glb`, *Realistic Human Heart* by neshallads, CC BY 4.0. The upstream GLB has one heart mesh and no separately addressable coronary arteries. The runtime wraps it in a named `Heart` group.
 - Vessel geometry: D-012's approved fallback is active. Project-authored `TubeGeometry` meshes named `LAD`, `LCX`, and `RCA` follow hand-authored `CatmullRomCurve3` paths. They are schematic, not patient-specific lesion maps. Static values LAD 0.80, LCX 0.30, and RCA 0.55 are illustrative test values, not live predictions.
+- S2 replaces those runtime static values with the current accepted prediction's per-vessel probabilities. Until that gated work is complete, the static S1 viewer remains the implementation baseline. Mock-driven updates must be labelled mock, not real-model integrated.
 - Loading: `useGLTF` (drei); use Draco only if needed and serve its decoder locally. `<Bounds fit>` on load; `frameloop="demand"`; `dpr={[1, 1.5]}`. No runtime asset/decoder CDN calls.
-- Colour mapping: probability → `d3-scale`-style interpolation green (#2e7d32) → amber (#f9a825) → red (#c62828), with vessel labels and numeric values as a secondary encoding.
-- Interaction: `OrbitControls` (damped), hover → emissive highlight + tooltip, click → select (outline via `@react-three/postprocessing` or emissive) and camera preset flyTo (anterior for LAD, lateral for LCX, inferior for RCA).
+- Colour mapping: probability → `d3-scale`-style interpolation green (#2e7d32) → amber (#f9a825) → red (#c62828), with vessel labels and numeric values as a secondary encoding. The continuous legend shows 0-100% predicted probability, not clinical severity cutoffs or percentage artery narrowing; unavailable values have a distinct neutral encoding.
+- Interaction: `OrbitControls` (damped), hover → emissive highlight + tooltip, click → select using the existing emissive highlight and shared results selection. Keyboard-operable result controls provide an alternative to 3D picking. Basic manual LAD/LCX/RCA focus presets and Reset frame the schematic geometry without automatic camera jumps or unverified anatomical-view labels; elaborate flyTo animation is not S2 scope.
 - Performance target: ≥50 fps during active rendering/interaction at 1080p; heart plus vessels ≤150k triangles total; GLB ≤8 MB. Phase 3 measured results are recorded with the evidence for the Gate 3 handoff.
 - Loading/error states are shown explicitly. The GLB and all its embedded textures are local; no runtime asset or decoder CDN is used.
 
 ## 7. Interpretability presentation
 
+- **S2 minimum:** CAD drivers by default, selected-vessel drivers on selection. Show up to five signed contributions sorted by absolute magnitude with deterministic ties, readable feature labels, entered values from the accepted response/submitted snapshot, and units from feature metadata. Explain unavailable/empty lists explicitly. Mock contributions remain visibly illustrative; values on an unconfirmed scale are not labelled probability-point changes or verified SHAP. No additive waterfall is required in S2.
 - **Why? tab**: horizontal bar / waterfall of top-10 `contributions` for the selected target (CAD by default; switches to vessel on selection). Red = pushes toward disease, blue = protective. Shows `base_value` and final probability.
 - Explanation scale must be agreed with M: the ML roadmap proposes logit-scale attributions. Do not add them to a probability-scale base or present them as probability-point changes. A waterfall may imply additivity only when the base, contributions and endpoint use the same documented scale; the final probability remains a separate labelled value.
-- **Vitals tab**: table of every feature: value entered, reference range (from `FeatureSchema.min/max` or a curated `referenceRanges.ts`), contribution bar, out-of-range flag.
-- Plain-language sentence generated client-side: "Top drivers for LAD risk: Typical chest pain (+0.21), Age 67 (+0.09), …".
+- **Vitals tab (S3):** table of features, entered values and model contributions. `FeatureSchema.min/max` are input-validation bounds, not clinical reference intervals. Clinical normal ranges/out-of-range claims require a separately sourced, agreed reference dataset; otherwise show units and values without normal/abnormal classification.
+- Plain-language summaries describe model drivers, not disease causation, and identify the attribution scale. Do not describe an unconfirmed signed contribution as a change in disease probability.
 
 ## 8. Clinical safety
 
