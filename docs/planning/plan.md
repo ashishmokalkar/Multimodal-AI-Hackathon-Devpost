@@ -2,7 +2,7 @@
 
 **Calendar:** Phase 0 started Oct 8 after `/compact`, per H (D-023). H approved Gate 0 and authorised Phase 1 tonight, Oct 8 (D-025); S2 completion remains targeted for Oct 9. S3 remains Oct 10-11, S4 Oct 12-13, and Oct 14 submission-only buffer.
 
-**Status:** Phase 0 self-check passed and human Gate 0 is approved (D-025), including detailed criteria, allocations, and explicit external-dependency deferrals. Phase 1 is authorised tonight and awaits H forwarding the handover to X; no delivery work has started in this planning session. Phases 2/3 remain gated. The baseline PR remains unmerged until H separately authorises merge.
+**Status:** Phase 0 self-check passed and human Gate 0 is approved (D-025), including detailed criteria, allocations, and explicit external-dependency deferrals. Phase 1 implementation has been delivered and awaits Gate 1 review. Its live mock-flow evidence is blocked because Windows Application Control denied the local `uvicorn.exe`; the gate is not passed. Phases 2/3 remain gated. The baseline PR remains unmerged until H separately authorises merge.
 
 **Sprint cap:** 1800 credits (D-008). S2 accounting starts **2026-10-08 20:43:11.531 UTC** (22:43 CEST), at H's start instruction. Deduplicated project events before that boundary total **1407.9373** credits: O **1331.0196**, X **76.9177**. This includes the remaining S1 transition/compaction work and leaves **92.0627** under S1's 1500 cap and **5592.0627** under the project cap at S2 start. These are local telemetry figures, not account-billing reconciliation.
 
@@ -78,7 +78,7 @@ These remain unanswered, not completed or signed off. H explicitly approved defe
 
 **Human gate 0 (approved):** H selected "Approve Gate 0 and authorise Phase 1 tonight (Recommended)", approving the detailed plan, allocations, external deferrals, and earlier Phase 1 start (D-025). PR merge remains a separate decision.
 
-## Phase 1 - Coherent prediction and visual mapping (authorised; not started)
+## Phase 1 - Coherent prediction and visual mapping (implementation delivered; Gate 1 pending)
 
 **Goal:** One fresh prediction response drives readable CAD/vessel results, schematic vessel colours, and synchronised vessel selection.
 
