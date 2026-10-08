@@ -2,6 +2,8 @@
 
 Status legend: ⬜ not started · 🔄 in progress · ✅ self-check passed · 🔒 human gate approved
 
+**Resumed 2026-10-08:** The original sprint dates have elapsed. Finish the remaining asset spike and retrospective before starting Sprint 2; revise the remaining calendar at the retrospective without skipping gates or increasing the credit cap.
+
 **Sprint goal:** De-risk the project. Repo + docs system live, frontend scaffold runs, API contract agreed with a working mock, and the 3D heart asset question is answered (D-012).
 
 **Sprint cap:** 1500 credits (D-008). **Exit criterion:** every phase 🔒, `frontend` PR'd to `dev`.
@@ -13,9 +15,15 @@ Status legend: ⬜ not started · 🔄 in progress · ✅ self-check passed · �
 | 0 Discussion & research | O+H | 300 | 380 | 15x orchestrator model; doc-writing calls 10-30 each |
 | 1 Scaffold | X | 250 | 13 (X) + ~280 (O review) | X on 1x model is ~0.15/call; O review dominated -> D-014 |
 | 2 API contract + mock | X | 350 | 21 (X) + ~370 (O) | O cost dominated by cache-miss calls after long pasted reports (~100 each); X halt on auto-fixable lint → D-015 |
-| 3 3D asset spike | X | 400 | | O budget for P3+P4 review: ≤250 total |
+| 3 3D asset spike | X | 400 | 20.6 | X local-telemetry delta from kickoff; O budget for P3+P4 review remains ≤250 and is not included. |
 | 4 Retro & cleanup | O+H | 100 | | |
 | **Total** | | **1400** | | cap 1500 → 100 slack |
+
+**Measured snapshot (2026-10-08 19:29 UTC):** 1228.1 credits across the local O and X sessions since Oct 5 (O 1193.6, X 34.5). Remaining project budget: 5771.9; remaining S1 cap: 271.9, before subsequent calls. The historical Phase 3 estimate is not an additional allocation: Phase 3 plus Phase 4, including O reviews, must fit the remaining S1 envelope. X's Phase 3 spend limit is 120 additional credits; report earlier if the overall S1 cap is at risk. No cap increase is approved.
+
+The Python credits command is blocked by Windows application control in both O's and X's shells. The snapshots below were obtained through the read-only local session-store tool, using the script's event-deduplication fields. Do not work around the application-control policy or retry the script; local telemetry is not a reconciliation against account billing.
+
+**Phase 3 kickoff refresh (2026-10-08):** 1258.9 credits total (O 1221.5, X 37.4), leaving 241.1 under the Sprint 1 cap. **Phase 3 closeout snapshot (2026-10-08 19:59 UTC):** 1295.1 total (O 1237.1, X 58.0); X's delta from kickoff is 20.6, within the 120-credit limit. Remaining Sprint 1 cap at this snapshot: 204.9 for the pending review and retrospective.
 
 ---
 
@@ -67,9 +75,9 @@ Human gate — H confirms screenshot + CI green → "GATE 1 APPROVED".
 
 ---
 
-## Phase 2 — API contract + mock server + typed client ✅ self-check passed (awaiting human gate)
+## Phase 2 — API contract + mock server + typed client 🔒 (approved 2026-10-08; backend sign-off deferred, D-016)
 
-> **Status 2026-10-05 23:55:** Closed out in `4669abb`, `30082a5`, `9d9b5c2`, `0d1037e` (after 6 earlier commits `57308f4`…`c28a198`). All self-check criteria verified by O: 55 features; `/predict` 200 + validated; chest-pain delta 0.1298; ruff/pytest/lint/typecheck/test/build clean; screenshot `docs/evidence/s1p2-form.png` shows API-driven groups, sample, probabilities, contributions; `docs/api-contract.md` reviewed (5 paths, OpenAPI 3.1, v1.0.0, change process). Samples are **synthetic** (UCI 404, Kaggle 403). M acknowledgement of the contract and Q1–Q3: **pending** — tracked as open item, not blocking Phase 3. Carry-over to S2: mock vessels nearly identical probabilities & all-positive contributions — add vessel-specific weights + some negative contributions so 3D/chart work is testable.
+> **Status 2026-10-08:** Mock implementation closed out in `4669abb`, `30082a5`, `9d9b5c2`, `0d1037e` (after 6 earlier commits `57308f4`…`c28a198`); self-check evidence was reviewed on Oct 5. H explicitly approved Gate 2 on Oct 8 with backend contract sign-off deferred (D-016). `origin/ML-dev` at `d09ebda` answers Q1 partially but does not acknowledge the contract or provide an API. Record integration differences in `spec.md §12`; do not treat the real backend as a base-URL-only swap yet. Samples remain **synthetic**. Carry-over to S2: agree raw-input names, categorical encodings, WBC units, explanation scale and final thresholds with M; retain varied mock vessel probabilities and signed contributions as chart/viewer test fixtures.
 
 **Goal:** `docs/api-contract.md` written, `mock-api/` serves it, frontend form is data-driven and calls `/predict`.
 
@@ -91,31 +99,36 @@ Self-check gate
 - `pytest`, `ruff check`, `pnpm typecheck`, `pnpm lint` exit 0
 - `api-contract.md` reviewed by O; sent to M by H
 
-Human gate — H confirms + M acknowledges contract (or logs objections) → "GATE 2 APPROVED".
+Human gate — **Approved by H on 2026-10-08**, with the explicit D-016 exception deferring M's contract acknowledgement. This permits Phase 3 only; it does not certify real-backend compatibility.
 
 ---
 
-## Phase 3 — 3D heart asset spike (timebox ½ day) ⬜
+## Phase 3 — 3D heart asset spike (timebox ½ day) ✅ self-check passed (awaiting human gate)
 
 **Goal:** Lock D-012: a licensed GLB with addressable `Heart`, `LAD`, `LCX`, `RCA` nodes loads in R3F and recolours per vessel — or the fallback is implemented.
 
-Tasks
-1. [ ] Research (≤45 min): BodyParts3D (FMA IDs for heart, LAD = anterior interventricular branch, LCX = circumflex branch, RCA), **Z-Anatomy** (CC-BY-SA, derived from BodyParts3D, named parts, GLB/Blender exports), NIH 3D Print Exchange, Sketchfab CC0/CC-BY "heart coronary arteries". Record URL, licence, format, triangle count for each in `assets/heart/CANDIDATES.md`
-2. [ ] Acquire best candidate; build one GLB with named nodes using `@gltf-transform/cli` (merge, rename, `dedup`, `weld`, `simplify` to ≤150k tris, `draco`) — Blender CLI only if already installed
-3. [ ] `assets/heart/LICENSE.md` (source, author, licence, modifications); copy GLB to `frontend/public/models/heart.glb`; fill `spec.md §10`
-4. [ ] `features/viewer/`: `HeartModel.tsx` (`useGLTF` + Draco), `vesselMap.ts` (`{ LAD: 'LAD', LCX: 'LCX', RCA: 'RCA' }` node names), `VesselMesh` applying colour from `lib/colorScale.ts` given a static map `{LAD: .8, LCX: .3, RCA: .55}`, hover → emissive + `<Html>` tooltip, click → `uiStore.selectedVessel`, drei `<Bounds fit>`, `<Stats>` (dev only)
-5. [ ] If nothing suitable by timebox: fallback — generic CC0 heart mesh + `TubeGeometry` on `CatmullRomCurve3` splines per vessel; same component API
-6. [ ] Update `decisions.md` D-012 with the outcome (chosen asset or fallback)
+**Kickoff 2026-10-08:** Research remains capped at 45 minutes, followed by the existing fallback if needed. No backend integration or dashboard expansion in this phase. Preserve the combined remaining S1 budget above.
 
-Constraints: touch only `assets/`, `frontend/public/models`, `frontend/src/features/viewer`, `frontend/src/lib`, `frontend/src/store`, `docs/spec.md §10`, `docs/decisions.md` D-012 row.
+**Outcome 2026-10-08:** Selected the redistributable CC BY 4.0 *Realistic Human Heart* by neshallads; the source GLB has one heart mesh and no coronary branch nodes. Implemented D-012's approved fallback with separately addressable schematic LAD/LCX/RCA tube meshes. All self-checks passed; Gate 3 human review is still pending.
+
+Tasks
+1. [x] Research (≤45 min): BodyParts3D (FMA IDs for heart, LAD = anterior interventricular branch, LCX = circumflex branch, RCA), **Z-Anatomy** (CC-BY-SA, derived from BodyParts3D, named parts, GLB/Blender exports), NIH 3D Print Exchange, Sketchfab CC0/CC-BY "heart coronary arteries". Record URL, licence, format, triangle count for each in `assets/heart/CANDIDATES.md`
+2. [x] Acquire best usable candidate. The selected source GLB is already under 8 MB and requires no Draco/compression or Blender conversion; runtime supplies the required `Heart` group and separate vessel meshes. No runtime CDN dependency.
+3. [x] Add `assets/heart/LICENSE.md` (source, author, licence, modifications); distribute GLB at `frontend/public/models/heart.glb` with adjacent attribution; fill `spec.md §10`
+4. [x] Implement `HeartModel.tsx` (`useGLTF`), `vesselMap.ts`, independent `VesselMesh` geometry/materials using `lib/colorScale.ts` at `{LAD: .8, LCX: .3, RCA: .55}`, hover → emissive + `<Html>` tooltip, click → typed `uiStore.selectedVessel`, drei `<Bounds fit>`, `<Stats>` (dev only)
+5. [x] Implement the approved fallback: generic licensed heart mesh + `TubeGeometry` on hand-authored `CatmullRomCurve3` paths; label them schematic, not patient-specific lesion maps
+6. [x] Append the outcome decision referencing D-012 in `decisions.md`
+
+Constraints: touch only `assets/`, `frontend/public/models`, `frontend/src/features/viewer`, `frontend/src/lib`, `frontend/src/store`, directly related `docs/spec.md §6/§10`, and append an asset decision to `docs/decisions.md` without deleting D-012. Minimal package-manifest/lockfile changes are allowed only for required asset tooling; update `frontend/README.md` only if asset setup needs instructions. Include O's known planning/documentation changes in the phase's documentation commit; preserve other work.
 
 Self-check gate
-- GLB ≤8 MB, ≤150k triangles (`gltf-transform inspect` output pasted); loads in <2 s on `pnpm dev`
-- Screenshot: three vessels in visibly different colours on the heart; second screenshot after rotating/zooming
-- Hover shows vessel name tooltip; click logs/sets selected vessel
-- `<Stats>` fps ≥50 on the dev machine; triangle count recorded
-- `LICENSE.md` present; licence is CC0/CC-BY/CC-BY-SA or equivalent permitting redistribution
-- `pnpm lint && pnpm typecheck && pnpm build` exit 0
+- GLB 3,255,284 bytes; 22,562 heart triangles + 2,304 tube triangles = 24,866 total. Full inspect output and counts: `docs/evidence/s1p3-gltf-transform-inspect.txt`, `docs/evidence/s1p3-measurements.txt`.
+- Cold cache-disabled load from navigation to first 3D draw: 489 ms in local Edge; conditions in `docs/evidence/s1p3-measurements.txt`.
+- Screenshots: `docs/evidence/s1p3-colours.png`, `docs/evidence/s1p3-rotated-zoomed.png`, `docs/evidence/s1p3-selection.png`, `docs/evidence/s1p3-hover-selection.png`.
+- Hover showed the vessel tooltip; click selected LAD and showed its illustrative test value. Screenshots above.
+- Active drag: 121.3 rendered frames/s at a 1920×1080 viewport on the AMD Radeon 760M; idle demand rendering produced 0 draw calls in a 1 s sample. Full conditions in `docs/evidence/s1p3-measurements.txt`.
+- `assets/heart/LICENSE.md` and adjacent `frontend/public/models/ATTRIBUTION.md` document the CC BY 4.0 model and attribution.
+- `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` exit 0; test/build evidence recorded at closeout.
 
 Human gate — H views the 3D model and approves asset + licence → "GATE 3 APPROVED".
 
@@ -128,8 +141,9 @@ Human gate — H views the 3D model and approves asset + licence → "GATE 3 APP
 Tasks
 - [ ] `docs/retro/sprint1.md`: what went well / wrong / actions; credit actuals vs estimates
 - [ ] `plan.md` → `planning/sprint1.md`; new `plan.md` skeleton for Sprint 2 (Phase 0 only)
-- [ ] `spec.md`: resolve `[TBD-S1]` markers; record M's answers to Q1–Q3
+- [ ] `spec.md`: resolve completed `[TBD-S1]` markers; carry forward unanswered parts of Q1–Q3 without claiming M sign-off
 - [ ] Budget table reconciled from Copilot usage data
+- [ ] Re-plan remaining sprint dates against the Oct 14 deadline; do not silently roll the expired S1 schedule forward
 - [ ] PR `frontend` → `dev` (title "Sprint 1: foundation"), H merges after CI green
 
 Self-check gate: all four files updated and committed; PR open.

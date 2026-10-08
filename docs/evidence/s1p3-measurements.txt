@@ -1,0 +1,58 @@
+Sprint 1 / Phase 3 3D heart measurements
+Date: 2026-10-08
+
+Asset inspection
+---------------
+Command: pnpm dlx @gltf-transform/cli inspect frontend\public\models\heart.glb
+GLB size: 3,255,284 bytes
+GLB SHA-256: fcb3c1036fe59dfdcc1c30917dbdaa8fbd52c858e6ba3cadaf126b44ccca4b5b
+Inspect output: docs/evidence/s1p3-gltf-transform-inspect.txt
+GLB mesh: one mesh, one TRIANGLES primitive, 22,562 indexed triangles, 12,013 vertices.
+GLB nodes: one source heart mesh; no separate LAD, LCX, or RCA nodes.
+
+Fallback geometry count
+-----------------------
+Vessel meshes: 3 (LAD, LCX, RCA), each a TubeGeometry with 48 tubular segments
+and 8 radial segments.
+Triangles per tube: 48 x 8 x 2 = 768
+Procedural vessel triangles: 3 x 768 = 2,304
+Total rendered geometry: 22,562 + 2,304 = 24,866 triangles (limit: 150,000).
+
+Cold asset load
+---------------
+Method: Edge 154.0.4258.62, new page navigation with Network.setCacheDisabled(true)
+and Page.reload(ignoreCache=true). Resource Timing transferSize was nonzero.
+Measurement ended at the first WebGL2 drawElements call after the local GLB loaded.
+Vite URL: http://127.0.0.1:5173/
+Viewport: 1920 x 1080 CSS pixels, deviceScaleFactor 1
+heart.glb request: start 415 ms, response end 432 ms, 3,255,284 bytes transferred
+First 3D draw: 489 ms after navigation start
+
+Active rendering / orbit
+------------------------
+Machine: HP Victus by HP Gaming Laptop 15-fb3xxx, Windows.
+Installed adapters: NVIDIA GeForce RTX 5050 Laptop GPU and AMD Radeon 760M
+Graphics. WebGL renderer actually used: ANGLE (AMD Radeon 760M, Direct3D 11).
+Browser: Edge 154.0.4258.62
+Viewport: 1920 x 1080 CSS pixels, deviceScaleFactor 1
+Canvas: 616.7 x 330 CSS pixels (three-panel layout)
+Method: active pointer-drag/orbit for approximately 3.01 seconds in a headless
+Edge page. Counted WebGL drawElements frame groups and requestAnimationFrame
+callbacks. 1,464 draw calls grouped into 365 rendered frames; 366 frame
+callbacks. Observed render rate: 121.3 frames/s (121.7 callbacks/s).
+Idle demand-rendering check: 0 WebGL draw calls during a separate 1 second idle
+sample.
+
+Loading/error state check
+-------------------------
+Intercepted the local heart.glb request and forced it to fail. The viewer showed
+an alert: "The local heart model could not be loaded. Could not load
+/models/heart.glb: Failed to fetch". Removing the interception and reloading
+restored the canvas and model.
+
+Evidence images
+---------------
+docs/evidence/s1p3-colours.png
+docs/evidence/s1p3-rotated-zoomed.png
+docs/evidence/s1p3-selection.png
+docs/evidence/s1p3-hover-selection.png

@@ -67,32 +67,36 @@ Data flow: form edit → `patientStore` → debounced `usePredict` (TanStack Que
 
 Extensibility (brief §Technical Considerations): new feature → appears automatically via `GET /features`; new vessel → add entry to `vesselMap.ts` + mesh node name; new model → backend only, metrics drawer is schema-driven.
 
-## 5. API contract (summary — authoritative version in `docs/api-contract.md`, **[TBD-S1]**)
+## 5. API contract (summary — authoritative mock v1.0.0 in `docs/api-contract.md`; real-backend agreement pending)
 
 | Method & path | Purpose | Response (shape) |
 |---|---|---|
-| `GET /health` | liveness, mode | `{status, model_version, mock}` |
+| `GET /health` | liveness, mode | `{status, model_version, contract_version, mock}` |
 | `GET /features` | feature schema for form | `FeatureSchema[]` = `{name, label, group, type: number\|boolean\|categorical, unit?, min?, max?, options?, default, description?}` |
-| `GET /patients/samples` | demo patients | `{id, label, features, ground_truth?}[]` |
+| `GET /patients/samples` | demo patients | `{id, label, features, synthetic, ground_truth?}[]` |
 | `POST /predict` | run models | `{request_id, model_version, cad: Target, vessels: {LAD, LCX, RCA}: Target, explanations: {cad, LAD, LCX, RCA}: Explanation, risk_summary}` |
 | `GET /model/metrics` | validation metrics | per target: `{accuracy, precision, recall, f1, roc_auc}`, `{validation, n_samples, trained_at}` |
 
 `Target = {probability: 0..1, label, threshold}`; `Explanation = {base_value, contributions: {feature, value, contribution, direction}[]}`. Errors: FastAPI default `{detail}`; 422 on invalid features. CORS open for `localhost:5173`.
 
+The current mock contract is not yet an agreed serving interface for `ML-dev`. Keep raw-input conversion and target-specific feature engineering in the backend, not in the frontend form. Confirm categorical options, units, and explanation output scale before claiming the real backend can be substituted by changing the base URL.
+
 Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via `/features`): Demographic (Age, Sex, BMI, DM, HTN, Smoker, FH, Obesity, CRF, CVA, Airway, Thyroid, CHF, DLP…), Symptoms/Exam (BP, PR, Edema, Murmurs, Typical/Atypical CP, Dyspnea, Function Class…), ECG (Q Wave, ST Elevation/Depression, T inversion, LVH, Poor R Progression, BBB), Lab/Echo (FBS, CR, TG, LDL, HDL, BUN, ESR, HB, K, Na, WBC, Lymph, Neut, PLT, EF-TTE, Region RWMA, VHD). **Excluded from inputs:** LAD, LCX, RCA, Cath (target leakage).
 
 ## 6. 3D pipeline
 
-- Asset: GLB with named nodes `Heart`, `LAD`, `LCX`, `RCA` (plus optional `Aorta`, `Torso_ghost`). Source + licence **[TBD-S1 spike, D-012]**.
-- Loading: `useGLTF` (drei) with Draco; `<Bounds fit>` on load; `frameloop="demand"`; `dpr={[1, 1.5]}`.
-- Colour mapping: probability → `d3-scale`-style interpolation green (#2e7d32) → amber (#f9a825) → red (#c62828), with a numeric legend; colour-blind-safe secondary encoding (label + pattern/opacity).
+- Heart asset: `frontend/public/models/heart.glb`, *Realistic Human Heart* by neshallads, CC BY 4.0. The upstream GLB has one heart mesh and no separately addressable coronary arteries. The runtime wraps it in a named `Heart` group.
+- Vessel geometry: D-012's approved fallback is active. Project-authored `TubeGeometry` meshes named `LAD`, `LCX`, and `RCA` follow hand-authored `CatmullRomCurve3` paths. They are schematic, not patient-specific lesion maps. Static values LAD 0.80, LCX 0.30, and RCA 0.55 are illustrative test values, not live predictions.
+- Loading: `useGLTF` (drei); use Draco only if needed and serve its decoder locally. `<Bounds fit>` on load; `frameloop="demand"`; `dpr={[1, 1.5]}`. No runtime asset/decoder CDN calls.
+- Colour mapping: probability → `d3-scale`-style interpolation green (#2e7d32) → amber (#f9a825) → red (#c62828), with vessel labels and numeric values as a secondary encoding.
 - Interaction: `OrbitControls` (damped), hover → emissive highlight + tooltip, click → select (outline via `@react-three/postprocessing` or emissive) and camera preset flyTo (anterior for LAD, lateral for LCX, inferior for RCA).
-- Performance target: ≥50 fps on integrated GPU at 1080p; mesh ≤150k triangles total; GLB ≤8 MB.
-- Fallback (D-012): generic heart mesh + `TubeGeometry` along hand-authored `CatmullRomCurve3` splines per vessel.
+- Performance target: ≥50 fps during active rendering/interaction at 1080p; heart plus vessels ≤150k triangles total; GLB ≤8 MB. Phase 3 measured results are recorded with the evidence for the Gate 3 handoff.
+- Loading/error states are shown explicitly. The GLB and all its embedded textures are local; no runtime asset or decoder CDN is used.
 
 ## 7. Interpretability presentation
 
 - **Why? tab**: horizontal bar / waterfall of top-10 `contributions` for the selected target (CAD by default; switches to vessel on selection). Red = pushes toward disease, blue = protective. Shows `base_value` and final probability.
+- Explanation scale must be agreed with M: the ML roadmap proposes logit-scale attributions. Do not add them to a probability-scale base or present them as probability-point changes. A waterfall may imply additivity only when the base, contributions and endpoint use the same documented scale; the final probability remains a separate labelled value.
 - **Vitals tab**: table of every feature: value entered, reference range (from `FeatureSchema.min/max` or a curated `referenceRanges.ts`), contribution bar, out-of-range flag.
 - Plain-language sentence generated client-side: "Top drivers for LAD risk: Typical chest pain (+0.21), Age 67 (+0.09), …".
 
@@ -107,12 +111,16 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 - No GPU requirement; no external network calls other than the API.
 - Accessibility: keyboard focus on cards/tabs, ARIA labels on 3D canvas summary.
 
-## 10. Assets & licences  **[TBD-S1]**
+## 10. Assets & licences
 
 | Asset | Source | Licence | Path |
 |---|---|---|---|
-| Heart mesh | — | — | `assets/heart/` |
-| Dataset samples | UCI Z-Alizadeh Sani extension | CC BY 4.0 | `mock-api/app/samples.json` |
+| Heart mesh | *Realistic Human Heart*, neshallads, Sketchfab | CC BY 4.0; attribution beside the distributed model and in `assets/heart/LICENSE.md` | `frontend/public/models/heart.glb` |
+| LAD/LCX/RCA overlays | Project-authored schematic `TubeGeometry` paths | Project-generated; not patient-specific lesion maps | `frontend/src/features/viewer/` |
+| Mock dataset samples | Generated synthetic records; not extracted UCI patients | Project-generated fixtures | `mock-api/data/samples.json` |
+
+Asset candidates, rejected options, source URLs, and mesh-addressability findings
+are recorded in `assets/heart/CANDIDATES.md`.
 
 ## 11. Out of scope
 
@@ -123,3 +131,23 @@ Deployment (D-006), authentication, patient persistence, mobile layout, DICOM/im
 - Q1 → M: exact preprocessed feature list, types and ranges; threshold per target; SHAP availability per target (TreeExplainer?).
 - Q2 → M: will the backend expose `/model/metrics`, or do we read a static JSON from the repo?
 - Q3 → H/M: who records the demo video and writes the shared 6-page doc skeleton (S4)?
+
+### ML branch evidence (reviewed 2026-10-08)
+
+Source: `origin/ML-dev` at `d09ebda`. The actual branch name is `ML-dev`, not `ml`; this evidence is not M's acknowledgement of `docs/api-contract.md`.
+
+| Question | Confirmed evidence | Still open |
+|---|---|---|
+| Q1: inputs | `ml/data.py`, `data/README.md`, and `reports/EDA.md` define 55 cleaned inputs: 21 continuous, 3 ordinal, 31 binary; snake_case identifiers; target columns excluded. Raw data is available at `data/raw/z_alizadeh_sani_ext/z_alizadeh_sani_ext.xlsx`, sheet `Sheet 1 - Table 1`. | Serving payload names, units, allowed ranges/defaults, and final per-target pipeline inputs need agreement. Observed dataset bounds are not clinical reference ranges. |
+| Q1: thresholds/explanations | Evaluation currently uses 0.5. `plan.md` proposes tuned thresholds, TreeExplainer/LinearExplainer and logit-scale contributions; model export/calibration/explanation serving is not implemented in the reviewed branch. | Final thresholds, explanation methods for the final selected models, scale, and API availability. Do not assume every model supports TreeExplainer. |
+| Q2: metrics | `ml/evaluate.py` computes metrics; report files contain validation results. `plan.md` proposes `reports/metrics/metrics.json` and final model exports. No FastAPI app or `/model/metrics` endpoint exists in the reviewed tree. | Whether M will serve all five contract endpoints, and delivery timing. Metrics from experiments must not be relabelled as final deployed-model metrics. |
+| Q3: submission | No assignment of video/document ownership found in the reviewed ML roadmap. | H/M must assign owners before S4. |
+
+Integration differences to resolve before the real-backend swap:
+
+- ML raw identifiers include `EX-Smoker`, `Airway disease`, `St Elevation`, `St Depression`, and `Tinversion`; the mock uses different spellings. Define an explicit serving-name map rather than silently accepting mismatches.
+- Raw `BBB` is categorical (`N`, `LBBB`, `RBBB`) and becomes two binary model inputs; the mock currently uses a boolean.
+- Raw `VHD` has four levels (`N`, `mild`, `Moderate`, `Severe`) mapped to 0–3; the mock currently uses a boolean.
+- `Function Class` is 0–3 in the data, versus mock options 1–4.
+- ML WBC values are 3700–18000, while the form uses thousands per microlitre (default 7.5). Confirm the serving unit and apply the factor-of-1000 conversion exactly once.
+- Constant `Exertional CP` is dropped by ML; `BBB` expansion keeps the cleaned count at 55. Matching feature counts alone does not prove schema compatibility.
