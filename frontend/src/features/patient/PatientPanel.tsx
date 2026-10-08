@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { useFeatures, usePredict, useSamples } from "../../api/hooks";
 import { FeatureValueSchema } from "../../api/types";
-import type {
-  FeatureDefinition,
-  FeatureValue,
-} from "../../api/types";
+import type { FeatureDefinition, FeatureValue } from "../../api/types";
+import {
+  requestPredictionForRevision,
+  schedulePrediction,
+} from "../../lib/predictionRequests";
 import { usePatientStore } from "../../store/patientStore";
 
 function createFeatureValidationSchema(features: FeatureDefinition[]) {
@@ -80,7 +81,9 @@ function createFeatureValidationSchema(features: FeatureDefinition[]) {
 }
 
 function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "The prediction request failed.";
+  return error instanceof Error
+    ? error.message
+    : "The prediction request failed.";
 }
 
 export function PatientPanel() {
@@ -90,20 +93,15 @@ export function PatientPanel() {
   const mutatePrediction = predictionMutation.mutateAsync;
   const patientFeatures = usePatientStore((state) => state.features);
   const selectedSampleId = usePatientStore((state) => state.selectedSampleId);
+  const inputRevision = usePatientStore((state) => state.inputRevision);
   const isPredicting = usePatientStore((state) => state.isPredicting);
   const setFeatures = usePatientStore((state) => state.setFeatures);
   const setFromSample = usePatientStore((state) => state.setFromSample);
   const updateFeature = usePatientStore((state) => state.updateFeature);
-  const setPredicting = usePatientStore((state) => state.setPredicting);
-  const setPrediction = usePatientStore((state) => state.setPrediction);
-  const setPredictionError = usePatientStore(
-    (state) => state.setPredictionError,
-  );
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [autoPredict, setAutoPredict] = useState(true);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
-  const requestSequence = useRef(0);
-  const autoPredictTimer = useRef<number | null>(null);
+  const cancelAutoPredict = useRef<(() => void) | null>(null);
   const initializedFromSamples = useRef(false);
 
   const defaultFeatures = useMemo(() => {
@@ -166,7 +164,13 @@ export function PatientPanel() {
   }, [patientFeatures, samplesQuery.data, setFromSample]);
 
   const requestPrediction = useCallback(
-    async (features: Record<string, FeatureValue>) => {
+    async (
+      features: Record<string, FeatureValue>,
+      expectedRevision: number,
+    ) => {
+      if (usePatientStore.getState().inputRevision !== expectedRevision) {
+        return;
+      }
       if (!validationSchema) {
         return;
       }
@@ -176,53 +180,38 @@ export function PatientPanel() {
         return;
       }
 
-      const sequence = ++requestSequence.current;
-      setPredicting(true);
-      try {
-        const response = await mutatePrediction({
-          features: parsed.data,
-        });
-        if (requestSequence.current === sequence) {
-          setPrediction(response);
-        }
-      } catch (error) {
-        if (requestSequence.current === sequence) {
-          setPredictionError(errorMessage(error));
-        }
-      }
+      await requestPredictionForRevision(
+        expectedRevision,
+        parsed.data,
+        (validFeatures) =>
+          mutatePrediction({
+            features: validFeatures,
+          }),
+      );
     },
-    [
-      mutatePrediction,
-      setPrediction,
-      setPredictionError,
-      setPredicting,
-      validationSchema,
-    ],
+    [mutatePrediction, validationSchema],
   );
 
   useEffect(() => {
-    if (autoPredictTimer.current !== null) {
-      window.clearTimeout(autoPredictTimer.current);
-      autoPredictTimer.current = null;
-    }
-    requestSequence.current += 1;
+    cancelAutoPredict.current?.();
+    cancelAutoPredict.current = null;
 
     if (autoPredict && validation?.success) {
-      autoPredictTimer.current = window.setTimeout(() => {
-        autoPredictTimer.current = null;
-        void requestPrediction(patientFeatures);
-      }, 500);
+      const scheduledFeatures = patientFeatures;
+      const scheduledRevision = inputRevision;
+      cancelAutoPredict.current = schedulePrediction(() => {
+        cancelAutoPredict.current = null;
+        void requestPrediction(scheduledFeatures, scheduledRevision);
+      });
     }
 
     return () => {
-      if (autoPredictTimer.current !== null) {
-        window.clearTimeout(autoPredictTimer.current);
-        autoPredictTimer.current = null;
-      }
-      requestSequence.current += 1;
+      cancelAutoPredict.current?.();
+      cancelAutoPredict.current = null;
     };
   }, [
     autoPredict,
+    inputRevision,
     patientFeatures,
     requestPrediction,
     validation?.success,
@@ -230,23 +219,21 @@ export function PatientPanel() {
 
   const handlePredict = () => {
     setShowValidationErrors(true);
-    if (autoPredictTimer.current !== null) {
-      window.clearTimeout(autoPredictTimer.current);
-      autoPredictTimer.current = null;
-    }
-    void requestPrediction(patientFeatures);
+    cancelAutoPredict.current?.();
+    cancelAutoPredict.current = null;
+    void requestPrediction(patientFeatures, inputRevision);
   };
 
-  const handleFeatureChange = (feature: FeatureDefinition, value: FeatureValue) => {
+  const handleFeatureChange = (
+    feature: FeatureDefinition,
+    value: FeatureValue,
+  ) => {
     setShowValidationErrors(false);
     updateFeature(feature.name, value);
   };
 
   return (
-    <section
-      className="panel min-h-0"
-      aria-labelledby="patient-panel-heading"
-    >
+    <section className="panel min-h-0" aria-labelledby="patient-panel-heading">
       <header className="panel-header">
         <div>
           <p className="eyebrow">Input workspace</p>
@@ -289,7 +276,8 @@ export function PatientPanel() {
           </select>
           {samplesQuery.isError && (
             <p className="text-xs text-red-700" role="alert">
-              Sample patients could not be loaded: {errorMessage(samplesQuery.error)}
+              Sample patients could not be loaded:{" "}
+              {errorMessage(samplesQuery.error)}
             </p>
           )}
           {featuresQuery.isError && (
@@ -306,10 +294,8 @@ export function PatientPanel() {
         </div>
 
         {groups.map(([group, features]) => {
-        const isOpen =
-          openGroup === null
-            ? groups[0]?.[0] === group
-            : openGroup === group;
+          const isOpen =
+            openGroup === null ? groups[0]?.[0] === group : openGroup === group;
           return (
             <section
               className="overflow-hidden rounded-xl border border-slate-200"
@@ -328,10 +314,7 @@ export function PatientPanel() {
                 </button>
               </h3>
               {isOpen && (
-                <div
-                  className="space-y-3 p-3"
-                  id={`feature-group-${group}`}
-                >
+                <div className="space-y-3 p-3" id={`feature-group-${group}`}>
                   {features.map((feature) => {
                     const value =
                       patientFeatures[feature.name] ?? feature.default;
@@ -381,7 +364,10 @@ export function PatientPanel() {
                             }}
                           >
                             {feature.options?.map((option) => (
-                              <option key={String(option)} value={String(option)}>
+                              <option
+                                key={String(option)}
+                                value={String(option)}
+                              >
                                 {String(option)}
                               </option>
                             ))}
@@ -396,7 +382,8 @@ export function PatientPanel() {
                             max={feature.max}
                             step="any"
                             value={
-                              typeof value === "number" && Number.isFinite(value)
+                              typeof value === "number" &&
+                              Number.isFinite(value)
                                 ? value
                                 : ""
                             }
@@ -445,14 +432,23 @@ export function PatientPanel() {
             checked={autoPredict}
             className="h-4 w-4 accent-emerald-700"
             type="checkbox"
-            onChange={(event) => setAutoPredict(event.target.checked)}
+            onChange={(event) => {
+              const enabled = event.target.checked;
+              if (!enabled) {
+                cancelAutoPredict.current?.();
+                cancelAutoPredict.current = null;
+              }
+              setAutoPredict(enabled);
+            }}
           />
           Auto-predict after 500 ms
         </label>
         <button
           className="w-full rounded-lg bg-emerald-800 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-900 disabled:cursor-wait disabled:opacity-60"
           type="button"
-          disabled={isPredicting || featuresQuery.isPending || !validationSchema}
+          disabled={
+            isPredicting || featuresQuery.isPending || !validationSchema
+          }
           onClick={handlePredict}
         >
           {isPredicting ? "Predicting…" : "Predict"}

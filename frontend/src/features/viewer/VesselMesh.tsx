@@ -1,10 +1,11 @@
 import { Html } from "@react-three/drei";
 import { useMemo } from "react";
 import { CatmullRomCurve3, Vector3 } from "three";
+import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 import {
-  vesselColor,
   vesselMap,
+  vesselDisplay,
   type VesselId,
   VESSEL_TUBE_RADIAL_SEGMENTS,
   VESSEL_TUBE_TUBULAR_SEGMENTS,
@@ -28,7 +29,9 @@ export function VesselMesh({ vessel }: VesselMeshProps) {
   const isSelected = useUiStore((state) => state.selectedVessel === vessel);
   const setHoveredVessel = useUiStore((state) => state.setHoveredVessel);
   const setSelectedVessel = useUiStore((state) => state.setSelectedVessel);
-  const color = vesselColor(vessel);
+  const prediction = usePatientStore((state) => state.prediction);
+  const display = vesselDisplay(prediction, vessel);
+  const color = display.color;
   const radius = isSelected ? 0.025 : 0.018;
   const emissiveIntensity = isHovered ? 0.9 : isSelected ? 0.45 : 0;
 
@@ -73,7 +76,8 @@ export function VesselMesh({ vessel }: VesselMeshProps) {
           style={{ pointerEvents: "none" }}
         >
           <span className="whitespace-nowrap rounded-full bg-slate-900 px-2 py-1 text-[10px] font-semibold text-white shadow-lg">
-            {vessel} · {definition.label}
+            {vessel} · {definition.label} · {display.percentage}
+            {display.target ? ` · ${display.target.label}` : ""}
           </span>
         </Html>
       )}

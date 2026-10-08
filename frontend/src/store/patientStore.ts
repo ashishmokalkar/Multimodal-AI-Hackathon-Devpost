@@ -8,53 +8,107 @@ import type {
 interface PatientState {
   features: Record<string, FeatureValue>;
   selectedSampleId: string | null;
+  inputRevision: number;
   prediction: PredictionResponse | null;
   predictionError: string | null;
   isPredicting: boolean;
+  latestPredictionRequestId: number;
   setFeatures: (
     features: Record<string, FeatureValue>,
     sampleId?: string | null,
   ) => void;
   setFromSample: (sample: SamplePatient) => void;
   updateFeature: (name: string, value: FeatureValue) => void;
-  setPredicting: (isPredicting: boolean) => void;
-  setPrediction: (prediction: PredictionResponse) => void;
-  setPredictionError: (message: string) => void;
+  beginPrediction: (expectedRevision: number) => number | null;
+  resolvePrediction: (
+    requestId: number,
+    expectedRevision: number,
+    prediction: PredictionResponse,
+  ) => boolean;
+  rejectPrediction: (
+    requestId: number,
+    expectedRevision: number,
+    message: string,
+  ) => boolean;
 }
 
 export const usePatientStore = create<PatientState>((set) => ({
   features: {},
   selectedSampleId: null,
+  inputRevision: 0,
   prediction: null,
   predictionError: null,
   isPredicting: false,
+  latestPredictionRequestId: 0,
   setFeatures: (features, sampleId = null) =>
-    set({
+    set((state) => ({
       features,
       selectedSampleId: sampleId,
-      prediction: null,
-      predictionError: null,
-      isPredicting: false,
-    }),
-  setFromSample: (sample) =>
-    set({
-      features: sample.features,
-      selectedSampleId: sample.id,
-      prediction: null,
-      predictionError: null,
-      isPredicting: false,
-    }),
-  updateFeature: (name, value) =>
-    set((state) => ({
-      features: { ...state.features, [name]: value },
-      selectedSampleId: null,
+      inputRevision: state.inputRevision + 1,
       prediction: null,
       predictionError: null,
       isPredicting: false,
     })),
-  setPredicting: (isPredicting) => set({ isPredicting }),
-  setPrediction: (prediction) =>
-    set({ prediction, predictionError: null, isPredicting: false }),
-  setPredictionError: (predictionError) =>
-    set({ predictionError, isPredicting: false }),
+  setFromSample: (sample) =>
+    set((state) => ({
+      features: sample.features,
+      selectedSampleId: sample.id,
+      inputRevision: state.inputRevision + 1,
+      prediction: null,
+      predictionError: null,
+      isPredicting: false,
+    })),
+  updateFeature: (name, value) =>
+    set((state) => ({
+      features: { ...state.features, [name]: value },
+      selectedSampleId: null,
+      inputRevision: state.inputRevision + 1,
+      prediction: null,
+      predictionError: null,
+      isPredicting: false,
+    })),
+  beginPrediction: (expectedRevision) => {
+    let requestId: number | null = null;
+    set((state) => {
+      if (state.inputRevision !== expectedRevision) {
+        return state;
+      }
+      requestId = state.latestPredictionRequestId + 1;
+      return {
+        latestPredictionRequestId: requestId,
+        prediction: null,
+        predictionError: null,
+        isPredicting: true,
+      };
+    });
+    return requestId;
+  },
+  resolvePrediction: (requestId, expectedRevision, prediction) => {
+    let accepted = false;
+    set((state) => {
+      if (
+        state.inputRevision !== expectedRevision ||
+        state.latestPredictionRequestId !== requestId
+      ) {
+        return state;
+      }
+      accepted = true;
+      return { prediction, predictionError: null, isPredicting: false };
+    });
+    return accepted;
+  },
+  rejectPrediction: (requestId, expectedRevision, predictionError) => {
+    let accepted = false;
+    set((state) => {
+      if (
+        state.inputRevision !== expectedRevision ||
+        state.latestPredictionRequestId !== requestId
+      ) {
+        return state;
+      }
+      accepted = true;
+      return { prediction: null, predictionError, isPredicting: false };
+    });
+    return accepted;
+  },
 }));

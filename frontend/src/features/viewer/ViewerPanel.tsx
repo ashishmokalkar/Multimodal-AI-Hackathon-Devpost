@@ -1,19 +1,12 @@
-import {
-  Bounds,
-  Html,
-  OrbitControls,
-  Stats,
-} from "@react-three/drei";
+import { Bounds, Html, OrbitControls, Stats } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Component, Suspense, type ReactNode } from "react";
 import type { ErrorInfo } from "react";
 import { HeartModel } from "./HeartModel";
 import { VesselMesh } from "./VesselMesh";
-import {
-  vesselColor,
-  vesselIds,
-  vesselMap,
-} from "./vesselMap";
+import { formatProbability } from "../../lib/format";
+import { usePatientStore } from "../../store/patientStore";
+import { vesselDisplay, vesselIds, vesselMap } from "./vesselMap";
 import { useUiStore } from "../../store/uiStore";
 
 function HeartScene() {
@@ -83,6 +76,21 @@ export function ViewerPanel() {
   const hoveredVessel = useUiStore((state) => state.hoveredVessel);
   const selectedVessel = useUiStore((state) => state.selectedVessel);
   const setSelectedVessel = useUiStore((state) => state.setSelectedVessel);
+  const prediction = usePatientStore((state) => state.prediction);
+  const isPredicting = usePatientStore((state) => state.isPredicting);
+  const predictionError = usePatientStore((state) => state.predictionError);
+  const selectedTarget = selectedVessel
+    ? prediction?.vessels[selectedVessel]
+    : prediction?.cad;
+  const selectedTargetName = selectedVessel ?? "CAD";
+  const selectedTargetProbability = selectedTarget?.probability ?? null;
+  const predictionStatus = prediction
+    ? `Current predicted probabilities: CAD ${formatProbability(prediction.cad.probability)}, LAD ${vesselDisplay(prediction, "LAD").percentage}, LCX ${vesselDisplay(prediction, "LCX").percentage}, RCA ${vesselDisplay(prediction, "RCA").percentage}.`
+    : isPredicting
+      ? "A prediction is pending; vessel probabilities are unavailable."
+      : predictionError
+        ? "The latest prediction failed; vessel probabilities are unavailable."
+        : "No current prediction; vessel probabilities are unavailable.";
 
   return (
     <section
@@ -102,7 +110,7 @@ export function ViewerPanel() {
       <div className="viewer-stage">
         <AssetErrorBoundary>
           <Canvas
-            aria-label="Interactive 3D heart with schematic LAD, LCX and RCA vessels. Drag to orbit and scroll to zoom."
+            aria-label={`Interactive 3D heart with schematic LAD, LCX and RCA vessels. ${predictionStatus} Drag to orbit and scroll to zoom.`}
             camera={{ position: [4, 2.8, 5], fov: 38 }}
             dpr={[1, 1.5]}
             frameloop="demand"
@@ -128,53 +136,90 @@ export function ViewerPanel() {
           <span>Drag to rotate - Scroll to zoom</span>
         </div>
       </div>
-      <div className="viewer-legend flex-wrap">
-        {vesselIds.map((vessel) => (
-          <span className="inline-flex items-center gap-1.5" key={vessel}>
+      <div
+        className="viewer-legend"
+        role="group"
+        aria-label="Predicted probability colour legend"
+      >
+        <div className="space-y-1">
+          <p className="text-[10px] font-semibold text-slate-600">
+            Predicted probability · not percentage artery narrowing
+          </p>
+          <div
+            aria-hidden="true"
+            className="h-2 rounded-full"
+            style={{
+              background:
+                "linear-gradient(90deg, #2e7d32 0%, #f9a825 50%, #c62828 100%)",
+            }}
+          />
+          <div className="flex justify-between text-[10px] tabular-nums text-slate-500">
+            <span>0%</span>
+            <span>50%</span>
+            <span>100%</span>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          {vesselIds.map((vessel) => {
+            const display = vesselDisplay(prediction, vessel);
+            return (
+              <span className="inline-flex items-center gap-1.5" key={vessel}>
+                <span
+                  aria-hidden="true"
+                  className="h-3 w-3 rounded-full border border-white shadow-sm"
+                  style={{ backgroundColor: display.color }}
+                />
+                <span>
+                  {vessel} {display.percentage}
+                </span>
+              </span>
+            );
+          })}
+          <span className="inline-flex items-center gap-1.5">
             <span
               aria-hidden="true"
               className="h-3 w-3 rounded-full border border-white shadow-sm"
-              style={{ backgroundColor: vesselColor(vessel) }}
+              style={{ backgroundColor: "#94a3b8" }}
             />
-            <span>
-              {vessel} {vesselMap[vessel].probability.toFixed(2)}
-            </span>
+            <span>Unavailable</span>
           </span>
-        ))}
+        </div>
       </div>
       <div
         aria-live="polite"
-        className="mx-4 mb-3 flex items-center justify-between gap-2 rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs text-emerald-950"
+        className="mx-4 mb-3 flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-800"
       >
         <span className="flex flex-wrap gap-x-3 gap-y-1">
-          {selectedVessel && (
-            <span>
-              Selected: {selectedVessel} ({vesselMap[selectedVessel].label}) —
-              illustrative test value{" "}
-              {vesselMap[selectedVessel].probability.toFixed(2)}
-            </span>
-          )}
+          <span>
+            Selected target:{" "}
+            {selectedVessel
+              ? `${selectedVessel} (${vesselMap[selectedVessel].label})`
+              : "CAD"}{" "}
+            — {formatProbability(selectedTargetProbability)}
+            {selectedTarget &&
+              ` · model label ${selectedTarget.label} · model threshold ${formatProbability(selectedTarget.threshold)}`}
+          </span>
           {hoveredVessel && (
             <span>
-              Hovering: {hoveredVessel} ({vesselMap[hoveredVessel].label})
+              Hovering: {hoveredVessel} ({vesselMap[hoveredVessel].label}) —{" "}
+              {vesselDisplay(prediction, hoveredVessel).percentage}
             </span>
-          )}
-          {!hoveredVessel && !selectedVessel && (
-            <span>Hover or select a vessel to inspect it.</span>
           )}
         </span>
         {selectedVessel && (
           <button
             className="shrink-0 rounded-md border border-emerald-200 bg-white px-2 py-1 font-semibold"
-            onClick={() => setSelectedVessel(null)}
             type="button"
+            onClick={() => setSelectedVessel(null)}
           >
-            Clear
+            Select CAD
           </button>
         )}
       </div>
       <p className="px-5 pb-2 text-[10px] leading-relaxed text-slate-500">
-        Illustrative test values only — not live predictions. Heart:{" "}
+        Vessel paths are schematic, not patient-specific lesion maps.{" "}
+        {prediction?.mock ? "Mock prediction. " : ""}
+        Heart:{" "}
         <a
           className="font-semibold underline"
           href="/models/ATTRIBUTION.md"
@@ -185,12 +230,9 @@ export function ViewerPanel() {
         </a>
         .
       </p>
-      <div className="sr-only" aria-live="polite">
-        {hoveredVessel
-          ? `Hovering over ${hoveredVessel}`
-          : selectedVessel
-            ? `Selected vessel ${selectedVessel}`
-            : "No vessel selected"}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {predictionStatus} Selected target {selectedTargetName}:{" "}
+        {formatProbability(selectedTargetProbability)}.
       </div>
     </section>
   );

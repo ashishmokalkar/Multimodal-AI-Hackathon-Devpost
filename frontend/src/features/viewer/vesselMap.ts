@@ -1,4 +1,6 @@
 import { colorScale } from "../../lib/colorScale";
+import { formatProbability } from "../../lib/format";
+import type { PredictionResponse, Target } from "../../api/types";
 
 export const vesselIds = ["LAD", "LCX", "RCA"] as const;
 
@@ -8,15 +10,15 @@ type Point3 = readonly [x: number, y: number, z: number];
 interface VesselDefinition {
   nodeName: VesselId;
   label: string;
-  probability: number;
   path: readonly Point3[];
 }
+
+export const UNAVAILABLE_VESSEL_COLOR = "#94a3b8";
 
 export const vesselMap = {
   LAD: {
     nodeName: "LAD",
     label: "Left anterior descending",
-    probability: 0.8,
     path: [
       [0.05, 0.46, 0.39],
       [0.11, 0.24, 0.45],
@@ -28,7 +30,6 @@ export const vesselMap = {
   LCX: {
     nodeName: "LCX",
     label: "Left circumflex",
-    probability: 0.3,
     path: [
       [0.05, 0.43, 0.39],
       [0.21, 0.43, 0.39],
@@ -39,7 +40,6 @@ export const vesselMap = {
   RCA: {
     nodeName: "RCA",
     label: "Right coronary artery",
-    probability: 0.55,
     path: [
       [-0.04, 0.44, 0.4],
       [-0.22, 0.37, 0.37],
@@ -58,6 +58,30 @@ export const PROCEDURAL_VESSEL_TRIANGLES =
   VESSEL_TUBE_RADIAL_SEGMENTS *
   2;
 
-export function vesselColor(vessel: VesselId): string {
-  return colorScale(vesselMap[vessel].probability);
+export interface VesselDisplay {
+  target: Target | null;
+  probability: number | null;
+  percentage: string;
+  color: string;
+}
+
+export function vesselColor(probability: number | null): string {
+  return probability === null
+    ? UNAVAILABLE_VESSEL_COLOR
+    : colorScale(probability);
+}
+
+export function vesselDisplay(
+  prediction: PredictionResponse | null,
+  vessel: VesselId,
+): VesselDisplay {
+  const target = prediction?.vessels[vessel] ?? null;
+  const probability = target?.probability ?? null;
+
+  return {
+    target,
+    probability,
+    percentage: formatProbability(probability),
+    color: vesselColor(probability),
+  };
 }

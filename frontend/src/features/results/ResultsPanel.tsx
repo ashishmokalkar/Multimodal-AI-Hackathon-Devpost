@@ -1,10 +1,13 @@
 import { RawResult } from "./RawResult";
 import { usePatientStore } from "../../store/patientStore";
+import { useUiStore } from "../../store/uiStore";
 
 export function ResultsPanel() {
   const prediction = usePatientStore((state) => state.prediction);
   const predictionError = usePatientStore((state) => state.predictionError);
   const isPredicting = usePatientStore((state) => state.isPredicting);
+  const selectedVessel = useUiStore((state) => state.selectedVessel);
+  const setSelectedVessel = useUiStore((state) => state.setSelectedVessel);
 
   return (
     <section
@@ -24,7 +27,10 @@ export function ResultsPanel() {
           </p>
         )}
         {predictionError && (
-          <p className="mb-4 rounded-lg bg-red-50 p-3 text-xs text-red-800" role="alert">
+          <p
+            className="mb-4 rounded-lg bg-red-50 p-3 text-xs text-red-800"
+            role="alert"
+          >
             Prediction failed: {predictionError}
           </p>
         )}
@@ -36,6 +42,8 @@ export function ResultsPanel() {
             riskSummary={prediction.risk_summary}
             modelVersion={prediction.model_version}
             isMock={prediction.mock}
+            selectedVessel={selectedVessel}
+            onSelectVessel={setSelectedVessel}
           />
         ) : (
           !isPredicting &&
@@ -48,6 +56,10 @@ export function ResultsPanel() {
               <p>
                 Choose a sample patient or enter clinical features to see
                 predicted CAD and vessel probabilities.
+              </p>
+              <p className="text-xs text-slate-500">
+                Vessel colours are neutral until a current prediction is
+                available.
               </p>
             </div>
           )
