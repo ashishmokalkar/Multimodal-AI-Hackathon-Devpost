@@ -126,9 +126,15 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 selects the corresponding response explanation for CAD/LAD/LCX/RCA, labels
 response-snapshot input values with feature metadata, sorts the leading five
 contributions, and explicitly handles empty output. Explanations are marked
-mock/illustrative and model-scale unconfirmed. Gate 2 remains pending H/O
-review; this status is not real-backend integration or explanation-scale
-agreement.
+mock/illustrative and model-scale unconfirmed. O accepted the technical
+self-check and H approved Gate 2 (D-029). The Phase 3 closeout package records
+the reviewed technical results and WSL mock-hosting recovery; H's Human Gate 3
+decision remains pending. WSL hosting resolves the mock verification route
+only, not real-backend runtime or contract compatibility. This status is not
+real-model integration or explanation-scale agreement. The Oct 10-11
+integration window is provisional; M's contract response/requested changes and
+concrete API delivery date are required before S3 Gate 0 can close. S3 Phase 0
+is prepared but unstarted and blocked on H's Gate 3 approval.
 
 ## 8. Clinical safety
 
@@ -170,7 +176,12 @@ Rechecked remotely at H's request on **2026-10-09**: GitHub comparison reports
 `ML-dev` identical to `d09ebda7317a94f9d23f5c5b8706c6222a531b5e`, with no new
 commits or changed files. The findings below remain the branch evidence;
 M's unpushed/local work and API delivery date are unknown. S2 Gate 1 approval
-does not close these questions; their follow-up is deferred to Gate 2 (D-028).
+did not close these questions. At S2 Gate 2, H explicitly treated Oct 10-11
+integration as provisional and required M's response before S3 Gate 0 can
+close (D-029 supersedes D-028's follow-up boundary); the answers remain open.
+S2 Phase 3 has prepared a closeout package for H's pending Gate 3 review.
+The S3 Phase 0 plan remains unstarted; neither this mock work nor WSL hosting
+resolves real-backend compatibility.
 
 | Question | Confirmed evidence | Still open |
 |---|---|---|
