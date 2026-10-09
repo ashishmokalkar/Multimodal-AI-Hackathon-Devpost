@@ -158,6 +158,12 @@ Deployment (D-006), authentication, patient persistence, mobile layout, DICOM/im
 
 Source: `origin/ML-dev` at `d09ebda`. The actual branch name is `ML-dev`, not `ml`; this evidence is not M's acknowledgement of `docs/api-contract.md`.
 
+Rechecked remotely at H's request on **2026-10-09**: GitHub comparison reports
+`ML-dev` identical to `d09ebda7317a94f9d23f5c5b8706c6222a531b5e`, with no new
+commits or changed files. The findings below remain the branch evidence;
+M's unpushed/local work and API delivery date are unknown. S2 Gate 1 approval
+does not close these questions; their follow-up is deferred to Gate 2 (D-028).
+
 | Question | Confirmed evidence | Still open |
 |---|---|---|
 | Q1: inputs | `ml/data.py`, `data/README.md`, and `reports/EDA.md` define 55 cleaned inputs: 21 continuous, 3 ordinal, 31 binary; snake_case identifiers; target columns excluded. Raw data is available at `data/raw/z_alizadeh_sani_ext/z_alizadeh_sani_ext.xlsx`, sheet `Sheet 1 - Table 1`. | Serving payload names, units, allowed ranges/defaults, and final per-target pipeline inputs need agreement. Observed dataset bounds are not clinical reference ranges. |

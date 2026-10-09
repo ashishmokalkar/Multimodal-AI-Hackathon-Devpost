@@ -2,7 +2,7 @@
 
 **Calendar:** Phase 0 started Oct 8 after `/compact`, per H (D-023). H approved Gate 0 and authorised Phase 1 tonight, Oct 8 (D-025); S2 completion remains targeted for Oct 9. S3 remains Oct 10-11, S4 Oct 12-13, and Oct 14 submission-only buffer.
 
-**Status:** Phase 0 self-check passed and human Gate 0 is approved (D-025), including detailed criteria, allocations, and explicit external-dependency deferrals. Phase 1 implementation and its self-check evidence are complete; Gate 1 awaits H's review. The former Windows `uvicorn.exe` blocker was resolved for mock verification by the user-approved WSL 2 setup (D-026). Phases 2/3 remain gated. The baseline PR remains unmerged until H separately authorises merge.
+**Status:** Gates 0 and 1 are approved (D-025, D-028). Phase 1 implementation and its technical self-check evidence are complete; the WSL mock-hosting route is verified (D-027). Phase 2 is authorised and awaits H forwarding the handover to X. M's contract response/API delivery-date follow-up is explicitly deferred to Gate 2, not completed. Phase 3 remains gated. The baseline PR remains unmerged until H separately authorises merge.
 
 **Sprint cap:** 1800 credits (D-008). S2 accounting starts **2026-10-08 20:43:11.531 UTC** (22:43 CEST), at H's start instruction. Deduplicated project events before that boundary total **1407.9373** credits: O **1331.0196**, X **76.9177**. This includes the remaining S1 transition/compaction work and leaves **92.0627** under S1's 1500 cap and **5592.0627** under the project cap at S2 start. These are local telemetry figures, not account-billing reconciliation.
 
@@ -23,6 +23,22 @@ within its 120-credit Phase 1 ceiling with **90.381847** credits left. S2 totals
 session-store telemetry, deduplicated with `scripts/credits.py`'s project
 filter and event fields; not account billing.
 
+O's Gate 1 review snapshot (latest recorded event **2026-10-09 19:12:53.762 UTC**):
+Phase 1 **114.7094** credits (O **83.3350**, X **31.3744**);
+S2 **165.5045**, leaving **1634.4955** under its cap.
+Cumulative project credits **1573.4417**, leaving **5426.5583** overall.
+This newer local-telemetry snapshot includes recorded usage after X's report;
+it is not a discrepancy with that earlier report or a final gate balance.
+Later review/approval/handover calls are not included.
+
+Gate 1 approval snapshot (latest recorded event **2026-10-09 19:20:59.959 UTC**):
+S2 **181.3086**, Phase 1 through this snapshot **130.5136**, and project
+**1589.2459** credits, leaving **1618.6914** under the S2 cap and
+**5410.7541** overall. This includes recorded gate-review calls, not later
+documentation/handover calls. Phase 2 has not started; X must record its fresh
+kickoff timestamp and baseline so handover overhead is not misattributed to
+execution. These remain deduplicated local telemetry, not billing totals.
+
 
 ## Scope and allocation
 
@@ -39,8 +55,8 @@ O+X allocations approved at Gate 0 (D-025):
 | Phase | Combined allocation | X ceiling | Actual |
 |---|---:|---:|---|
 | 0 - Discussion and research | 200 | 0 | 50.7951 before Phase 1 kickoff, including handover overhead |
-| 1 - Coherent prediction and visual mapping | 650 | 120 | 83.623823 through the Oct 9 recovery snapshot (executor 29.618153); Gate 1 pending |
-| 2 - Minimum interpretation and supporting controls | 650 | 160 | Not started |
+| 1 - Coherent prediction and visual mapping | 650 | 120 | 130.5136 through the Gate 1 approval snapshot; later handover overhead excluded |
+| 2 - Minimum interpretation and supporting controls | 650 | 160 | Authorised; not started |
 | 3 - Retrospective and cleanup | 150 | 30 | Not started |
 | Contingency, only with H approval | 150 | Unassigned | Unused |
 | **Total** | **1800** | | |
@@ -57,7 +73,7 @@ Tasks
 
 - [x] Review `docs/spec.md`, `docs/decisions.md`, `docs/retro/sprint1.md`, and current deduplicated budget. Remote `ML-dev` remains at `d09ebda7317a94f9d23f5c5b8706c6222a531b5e` at S2 start; the previous ML findings remain applicable, not backend sign-off.
 - [x] Confirm evaluation-led scope with H (D-024), detailed criteria/allocations at Gate 0 (D-025), and retain the current orchestrator (D-020).
-- [ ] Via H, obtain M's acknowledgement or requested changes to `docs/api-contract.md`, plus a concrete API delivery date. Response deferred to the Gate 1 follow-up by H (D-025), not completed.
+- [ ] Via H, obtain M's acknowledgement or requested changes to `docs/api-contract.md`, plus a concrete API delivery date. Initially deferred to Gate 1 (D-025); H approved Gate 1 with this response deferred to Gate 2 (D-028), not completed.
 - [ ] Via H, assign ownership for the demo video and shared six-page document. Response deferred to S3 Phase 0 by H (D-025), not completed.
 - [x] Draft delivery phases, atomic tasks, acceptance criteria, evidence, and both gates; synchronise the affected spec and record H's scope decision.
 - [x] Obtain Gate 0 approval, including allocations, external follow-up deferrals, and Phase 1 tonight (D-025). Issue only the Phase 1 handover through H.
@@ -66,10 +82,10 @@ Tasks
 
 | Unanswered item | Owner and next action | Follow-up deadline | Blocking boundary |
 |---|---|---|---|
-| M's contract acknowledgement/requested changes and concrete serving API delivery date | H obtains M's response to `docs/api-contract.md` and the integration questions below; O records it. | Before S2 Phase 1 human gate, targeted Oct 9. This is our follow-up target, not a promised delivery date from M. | Does not block approved mock-based wiring. Real-backend integration cannot be claimed or completed without agreement and a usable API. If unanswered at Gate 1, H explicitly revisits S3 timing. |
+| M's contract acknowledgement/requested changes and concrete serving API delivery date | H obtains M's response to `docs/api-contract.md` and the integration questions below; O records it. | Before S2 Gate 2 (D-028), following H's explicit extension from Gate 1. This is our follow-up boundary, not a promised API delivery date from M. | Does not block independent Phase 2 work. The Oct 10-11 real-integration window remains at risk until confirmed. If still unanswered at Gate 2, H explicitly revisits integration timing before S3 proceeds; mock-only work cannot certify compatibility. |
 | Demo video and shared six-page document owners | H and M assign accountable owners; O records them in the next planning discussion. | Before S3 Phase 0 closes, targeted Oct 10. | Does not block viewer work; submission preparation cannot remain ownerless into S4. |
 
-These remain unanswered, not completed or signed off. H explicitly approved deferring their responses to these boundaries at Gate 0 (D-025). All contact still goes through H; no agents are spawned or directly messaged.
+These remain unanswered, not completed or signed off. H explicitly approved the initial deferrals at Gate 0 (D-025) and the contract/date extension at Gate 1 (D-028). All contact still goes through H; no agents are spawned or directly messaged.
 
 ### Integration questions carried forward
 
@@ -90,7 +106,7 @@ These remain unanswered, not completed or signed off. H explicitly approved defe
 
 **Human gate 0 (approved):** H selected "Approve Gate 0 and authorise Phase 1 tonight (Recommended)", approving the detailed plan, allocations, external deferrals, and earlier Phase 1 start (D-025). PR merge remains a separate decision.
 
-## Phase 1 - Coherent prediction and visual mapping (implementation delivered; Gate 1 pending)
+## Phase 1 - Coherent prediction and visual mapping (approved)
 
 **Goal:** One fresh prediction response drives readable CAD/vessel results, schematic vessel colours, and synchronised vessel selection.
 
@@ -135,7 +151,8 @@ allocation of 650 and total X ceiling of 120, including the prior 10.0098 credit
 the fresh recovery boundary and delta are recorded above without resetting the
 ceiling. All usage remains within the approved limits. Credits continue through
 the permitted read-only Windows session-store interface.
-H/M's contract response/API-date follow-up remains open at Gate 1.
+H/M's contract response/API-date follow-up remains open; H extended its boundary
+to Gate 2 when approving Gate 1 (D-028).
 
 **Self-check gate 1:**
 
@@ -164,9 +181,37 @@ zero-boundary, invalidation, deferred-race, and frontend quality evidence remain
 in `docs/evidence/s2p1-validation.txt`; frontend source/dependencies were not
 changed during this hosting recovery.
 
-**Human gate 1:** H approves mapping, correspondence, state handling and X's evidence after O review. H also records M's response/delivery timing, or explicitly revisits the external follow-up and S3 schedule if still unanswered. Phase 2 cannot begin before this approval.
+**Human gate 1 (approved):** H said "we can approve gate 1" after O accepted the
+technical evidence and proposed proceeding with the contract/date follow-up
+explicitly deferred to Gate 2 (D-028). H also requested a fresh ML-branch check.
+Phase 2 is authorised; real-backend compatibility and PR merge are not.
 
-## Phase 2 - Minimum interpretation and supporting controls (not started)
+**O review, Oct 9:** The technical self-check is accepted from the existing
+source/test review plus X's new WSL/browser evidence. Fresh response values in
+`s2p1-live-flow.txt` match the before/after result percentages, vessel legend,
+and callout screenshots. The selection/reset screenshots support X's recorded
+pointer/keyboard checks; the neutral-edit screenshot shows cleared results and
+neutral vessel geometry. README records the verified Linux-native environment,
+Windows-localhost startup and foreground shutdown commands. The recovery changes
+no frontend source/dependencies. Both branch refs matched
+`11d9cc1c46685fe993935855e9920d425b09c898` and the delivered tree was clean.
+
+The technical hosting blocker is closed for the mock, not for the unimplemented
+real backend. M's contract response/delivery date remain open; H subsequently
+approved Gate 1 with their follow-up deferred to Gate 2. Full-page screenshots and idle demand-mode
+FPS counters do not establish active-orbit performance. Phase 2 must measure
+the current canvas at a 1920x1080 viewport (X recorded 616.734375x936.25 CSS
+pixels during the selection sequence), rather than inherit S1's smaller-canvas
+benchmark.
+
+**Fresh ML check at H's request, Oct 9:** GitHub's comparison of
+`d09ebda7317a94f9d23f5c5b8706c6222a531b5e...ML-dev` returned `identical`,
+zero ahead/behind commits, and no changed files. The remote branch remains at
+the reviewed commit; no new serving API, exports, explanation serving, contract
+response, or delivery-date evidence appeared there. This is branch evidence,
+not a claim about M's unpushed/local work or an acknowledgement on M's behalf.
+
+## Phase 2 - Minimum interpretation and supporting controls (authorised; not started)
 
 **Goal:** Make the selected target's drivers understandable and its schematic vessel easy to inspect without pretending the mock is a validated clinical model.
 
@@ -191,7 +236,7 @@ Atomic tasks
 5. During active orbit on the intended demo machine, measure at least 50 FPS with a 1920x1080 viewport and record actual canvas CSS dimensions/DPR/device. Retain demand rendering and verify it settles when idle. This is not a full-screen 1080p benchmark; S4 will recheck the final integrated dashboard.
 6. `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` pass. Record concise evidence under `docs/evidence/s2p2-*`, commit/push and report credits/hashes. No CI troubleshooting.
 
-**Human gate 2:** H approves the minimum explanation experience, truthful labels, supporting controls, measured responsiveness, and X's evidence after O review.
+**Human gate 2:** H approves the minimum explanation experience, truthful labels, supporting controls, measured responsiveness, and X's evidence after O review. H/M also records the contract response/API delivery date deferred from Gate 1, or H explicitly revisits the threatened S3 integration window before proceeding; missing answers cannot silently carry over.
 
 ## Phase 3 - Retrospective and cleanup (not started)
 
