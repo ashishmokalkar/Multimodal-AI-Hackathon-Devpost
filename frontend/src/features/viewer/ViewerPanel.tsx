@@ -1,33 +1,158 @@
 import { Bounds, Html, OrbitControls, Stats } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
-import { Component, Suspense, type ReactNode } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import {
+  Component,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentRef,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import type { ErrorInfo } from "react";
+import { CatmullRomCurve3, Vector3 } from "three";
 import { HeartModel } from "./HeartModel";
 import { VesselMesh } from "./VesselMesh";
+import {
+  cameraPositionForTarget,
+  OVERVIEW_CAMERA_POSITION,
+  OVERVIEW_CAMERA_TARGET,
+} from "../../lib/cameraFocus";
 import { formatProbability } from "../../lib/format";
 import { usePatientStore } from "../../store/patientStore";
-import { vesselDisplay, vesselIds, vesselMap } from "./vesselMap";
+import {
+  vesselDisplay,
+  vesselIds,
+  vesselMap,
+  type VesselId,
+} from "./vesselMap";
 import { useUiStore } from "../../store/uiStore";
 
-function HeartScene() {
+type OrbitControlsImpl = ComponentRef<typeof OrbitControls>;
+
+interface CameraRequest {
+  focusVessel: VesselId | null;
+  sequence: number;
+}
+
+interface HeartSceneProps {
+  cameraRequest: CameraRequest;
+  controlsRef: RefObject<OrbitControlsImpl | null>;
+  setControlsRef: (controls: OrbitControlsImpl | null) => void;
+}
+
+interface OverviewView {
+  position: Vector3;
+  target: Vector3;
+}
+
+interface CameraFocusControllerProps {
+  cameraRequest: CameraRequest;
+  controlsRef: RefObject<OrbitControlsImpl | null>;
+  overviewViewRef: RefObject<OverviewView | null>;
+}
+
+function CameraFocusController({
+  cameraRequest,
+  controlsRef,
+  overviewViewRef,
+}: CameraFocusControllerProps) {
+  const { camera, invalidate } = useThree();
+  const appliedSequence = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (cameraRequest.sequence === appliedSequence.current) {
+      return;
+    }
+    appliedSequence.current = cameraRequest.sequence;
+
+    const controls = controlsRef.current;
+    if (!controls) {
+      return;
+    }
+
+    if (cameraRequest.focusVessel === null) {
+      const overview = overviewViewRef.current;
+      camera.position.copy(
+        overview?.position ?? new Vector3(...OVERVIEW_CAMERA_POSITION),
+      );
+      controls.target.copy(
+        overview?.target ?? new Vector3(...OVERVIEW_CAMERA_TARGET),
+      );
+    } else {
+      const path = vesselMap[cameraRequest.focusVessel].path;
+      const focusPoint = new CatmullRomCurve3(
+        path.map(([x, y, z]) => new Vector3(x, y, z)),
+      ).getPoint(0.5);
+      const nextCameraPosition = cameraPositionForTarget(
+        [camera.position.x, camera.position.y, camera.position.z],
+        [controls.target.x, controls.target.y, controls.target.z],
+        [focusPoint.x, focusPoint.y, focusPoint.z],
+      );
+      camera.position.set(...nextCameraPosition);
+      controls.target.copy(focusPoint);
+    }
+
+    controls.update();
+    invalidate();
+  }, [
+    camera,
+    cameraRequest.focusVessel,
+    cameraRequest.sequence,
+    controlsRef,
+    invalidate,
+    overviewViewRef,
+  ]);
+
+  return null;
+}
+
+function HeartScene({
+  cameraRequest,
+  controlsRef,
+  setControlsRef,
+}: HeartSceneProps) {
+  const { camera } = useThree();
+  const overviewViewRef = useRef<OverviewView | null>(null);
+
   return (
     <>
       <color attach="background" args={["#f4f8f5"]} />
       <ambientLight intensity={1.35} />
       <directionalLight position={[4, 5, 5]} intensity={2.2} />
       <directionalLight position={[-4, -2, -3]} intensity={0.65} />
-      <Bounds fit clip margin={1.2}>
+      <Bounds
+        fit
+        clip
+        margin={1.2}
+        maxDuration={1}
+        onFit={({ center, distance }) => {
+          const direction = camera.position.clone().sub(center).normalize();
+          overviewViewRef.current = {
+            position: center.clone().addScaledVector(direction, distance),
+            target: center.clone(),
+          };
+        }}
+      >
         <HeartModel />
         {vesselIds.map((vessel) => (
           <VesselMesh key={vessel} vessel={vessel} />
         ))}
       </Bounds>
       <OrbitControls
+        ref={setControlsRef}
         makeDefault
         enableDamping
         dampingFactor={0.08}
         minDistance={1.4}
         maxDistance={5.5}
+      />
+      <CameraFocusController
+        cameraRequest={cameraRequest}
+        controlsRef={controlsRef}
+        overviewViewRef={overviewViewRef}
       />
       {import.meta.env.DEV && <Stats />}
     </>
@@ -73,6 +198,14 @@ class AssetErrorBoundary extends Component<
 }
 
 export function ViewerPanel() {
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const setControlsRef = useCallback((controls: OrbitControlsImpl | null) => {
+    controlsRef.current = controls;
+  }, []);
+  const [cameraRequest, setCameraRequest] = useState<CameraRequest>({
+    focusVessel: null,
+    sequence: 0,
+  });
   const hoveredVessel = useUiStore((state) => state.hoveredVessel);
   const selectedVessel = useUiStore((state) => state.selectedVessel);
   const setSelectedVessel = useUiStore((state) => state.setSelectedVessel);
@@ -91,6 +224,19 @@ export function ViewerPanel() {
       : predictionError
         ? "The latest prediction failed; vessel probabilities are unavailable."
         : "No current prediction; vessel probabilities are unavailable.";
+
+  const focusVessel = (vessel: VesselId) => {
+    setCameraRequest((request) => ({
+      focusVessel: vessel,
+      sequence: request.sequence + 1,
+    }));
+  };
+  const resetView = () => {
+    setCameraRequest((request) => ({
+      focusVessel: null,
+      sequence: request.sequence + 1,
+    }));
+  };
 
   return (
     <section
@@ -127,7 +273,11 @@ export function ViewerPanel() {
                 </Html>
               }
             >
-              <HeartScene />
+              <HeartScene
+                cameraRequest={cameraRequest}
+                controlsRef={controlsRef}
+                setControlsRef={setControlsRef}
+              />
             </Suspense>
           </Canvas>
         </AssetErrorBoundary>
@@ -135,6 +285,29 @@ export function ViewerPanel() {
           <span>Schematic vessels; not patient-specific lesion maps.</span>
           <span>Drag to rotate - Scroll to zoom</span>
         </div>
+      </div>
+      <div
+        aria-label="Schematic camera controls"
+        className="mx-4 mb-3 flex flex-wrap items-center gap-2"
+        role="group"
+      >
+        <button
+          className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-emerald-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+          type="button"
+          onClick={resetView}
+        >
+          Reset view
+        </button>
+        {vesselIds.map((vessel) => (
+          <button
+            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-emerald-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            key={vessel}
+            type="button"
+            onClick={() => focusVessel(vessel)}
+          >
+            Focus {vessel}
+          </button>
+        ))}
       </div>
       <div
         className="viewer-legend"

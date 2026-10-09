@@ -1,8 +1,10 @@
 import { RawResult } from "./RawResult";
+import { useFeatures } from "../../api/hooks";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 
 export function ResultsPanel() {
+  const featuresQuery = useFeatures();
   const prediction = usePatientStore((state) => state.prediction);
   const predictionError = usePatientStore((state) => state.predictionError);
   const isPredicting = usePatientStore((state) => state.isPredicting);
@@ -34,14 +36,16 @@ export function ResultsPanel() {
             Prediction failed: {predictionError}
           </p>
         )}
+        {featuresQuery.isError && (
+          <p className="mb-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-900" role="alert">
+            Feature labels and units could not be loaded:{" "}
+            {featuresQuery.error.message}
+          </p>
+        )}
         {prediction ? (
           <RawResult
-            cad={prediction.cad}
-            vessels={prediction.vessels}
-            contributions={prediction.explanations.cad.contributions}
-            riskSummary={prediction.risk_summary}
-            modelVersion={prediction.model_version}
-            isMock={prediction.mock}
+            prediction={prediction}
+            features={featuresQuery.data ?? []}
             selectedVessel={selectedVessel}
             onSelectVessel={setSelectedVessel}
           />
