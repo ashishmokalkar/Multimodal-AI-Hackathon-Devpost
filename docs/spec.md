@@ -77,6 +77,14 @@ colour rather than a success-shaped default. A selected anatomical target may
 persist without risk detail. Older request successes/errors must not overwrite a
 newer input revision or request, including during the debounce interval.
 
+**Local hosting (D-026; mock setup verified 2026-10-09):** the frontend runs on
+Windows, while the mock API uses a separate Linux-native environment in WSL 2.
+Keep the existing Windows checkout/Git workflow; do not reuse its Windows
+virtual environment in Linux. API access through Windows localhost is verified;
+no host protections were disabled and no public service is exposed. Using WSL
+for the real backend still requires M's confirmed Python/dependency/model-artifact
+requirements; this is not backend compatibility sign-off.
+
 Extensibility (brief §Technical Considerations): new feature → appears automatically via `GET /features`; new vessel → add entry to `vesselMap.ts` + mesh node name; new model → backend only, metrics drawer is schema-driven.
 
 ## 5. API contract (summary — authoritative mock v1.0.0 in `docs/api-contract.md`; real-backend agreement pending)

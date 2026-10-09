@@ -2,7 +2,7 @@
 
 **Calendar:** Phase 0 started Oct 8 after `/compact`, per H (D-023). H approved Gate 0 and authorised Phase 1 tonight, Oct 8 (D-025); S2 completion remains targeted for Oct 9. S3 remains Oct 10-11, S4 Oct 12-13, and Oct 14 submission-only buffer.
 
-**Status:** Phase 0 self-check passed and human Gate 0 is approved (D-025), including detailed criteria, allocations, and explicit external-dependency deferrals. Phase 1 implementation has been delivered and awaits Gate 1 review. Its live mock-flow evidence is blocked because Windows Application Control denied the local `uvicorn.exe`; the gate is not passed. Phases 2/3 remain gated. The baseline PR remains unmerged until H separately authorises merge.
+**Status:** Phase 0 self-check passed and human Gate 0 is approved (D-025), including detailed criteria, allocations, and explicit external-dependency deferrals. Phase 1 implementation and its self-check evidence are complete; Gate 1 awaits H's review. The former Windows `uvicorn.exe` blocker was resolved for mock verification by the user-approved WSL 2 setup (D-026). Phases 2/3 remain gated. The baseline PR remains unmerged until H separately authorises merge.
 
 **Sprint cap:** 1800 credits (D-008). S2 accounting starts **2026-10-08 20:43:11.531 UTC** (22:43 CEST), at H's start instruction. Deduplicated project events before that boundary total **1407.9373** credits: O **1331.0196**, X **76.9177**. This includes the remaining S1 transition/compaction work and leaves **92.0627** under S1's 1500 cap and **5592.0627** under the project cap at S2 start. These are local telemetry figures, not account-billing reconciliation.
 
@@ -11,6 +11,18 @@ First S2 snapshot (latest recorded event **2026-10-08 20:43:48.832 UTC**): **10.
 Planning snapshot (latest recorded event **2026-10-08 20:52:00.495 UTC**): **28.3358** S2 credits; **1436.2731** cumulative; **5563.7269** project credits remaining, before subsequent calls. Phase actuals will be recorded at their gates; do not invent an O/X phase partition.
 
 Gate 0 snapshot (latest recorded event **2026-10-08 20:56:54.963 UTC**): O **1373.8175**, X **76.9177**, cumulative **1450.7352**; S2 planning so far **42.7979**, with **1757.2021** left under the S2 cap and **5549.2648** overall, before subsequent gate-recording/handover calls. X has not started S2. Record a fresh X phase-start boundary at actual kickoff; do not use X's whole-session total as Phase 1 spend.
+
+Phase 1 kickoff: **2026-10-08 20:59:33 UTC**, with **50.7951** S2 credits recorded before that boundary. X's report snapshot through **2026-10-08 21:10:35.334 UTC** records **10.0098** X/combined Phase 1 credits and **60.8049** S2 credits. O's first review snapshot through **2026-10-08 21:16:00.058 UTC** records **16.7765** combined Phase 1 credits, **67.5716** S2 credits, **1475.5089** cumulative project credits, and **5524.4911** remaining overall, before later review calls. These snapshots include no Gate 1 approval.
+
+Recovery snapshot (latest deduplicated event **2026-10-09 19:08:22.256 UTC**):
+Phase 1 totals are **82.001760** credits (planning session **54.005670**;
+executor session **27.996090**). The executor's recovery delta since
+**2026-10-09 18:50:38.568 UTC** is **15.017098** credits; the executor remains
+within its 120-credit Phase 1 ceiling with **92.003910** credits left. S2 totals
+**132.796830** credits across the two project sessions. Values are local
+session-store telemetry, deduplicated with `scripts/credits.py`'s project
+filter and event fields; not account billing.
+
 
 ## Scope and allocation
 
@@ -26,8 +38,8 @@ O+X allocations approved at Gate 0 (D-025):
 
 | Phase | Combined allocation | X ceiling | Actual |
 |---|---:|---:|---|
-| 0 - Discussion and research | 200 | 0 | 42.7979 through the Gate 0 snapshot; later handover overhead not included |
-| 1 - Coherent prediction and visual mapping | 650 | 120 | Authorised; not started |
+| 0 - Discussion and research | 200 | 0 | 50.7951 before Phase 1 kickoff, including handover overhead |
+| 1 - Coherent prediction and visual mapping | 650 | 120 | 82.001760 through the Oct 9 recovery snapshot (executor 27.996090); Gate 1 pending |
 | 2 - Minimum interpretation and supporting controls | 650 | 160 | Not started |
 | 3 - Retrospective and cleanup | 150 | 30 | Not started |
 | Contingency, only with H approval | 150 | Unassigned | Unused |
@@ -86,14 +98,44 @@ These remain unanswered, not completed or signed off. H explicitly approved defe
 
 Atomic tasks
 
-- [ ] Replace static vessel probabilities in runtime rendering with accepted `patientStore.prediction` targets. Keep geometry/IDs separate from response values and reuse `colorScale`; no fallback sample probabilities.
-- [ ] Render readable CAD and LAD/LCX/RCA probability summaries from the same response, using one consistent percentage formatter. Show response-provided labels/thresholds as model outputs, not invented clinical risk categories.
-- [ ] Make each vessel summary keyboard-operable. Use `uiStore.selectedVessel` for bidirectional selection; a CAD/clear action restores the default CAD target. Selection does not automatically reposition the camera.
-- [ ] Show the selected vessel's name and current probability in the viewer callout; keep labels/numeric values as a secondary encoding alongside colour. Add a continuous 0-100% probability legend with a distinct neutral/unavailable state, not clinical low/medium/high cutoffs.
-- [ ] Derive viewer and results availability from the same prediction state. Preserve the current clear-on-edit/sample-change behaviour: neutral vessels and no prior probability/contribution values until a fresh response arrives. The selected anatomical target may persist, but its prediction detail must clear.
-- [ ] Check request freshness at the current input revision/latest request. Earlier success or error responses must not overwrite a newer input/prediction, including during the debounce interval, with auto-predict off, after invalid input, or on sample/reset changes. Clear old results while retrying; show latest request errors explicitly.
-- [ ] Preserve Zod response validation, the 500 ms debounce, manual Predict, data-driven form validation, synthetic/mock labels, asset attribution, schematic warning, and clinical disclaimers.
-- [ ] Add focused tests and capture the gate evidence below. Do not implement Phase 2 explanation presentation or camera presets yet.
+- [x] Replace static vessel probabilities in runtime rendering with accepted `patientStore.prediction` targets. Keep geometry/IDs separate from response values and reuse `colorScale`; no fallback sample probabilities.
+- [x] Render readable CAD and LAD/LCX/RCA probability summaries from the same response, using one consistent percentage formatter. Show response-provided labels/thresholds as model outputs, not invented clinical risk categories.
+- [x] Make each vessel summary keyboard-operable. Use `uiStore.selectedVessel` for bidirectional selection; a CAD/clear action restores the default CAD target. Selection does not automatically reposition the camera. Implementation reviewed; live interaction evidence is recorded below.
+- [x] Show the selected vessel's name and current probability in the viewer callout; keep labels/numeric values as a secondary encoding alongside colour. Add a continuous 0-100% probability legend with a distinct neutral/unavailable state, not clinical low/medium/high cutoffs.
+- [x] Derive viewer and results availability from the same prediction state. Preserve the current clear-on-edit/sample-change behaviour: neutral vessels and no prior probability/contribution values until a fresh response arrives. The selected anatomical target may persist, but its prediction detail must clear.
+- [x] Check request freshness at the current input revision/latest request. Earlier success or error responses must not overwrite a newer input/prediction, including during the debounce interval, with auto-predict off, after invalid input, or on sample/reset changes. Clear old results while retrying; show latest request errors explicitly.
+- [x] Preserve Zod response validation, the 500 ms debounce, manual Predict, data-driven form validation, synthetic/mock labels, asset attribution, schematic warning, and clinical disclaimers.
+- [x] Add focused tests and capture the gate evidence below. Do not implement Phase 2 explanation presentation or camera presets yet.
+
+**O review, Oct 8 (historical, before WSL recovery):** `d7130c4`, `2d7debb`, and `7ee2b32` were present; local/remote `frontend` matched `7ee2b3290a56e159e886e50cf279aed2e7cf55ef`. Focused source/test review supported the probability mapping, neutral-state handling, shared selection, and revision/request freshness design; no blocking implementation defect was identified. X's recorded local checks passed (5 files / 15 tests). The live browser/API flow was still unverified at that review.
+
+**Historical blocker:** Windows Application Control denied `mock-api\.venv\Scripts\uvicorn.exe`; it was not retried or bypassed. See `docs/evidence/s2p1-live-flow-blocker.txt` and `s2p1-hosting-diagnosis.txt`. The authorized WSL route below has now completed the mock-based live verification.
+
+**H direction and hosting diagnosis:** H chose WSL rather than deferring verification (D-026). Read-only inspection found Windows 11 Home with Smart App Control enabled, unsigned local venv launchers, and Code Integrity events rejecting this project's `uvicorn.exe` before server startup. No protection settings were changed and no blocked process was retried. WSL 2 now serves the mock through Windows localhost; this does not certify the real backend.
+
+### Gate 1 completion - user-approved WSL hosting setup (D-026)
+
+H chose WSL rather than deferring verification. Ubuntu 24.04 runs as WSL 2;
+the existing Windows checkout is mounted in Linux, with Git remaining on Windows.
+The Linux-only environment is `/home/jalfaizy/.venvs/multimodal-ai-hack-mock-api`
+(Python 3.12.3, uv 0.12.24), synced from `uv.lock` without changing it. The API
+is bound to WSL loopback and is reachable from both Ubuntu and the Windows
+frontend at `http://localhost:8000`. No administrator/reboot action remained;
+no firewall or host-protection setting was changed.
+
+- [x] H's WSL/Ubuntu setup and Linux first login are complete; verified Ubuntu 24.04 is WSL 2.
+- [x] X created the Linux-native Python/uv environment in Ubuntu's home, separate from `mock-api\.venv`; reused the manifest/lockfile without upgrades and kept Git operations on Windows.
+- [x] X started the mock on loopback and verified `/health` inside Linux and from Windows localhost; Windows-origin CORS and the frontend's API-backed flow returned successfully.
+- [x] X captured the sample/chest-pain comparison, bidirectional viewer/results selection, Enter/Space, CAD/clear, stable camera frame, and live edit invalidation/neutral state.
+- [x] X documented verified Windows-frontend/WSL-API setup/start/stop instructions in `README.md` and saved the evidence under `docs/evidence/s2p1-*`. The in-scope planning edits and hosting diagnosis are included for publication.
+
+No feature redesign, API contract change, public deployment, Docker setup, or
+real-model integration is authorised here. Maintain the existing Phase 1 combined
+allocation of 650 and total X ceiling of 120, including the prior 10.0098 credits;
+the fresh recovery boundary and delta are recorded above without resetting the
+ceiling. All usage remains within the approved limits. Credits continue through
+the permitted read-only Windows session-store interface.
+H/M's contract response/API-date follow-up remains open at Gate 1.
 
 **Self-check gate 1:**
 
@@ -103,6 +145,24 @@ Atomic tasks
 4. Tests cover initial no-result, edit/sample/reset invalidation, pending/retry, rejected request, and invalid response. In each unavailable state there are no fixed test probabilities, no old risk values, and no success-coloured default vessels; errors have a visible alert.
 5. Deferred-promise tests prove an old success and an old rejection cannot replace a newer input/current request state, including the 500 ms debounce interval and auto-predict-off/invalid-input cases. The current response succeeds normally afterward.
 6. `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` pass. Record concise output and screenshots/state evidence under `docs/evidence/s2p1-*`; commit and push passing in-scope work, report hashes and actual credits. CI is informational, not a waiting/debugging task.
+
+**Evidence completion, Oct 9:** Current response values, DOM legend colours/callouts,
+and screenshots are recorded in `docs/evidence/s2p1-live-flow.txt`,
+`s2p1-live-before.png`, `s2p1-live-after.png`, `s2p1-selection-results.png`,
+`s2p1-selection-viewer.png`, and `s2p1-neutral-after-edit.png`. The same sample-1
+features produced CAD probabilities **0.7523** with Typical Chest Pain false and
+**0.8821** with it true (delta **0.1298**); the after-edit UI labels the modified
+sample as custom. Live result selection via Enter (LAD/RCA), Space (LCX), and
+CAD reset updated the viewer callout and `aria-pressed`; pointer picking each
+schematic vessel updated the corresponding result control. Canvas viewport
+bounds remained unchanged during selection. Editing Age 67→68 with auto-predict
+off cleared all prior outputs and contributions, rendered every vessel neutral,
+and retained RCA selection with unavailable risk detail. These close the
+executor's evidence tasks only: Gate 1 still awaits H's approval, and M's
+contract acknowledgement/API delivery date remain open. The existing mapping,
+zero-boundary, invalidation, deferred-race, and frontend quality evidence remains
+in `docs/evidence/s2p1-validation.txt`; frontend source/dependencies were not
+changed during this hosting recovery.
 
 **Human gate 1:** H approves mapping, correspondence, state handling and X's evidence after O review. H also records M's response/delivery timing, or explicitly revisits the external follow-up and S3 schedule if still unanswered. Phase 2 cannot begin before this approval.
 

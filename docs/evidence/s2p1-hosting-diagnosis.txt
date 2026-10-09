@@ -1,0 +1,67 @@
+Sprint 2 Phase 1 hosting diagnosis
+Date: 2026-10-08
+Method: read-only Windows metadata, executable signatures, and project-scoped
+Code Integrity events. No blocked executable was retried and no security setting
+was changed.
+
+Observed:
+- OS: Microsoft Windows 11 Home, build 26300.
+- VerifiedAndReputablePolicyState: 1 (Smart App Control enabled).
+- mock-api\.venv\Scripts\uvicorn.exe: Authenticode status NotSigned.
+- mock-api\.venv\Scripts\python.exe: Authenticode status NotSigned.
+- Code Integrity events 3077 and 3033 at 2026-10-08 23:05:14 local time identify
+  this repository's uvicorn.exe as failing signing/code-integrity requirements.
+- Event 3077 identifies policy {0283ac0f-fff1-49ae-ada1-8a933130cad6}.
+  Its generic "Enterprise signing level" wording is not evidence that this
+  personal PC is enterprise-managed.
+
+Assessment:
+The documented launcher was blocked before the API could listen on port 8000.
+The connection refusal is therefore not evidence of a FastAPI route, CORS, or
+frontend defect. Smart App Control is enabled and Windows Code Integrity
+rejected the unsigned launcher. Do not infer malware solely from NotSigned.
+
+Microsoft's Smart App Control FAQ explains the reputation/signature checks and
+states that individual-app exceptions are not currently supported:
+https://support.microsoft.com/en-us/windows/security/threat-malware-protection/smart-app-control-frequently-asked-questions
+
+At the time of the initial diagnosis, the approved execution environment and
+live-flow evidence were pending. H subsequently selected WSL 2 for local API
+development (D-026). The original Windows launcher was not retried or bypassed.
+
+User-directed follow-up:
+H selected WSL for local API development (D-026). Read-only preflight found:
+- HypervisorPresent: True.
+- VirtualizationFirmwareEnabled: True.
+- VMMonitorModeExtensions / SecondLevelAddressTranslationExtensions: False;
+  these can be masked by an active hypervisor and do not alone prove that
+  the hardware lacks virtualisation support.
+- C:\Windows\System32\wsl.exe: valid Microsoft Windows Authenticode signature.
+- Free space on C: at preflight: 344.9 GB.
+
+Official installation reference:
+https://learn.microsoft.com/en-us/windows/wsl/install
+
+Follow-up verification, 2026-10-09:
+- `wsl --list --verbose` reported Ubuntu-24.04, version 2. Starting that distro
+  reported Linux kernel `6.18.40.1-microsoft-standard-WSL2`; its existing Linux
+  account was initialized, so no administrator, reboot, or first-login action
+  remained.
+- Linux tools were checked before installation: Python 3.12.3 was present;
+  `uv` and `pip` were absent; `curl` was present. Installed uv 0.12.24 using
+  Astral's installer, then synced the existing project lockfile into
+  `/home/jalfaizy/.venvs/multimodal-ai-hack-mock-api`. No lockfile change or
+  dependency upgrade was made.
+- `pytest -q`: 3 passed. `ruff check .`: All checks passed.
+- Uvicorn listened on `127.0.0.1:8000` in WSL. `/health` returned
+  `{"status":"ok","model_version":"mock-1.0.0","contract_version":"1.0.0","mock":true}`
+  inside Linux and through Windows `http://localhost:8000`. Windows CORS
+  preflight-origin request from `http://localhost:5173` returned HTTP 200 and
+  `Access-Control-Allow-Origin: http://localhost:5173`; `/features` returned
+  55 features.
+- The Windows frontend completed the sample-1 prediction and chest-pain-toggle
+  flow, live selection/keyboard checks, and edit invalidation. Details and
+  screenshots are in `s2p1-live-flow.txt` and adjacent `s2p1-*.png` evidence.
+- No Windows security setting, firewall rule, or WSL-wide restart was used.
+  This verifies the mock workflow only; it is not M's real-backend runtime
+  handoff or backend compatibility sign-off.
