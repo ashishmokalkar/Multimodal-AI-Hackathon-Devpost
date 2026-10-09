@@ -2,7 +2,7 @@
 
 **Calendar:** Phase 0 started Oct 8 after `/compact`, per H (D-023). H approved Gate 0 and authorised Phase 1 tonight, Oct 8 (D-025); S2 completion remains targeted for Oct 9. S3 remains Oct 10-11, S4 Oct 12-13, and Oct 14 submission-only buffer.
 
-**Status:** Gates 0 and 1 are approved (D-025, D-028). Phase 1 implementation and its technical self-check evidence are complete; the WSL mock-hosting route is verified (D-027). Phase 2 is authorised and awaits H forwarding the handover to X. M's contract response/API delivery-date follow-up is explicitly deferred to Gate 2, not completed. Phase 3 remains gated. The baseline PR remains unmerged until H separately authorises merge.
+**Status:** Gates 0 and 1 are approved (D-025, D-028). Phase 1 implementation and its technical self-check evidence are complete; the WSL mock-hosting route is verified (D-027). Phase 2's mock-based implementation and technical self-check evidence are delivered; Gate 2 awaits H/O review. M's contract response/API delivery-date follow-up remains open and was deferred to Gate 2, not completed. Phase 3 remains gated. The baseline PR remains unmerged until H separately authorises merge.
 
 **Sprint cap:** 1800 credits (D-008). S2 accounting starts **2026-10-08 20:43:11.531 UTC** (22:43 CEST), at H's start instruction. Deduplicated project events before that boundary total **1407.9373** credits: O **1331.0196**, X **76.9177**. This includes the remaining S1 transition/compaction work and leaves **92.0627** under S1's 1500 cap and **5592.0627** under the project cap at S2 start. These are local telemetry figures, not account-billing reconciliation.
 
@@ -39,6 +39,21 @@ documentation/handover calls. Phase 2 has not started; X must record its fresh
 kickoff timestamp and baseline so handover overhead is not misattributed to
 execution. These remain deduplicated local telemetry, not billing totals.
 
+Phase 2 kickoff boundary **2026-10-09 19:27:22.028 UTC**: immediately before
+the boundary, O/planning had **1493.209565** all-time and **162.189990** S2
+credits; X/executor had **111.1197645** all-time and **34.2020645** S2 credits.
+Combined kickoff totals were **1604.3293295** all-time and **196.3920545** S2.
+All later deduplicated events in the same two project sessions count toward
+Phase 2; this is local session-store telemetry, not account billing.
+
+Phase 2 usage snapshot (latest project event **2026-10-09 19:58:07.752 UTC**):
+O/planning **31.679840**, X/executor **36.627854**, combined **68.307694**
+credits since kickoff. S2 total **264.6997485**; cumulative project total
+**1672.6370235**. Phase 2 remains within its 650 allocation with
+**581.692306** credits left; X remains within its 160 ceiling with
+**123.372146** left. Later documentation, commit, and push events are not
+included in this snapshot.
+
 
 ## Scope and allocation
 
@@ -56,7 +71,7 @@ O+X allocations approved at Gate 0 (D-025):
 |---|---:|---:|---|
 | 0 - Discussion and research | 200 | 0 | 50.7951 before Phase 1 kickoff, including handover overhead |
 | 1 - Coherent prediction and visual mapping | 650 | 120 | 130.5136 through the Gate 1 approval snapshot; later handover overhead excluded |
-| 2 - Minimum interpretation and supporting controls | 650 | 160 | Authorised; not started |
+| 2 - Minimum interpretation and supporting controls | 650 | 160 | 68.307694 through the 2026-10-09 19:58:07.752 UTC snapshot (O 31.679840, X 36.627854); later events excluded |
 | 3 - Retrospective and cleanup | 150 | 30 | Not started |
 | Contingency, only with H approval | 150 | Unassigned | Unused |
 | **Total** | **1800** | | |
@@ -211,7 +226,7 @@ the reviewed commit; no new serving API, exports, explanation serving, contract
 response, or delivery-date evidence appeared there. This is branch evidence,
 not a claim about M's unpushed/local work or an acknowledgement on M's behalf.
 
-## Phase 2 - Minimum interpretation and supporting controls (authorised; not started)
+## Phase 2 - Minimum interpretation and supporting controls (implementation delivered; Gate 2 pending H review)
 
 **Goal:** Make the selected target's drivers understandable and its schematic vessel easy to inspect without pretending the mock is a validated clinical model.
 
@@ -219,13 +234,20 @@ not a claim about M's unpushed/local work or an acknowledgement on M's behalf.
 
 Atomic tasks
 
-- [ ] Show CAD explanations by default; vessel selection switches to exactly `prediction.explanations[selectedVessel]`. Use the shared selection state, not a second target store.
-- [ ] Present up to five contributions sorted by absolute magnitude, with deterministic tie handling, readable feature labels, input values, units when supplied, and signed contribution values. Read values from the accepted response/submitted snapshot, not a subsequently edited form.
-- [ ] Include positive, negative, and zero/empty-list states. Describe model contributions, not clinical causation; do not calculate a probability endpoint by summing unconfirmed-scale contributions.
-- [ ] Keep mock attribution visibly illustrative. For any scale not established by the contract, label it unconfirmed/model scale; do not claim probability-point changes, genuine SHAP, or a mathematically additive waterfall. Real explanation-scale/schema changes remain M/S3 work.
-- [ ] Add basic Reset and LAD/LCX/RCA focus controls only after the interpretation tasks pass. Use existing controls/geometry to frame the named schematic vessel; do not introduce unverified anterior/lateral/inferior anatomical labels or elaborate flight animation.
-- [ ] Keep all inspection controls keyboard-operable, give the canvas a useful accessible summary, and maintain numeric/label encodings so meaning is not colour-only.
-- [ ] Capture the gate evidence and verify the integrated viewer still uses demand rendering and the existing local assets. No dashboard tabs, metrics drawer, reference-range classifier, or backend swap in this phase.
+- [x] Show CAD explanations by default; vessel selection switches to exactly `prediction.explanations[selectedVessel]`. Use the shared selection state, not a second target store.
+- [x] Present up to five contributions sorted by absolute magnitude, with deterministic tie handling, readable feature labels, input values, units when supplied, and signed contribution values. Read values from the accepted response/submitted snapshot, not a subsequently edited form.
+- [x] Include positive, negative, and zero/empty-list states. Describe model contributions, not clinical causation; do not calculate a probability endpoint by summing unconfirmed-scale contributions.
+- [x] Keep mock attribution visibly illustrative. For any scale not established by the contract, label it unconfirmed/model scale; do not claim probability-point changes, genuine SHAP, or a mathematically additive waterfall. Real explanation-scale/schema changes remain M/S3 work.
+- [x] Add basic Reset and LAD/LCX/RCA focus controls only after the interpretation tasks pass. Use existing controls/geometry to frame the named schematic vessel; do not introduce unverified anterior/lateral/inferior anatomical labels or elaborate flight animation.
+- [x] Keep all inspection controls keyboard-operable, give the canvas a useful accessible summary, and maintain numeric/label encodings so meaning is not colour-only.
+- [x] Capture the gate evidence and verify the integrated viewer still uses demand rendering and the existing local assets. No dashboard tabs, metrics drawer, reference-range classifier, or backend swap in this phase.
+
+**Implementation and evidence status (2026-10-09):** The current accepted mock
+response drives the selected-target explanation and the 3D camera controls.
+Self-check evidence is recorded in `docs/evidence/s2p2-validation.txt` and the
+screenshots beside it. No contract, API, prediction schema, or backend code was
+changed. Gate 2 remains pending H/O review; this work does not certify real
+backend integration or resolve M's contract/API-date follow-up.
 
 **Self-check gate 2:**
 
@@ -235,6 +257,17 @@ Atomic tasks
 4. Reset restores the overview; each focus control visibly frames its named schematic vessel without losing orbit/zoom. Keyboard operation works, and ordinary vessel selection still does not move the camera.
 5. During active orbit on the intended demo machine, measure at least 50 FPS with a 1920x1080 viewport and record actual canvas CSS dimensions/DPR/device. Retain demand rendering and verify it settles when idle. This is not a full-screen 1080p benchmark; S4 will recheck the final integrated dashboard.
 6. `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` pass. Record concise evidence under `docs/evidence/s2p2-*`, commit/push and report credits/hashes. No CI troubleshooting.
+
+**Executor self-check (2026-10-09):** All six technical criteria are
+documented in `docs/evidence/s2p2-validation.txt`. The fixture tests cover all
+four explanation targets, stable top-five sorting, signs, response values,
+units and empty explanations. Live mock screenshots show the synthetic sample,
+selected LAD values, neutral invalidation and the fresh chest-pain-toggle
+response. Viewer picking and result controls select the same LAD/LCX/RCA/CAD
+state; pointer and keyboard focus/reset controls frame the schematic geometry.
+The active-orbit measurement uses the actual 1920x1080 browser viewport and
+records canvas size/DPR and the WebGL renderer. Lint, typecheck, all 21 tests,
+and build pass; Vite retains its non-blocking large-chunk advisory.
 
 **Human gate 2:** H approves the minimum explanation experience, truthful labels, supporting controls, measured responsiveness, and X's evidence after O review. H/M also records the contract response/API delivery date deferred from Gate 1, or H explicitly revisits the threatened S3 integration window before proceeding; missing answers cannot silently carry over.
 

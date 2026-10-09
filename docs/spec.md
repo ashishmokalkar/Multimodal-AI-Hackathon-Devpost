@@ -110,7 +110,7 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 - S2's mock-based viewer maps only the current accepted `PredictionResponse` to per-vessel colours, summaries, hover details, and selection details. When a current response is unavailable, all vessels use a distinct neutral colour and no old probability or contribution is shown. These mock-driven updates are not real-model integration.
 - Loading: `useGLTF` (drei); use Draco only if needed and serve its decoder locally. `<Bounds fit>` on load; `frameloop="demand"`; `dpr={[1, 1.5]}`. No runtime asset/decoder CDN calls.
 - Colour mapping: probability → `d3-scale`-style interpolation green (#2e7d32) → amber (#f9a825) → red (#c62828), with vessel labels and numeric values as a secondary encoding. The continuous legend shows 0-100% predicted probability, not clinical severity cutoffs or percentage artery narrowing; unavailable values have a distinct neutral encoding.
-- Interaction: `OrbitControls` (damped), hover → emissive highlight + tooltip, click → select using the existing emissive highlight and shared results selection. Keyboard-operable result controls provide an alternative to 3D picking. Basic manual LAD/LCX/RCA focus presets and Reset frame the schematic geometry without automatic camera jumps or unverified anatomical-view labels; elaborate flyTo animation is not S2 scope.
+- Interaction: `OrbitControls` (damped), hover → emissive highlight + tooltip, click → select using the existing emissive highlight and shared results selection. Keyboard-operable result controls provide an alternative to 3D picking. Basic manual LAD/LCX/RCA focus controls and Reset frame the schematic geometry; result selection itself does not change the camera. Focus translates the camera and orbit target together to preserve the current orbit and zoom. No unverified anatomical-view labels or elaborate flyTo animation.
 - Performance target: ≥50 fps during active rendering/interaction at 1080p; heart plus vessels ≤150k triangles total; GLB ≤8 MB. Phase 3 measured results are recorded with the evidence for the Gate 3 handoff.
 - Loading/error states are shown explicitly. The GLB and all its embedded textures are local; no runtime asset or decoder CDN is used.
 
@@ -121,6 +121,14 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 - Explanation scale must be agreed with M: the ML roadmap proposes logit-scale attributions. Do not add them to a probability-scale base or present them as probability-point changes. A waterfall may imply additivity only when the base, contributions and endpoint use the same documented scale; the final probability remains a separate labelled value.
 - **Vitals tab (S3):** table of features, entered values and model contributions. `FeatureSchema.min/max` are input-validation bounds, not clinical reference intervals. Clinical normal ranges/out-of-range claims require a separately sourced, agreed reference dataset; otherwise show units and values without normal/abnormal classification.
 - Plain-language summaries describe model drivers, not disease causation, and identify the attribution scale. Do not describe an unconfirmed signed contribution as a change in disease probability.
+
+**S2 Phase 2 implementation status (2026-10-09):** The mock frontend now
+selects the corresponding response explanation for CAD/LAD/LCX/RCA, labels
+response-snapshot input values with feature metadata, sorts the leading five
+contributions, and explicitly handles empty output. Explanations are marked
+mock/illustrative and model-scale unconfirmed. Gate 2 remains pending H/O
+review; this status is not real-backend integration or explanation-scale
+agreement.
 
 ## 8. Clinical safety
 
