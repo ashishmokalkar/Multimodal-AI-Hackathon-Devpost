@@ -14,12 +14,12 @@ Gate 0 snapshot (latest recorded event **2026-10-08 20:56:54.963 UTC**): O **137
 
 Phase 1 kickoff: **2026-10-08 20:59:33 UTC**, with **50.7951** S2 credits recorded before that boundary. X's report snapshot through **2026-10-08 21:10:35.334 UTC** records **10.0098** X/combined Phase 1 credits and **60.8049** S2 credits. O's first review snapshot through **2026-10-08 21:16:00.058 UTC** records **16.7765** combined Phase 1 credits, **67.5716** S2 credits, **1475.5089** cumulative project credits, and **5524.4911** remaining overall, before later review calls. These snapshots include no Gate 1 approval.
 
-Recovery snapshot (latest deduplicated event **2026-10-09 19:08:22.256 UTC**):
-Phase 1 totals are **82.001760** credits (planning session **54.005670**;
-executor session **27.996090**). The executor's recovery delta since
-**2026-10-09 18:50:38.568 UTC** is **15.017098** credits; the executor remains
-within its 120-credit Phase 1 ceiling with **92.003910** credits left. S2 totals
-**132.796830** credits across the two project sessions. Values are local
+Recovery snapshot (latest deduplicated event **2026-10-09 19:09:22.576 UTC**):
+Phase 1 totals are **83.623823** credits (planning session **54.005670**;
+executor session **29.618153**). The executor's recovery delta since
+**2026-10-09 18:50:38.568 UTC** is **16.639161** credits; the executor remains
+within its 120-credit Phase 1 ceiling with **90.381847** credits left. S2 totals
+**134.418893** credits across the two project sessions. Values are local
 session-store telemetry, deduplicated with `scripts/credits.py`'s project
 filter and event fields; not account billing.
 
@@ -39,7 +39,7 @@ O+X allocations approved at Gate 0 (D-025):
 | Phase | Combined allocation | X ceiling | Actual |
 |---|---:|---:|---|
 | 0 - Discussion and research | 200 | 0 | 50.7951 before Phase 1 kickoff, including handover overhead |
-| 1 - Coherent prediction and visual mapping | 650 | 120 | 82.001760 through the Oct 9 recovery snapshot (executor 27.996090); Gate 1 pending |
+| 1 - Coherent prediction and visual mapping | 650 | 120 | 83.623823 through the Oct 9 recovery snapshot (executor 29.618153); Gate 1 pending |
 | 2 - Minimum interpretation and supporting controls | 650 | 160 | Not started |
 | 3 - Retrospective and cleanup | 150 | 30 | Not started |
 | Contingency, only with H approval | 150 | Unassigned | Unused |

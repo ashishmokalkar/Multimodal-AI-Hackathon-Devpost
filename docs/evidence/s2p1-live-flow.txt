@@ -1,10 +1,10 @@
 Sprint 2 Phase 1 - WSL hosting and live verification
 Date: 2026-10-09
 Recovery boundary: 2026-10-09T18:50:38.568Z
-Latest local usage event: 2026-10-09T19:08:22.256Z
-Deduplicated local telemetry: recovery delta 15.017098 X credits; Phase 1
-82.001760 total (O/planning session 54.005670, X/executor session 27.996090);
-S2 132.796830 total. X remains within its 120-credit Phase 1 ceiling.
+Latest local usage event: 2026-10-09T19:09:22.576Z
+Deduplicated local telemetry: recovery delta 16.639161 X credits; Phase 1
+83.623823 total (O/planning session 54.005670, X/executor session 29.618153);
+S2 134.418893 total. X remains within its 120-credit Phase 1 ceiling.
 
 Environment and API readiness
 - `wsl --status`: default WSL version 2. `wsl -d Ubuntu-24.04` reported
