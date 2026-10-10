@@ -17,6 +17,13 @@ All handovers O → X and X → O pass **through H in chat**. No agent spawns su
 
 - **Deadline:** 14 Oct 2026, 20:45 CEST (Devpost: 15 Oct 00:15 IST). Oct 14 is submission-only buffer.
 - **Budget:** 7000 Copilot credits for O + X combined. Per-sprint caps live in `plan.md`. Exceeding a sprint cap requires an explicit H decision logged in `decisions.md`.
+- **S4 budget simplification (D-049):** one shared hard ceiling of 700 for O
+  and X. Phase, executor, warning and publication allocations are planning
+  estimates, not separate stop limits. X may use the remaining shared sprint
+  budget for approved scope without micro-allowance requests. Preserve dated
+  actuals and historical overruns; S5 500, reserve 700 and project 7000 stay
+  unchanged. Human gates, scope approvals and repeated-failure rules still
+  apply; this does not authorise later phases automatically.
 - **Branches:** `main` ← `dev` ← `frontend` (ours) / `ML-dev` (colleague). We only commit to `frontend`. Merges to `dev` happen at sprint end via PR after H approval.
 
 ## 3. Artefacts

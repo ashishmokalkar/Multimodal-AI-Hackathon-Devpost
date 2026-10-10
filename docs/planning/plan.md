@@ -1,7 +1,14 @@
 # Sprint 4 Plan - Feedback and code completion
 
 **Status:** Human Gates 0 and 1 are approved. Phase 1 is accepted; H authorised
-the bounded Phase 2 feedback/hardening batch under D-047. Feedback from a
+the bounded Phase 2 feedback/hardening batch under D-047. Phase 2 source,
+README and live evidence are delivered locally but remain unpublished.
+H approved publication-only completion and a bounded combined-credit
+reallocation under D-048 after corrective and combined limits were crossed.
+H subsequently replaced S4's sublimits with one shared 700-credit hard sprint
+budget (D-049) and explicitly authorised O to commit/push the reviewed work.
+Human Gate 2 remains pending; no cleanup or code-freeze work is authorised.
+Feedback from a
 review of older `cbb9d95` is triaged below; only S4-F01/F04/F06/F08/F09 and
 the existing release-candidate/carryover tasks enter this batch. Deferred or
 no-change items do not reopen implementation scope.
@@ -39,11 +46,19 @@ H approved splitting D-008's existing 1200 final-sprint allocation into S4
 increase, overrun reset, reserve use or transfer of earlier underspend is
 authorised.
 
-| Phase | Combined ceiling | X ceiling | Status |
+**Current budget authority (D-049):** S4 has one shared hard 700-credit budget
+for O and X. The phase/executor/corrective/publication figures below are
+historical allocations and planning estimates, not independent stop limits.
+X may use the remaining shared sprint budget for already-approved scope
+without repeated micro-allowance requests. Count all O/X usage, retain every
+historical overrun, and stop/re-plan if the shared S4 or project cap is reached.
+Scope, human gates and repeated-failure rules remain mandatory.
+
+| Phase | Combined estimate | Historical X allocation | Status |
 |---|---:|---:|---|
 | 0 - Discussion and research | 100 | 0 | Gate 0 approved |
-| 1 - Summary-first results and explanations | 350 | 120 | Accepted at Gate 1 |
-| 2 - Bounded feedback, release-candidate hardening and carryover | 150 | 100; carryover corrective limit 60 cumulative, overlapping | Authorised by D-047 |
+| 1 - Summary-first results and explanations | 275 (was 350) | 120 | Accepted; unused 75 reallocated by D-048 |
+| 2 - Bounded feedback, release-candidate hardening and carryover | 225 (was 150) | 100; corrective limit 65 cumulative, publication-only extension | Local delivery; publication only authorised by D-048 |
 | 3 - Retrospective and code-freeze cleanup | 50 | Requires H approval at Gate 2 | Not authorised |
 | Contingency | 50 | Requires separate H approval | Unused |
 | **S4 total** | **700** | | |
@@ -64,8 +79,9 @@ No ceiling or prior actual is reset.
 
 D-041/D-043's historical corrective X usage remains **36.7557225** of 40
 at S3 closeout. D-044's carried warning evidence remains open in Phase 2.
-D-047 extends that historical corrective limit from 40 to 60 for carried
-warning evidence only, overlapping Phase 2's 100 X ceiling. No historical
+D-047 extended that historical corrective limit from 40 to 60 for carried
+warning evidence only, overlapping Phase 2's 100 X ceiling. D-048 adds a
+publication-only extension to 65 after a recorded overrun. No historical
 actual is reset. Phase 1 density work is not corrective warning work;
 an unrestricted time slice from D-041 through Phase 1 would wrongly charge
 it to the repair allowance. X must record separate start/end cutoffs for
@@ -164,7 +180,9 @@ allocations, five-sprint calendar and explicit ML-document timing deferral.
 **Goal:** Make the selected-target explanation visible and understandable
 without removing source/safety detail or changing prediction semantics.
 
-**Allocation:** 350 O+X; X ceiling 120. Prerequisite: Gate 0, approved.
+**Allocation:** Originally 350 O+X; current ceiling 275 under D-048 after
+75 unused credits were transferred to Phase 2. X ceiling remains 120.
+Prerequisite: Gate 0, approved.
 Start now; target human review Oct 10 evening or Oct 11, preserving the end
 Oct 11 code freeze. X publishes the pending O documentation, records actual
 kickoff/credits and implements only this phase.
@@ -295,9 +313,10 @@ suggestions, not automatically accepted defects. The workflow in
 | S4-F10 | Disclaimer modal appears once | Persistent banner/footer meet the visible-disclaimer requirement; first-visit acknowledgement is intentional. | No change. Retain always-visible banner/footer and current acknowledgement behavior. |
 
 **Approved batch (D-047):** S4-F01/F04/F06/F08/F09 plus existing Phase 2
-release-candidate/carryover tasks. Phase 2 is 150 combined/100 X; D-041/D-043
-corrective total is extended from 40 to 60 for carried warning evidence,
-overlapping (not added to) that X ceiling. Original actuals/overruns, S4 700,
+release-candidate/carryover tasks. Original Phase 2 was 150 combined/100 X;
+D-048 revises only its combined ceiling to 225 using 75 unused Phase 1
+credits, with a publication-only corrective extension from 60 to 65.
+Limits overlap, not add. Original actuals/overruns, S4 700,
 S5 500, reserve 700, project 7000 and end Oct 11 code freeze remain intact.
 F02/F03/F05/F07/F10 stay outside the implementation batch.
 
@@ -306,12 +325,22 @@ F02/F03/F05/F07/F10 stay outside the implementation batch.
 **Goal:** Improve threshold/selection clarity and portable setup, then prove
 the final integrated workflow and D-044 carryover before code freeze.
 
-**Allocation:** 150 O+X; X ceiling 100. H adds 20 corrective X credits for
-carried warning work, extending its cumulative limit to 60; historical use
-at S3 closeout is 36.7557225, leaving 23.2442775 before further carried work.
+**Allocation:** Current ceiling 225 O+X (was 150); X ceiling 100. D-048
+transfers 75 unused Phase 1 credits without increasing S4's 700 allocation.
+D-047 originally extended the cumulative corrective limit to 60; historical
+use at S3 closeout was 36.7557225. X reported 23.823690 further carried-warning
+credits, reaching 60.5794125, or 0.5794125 over that limit. Preserve this
+overrun. D-048 permits at most 5 further X credits for publication only,
+also subject to the new cumulative corrective ceiling of 65: at that report,
+4.4205875 remained under 65. Use the tighter applicable guard.
 Limits overlap, not add. Record a separate warning-work interval; do not
 charge unrelated Phase 1/2 tasks to it or exclude related verification/report
 calls. Prerequisite: Human Gate 1, approved in D-047.
+
+The preceding sublimits are historical: **D-049 supersedes them as hard
+guards**, including the corrective/publication limits. Use the shared S4
+700 cap for current execution; retain those estimates and overruns for the
+retrospective rather than resetting or rewriting history.
 
 Atomic tasks
 
@@ -378,6 +407,76 @@ repeated failure; no CI debugging, PR work or later phase start.
 
 **Human Gate 2:** H accepts the release candidate and authorises cleanup.
 Incomplete evidence requires an explicit decision, not another silent carry.
+
+### Local delivery and publication-only completion (D-048)
+
+The approved planning update is published at
+`61d39a59d3414daa8c936a3a03bc541865129d42`. New Phase 2 implementation,
+README changes and `docs/evidence/s4p2-*` remain uncommitted and unpushed.
+X reports frontend lint/typecheck, 64 tests and build passing, plus six
+existing-environment API tests; do not rerun these solely for publication.
+
+O reviewed the local source/evidence: the selected-target threshold marker
+uses the accepted threshold without changing probability colours, and the
+label preserves existing picking/emissive/camera handlers. Warning-bearing
+closed/open pairs at 1920x1080 and 1280x800 show zero document overflow and
+zero canvas-height variation, with heights 576.0138/318.3858 CSS px.
+The 1280 closed-warning capture retains three full chart rows. Keyboard
+traversal/activation and qualified empty-warning captures exist at both
+viewports. The warning pairs use an edited patient-20 scenario with retained
+demo-model origin; the earlier original-patient capture is separate.
+The 2.78% canvas pixel difference after selection is not by itself proof of
+camera position; unchanged camera handlers and supported selection evidence
+are the relevant basis. Existing-environment startup evidence does not
+certify a fresh installation on every Linux/Windows host.
+
+Feedback IDs S4-F01/F04/F06/F08/F09 are implemented locally and await
+publication/Human Gate 2 verification. D-044's previously missing evidence
+is now present locally, not yet a published gate pass. Keep all deferred/
+no-change IDs and their rationales.
+
+**Budget stop and H approval:** X stopped after the cumulative corrective
+limit reached 60.5794125. H selected "Approve the bounded publication-only
+allowance (Recommended)", adding up to 5 X credits with a cumulative ceiling
+of 65, while leaving the combined Phase 2 cap unchanged at that decision.
+O's later fresh snapshot through **2026-10-10T17:44:22.172Z** showed Phase 2
+**178.1378245** (O **134.219630**, X **43.9181945**), or **28.1378245** over
+the original 150 combined cap. S4 was **331.449464** and project
+**3285.2362425**. O's review/approval conversation caused that combined
+overrun; do not attribute it to X or erase it retrospectively.
+H then selected "Approve the reallocation for publication-only closeout
+(Recommended)", transferring 75 unused Phase 1 credits (350 -> 275) to Phase
+2 (150 -> 225). Original actuals/overruns remain recorded; S4/S5/reserve/
+project caps remain unchanged. At that historical snapshot the revised
+combined headroom was **46.8621755**; later calls are excluded.
+Figures are deduplicated local telemetry, not billing.
+
+**Subsequent publication stop and simplification (D-049):** X reported no
+edits/commit/push during its final publication attempt. Through
+`2026-10-10T18:28:34.655Z`, its report recorded P2 201.002967 (X 48.266057),
+publication X 4.3478625 and only 0.072725 corrective headroom. O's subsequent
+read-only snapshot through `2026-10-10T18:36:30.498Z` recorded P2
+311.878097 (X 49.349427), above D-048's revised 225 ceiling. Preserve both
+dated observations; do not silently reconcile them into one cutoff.
+No commit or staging happened before H's further decision.
+H explicitly authorised O to commit/push the already-reviewed work, then
+selected "Approve shared sprint budgeting and publish now (Recommended)".
+S4 now has one shared 700 hard cap; all sublimits are estimates. No requested
+150-credit transfer was approved or applied. No code changes, executor retry,
+cleanup, freeze, PR operation or Gate 2 approval is implied.
+
+Publication-only tasks:
+
+- [ ] Publish already-passing Phase 2 implementation, README and evidence,
+  plus O's D-048 plan/spec/decision updates. Update feedback status to
+  implemented/published awaiting Human Gate 2, not already verified.
+- [ ] Reconcile the separate carried-warning/publication interval and dated
+  P2/S4/project credits, retaining both overruns and both approvals. No
+  repeated accounting-only commit loop or reset.
+- [ ] Verify clean matching local/remote hashes and return a concise report.
+  No feature/content expansion, new captures, test-suite reruns, Phase 3,
+  code freeze, PR operation or merge. O is explicitly authorised for this
+  scoped commit/push only; stop on the shared S4/project hard budget.
 
 ## Phase 3 - Retrospective and code-freeze cleanup (unstarted)
 

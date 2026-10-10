@@ -26,6 +26,8 @@ import {
   formatTargetUncertainty,
   formatTargetUncertaintyShort,
 } from "../../lib/format";
+import { ProbabilityLegend } from "./ProbabilityLegend";
+import { selectedPredictionTarget } from "./probabilityLegendHelpers";
 import { usePatientStore } from "../../store/patientStore";
 import {
   vesselDisplay,
@@ -276,10 +278,8 @@ export function ViewerPanel() {
   const prediction = usePatientStore((state) => state.prediction);
   const isPredicting = usePatientStore((state) => state.isPredicting);
   const predictionError = usePatientStore((state) => state.predictionError);
-  const selectedTarget = selectedVessel
-    ? prediction?.vessels[selectedVessel]
-    : prediction?.cad;
-  const selectedTargetName = selectedVessel ?? "CAD";
+  const { name: selectedTargetName, target: selectedTarget } =
+    selectedPredictionTarget(prediction, selectedVessel);
   const selectedTargetProbability = selectedTarget?.probability ?? null;
   const predictionStatus = prediction
     ? `Current predicted probabilities: CAD ${formatProbability(prediction.cad.probability)}, LAD ${vesselDisplay(prediction, "LAD").percentage}, LCX ${vesselDisplay(prediction, "LCX").percentage}, RCA ${vesselDisplay(prediction, "RCA").percentage}. CAD: ${formatTargetUncertainty(prediction.cad.uncertain)} LAD: ${formatTargetUncertainty(prediction.vessels.LAD.uncertain)} LCX: ${formatTargetUncertainty(prediction.vessels.LCX.uncertain)} RCA: ${formatTargetUncertainty(prediction.vessels.RCA.uncertain)}`
@@ -373,56 +373,10 @@ export function ViewerPanel() {
           </button>
         ))}
       </div>
-      <div
-        className="viewer-legend"
-        role="group"
-        aria-label="Predicted probability colour legend"
-      >
-        <div className="space-y-1">
-          <p className="text-[10px] font-semibold text-slate-600">
-            Predicted probability (not narrowing) · 90% set status
-          </p>
-          <div
-            aria-hidden="true"
-            className="h-2 rounded-full"
-            style={{
-              background:
-                "linear-gradient(90deg, #2e7d32 0%, #f9a825 50%, #c62828 100%)",
-            }}
-          />
-          <div className="flex justify-between text-[10px] tabular-nums text-slate-500">
-            <span>0%</span>
-            <span>50%</span>
-            <span>100%</span>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          {vesselIds.map((vessel) => {
-            const display = vesselDisplay(prediction, vessel);
-            return (
-              <span className="inline-flex items-center gap-1.5" key={vessel}>
-                <span
-                  aria-hidden="true"
-                  className="h-3 w-3 rounded-full border border-white shadow-sm"
-                  style={{ backgroundColor: display.color }}
-                />
-                <span className="whitespace-nowrap">
-                  {vessel} {display.percentage} ·{" "}
-                  {formatTargetUncertaintyShort(display.target?.uncertain)}
-                </span>
-              </span>
-            );
-          })}
-          <span className="inline-flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              className="h-3 w-3 rounded-full border border-white shadow-sm"
-              style={{ backgroundColor: "#94a3b8" }}
-            />
-            <span>Unavailable</span>
-          </span>
-        </div>
-      </div>
+      <ProbabilityLegend
+        prediction={prediction}
+        selectedVessel={selectedVessel}
+      />
       <div
         aria-live="polite"
         className="mx-4 mb-3 flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] leading-4 text-slate-800"

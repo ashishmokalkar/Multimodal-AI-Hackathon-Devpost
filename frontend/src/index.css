@@ -740,6 +740,10 @@ button:focus-visible {
     padding-inline: 10px;
     padding-bottom: 4px;
   }
+
+  .response-warning-disclosure {
+    padding-block: 2px;
+  }
 }
 
 @media (max-width: 1120px) {

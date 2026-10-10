@@ -127,6 +127,13 @@ describe("ModelMetricsDrawer", () => {
     expect(markup).toContain("Recall");
     expect(markup).toContain("F1");
     expect(markup).toContain("ROC-AUC");
+    expect(markup).toContain("Each target has its own decision threshold");
+    expect(markup).toContain(
+      "each served vessel probability is capped at the served CAD probability",
+    );
+    expect(markup).toContain(
+      "equal values alone do not show that the cap changed an output",
+    );
     expect(markup).toContain("81.0%");
     expect(markup).toContain("91.0%");
     expect(markup).toContain("71.0%");

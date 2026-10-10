@@ -333,10 +333,24 @@ Retain sample origin through edits, the pinned profile guards, schematic
 geometry, asset/dependency/loading paths and disclaimer behavior. Anatomy,
 contract extension and bundle optimisation remain separately scoped/deferred.
 Preserve Phase 1's readability and complete D-044's remaining evidence before
-code freeze. Phase 2 is 150 combined/100 X; the warning corrective limit is
-explicitly extended to 60 cumulative, overlapping, with no reset of history.
+code freeze. Original Phase 2 was 150 combined/100 X, with a 60 cumulative
+warning limit. D-048 moves 75 unused Phase 1 credits to Phase 2 (now 225
+combined; X still 100) and permits publication only under a 65 cumulative
+corrective ceiling. Retain the recorded corrective and combined overruns;
+S4's 700 total and all other caps remain unchanged.
+H subsequently approved D-049: S4's phase/executor/corrective/publication
+amounts are planning estimates under one shared hard 700-credit O+X budget.
+E may use its remaining budget for approved scope without micro-allowance
+requests. Historical overruns, S5 500, reserve 700 and project 7000 remain.
 Approval is not implementation/verification; use the workflow/plan feedback
 ledger and Human Gate 2 to close the batch.
+
+The Phase 2 source, portable README and live warning/selection evidence are
+present locally but unpublished. O's evidence review supports the bounded
+changes; H authorised publication-only completion under D-048, then explicitly
+authorised O's scoped commit/push under D-049. Human Gate 2
+is still pending. Local tests/captures or budget approval do not authorise
+cleanup, code freeze, broader features, public deployment or clinical claims.
 
 S4 completes code under a 700-credit cap; S5 finalises the submission Oct
 12-13 under 500, splitting the existing 1200 allocation (D-045). Draft/final
