@@ -273,3 +273,7 @@ Typing 49 fields takes a clinician several minutes, and it's where errors creep 
 1. **Document upload** (option 2) for labs, ECG and echo: highly visible in the video, and on theme.
 2. **The 3-question chest-pain helper** (option 3): small, clinically sound, and easy for patients.
 3. **FHIR import** (option 1) as the roadmap, or demonstrated with a Synthea patient if time allows.
+
+---
+
+**Integration commit:** `9ddb96b` on `ML-dev` (any later `ML-dev` commit also works). Start the API from that checkout as in item 5.
