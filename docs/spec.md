@@ -345,17 +345,25 @@ requests. Historical overruns, S5 500, reserve 700 and project 7000 remain.
 Approval is not implementation/verification; use the workflow/plan feedback
 ledger and Human Gate 2 to close the batch.
 
-The Phase 2 source, portable README and live warning/selection evidence are
-present locally but unpublished. O's evidence review supports the bounded
-changes; H authorised publication-only completion under D-048, then explicitly
-authorised O's scoped commit/push under D-049. Human Gate 2
-is still pending. Local tests/captures or budget approval do not authorise
-cleanup, code freeze, broader features, public deployment or clinical claims.
+The Phase 2 source, portable README and live warning/selection evidence were
+published at `39ffab1c8adecd707c0f40ce826c12a568c41267` under D-049. H approved
+Human Gate 2 under D-050 after publication, accepting the release candidate
+and completed D-044 carryover evidence. Phase 3 retrospective/code-freeze
+cleanup is authorised; no new feature implementation, S5 start, PR operation,
+public deployment or clinical-validity claim follows from that approval.
+Record the accepted source hash separately from documentation-only closeout.
 
 S4 completes code under a 700-credit cap; S5 finalises the submission Oct
 12-13 under 500, splitting the existing 1200 allocation (D-045). Draft/final
 document/video dates and Oct 14 submission-only remain protected. S5 does
 not authorise new features; any blocking frozen-code fix needs H approval.
+
+S4 Phase 3 retrospective and archive were published as a documentation-only
+closeout on 2026-10-10. The frozen source baseline remains
+`39ffab1c8adecd707c0f40ce826c12a568c41267`; the closeout commit is separate
+and does not represent a code change. Human Gate 3 remains pending. S5 Phase 0
+is staged but unstarted and gated on Gate 3; Ashish's ML-section timing
+remains unconfirmed. No PR merge or S5 delivery is implied.
 
 ## 8. Clinical safety
 
