@@ -510,12 +510,12 @@ project **2616.230663**. It recorded X **32.759806** over the original 200
 ceiling.
 
 **Final closeout accounting snapshot — deduplicated local telemetry, not billing:**
-through **2026-10-10T14:04:07.687Z**, Phase 3 actual was **283.071933**
-(O **33.668890**, X **249.403043**). This is **516.928067** under the
-800 combined allocation; X is **49.403043** over the original 200 ceiling.
-S3 cumulative usage was **860.269583** (O **508.979040**, X **351.290543**)
-and project usage **2632.873900** (O **2110.445665**, X **522.428235**),
-leaving **939.730417** under the S3 cap and **4367.126100** under the project
+through **2026-10-10T14:07:55.511Z**, Phase 3 actual was **287.152875**
+(O **33.668890**, X **253.483985**). This is **512.847125** under the
+800 combined allocation; X is **53.483985** over the original 200 ceiling.
+S3 cumulative usage was **864.350525** (O **508.979040**, X **355.371485**)
+and project usage **2636.954842** (O **2110.445665**, X **526.509177**),
+leaving **935.649475** under the S3 cap and **4363.045158** under the project
 cap. The calculation deduplicates `assistant_usage_events` on session, event
 time, model, token counts and `total_nano_aiu`, scoped to the exact project
 checkout; Phase 3 starts at the approved `2026-10-10T10:30:42.653Z` boundary.
@@ -523,14 +523,15 @@ D-039 authorizes closeout after the X ceiling overage; neither budget nor
 actuals are reset.
 
 The aggregate increase from the previous recorded snapshot
-(`2026-10-10T13:54:35.093Z`) is **16.643237** credits for Phase 3, S3 and the
-project. A raw event-time query for this executor session at/after that
-timestamp totals **26.647699** credits, a **10.004462** difference from the
-aggregate delta. The final totals above were recomputed from the current
+(`2026-10-10T13:54:35.093Z`) is **20.724179** credits for Phase 3, S3 and the
+project. A current raw event-time query for this executor session at/after
+that timestamp totals **30.325039** credits, a **9.600860** difference from
+the aggregate delta. The final totals above were recomputed from the current
 deduplicated local event store; this interval mismatch is unresolved, so do not
 present that raw time-slice as an exact marginal delta. The earlier snapshot is
-preserved as historical. Later attribution/UI commit, documentation commit,
-push and status-check calls are excluded from this timestamped snapshot.
+preserved as historical. The Phase 3 UI/evidence/documentation commits and first
+push are included; the accounting-only update, its push/status checks and
+reporting calls after this timestamp are excluded.
 
 Atomic tasks
 
