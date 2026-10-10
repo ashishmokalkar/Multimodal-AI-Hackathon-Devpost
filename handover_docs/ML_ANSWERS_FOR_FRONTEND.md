@@ -8,8 +8,8 @@ This replies to the six questions about the [API contract](https://github.com/as
 already parses with your current zod schemas (`frontend/src/api/types.ts`). The frontend works against it **without code changes**. The changes below
 are about using the new information well, not about fixing breakage.
 
-- **Code:** branch `ML-dev`, folder `api/`. Full API docs: [`api/README.md`](api/README.md).
-- **Validation results:** [`reports/BEST_MODELS.md`](reports/BEST_MODELS.md).
+- **Code:** branch `ML-dev`, folder `api/`. Full API docs: [`api/README.md`](../api/README.md).
+- **Validation results:** [`reports/BEST_MODELS.md`](../reports/BEST_MODELS.md).
 
 ---
 
