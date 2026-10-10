@@ -422,6 +422,16 @@ current-form/access check, plus Ashish's ML verification, remain pending and
 block finalisation and Human Gate 2. No upload, submission, source change or
 Gate 2 approval is implied.
 
+**Review sharing (D-055):** H requested GitHub access to the video and
+documentation for colleague review and gave O one-time scoped commit/push
+authority. The review index at `docs/submission/README.md` links corrected
+drafts and a byte-identical 7,097,500-byte captioned MP4 at
+`docs/submission/demo-review.mp4`. Raw footage stays outside Git. The
+repository is private; a reviewer needs repository access, and this copy is
+not a substitute for the required YouTube upload or verified judge access.
+All H/M reviews and Gate 2 remain pending; no application-source change or
+finalisation/PR/submission authority follows from review publication.
+
 ## 8. Clinical safety
 
 - Modal on first load (acknowledge required), persistent header banner, footer. Text: *"For decision-support and educational purposes only. Not a substitute for formal diagnostic imaging or clinical judgement."*

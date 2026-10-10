@@ -90,8 +90,10 @@ or schematic vessels as patient-specific lesions.
 Reuse `docs/evidence/s4p2-*` for document illustrations and accepted checks.
 Capture new video to distinct S5 paths; never rerun or overwrite accepted
 evidence merely to produce submission assets. Keep large raw clips and the
-MP4 in session artifacts or an H-designated output folder, not Git; no
-binary over 10 MB may enter the repository without separate H approval.
+MP4 in session artifacts or an H-designated output folder, not Git, except
+for D-055's specifically approved 7,097,500-byte captioned review copy;
+raw footage remains outside Git. No binary over 10 MB may enter the
+repository without separate H approval.
 Commit only small submission sources/exports and directly related docs.
 
 ## Calendar and H time reserve
@@ -338,6 +340,23 @@ matches all 626 unique source tokens. The unchanged captioned video remains
 4:21. These are still drafts: H's full PDF/video review and form/access check,
 Ashish's ML verification, final uploads and judge-accessible links remain
 open. No Gate 2 approval or finalisation is claimed.
+
+**Colleague review publication (D-055):** H requested that the video and
+documentation be pushed to GitHub for colleague review, then explicitly
+authorised O to commit/push only the video, review index and related status
+docs. `docs/submission/README.md` links the existing corrected document,
+Devpost draft, storyboard/captions and unchanged captioned rough cut copied
+to `docs/submission/demo-review.mp4` (7,097,500 bytes). The original/raw
+recordings remain untouched. The repository is private; reviewers need
+repository access. This is not a public/judge-access test, YouTube upload,
+final acceptance or Gate 2 pass. No application/API/model change, branch/
+PR operation, new phase or standing O Git authority is implied.
+
+At the dated pre-publication snapshot through
+**2026-10-10T20:43:25.323Z**, local telemetry records Phase 2 **65.829093**,
+S5 **284.270252**, project **3768.5669045**, leaving **215.729748** under
+S5 500. This is not billing; later publication/review calls are excluded
+and no actual or boundary is reset.
 
 **Self-check gate 2:** Final exported assets meet measured page/duration
 limits; S5-F01/F02/F03, Ashish's ML sign-off, H's full draft review and feedback
