@@ -146,10 +146,10 @@ kickoff/credits and implements only this phase.
 
 Atomic tasks
 
-- [ ] Capture the current real patient-20 CAD Why? view at exact CSS
+- [x] Capture the current real patient-20 CAD Why? view at exact CSS
   1920x1080/1280x800 before editing. Reuse healthy H-owned local services if
   available; do not stop/restart processes owned by H.
-- [ ] Simplify `RawResult`, `WhyView` and `InputsView` presentation using
+- [x] Simplify `RawResult`, `WhyView` and `InputsView` presentation using
   existing formatting/data helpers and native disclosure patterns.
   Compact duplicate source/version/method copy; keep real/mock, custom/
   dataset/edited and final/demo provenance truthful and visible. Keep the
@@ -157,20 +157,20 @@ Atomic tasks
   Preserve all four probabilities, labels/thresholds, uncertainty and
   warning status near the top. Never put reliability warning existence
   inside the methodological disclosure.
-- [ ] Move the signed top-ten contribution chart ahead of lengthy methods.
+- [x] Move the signed top-ten contribution chart ahead of lengthy methods.
   Keep a concise visible unit/reference/subset/non-causation explanation,
   full source/method wording and numeric feature/input/contribution detail
   accessible by keyboard. Do not shrink existing 11 CSS px chart text,
   remove rows, change ranking/units or invent a generated clinical summary.
   Preserve mock/unconfirmed-scale and empty/missing/zero distinctions.
-- [ ] Remove repeated introductory method text from Inputs without changing
+- [x] Remove repeated introductory method text from Inputs without changing
   accepted snapshots, grouping, actual values/units, missing contributions
   or read-only BMI/dataset Obesity qualifications. Keep full methodology
   reachable; no live-draft values substituted for accepted inputs.
-- [ ] Add focused presentation/disclosure/selection regressions. Reuse
+- [x] Add focused presentation/disclosure/selection regressions. Reuse
   accepted freshness/mapping tests; do not alter backend/model/API/store
   behavior or introduce packages/global abstractions.
-- [ ] Record live before/after clarity and preserved behavior at both
+- [x] Record live before/after clarity and preserved behavior at both
   viewports, run frontend lint/typecheck/test/build, publish source/evidence/
   docs and dated credits, stop only verification helpers started by X,
   and stop for Human Gate 1.
@@ -202,6 +202,36 @@ Atomic tasks
    credits are published. No API/model/additivity/performance rerun without
    a concrete regression, no CI troubleshooting and no PR operation.
    Report H-owned services separately from X's stopped helpers.
+
+**Phase 1 delivery evidence — awaiting Human Gate 1:** Approved planning
+updates were published in `6b5ad78bbef9562cb89451d49aeff3bedc968202`;
+implementation and settled before/after evidence are in
+`d8a4b572b9512367dd350879cf54f29eca767fb1`. At 1280x800 the three complete
+visible chart rows are Chest pain type (label y=633.746, bar y=632.781),
+High blood pressure (label y=672.146, bar y=676.681), and Diabetes (label
+y=721.546, bar y=720.581). Both screenshots use DPR 1 and exact matching CSS/
+PNG viewport dimensions; document overflow is 0 px at both sizes. Canvas
+dimensions are unchanged before/after: 620.766x591.859 at 1920x1080 and
+509.734x362.547 at 1280x800. Chart labels remain 11 px. The 1280 capture has
+warning/method disclosures closed and results scrollTop 0.
+
+Evidence: `docs/evidence/s4p1-before-*`,
+`docs/evidence/s4p1-release-*`, and `docs/evidence/s4p1-keyboard.txt`.
+The headed real profile reports mock=false and model `cardiotwin-v2.0.0`.
+Keyboard focus reaches the full ten-row CAD numeric alternative, method
+disclosures, and metadata-grouped input table regions. Existing target,
+freshness, mock, empty-warning and warning regressions remain covered by the
+frontend suite. `pnpm lint`, `pnpm typecheck`, `pnpm test` (58 passed), and
+`pnpm build` passed; Vite reported only its non-blocking large-chunk advisory.
+The separate D-044 empty-warning captures and settled warning canvas pair
+remain Phase 2 work; they are not claimed passed here.
+
+Latest deduplicated local telemetry snapshot through
+**2026-10-10T16:23:44.069Z**: Phase 1 **43.2409575** (O **15.843140**,
+X **27.3978175**); S4 **79.870487**; project **3033.657266** credits. These
+are local telemetry, not billing; later documentation publication calls are
+excluded. Phase 1 remains within 350 combined / 120 X, S4 within 700, and the
+project within 7000; no ceiling or prior actual was reset.
 
 **Human Gate 1:** H reviews O's assessment and authorises Phase 2 only after
 accepting clarity/behavior evidence and explicitly setting its X ceiling and
