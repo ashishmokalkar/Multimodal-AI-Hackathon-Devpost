@@ -55,6 +55,20 @@ existing contract. Gate 0 approved the detailed scope/budget/dates and
 authorised Phase 1 only. Real integration requires a separate readiness self-check and
 human gate; mock UI work cannot establish backend compatibility.
 
+**UI/UX review and approved next phase (D-035, D-036):** H requested one Opus 5.5
+extra-high read-only review after dashboard delivery. The reviewer identified
+cropped heart captures and below-fold controls/source labels, unclear edited
+states and weak chart zero/label readability. Approved remedies are a bounded
+desktop workspace with independently scrolling side panels and stable canvas,
+always-visible prediction actions/viewer controls, compact probability summaries
+with prominent source/version, explicit state guidance and a zero-aligned,
+readable signed chart. Verify at actual 1920 x 1080 and 1280 x 800 viewports,
+not from full-page screenshot height. The precise resize cause needs live
+reproduction. H approved Gate 1 with mandatory presentation carryover and
+authorised UI/UX Phase 2, not real integration. The UX changes are not yet
+implemented; geometry, clinical meaning and the API stay unchanged. Integration
+is Phase 3 and requires UI/UX Gate 2 plus the separate readiness Gate R.
+
 ## 4. Architecture
 
 ```
@@ -145,8 +159,9 @@ delivery date and runtime/model handoff remain required at the separate
 real-integration readiness gate. H approved S3 Gate 0 and authorised independent
 Phase 1 only (D-034). X implemented and locally verified the mock-backed Why?/
 Inputs dashboard and metrics drawer, with evidence under `docs/evidence/s3p1-*`;
-Human Gate 1 is pending. This remains mock-only and does not authorize Phase 2
-or establish real-backend compatibility. Gate R remains separate and blocked on
+Human Gate 1 is approved with presentation gaps carried into mandatory UI/UX
+Phase 2 (D-036). This remains mock-only and does not establish real-backend
+compatibility. Gate R remains separate and blocked on
 M's contract/runtime/model handoff and H's approval.
 
 ## 8. Clinical safety
