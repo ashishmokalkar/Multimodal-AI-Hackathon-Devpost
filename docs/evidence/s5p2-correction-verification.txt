@@ -77,14 +77,14 @@ Credits
   16.6247525; S5 235.0659115; project 3719.362564. Phase 1 remained
   218.441159. Remaining under S5 500: 264.9340885; under project 7000:
   3280.637436.
-- Corrected-candidate cutoff through 2026-10-10T20:37:26.184Z: Phase 2
-  24.344199; S5 242.785358; project 3727.0820105. Phase 1 remained
-  218.441159. Remaining under S5 500: 257.214642; under project 7000:
-  3272.9179895.
+- Phase 2 execution stop snapshot through 2026-10-10T20:40:09.481Z: Phase 2
+  27.326421 (48 deduplicated events); S5 245.767580; project 3730.0642325.
+  Phase 1 remained 218.441159. Remaining under S5 500: 254.232420; under
+  project 7000: 3269.9357675.
 - Deduplicated local session-store telemetry filtered to the repository
   working directory, not account billing. Existing boundaries and actuals
-  were not reset. Status-publication and reporting calls after the cutoff
-  are excluded.
+  were not reset. Accounting-record publication and reporting calls after
+  the cutoff are excluded.
 
 Helpers
 - Only isolated Edge PDF-export/review processes started for this work were

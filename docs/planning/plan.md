@@ -127,7 +127,7 @@ source and do not assume the default branch contains it.
 |---|---:|---|
 | 0 - Planning | 150 | 90.225900 through the recorded pre-Phase-1 cutoff below |
 | 1 - Automated draft package | 220 | 128.215259 through the recorded pre-Phase-2 cutoff below |
-| 2 - Finalisation and access checks | 90 | 24.344199 through 2026-10-10T20:37:26.184Z; corrected candidates only |
+| 2 - Finalisation and access checks | 90 | 27.326421 through 2026-10-10T20:40:09.481Z; corrected candidates only |
 | 3 - Submission, retrospective and cleanup | 40 | Not started |
 | **S5 total** | **500 hard sprint ceiling** | Includes all planning/review/publication |
 
@@ -187,14 +187,15 @@ store's deduplicated event fields and repository working-directory filter,
 not account billing. It includes available O/E work since the unchanged
 boundaries; no actuals were reset.
 
-**Phase 2 corrected-candidate cutoff (Human Gate 2 remains pending):** through
-`2026-10-10T20:37:26.184Z`, deduplicated local telemetry records Phase 2
-**24.344199**, S5 **242.785358**, and project **3727.0820105**. It leaves
-**257.214642** under the shared S5 ceiling and **3272.9179895** under the
+**Phase 2 execution stop snapshot (Human Gate 2 remains pending):** through
+`2026-10-10T20:40:09.481Z`, deduplicated local telemetry records Phase 2
+**27.326421**, S5 **245.767580**, and project **3730.0642325**. It leaves
+**254.232420** under the shared S5 ceiling and **3269.9357675** under the
 project cap; Phase 1 remains **218.441159**. This is local telemetry, not
-billing. It uses the same event deduplication and repository filter as the
-pre-correction snapshot; the boundaries and actuals were not reset. Later
-status-publication and reporting calls are excluded.
+billing, using the same event deduplication and repository filter as the
+pre-correction snapshot. Boundaries and actuals were not reset. The
+accounting-record publication and reporting calls after the cutoff are
+excluded.
 
 ## Phase 0 - Discussion and research (complete)
 
