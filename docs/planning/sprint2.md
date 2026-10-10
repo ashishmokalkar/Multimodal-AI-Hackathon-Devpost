@@ -2,7 +2,7 @@
 
 **Calendar:** Phase 0 started Oct 8 after `/compact`, per H (D-023). H approved Gate 0 and authorised Phase 1 tonight, Oct 8 (D-025); S2 completion remains targeted for Oct 9. S3 remains Oct 10-11, S4 Oct 12-13, and Oct 14 submission-only buffer.
 
-**Status:** Gates 0, 1 and 2 are approved (D-025, D-028, D-029). Phase 1 mock integration and Phase 2 mock interpretation/controls are complete and technically accepted. Phase 3 retrospective/cleanup documentation is prepared and pushed; Human Gate 3 remains pending H, so Sprint 2 is not formally closed. The verified WSL route hosts only the mock API; real-backend compatibility remains unverified. M's contract response/API delivery-date follow-up remains open: H made Oct 10-11 integration provisional and requires the response before S3 Gate 0 can close (D-029). No S3 work has started. The baseline PR remains unmerged; no PR operation is authorised here.
+**Status:** Sprint 2 is closed: Gates 0-3 are approved (D-025, D-028, D-029, D-031). O accepted the closeout package at `fc08cb4`; H approved Gate 3 on Oct 10 and authorised S3 Phase 0 in this session. The delivered frontend and verified WSL hosting remain mock-only; real-backend compatibility is unverified. M's contract/API-date follow-up remains open. During S3 planning, H explicitly moved that dependency to a separate real-integration readiness gate under D-032, then approved S3 Gate 0 and independent Phase 1 only (D-034). The baseline PR remains unmerged.
 
 **Sprint cap:** 1800 credits (D-008). S2 accounting starts **2026-10-08 20:43:11.531 UTC** (22:43 CEST), at H's start instruction. Deduplicated project events before that boundary total **1407.9373** credits: O **1331.0196**, X **76.9177**. This includes the remaining S1 transition/compaction work and leaves **92.0627** under S1's 1500 cap and **5592.0627** under the project cap at S2 start. These are local telemetry figures, not account-billing reconciliation.
 
@@ -89,7 +89,7 @@ O+X allocations approved at Gate 0 (D-025):
 | 0 - Discussion and research | 200 | 0 | 50.7951 before Phase 1 kickoff, including handover overhead |
 | 1 - Coherent prediction and visual mapping | 650 | 120 | 130.5136 through the Gate 1 approval snapshot; later handover overhead excluded |
 | 2 - Minimum interpretation and supporting controls | 650 | 160 | 100.107947 through the 2026-10-09 20:04:12.683 UTC review snapshot (O 52.638430, X 47.469517); later events excluded |
-| 3 - Retrospective and cleanup | 150 | 30 | 2.988014 (O 0; X 2.988014) through the 2026-10-09T20:12:46.984Z local snapshot |
+| 3 - Retrospective and cleanup | 150 | 30 | 36.983164 (O 33.332280; X 3.650884) recorded before the S3 boundary, including publication and gate review |
 | Contingency, only with H approval | 150 | Unassigned | Unused |
 | **Total** | **1800** | | |
 
@@ -301,7 +301,7 @@ contract/API-date follow-up; H's subsequent approval is recorded below.
 
 **Human gate 2 (approved, 2026-10-09):** H selected "Approve Gate 2 and closeout; require Ashish's response before S3 Gate 0 (Recommended)" after O's technical review. H accepted the mock interpretation/controls and explicitly revisited integration timing: Oct 10-11 is provisional, and M's contract response and concrete API delivery date are required before S3 Gate 0 can close (D-029). This authorises S2 retrospective/cleanup only, not S3 implementation, real-backend sign-off or PR merge.
 
-## Phase 3 - Retrospective and cleanup (documentation prepared; Human Gate 3 pending)
+## Phase 3 - Retrospective and cleanup (approved; Sprint 2 closed)
 
 **Goal:** Close S2 with reconciled evidence/budget and a dependency-aware S3 planning entry point.
 
@@ -334,12 +334,27 @@ Since O's 20:04:12.683Z review snapshot, recorded project usage increased
 documentation publication calls; it is not account billing and does not reset
 either Phase 3 ceiling.
 
-**Self-check gate 3:** Gates 0-2 are approved; Gate 3 remains pending H.
+**Self-check gate 3 (accepted by O, 2026-10-10):** Gates 0-2 were approved before closeout.
 Implementation and evidence are recorded; retro/archive/spec/decisions agree;
-mock-only work is not labelled real-model integrated; S3 Phase 0 is unstarted,
-retains its S2 Gate 3 prerequisite, M/API blocker and video/document owners,
-and has explicit objective and human gates. Approved documentation is pushed and the working tree is clean.
+mock-only work is not labelled real-model integrated. At review, S3 Phase 0
+was unstarted, retained its S2 Gate 3 prerequisite, M/API blocker and
+video/document owner follow-ups, and had explicit objective and human gates.
+At review, approved documentation
+was pushed and the working tree was clean; local HEAD and `origin/frontend`
+matched `fc08cb47933a75557849c4d1075e8f346cfc1b4f`.
 
-**Human gate 3 (pending):** H reviews the S2 closeout evidence and decides
-whether to close Sprint 2 and authorise S3 Phase 0. Approval does not
-automatically authorise a merge, another PR, or S3 implementation.
+**Human gate 3 (approved, 2026-10-10):** H selected "Approve Gate 3 and begin
+S3 planning here (Recommended)" (D-031). Sprint 2 is closed and S3 Phase 0 is
+authorised in the same session. No merge, another PR, S3 implementation or
+O commit/push is authorised.
+
+**Final S2 accounting boundary:** S3 starts at
+**2026-10-10T07:25:25.736Z**. Deduplicated recorded events before this boundary
+give O **1601.466625** and X **171.1376925** all-time, combined
+**1772.6043175**. S2 totals **364.6670425** (O **270.447050**,
+X **94.2199925**), leaving **1435.3329575** under its cap and
+**5227.3956825** overall at transition. Phase 3 totals **36.983164**
+(O **33.332280**, X **3.650884**), within the 150 combined / 30 X ceilings.
+Earlier snapshots remain historical; dated phase snapshots do not form an
+exhaustive partition of handover overhead. Calls at or after the S3 boundary
+are S3 spend. Figures are local telemetry, not account billing.

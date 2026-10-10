@@ -1,10 +1,12 @@
 # Sprint 2 Retrospective — Coherent prediction and visual mapping
 
-**Status:** S2 delivery and its Phase 3 documentation package are prepared for
-H's Human Gate 3 review. Gates 0-2 are approved; Gate 3 remains pending, so
-Sprint 2 is not formally closed. S3 Phase 0 is prepared but unstarted and
-requires Gate 3 approval. The delivered frontend remains mock-based and uses
-synthetic samples and schematic vessels.
+**Status:** Sprint 2 is closed. O accepted the published closeout package at
+`fc08cb4`; H approved Gate 3 on 2026-10-10 and authorised S3 planning in the
+same session (D-031). The delivered frontend remains mock-based and uses
+synthetic samples and schematic vessels. S3 scope was subsequently split into
+independent dashboard work and separately gated real integration (D-032);
+H subsequently approved S3 Gate 0 and authorised independent Phase 1 only
+(D-034); real integration remains gated.
 
 ## What worked
 
@@ -50,9 +52,9 @@ synthetic samples and schematic vessels.
 | Action | Owner | When |
 |---|---|---|
 | Retain the verified Windows-frontend/WSL-mock-API setup and startup/shutdown instructions. | X/H | S3/S4 |
-| Obtain M's contract response/requested changes and concrete API delivery date; resolve compatibility questions through H before S3 Gate 0 closes. | H/M | Before S3 Gate 0 |
+| Obtain M's contract response/requested changes and concrete API delivery date; resolve compatibility questions through H. D-032 moves this blocker from independent UI Gate 0 to the separate integration readiness gate. | H/M | Before real-integration authorisation |
 | Revisit S3 scope/calendar if M's readiness or date does not support the provisional Oct 10-11 window. | H | S3 Phase 0 |
-| Assign the demo video and shared six-page document owners, deliverables, and dates. | H/M | Before S3 Gate 0 closes |
+| Faizan owns the video and shared document (D-033); request ML sections from Ashish and approve deliverable dates. | H/M | Dates before S3 Gate 0 closes |
 | Keep reviews concise and evidence-driven; do not rerun checks accepted from complete evidence without a specific reason. | O/H | Ongoing |
 | Remeasure the final dashboard's active rendering and idle settling on the intended demo machine. | X | S4 |
 
@@ -91,3 +93,14 @@ are not reset. All figures use the repository-path filter and event
 de-duplication fields from `scripts/credits.py` through the permitted
 read-only local session store. They are local telemetry, not account-billing
 totals.
+
+**Gate 3 / S3 transition reconciliation:** S3 accounting starts at
+**2026-10-10T07:25:25.736Z**. Recorded events before this boundary total
+**1772.6043175** project credits (O **1601.466625**, X **171.1376925**);
+S2 totals **364.6670425** (O **270.447050**, X **94.2199925**).
+Phase 3 totals **36.983164** (O **33.332280**, X **3.650884**),
+including publication and O's gate review. Remaining at transition:
+**1435.3329575** under S2's cap, **113.016836** under Phase 3's combined
+allocation, **26.349116** under its X ceiling and **5227.3956825** overall.
+This supersedes the earlier pre-publication snapshot for transition totals,
+not its historical validity. Subsequent calls count toward S3.

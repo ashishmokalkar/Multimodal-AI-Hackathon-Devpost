@@ -18,7 +18,7 @@ A browser app where a clinician enters (or loads) a patient's clinical/ECG/lab/e
 
 ## 2. Users & core scenarios
 
-1. **Clinician demo flow** — pick a sample patient → prediction appears → heart colours update → click RCA → see RCA probability, top contributing features → open "Why?" tab → SHAP waterfall.
+1. **Clinician demo flow** — pick a sample patient → prediction appears → heart colours update → click RCA → see RCA probability, top contributing features → open "Why?" tab → signed contribution chart. An additive waterfall requires a confirmed common attribution/base/output scale.
 2. **What-if flow** — edit a feature (e.g. toggle Typical Chest Pain, raise FBS) → prediction re-runs (debounced) → colours animate → contribution chart updates.
 3. **Model transparency** — open Model drawer → see validation metrics (acc/prec/rec/F1/AUC) per target, dataset size, model version.
 
@@ -47,6 +47,13 @@ S2's approved sequencing (D-024) delivers readable CAD/vessel summaries and a
 selected-target top-driver/value list before the full gauge/tabs/charts/metrics
 experience in S3. Basic camera focus/reset supports the core demo flow; decorative
 controls and elaborate transitions are not priorities. Delivery remains gated.
+
+**S3 sequencing (D-032, D-034):** H approved an independent mock-backed
+dashboard phase while M's response is pending: selected-target signed charts,
+patient input/contribution breakdown and a labelled metrics drawer using the
+existing contract. Gate 0 approved the detailed scope/budget/dates and
+authorised Phase 1 only. Real integration requires a separate readiness self-check and
+human gate; mock UI work cannot establish backend compatibility.
 
 ## 4. Architecture
 
@@ -117,9 +124,10 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 ## 7. Interpretability presentation
 
 - **S2 minimum:** CAD drivers by default, selected-vessel drivers on selection. Show up to five signed contributions sorted by absolute magnitude with deterministic ties, readable feature labels, entered values from the accepted response/submitted snapshot, and units from feature metadata. Explain unavailable/empty lists explicitly. Mock contributions remain visibly illustrative; values on an unconfirmed scale are not labelled probability-point changes or verified SHAP. No additive waterfall is required in S2.
-- **Why? tab**: horizontal bar / waterfall of top-10 `contributions` for the selected target (CAD by default; switches to vessel on selection). Red = pushes toward disease, blue = protective. Shows `base_value` and final probability.
+- **Why? tab (S3 approved scope):** non-additive horizontal signed bars for up to ten returned contributions for the selected target (CAD by default; switches to vessel on selection), sorted by absolute magnitude with stable ties. Show readable labels, input values/units and signed numeric values as alternatives to colour. Positive/negative are model-contribution signs, not established clinical protective/harmful effects. Keep predicted probability separate; do not draw a base-to-probability waterfall while the scale is unconfirmed.
 - Explanation scale must be agreed with M: the ML roadmap proposes logit-scale attributions. Do not add them to a probability-scale base or present them as probability-point changes. A waterfall may imply additivity only when the base, contributions and endpoint use the same documented scale; the final probability remains a separate labelled value.
-- **Vitals tab (S3):** table of features, entered values and model contributions. `FeatureSchema.min/max` are input-validation bounds, not clinical reference intervals. Clinical normal ranges/out-of-range claims require a separately sourced, agreed reference dataset; otherwise show units and values without normal/abnormal classification.
+- **Inputs tab (S3 approved scope):** metadata-grouped patient measurements/inputs and the selected target's returned contributions. Values must correspond to the accepted prediction input revision; response contribution values take precedence for attributed inputs. A missing contribution says "Not returned", not zero effect; absent input values are unavailable, not invented defaults. `FeatureSchema.min/max` are input-validation bounds, not clinical reference intervals. No normal/abnormal classification without a separately sourced, agreed reference dataset.
+- **Metrics drawer (S3 approved scope):** show response-provided accuracy, precision, recall, F1 and ROC-AUC for CAD/LAD/LCX/RCA, with model version, validation description, sample count and training date. Mock metrics are explicitly illustrative, not deployed-model validation. Loading/error states are explicit; mismatched prediction/metrics versions must not be presented as one validated model.
 - Plain-language summaries describe model drivers, not disease causation, and identify the attribution scale. Do not describe an unconfirmed signed contribution as a change in disease probability.
 
 **S2 Phase 2 implementation status (2026-10-09):** The mock frontend now
@@ -127,14 +135,15 @@ selects the corresponding response explanation for CAD/LAD/LCX/RCA, labels
 response-snapshot input values with feature metadata, sorts the leading five
 contributions, and explicitly handles empty output. Explanations are marked
 mock/illustrative and model-scale unconfirmed. O accepted the technical
-self-check and H approved Gate 2 (D-029). The Phase 3 closeout package records
-the reviewed technical results and WSL mock-hosting recovery; H's Human Gate 3
-decision remains pending. WSL hosting resolves the mock verification route
+self-check and H approved Gate 2 (D-029). H approved the Phase 3 closeout and
+closed S2 on 2026-10-10 (D-031). WSL hosting resolves the mock verification route
 only, not real-backend runtime or contract compatibility. This status is not
 real-model integration or explanation-scale agreement. The Oct 10-11
-integration window is provisional; M's contract response/requested changes and
-concrete API delivery date are required before S3 Gate 0 can close. S3 Phase 0
-is prepared but unstarted and blocked on H's Gate 3 approval.
+integration window is provisional. During S3 planning, H allowed an independent
+mock-dashboard plan while M's response is pending (D-032); contract changes,
+delivery date and runtime/model handoff remain required at the separate
+real-integration readiness gate. H approved S3 Gate 0 and authorised independent
+Phase 1 only (D-034); its implementation kickoff is pending.
 
 ## 8. Clinical safety
 
@@ -179,8 +188,9 @@ M's unpushed/local work and API delivery date are unknown. S2 Gate 1 approval
 did not close these questions. At S2 Gate 2, H explicitly treated Oct 10-11
 integration as provisional and required M's response before S3 Gate 0 can
 close (D-029 supersedes D-028's follow-up boundary); the answers remain open.
-S2 Phase 3 has prepared a closeout package for H's pending Gate 3 review.
-The S3 Phase 0 plan remains unstarted; neither this mock work nor WSL hosting
+H subsequently closed S2 at Gate 3 (D-031) and approved the S3 planning split
+(D-032). M's response is now required at the separate real-integration readiness
+gate, not before independent UI Gate 0. Neither mock work nor WSL hosting
 resolves real-backend compatibility.
 
 | Question | Confirmed evidence | Still open |
