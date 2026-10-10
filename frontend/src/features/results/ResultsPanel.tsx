@@ -1,7 +1,11 @@
 import { RawResult } from "./RawResult";
 import { useFeatures } from "../../api/hooks";
 import { predictionStatusCopy } from "../../lib/predictionStatus";
-import { usePatientStore } from "../../store/patientStore";
+import { HeartbeatLoader } from "../loading/HeartbeatLoader";
+import {
+  isAwaitingPrediction,
+  usePatientStore,
+} from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 
 export function ResultsPanel() {
@@ -15,6 +19,7 @@ export function ResultsPanel() {
   const predictionError = usePatientStore((state) => state.predictionError);
   const isPredicting = usePatientStore((state) => state.isPredicting);
   const predictionStatus = usePatientStore((state) => state.predictionStatus);
+  const awaitingPrediction = usePatientStore(isAwaitingPrediction);
   const currentStatus = prediction
     ? "ready"
     : isPredicting
@@ -69,6 +74,8 @@ export function ResultsPanel() {
             selectedVessel={selectedVessel}
             onSelectVessel={setSelectedVessel}
           />
+        ) : awaitingPrediction ? (
+          <HeartbeatLoader title="Preparing the explanation" />
         ) : (
           statusCopy && (
             <div

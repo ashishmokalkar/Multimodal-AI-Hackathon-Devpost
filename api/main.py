@@ -19,8 +19,8 @@ from fastapi.responses import JSONResponse
 
 from api.explain import explain, predict
 from api.features import NAMES, SPECS, from_model_row, public_schema, training_ranges, validate
-from api.schemas import (FeatureSchema, HealthResponse, MetricsResponse, PredictionResponse, PredictRequest,
-                         SamplePatient)
+from api.schemas import (FeatureSchema, HealthResponse, ImportanceResponse, MetricsResponse, PredictionResponse,
+                         PredictRequest, SamplePatient)
 from ml.data import ROOT, TARGETS, VESSELS
 
 CONTRACT_VERSION = "1.1.0"
@@ -98,8 +98,10 @@ def predict_endpoint(request: PredictRequest):
     sample = request.sample_id or s["sample_keys"].get(json.dumps(patient, sort_keys=True))
     models = s["demo_models"] if sample else s["models"]
     probs = {t: float(v[0]) for t, v in predict(models, [patient]).items()}
+    uncapped = _uncapped(models, patient)
     expl = explain(models, patient)
-    targets = {t: _target(models[t], probs[t]) for t in TARGETS}
+    targets = {t: _target(models[t], probs[t], capped=uncapped[t] > uncapped["cad"] if t != "cad" else None)
+               for t in TARGETS}
     return {
         "request_id": str(uuid.uuid4()),
         "model_version": s["manifest"]["model_version"],
@@ -134,10 +136,28 @@ def metrics():
             "n_samples": m["n_patients"], "trained_at": trained, "targets": out, "mock": False}
 
 
+@app.get("/model/importance", response_model=ImportanceResponse)
+def importance():
+    """What each model generally relies on: average contribution size over the 303 dataset patients
+    (precomputed by `python -m api.importance`)."""
+    from ml.export import MODELS
+
+    data = json.loads((MODELS / "importance.json").read_text())
+    return {**data, "targets": {API_KEYS[t]: rows for t, rows in data["targets"].items()}}
+
+
 # ------------------------------------------------------------------------------------------- helpers
-def _target(model, p: float) -> dict:
+def _target(model, p: float, capped: bool | None = None) -> dict:
     return {"probability": round(p, 4), "label": "elevated" if p >= model.threshold else "not elevated",
-            "threshold": round(model.threshold, 4), "uncertain": len(model.conformal_set([p])[0]) != 1}
+            "threshold": round(model.threshold, 4), "uncertain": len(model.conformal_set([p])[0]) != 1,
+            "capped": capped}
+
+
+def _uncapped(models: dict, patient: dict) -> dict:
+    from api.features import to_model_frame
+
+    X = to_model_frame([patient])
+    return {t: float(models[t].predict_proba(X)[0]) for t in TARGETS}
 
 
 def _explanation(e: dict, patient: dict) -> dict:

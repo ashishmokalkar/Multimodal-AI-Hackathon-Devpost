@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   fetchFeatures,
   fetchHealth,
+  fetchImportance,
   fetchMetrics,
   fetchSamples,
   postPredict,
@@ -66,6 +67,16 @@ export function useMetrics() {
     queryFn: () => requireProfile(profile, fetchMetrics),
     enabled: profile !== null,
     staleTime: 60_000,
+  });
+}
+
+export function useImportance() {
+  const profile = useActiveProfile();
+  return useQuery({
+    queryKey: ["api-profile-data", profile?.id, "importance"],
+    queryFn: () => requireProfile(profile, fetchImportance),
+    enabled: profile !== null,
+    staleTime: Infinity,
   });
 }
 

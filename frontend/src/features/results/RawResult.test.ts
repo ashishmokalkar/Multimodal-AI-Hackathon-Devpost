@@ -192,14 +192,18 @@ describe("RawResult explanation rendering", () => {
   it("uses confirmed probability-scale units and displays real prediction provenance", () => {
     const markup = renderResult(null, realPrediction);
 
-    expect(markup).toContain("+12.00 percentage points");
-    expect(markup).toContain("Reference model risk: 42.0%");
+    expect(markup).toContain("+12 pts");
+    expect(markup).toContain("Typical patient");
+    expect(markup).toContain("42%");
     expect(markup).toContain(
       "Baseline Shapley on served probability (32 orderings).",
     );
     expect(markup).toContain("Final models trained on all 303 patients");
     expect(markup).toContain("<details");
-    expect(markup).toContain("Model warnings (1) - Show details");
+    expect(markup).toContain("Please note");
+    expect(markup).toContain("Coronary artery disease");
+    expect(markup).toContain("Which arteries may be narrowed");
+    expect(markup).toContain("What is driving the overall result");
     expect(markup).toContain("An input was outside the training range.");
     expect(markup).not.toContain("scale unconfirmed");
   });
@@ -211,10 +215,7 @@ describe("RawResult explanation rendering", () => {
     });
     const mock = renderResult(null, prediction);
 
-    expect(emptyRealWarnings).toContain(
-      "Response warnings: none returned; this is not clinical reassurance.",
-    );
-    expect(emptyRealWarnings).not.toContain("Model warnings (");
+    expect(emptyRealWarnings).not.toContain("Please note");
     expect(mock).toContain(
       "Real-model warning assessment is unavailable in mock v1.0.",
     );

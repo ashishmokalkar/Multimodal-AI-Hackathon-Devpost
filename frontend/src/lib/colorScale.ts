@@ -1,8 +1,13 @@
 type RGB = readonly [red: number, green: number, blue: number];
 
-const GREEN: RGB = [0x2e, 0x7d, 0x32];
-const AMBER: RGB = [0xf9, 0xa8, 0x25];
-const RED: RGB = [0xc6, 0x28, 0x28];
+// Colour-blind-safe risk ramp (blue -> amber -> magenta), checked for CVD separation and >= 3:1 contrast on the
+// light canvas. Red-green is avoided because about 1 in 12 men cannot tell those apart.
+const LOW: RGB = [0x3a, 0x7b, 0xbf];
+const MID: RGB = [0xc9, 0x84, 0x00];
+const HIGH: RGB = [0xb0, 0x12, 0x7a];
+
+export const COLOR_SCALE_GRADIENT =
+  "linear-gradient(90deg, #3a7bbf 0%, #c98400 50%, #b0127a 100%)";
 
 function blend(start: RGB, end: RGB, amount: number): RGB {
   return [
@@ -20,8 +25,8 @@ export function colorScale(probability: number): string {
   const position = Math.min(1, Math.max(0, probability));
   const color =
     position <= 0.5
-      ? blend(GREEN, AMBER, position * 2)
-      : blend(AMBER, RED, (position - 0.5) * 2);
+      ? blend(LOW, MID, position * 2)
+      : blend(MID, HIGH, (position - 0.5) * 2);
 
   return `#${color
     .map((channel) => Math.round(channel).toString(16).padStart(2, "0"))

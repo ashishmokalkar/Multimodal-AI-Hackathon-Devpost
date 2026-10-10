@@ -158,3 +158,14 @@ def test_metrics(client):
         assert target["roc_auc_ci95"][0] <= target["roc_auc_ci95"][1]
         assert target["model"]
         assert target["threshold"] != 0.5
+
+
+def test_reference_ranges_capping_flag_and_global_importance(client):
+    feats = {f["name"]: f for f in client.get("/features").json()}
+    assert feats["LDL"]["reference_range"] == {"high": 100} and feats["LDL"]["modifiable"] is True
+    assert "reference_range" not in feats["Age"] and "modifiable" not in feats["Age"]     # omitted, never null
+    body = client.post("/predict", json={"features": {n: f["default"] for n, f in feats.items()}}).json()
+    assert "capped" not in body["cad"] and all(isinstance(v["capped"], bool) for v in body["vessels"].values())
+    imp = client.get("/model/importance").json()
+    assert set(imp["targets"]) == {"cad", "LAD", "LCX", "RCA"} and imp["n_patients"] == 303
+    assert len(imp["targets"]["cad"]) == len(feats)

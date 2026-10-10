@@ -17,6 +17,11 @@ export const FeatureSchema = z.object({
   default: FeatureValueSchema,
   options: z.array(FeatureValueSchema).optional(),
   description: z.string().optional(),
+  reference_range: z
+    .object({ low: z.number().optional(), high: z.number().optional() })
+    .strict()
+    .optional(),
+  modifiable: z.boolean().optional(),
 }).strict();
 
 export const HealthResponseSchema = z.object({
@@ -50,6 +55,7 @@ export const TargetSchema = z.object({
   label: z.string(),
   threshold: z.number().min(0).max(1),
   uncertain: z.boolean().optional(),
+  capped: z.boolean().optional(),
 });
 
 const RealTargetSchema = TargetSchema.extend({
@@ -186,6 +192,24 @@ export const MetricsResponseSchema = z.discriminatedUnion("mock", [
   RealMetricsResponseSchema,
 ]);
 
+export const FeatureImportanceSchema = z.object({
+  feature: z.string(),
+  mean_abs_contribution: z.number().finite().min(0),
+  share_raising: z.number().min(0).max(1),
+}).strict();
+
+export const ImportanceResponseSchema = z.object({
+  model_version: z.string().min(1),
+  n_patients: z.number().int().min(1),
+  description: z.string(),
+  targets: z.object({
+    cad: z.array(FeatureImportanceSchema),
+    LAD: z.array(FeatureImportanceSchema),
+    LCX: z.array(FeatureImportanceSchema),
+    RCA: z.array(FeatureImportanceSchema),
+  }).strict(),
+}).strict();
+
 export const PredictRequestSchema = z.object({
   features: z.record(z.string(), FeatureValueSchema),
   sample_id: z.string().min(1).optional(),
@@ -218,3 +242,6 @@ export type MetricsResponse = z.infer<typeof MetricsResponseSchema>;
 export type PredictRequest = z.infer<typeof PredictRequestSchema>;
 export type ValidationErrorItem = z.infer<typeof ValidationErrorItemSchema>;
 export type ValidationError = z.infer<typeof ValidationErrorSchema>;
+export type FeatureImportance = z.infer<typeof FeatureImportanceSchema>;
+export type ImportanceResponse = z.infer<typeof ImportanceResponseSchema>;
+export type ReferenceRange = NonNullable<FeatureDefinition["reference_range"]>;

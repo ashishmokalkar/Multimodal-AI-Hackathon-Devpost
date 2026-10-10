@@ -14,19 +14,30 @@ import {
 } from "react";
 import type { ErrorInfo } from "react";
 import { CatmullRomCurve3, Vector3 } from "three";
+import { ArteryScale } from "./ArteryScale";
 import { HeartModel } from "./HeartModel";
+import { HeartbeatLoader } from "../loading/HeartbeatLoader";
+import { useFeatures } from "../../api/hooks";
+import {
+  attributionColor,
+  factorImpact,
+  formatFeatureValue,
+  formatPoints,
+  INSIGHT_TARGETS,
+  TARGET_SHORT,
+} from "../../lib/insights";
+import { useActiveScenario } from "../../store/whatIfStore";
 import { VesselMesh } from "./VesselMesh";
 import {
   cameraPositionForTarget,
   OVERVIEW_CAMERA_POSITION,
   OVERVIEW_CAMERA_TARGET,
 } from "../../lib/cameraFocus";
+import { formatProbability, formatTargetUncertainty } from "../../lib/format";
 import {
-  formatProbability,
-  formatTargetUncertainty,
-  formatTargetUncertaintyShort,
-} from "../../lib/format";
-import { usePatientStore } from "../../store/patientStore";
+  isAwaitingPrediction,
+  usePatientStore,
+} from "../../store/patientStore";
 import {
   vesselDisplay,
   vesselIds,
@@ -187,12 +198,7 @@ function HeartScene({
       <ambientLight intensity={1.35} />
       <directionalLight position={[4, 5, 5]} intensity={2.2} />
       <directionalLight position={[-4, -2, -3]} intensity={0.65} />
-      <Bounds
-        fit
-        clip
-        margin={1.2}
-        maxDuration={1}
-      >
+      <Bounds fit clip margin={1.2} maxDuration={1}>
         <HeartModel />
         {vesselIds.map((vessel) => (
           <VesselMesh key={vessel} vessel={vessel} />
@@ -270,11 +276,30 @@ export function ViewerPanel() {
     focusVessel: null,
     sequence: 0,
   });
-  const hoveredVessel = useUiStore((state) => state.hoveredVessel);
   const selectedVessel = useUiStore((state) => state.selectedVessel);
-  const setSelectedVessel = useUiStore((state) => state.setSelectedVessel);
-  const prediction = usePatientStore((state) => state.prediction);
+  const acceptedPrediction = usePatientStore((state) => state.prediction);
+  const scenario = useActiveScenario();
+  // A what-if scenario, when active, is what the heart shows; the accepted prediction is unchanged.
+  const prediction = scenario ?? acceptedPrediction;
+  const hoveredFactor = useUiStore((state) => state.hoveredFactor);
+  const featuresQuery = useFeatures();
+  const factorDefinition = featuresQuery.data?.find(
+    (feature) => feature.name === hoveredFactor,
+  );
+  const factorValue =
+    hoveredFactor && prediction && !prediction.mock
+      ? INSIGHT_TARGETS.map((target) =>
+          prediction.explanations[target].contributions.find(
+            (item) => item.feature === hoveredFactor,
+          ),
+        ).find(Boolean)?.value
+      : undefined;
+  const impact =
+    hoveredFactor && prediction && !prediction.mock
+      ? factorImpact(prediction.explanations, hoveredFactor)
+      : null;
   const isPredicting = usePatientStore((state) => state.isPredicting);
+  const awaitingPrediction = usePatientStore(isAwaitingPrediction);
   const predictionError = usePatientStore((state) => state.predictionError);
   const selectedTarget = selectedVessel
     ? prediction?.vessels[selectedVessel]
@@ -328,12 +353,10 @@ export function ViewerPanel() {
             <Suspense
               fallback={
                 <Html center>
-                  <div
-                    className="whitespace-nowrap rounded-lg bg-white/90 px-3 py-2 text-xs text-slate-700 shadow"
-                    role="status"
-                  >
-                    Loading local heart model...
-                  </div>
+                  <HeartbeatLoader
+                    steps={["Loading the anatomical heart model"]}
+                    title="Preparing the 3D heart"
+                  />
                 </Html>
               }
             >
@@ -345,6 +368,48 @@ export function ViewerPanel() {
             </Suspense>
           </Canvas>
         </AssetErrorBoundary>
+        {awaitingPrediction && (
+          <HeartbeatLoader title="Reading the arteries" variant="stage" />
+        )}
+        {scenario && (
+          <div className="viewer-scenario-badge" role="status">
+            What-if scenario · reset it in the What-if tab
+          </div>
+        )}
+        {impact && hoveredFactor && (
+          <div className="viewer-factor-overlay" role="status">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+              Factor on the heart
+            </p>
+            <p className="text-[12px] font-semibold text-slate-900">
+              {factorDefinition?.label ?? hoveredFactor}
+              {factorValue !== undefined && (
+                <span className="font-normal text-slate-500">
+                  {" "}
+                  · {formatFeatureValue(factorValue, factorDefinition)}
+                </span>
+              )}
+            </p>
+            <div className="mt-1 grid grid-cols-4 gap-1">
+              {INSIGHT_TARGETS.map((target) => (
+                <span
+                  className="rounded-md px-1.5 py-0.5 text-center text-[10px] font-bold tabular-nums text-white"
+                  key={target}
+                  style={{
+                    backgroundColor: attributionColor(impact[target], 1),
+                  }}
+                >
+                  {TARGET_SHORT[target]}{" "}
+                  {formatPoints(impact[target], 0).replace(" pts", "")}
+                </span>
+              ))}
+            </div>
+            <p className="mt-1 text-[9.5px] text-slate-500">
+              Magenta glow raises, blue glow lowers; faded arteries are not
+              moved by this factor.
+            </p>
+          </div>
+        )}
         <div className="viewer-caption">
           <span>Schematic vessels; not patient-specific lesion maps.</span>
           <span>Drag to rotate - Scroll to zoom</span>
@@ -373,84 +438,7 @@ export function ViewerPanel() {
           </button>
         ))}
       </div>
-      <div
-        className="viewer-legend"
-        role="group"
-        aria-label="Predicted probability colour legend"
-      >
-        <div className="space-y-1">
-          <p className="text-[10px] font-semibold text-slate-600">
-            Predicted probability (not narrowing) · 90% set status
-          </p>
-          <div
-            aria-hidden="true"
-            className="h-2 rounded-full"
-            style={{
-              background:
-                "linear-gradient(90deg, #2e7d32 0%, #f9a825 50%, #c62828 100%)",
-            }}
-          />
-          <div className="flex justify-between text-[10px] tabular-nums text-slate-500">
-            <span>0%</span>
-            <span>50%</span>
-            <span>100%</span>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          {vesselIds.map((vessel) => {
-            const display = vesselDisplay(prediction, vessel);
-            return (
-              <span className="inline-flex items-center gap-1.5" key={vessel}>
-                <span
-                  aria-hidden="true"
-                  className="h-3 w-3 rounded-full border border-white shadow-sm"
-                  style={{ backgroundColor: display.color }}
-                />
-                <span className="whitespace-nowrap">
-                  {vessel} {display.percentage} ·{" "}
-                  {formatTargetUncertaintyShort(display.target?.uncertain)}
-                </span>
-              </span>
-            );
-          })}
-          <span className="inline-flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              className="h-3 w-3 rounded-full border border-white shadow-sm"
-              style={{ backgroundColor: "#94a3b8" }}
-            />
-            <span>Unavailable</span>
-          </span>
-        </div>
-      </div>
-      <div
-        aria-live="polite"
-        className="mx-4 mb-3 flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] leading-4 text-slate-800"
-      >
-        <span className="flex min-w-0 flex-nowrap gap-x-3">
-          <span className="whitespace-nowrap">
-            Selected target: {selectedTargetName} —{" "}
-            {formatProbability(selectedTargetProbability)}
-            {selectedTarget &&
-              ` · ${selectedTarget.label} · threshold ${formatProbability(selectedTarget.threshold)} · ${formatTargetUncertaintyShort(selectedTarget.uncertain)}`}
-          </span>
-          {hoveredVessel && (
-            <span className="whitespace-nowrap">
-              Hovering: {hoveredVessel} ({vesselMap[hoveredVessel].label}) —{" "}
-              {vesselDisplay(prediction, hoveredVessel).percentage}
-            </span>
-          )}
-        </span>
-        {selectedVessel && (
-          <button
-            className="shrink-0 rounded-md border border-emerald-200 bg-white px-2 py-1 font-semibold"
-            type="button"
-            onClick={() => setSelectedVessel(null)}
-          >
-            Select CAD
-          </button>
-        )}
-      </div>
+      <ArteryScale prediction={prediction} />
       <p className="viewer-attribution px-5 pb-2 text-[10px] leading-relaxed text-slate-500">
         {prediction?.mock ? "Mock prediction. " : ""}
         Heart:{" "}

@@ -1,3 +1,6 @@
+import type { ImportanceResponse } from "../../api/types";
+import { GlobalImportance } from "../insights/GlobalImportance";
+import { ModelPerformanceChart } from "./ModelPerformanceChart";
 import { useEffect, useRef } from "react";
 import type { RefObject } from "react";
 import type { MetricsResponse } from "../../api/types";
@@ -20,6 +23,8 @@ interface ModelMetricsDrawerProps {
   predictionSource: string | null;
   returnFocusRef: RefObject<HTMLButtonElement | null>;
   metricsQuery: MetricsQueryState;
+  importance?: ImportanceResponse | null;
+  featureLabels?: ReadonlyMap<string, string>;
 }
 
 const targets = [
@@ -72,9 +77,13 @@ function formatMetricValue(
         ? formatProbability(target.balanced_accuracy)
         : "Not provided by mock v1.0";
     case "brier":
-      return "brier" in target ? target.brier.toFixed(3) : "Not provided by mock v1.0";
+      return "brier" in target
+        ? target.brier.toFixed(3)
+        : "Not provided by mock v1.0";
     case "ece":
-      return "ece" in target ? target.ece.toFixed(3) : "Not provided by mock v1.0";
+      return "ece" in target
+        ? target.ece.toFixed(3)
+        : "Not provided by mock v1.0";
     case "threshold":
       return "threshold" in target
         ? formatProbability(target.threshold)
@@ -92,6 +101,8 @@ export function ModelMetricsDrawer({
   predictionSource,
   returnFocusRef,
   metricsQuery,
+  importance = null,
+  featureLabels,
 }: ModelMetricsDrawerProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -258,8 +269,8 @@ export function ModelMetricsDrawer({
 
               {hasSourceMismatch ? (
                 <p className="metrics-version-warning" role="alert">
-                  Source mismatch: these {data.mock ? "mock" : "real API"} metrics
-                  do not match the{" "}
+                  Source mismatch: these {data.mock ? "mock" : "real API"}{" "}
+                  metrics do not match the{" "}
                   {predictionMock ? "mock" : "real API"} accepted prediction.
                   They are not presented as validating that prediction.
                 </p>
@@ -295,6 +306,8 @@ export function ModelMetricsDrawer({
                 </p>
               )}
 
+              <ModelPerformanceChart data={data} />
+
               <dl className="metrics-metadata">
                 <div>
                   <dt>Metrics model version</dt>
@@ -316,64 +329,75 @@ export function ModelMetricsDrawer({
                 </div>
               </dl>
 
-              <div className="overflow-x-auto rounded-xl border border-slate-200">
-                <table className="w-full min-w-[570px] border-collapse text-left text-xs">
-                  <caption className="sr-only">
-                    Model validation metrics by prediction target
-                  </caption>
-                  <thead className="bg-slate-50 text-slate-600">
-                    <tr>
-                      <th className="px-3 py-3 font-semibold" scope="col">
-                        Metric
-                      </th>
-                      {targets.map((target) => (
-                        <th
-                          className="px-3 py-3 font-semibold"
-                          key={target.key}
-                          scope="col"
-                        >
-                          {target.label}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {metricRows.map((metric) => (
-                      <tr
-                        className="border-t border-slate-100"
-                        key={metric.key}
-                      >
-                        <th
-                          className="px-3 py-3 font-medium text-slate-700"
-                          scope="row"
-                        >
-                          {metric.label}
+              <details className="metrics-table-details">
+                <summary className="cursor-pointer text-xs font-semibold text-slate-700">
+                  All validation metrics (table)
+                </summary>
+                <div className="mt-2 overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full min-w-[570px] border-collapse text-left text-xs">
+                    <caption className="sr-only">
+                      Model validation metrics by prediction target
+                    </caption>
+                    <thead className="bg-slate-50 text-slate-600">
+                      <tr>
+                        <th className="px-3 py-3 font-semibold" scope="col">
+                          Metric
                         </th>
                         {targets.map((target) => (
-                          <td
-                            className="break-words px-3 py-3 tabular-nums text-slate-800"
+                          <th
+                            className="px-3 py-3 font-semibold"
                             key={target.key}
+                            scope="col"
                           >
-                            {formatMetricValue(
-                              metric.key,
-                              data.targets[target.key],
-                            )}
-                          </td>
+                            {target.label}
+                          </th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {metricRows.map((metric) => (
+                        <tr
+                          className="border-t border-slate-100"
+                          key={metric.key}
+                        >
+                          <th
+                            className="px-3 py-3 font-medium text-slate-700"
+                            scope="row"
+                          >
+                            {metric.label}
+                          </th>
+                          {targets.map((target) => (
+                            <td
+                              className="break-words px-3 py-3 tabular-nums text-slate-800"
+                              key={target.key}
+                            >
+                              {formatMetricValue(
+                                metric.key,
+                                data.targets[target.key],
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
               {!data.mock && (
                 <p className="metrics-state">
                   Validation-report caveats: the CAD selection has a modest
-                  selection effect, and ensemble comparisons have mild
-                  optimism. Headline per-fold mean ROC-AUC is not the pooled
-                  calibrated AUC; these results are not clinical validation or
-                  in-sample scores. The validation threshold above is distinct
-                  from each patient prediction’s returned decision threshold.
+                  selection effect, and ensemble comparisons have mild optimism.
+                  Headline per-fold mean ROC-AUC is not the pooled calibrated
+                  AUC; these results are not clinical validation or in-sample
+                  scores. The validation threshold above is distinct from each
+                  patient prediction’s returned decision threshold.
                 </p>
+              )}
+              {!data.mock && importance && (
+                <GlobalImportance
+                  data={importance}
+                  labels={featureLabels ?? new Map()}
+                />
               )}
             </>
           )}

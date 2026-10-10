@@ -162,3 +162,18 @@ export const usePatientStore = create<PatientState>((set) => ({
     return accepted;
   },
 }));
+
+/**
+ * True while the UI is genuinely waiting for a prediction: an automatic request is scheduled (debounce) or a
+ * request is in flight, and there is no current prediction to show. Manual "edited" and error states do not count.
+ */
+export function isAwaitingPrediction(
+  state: Pick<PatientState, "prediction" | "isPredicting" | "predictionStatus">,
+): boolean {
+  return (
+    state.prediction === null &&
+    (state.isPredicting ||
+      state.predictionStatus === "pending" ||
+      state.predictionStatus === "auto-updating")
+  );
+}

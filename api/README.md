@@ -92,3 +92,12 @@ All the additions are new keys, so the frontend's current zod schemas ignore the
   - `threshold`;
   - `model`.
 - `trained_at` is UTC with a `Z` suffix, which is what the frontend's `z.string().datetime()` requires.
+
+## Additions for the explanation dashboard (still contract `1.1.0`; all optional keys, omitted when not applicable)
+
+| Where | Field | Meaning |
+|---|---|---|
+| `FeatureSchema` | `reference_range: {low?, high?}` | Typical adult reference interval for a measurement (labs differ). It is shown to orient the reader; it is never used by the model |
+| `FeatureSchema` | `modifiable: true` | A risk factor a patient can change (weight, smoking, BP, fasting glucose, TG, LDL, HDL). Drives the what-if sliders |
+| `Target` (vessels only) | `capped: bool` | `true` when the vessel model's estimate was above P(CAD) and was lowered to it |
+| new `GET /model/importance` | `{model_version, n_patients, description, targets: {cad, LAD, LCX, RCA: [{feature, mean_abs_contribution, share_raising}]}}` | What each model generally relies on: the average size of every input's contribution over the 303 dataset patients, using the same explanations as `/predict`. Precomputed by `python -m api.importance` into `models/importance.json` |

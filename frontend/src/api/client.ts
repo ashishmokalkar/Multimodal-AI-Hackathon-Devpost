@@ -1,5 +1,7 @@
 import {
   FeatureSchema,
+  ImportanceResponseSchema,
+  type ImportanceResponse,
   MetricsResponseSchema,
   PredictRequestSchema,
   PredictionResponseSchema,
@@ -97,4 +99,14 @@ export function fetchMetrics(
     }
     return metrics;
   });
+}
+
+export function fetchImportance(
+  profile: ApiProfile,
+): Promise<ImportanceResponse | null> {
+  // Global importance is a real-model (v1.1.0) endpoint; the mock contract has no equivalent.
+  if (profile.mode !== "real") {
+    return Promise.resolve(null);
+  }
+  return requestJson("/model/importance", ImportanceResponseSchema);
 }

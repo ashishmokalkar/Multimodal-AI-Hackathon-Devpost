@@ -12,7 +12,12 @@ import { DisclaimerBanner } from "../features/safety/DisclaimerBanner";
 import { DisclaimerModal } from "../features/safety/DisclaimerModal";
 import { DISCLAIMER_TEXT } from "../features/safety/disclaimer";
 import { ViewerPanel } from "../features/viewer/ViewerPanel";
-import { useApiProfile, useMetrics } from "../api/hooks";
+import {
+  useApiProfile,
+  useFeatures,
+  useImportance,
+  useMetrics,
+} from "../api/hooks";
 import { useUiStore } from "../store/uiStore";
 
 const DISCLAIMER_STORAGE_KEY = "cad-risk-visualizer-disclaimer-acknowledged";
@@ -22,6 +27,11 @@ function AppContent() {
   const profileQuery = useApiProfile();
   const profile = profileQuery.isSuccess ? profileQuery.data : null;
   const metricsQuery = useMetrics();
+  const importanceQuery = useImportance();
+  const featuresQuery = useFeatures();
+  const featureLabels = new Map(
+    (featuresQuery.data ?? []).map((feature) => [feature.name, feature.label]),
+  );
   const prediction = usePatientStore((state) => state.prediction);
   const previousProfileId = useRef<string | null>(null);
   const metricsButtonRef = useRef<HTMLButtonElement>(null);
@@ -149,6 +159,8 @@ function AppContent() {
 
       <ModelMetricsDrawer
         metricsQuery={metricsQuery}
+        importance={importanceQuery.data ?? null}
+        featureLabels={featureLabels}
         onClose={closeMetrics}
         open={isMetricsOpen}
         predictionVersion={prediction?.model_version ?? null}

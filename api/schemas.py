@@ -21,6 +21,11 @@ class HealthResponse(ContractModel):
     mock: bool
 
 
+class ReferenceRange(ContractModel):
+    low: float | None = None
+    high: float | None = None
+
+
 class FeatureSchema(ContractModel):
     name: str = Field(min_length=1)
     label: str
@@ -32,6 +37,8 @@ class FeatureSchema(ContractModel):
     default: FeatureValue
     options: list[FeatureValue] | None = None
     description: str | None = None
+    reference_range: ReferenceRange | None = Field(None, description="Typical adult reference interval (labs differ).")
+    modifiable: bool | None = Field(None, description="A risk factor a patient can change (what-if sliders).")
 
 
 class VesselGroundTruth(ContractModel):
@@ -65,6 +72,8 @@ class Target(ContractModel):
     label: str
     threshold: Probability
     uncertain: bool = Field(description="True when the model's 90% prediction set contains both answers.")
+    capped: bool | None = Field(None, description="Vessels only: the model's vessel estimate exceeded P(CAD) and "
+                                                  "was lowered to it.")
 
 
 class VesselTargets(ContractModel):
@@ -136,3 +145,16 @@ class MetricsResponse(ContractModel):
     trained_at: str
     targets: TargetMetricsMap
     mock: bool
+
+
+class FeatureImportance(ContractModel):
+    feature: str
+    mean_abs_contribution: float = Field(description="Average size of the input's contribution (probability units).")
+    share_raising: Probability = Field(description="Share of patients for whom the input raised the probability.")
+
+
+class ImportanceResponse(ContractModel):
+    model_version: str
+    n_patients: int
+    description: str
+    targets: dict[str, list[FeatureImportance]]

@@ -23,9 +23,14 @@ BBB = ["None", "LBBB", "RBBB"]
 VHD = ["None", "Mild", "Moderate", "Severe"]
 
 
-def _num(name, label, group, unit, lo, hi, default, description, col, scale=1.0):
-    return {"name": name, "label": label, "group": group, "type": "number", "unit": unit, "min": lo, "max": hi,
-            "default": default, "description": description, "_col": col, "_scale": scale}
+def _num(name, label, group, unit, lo, hi, default, description, col, scale=1.0, ref=None, modifiable=False):
+    d = {"name": name, "label": label, "group": group, "type": "number", "unit": unit, "min": lo, "max": hi,
+         "default": default, "description": description, "_col": col, "_scale": scale}
+    if ref:
+        d["reference_range"] = {k: v for k, v in zip(("low", "high"), ref) if v is not None}
+    if modifiable:
+        d["modifiable"] = True
+    return d
 
 
 def _bool(name, label, group, description, col):
@@ -33,25 +38,30 @@ def _bool(name, label, group, description, col):
             "description": description, "_col": col}
 
 
-def _cat(name, label, group, options, default, description, unit=None):
+def _cat(name, label, group, options, default, description, unit=None, modifiable=False):
     d = {"name": name, "label": label, "group": group, "type": "categorical", "options": options, "default": default,
          "description": description}
     if unit:
         d["unit"] = unit
+    if modifiable:
+        d["modifiable"] = True
     return d
 
 
 # min/max are plausibility limits (outside -> HTTP 422); the narrower ranges seen in training produce a warning.
+# reference_range is a typical adult reference interval (labs differ; for orientation, not diagnosis).
+# modifiable marks the risk factors a patient can change (what-if sliders).
 # Numeric defaults are the dataset medians; yes/no defaults are "No" and choices default to their "none" option.
 FEATURE_SPECS: list[dict] = [
     _num("Age", "Age", DEMO, "years", 18, 100, 58, "Age in completed years.", "age"),
-    _num("Weight", "Weight", DEMO, "kg", 35, 200, 74, "Body weight.", "weight"),
+    _num("Weight", "Weight", DEMO, "kg", 35, 200, 74, "Body weight.", "weight", modifiable=True),
     _num("Length", "Height", DEMO, "cm", 130, 210, 165, "Body height. BMI is calculated from height and weight.",
          "height"),
     _cat("Sex", "Sex", DEMO, ["Female", "Male"], "Male", "Sex recorded at the time of the visit."),
     _bool("DM", "Diabetes", DEMO, "Diagnosed diabetes mellitus.", "dm"),
     _bool("HTN", "High blood pressure", DEMO, "Diagnosed hypertension.", "htn"),
-    _cat("Smoking", "Smoking", DEMO, SMOKING, "Never", "Never smoked, former smoker, or current smoker."),
+    _cat("Smoking", "Smoking", DEMO, SMOKING, "Never", "Never smoked, former smoker, or current smoker.",
+         modifiable=True),
     _bool("FH", "Family history of heart disease", DEMO, "Early coronary heart disease in a close relative.", "fh"),
     _bool("CRF", "Chronic kidney failure", DEMO, "Diagnosed chronic renal failure.", "crf"),
     _bool("CVA", "Previous stroke", DEMO, "History of stroke (cerebrovascular accident).", "cva"),
@@ -59,8 +69,9 @@ FEATURE_SPECS: list[dict] = [
     _bool("Thyroid Disease", "Thyroid disease", DEMO, "Diagnosed thyroid disease.", "thyroid_disease"),
     _bool("CHF", "Heart failure", DEMO, "Diagnosed congestive heart failure.", "chf"),
     _bool("DLP", "High cholesterol (dyslipidaemia)", DEMO, "Diagnosed abnormal blood fats.", "dlp"),
-    _num("BP", "Blood pressure (systolic)", EXAM, "mmHg", 70, 240, 130, "Systolic (upper) blood pressure.", "bp"),
-    _num("PR", "Pulse rate", EXAM, "beats/min", 35, 180, 70, "Resting heart rate.", "pr"),
+    _num("BP", "Blood pressure (systolic)", EXAM, "mmHg", 70, 240, 130, "Systolic (upper) blood pressure.", "bp",
+         ref=(90, 120), modifiable=True),
+    _num("PR", "Pulse rate", EXAM, "beats/min", 35, 180, 70, "Resting heart rate.", "pr", ref=(60, 100)),
     _cat("Chest Pain", "Chest pain type", EXAM, CHEST_PAIN, "None",
          "Typical: chest discomfort brought on by exertion or stress and relieved by rest. Atypical: two of those "
          "features. Non-anginal: one or none. None: no chest pain."),
@@ -82,23 +93,33 @@ FEATURE_SPECS: list[dict] = [
     _bool("Poor R Progression", "Poor R-wave progression", ECG, "Poor R-wave progression on the ECG.",
           "poor_r_progression"),
     _cat("BBB", "Bundle branch block", ECG, BBB, "None", "Left (LBBB) or right (RBBB) bundle branch block on the ECG."),
-    _num("FBS", "Fasting blood sugar", LAB, "mg/dL", 40, 600, 98, "Fasting plasma glucose.", "fbs"),
-    _num("CR", "Creatinine", LAB, "mg/dL", 0.3, 15, 1.0, "Serum creatinine (kidney function).", "cr"),
-    _num("TG", "Triglycerides", LAB, "mg/dL", 20, 2000, 122, "Fasting triglycerides.", "tg"),
-    _num("LDL", "LDL cholesterol", LAB, "mg/dL", 10, 400, 100, "'Bad' cholesterol.", "ldl"),
-    _num("HDL", "HDL cholesterol", LAB, "mg/dL", 10, 150, 39, "'Good' cholesterol.", "hdl"),
-    _num("BUN", "Blood urea nitrogen", LAB, "mg/dL", 2, 180, 16, "Kidney function marker.", "bun"),
-    _num("ESR", "ESR", LAB, "mm/h", 0, 150, 15, "Erythrocyte sedimentation rate (inflammation marker).", "esr"),
-    _num("HB", "Haemoglobin", LAB, "g/dL", 5, 20, 13.2, "Blood haemoglobin.", "hb"),
-    _num("K", "Potassium", LAB, "mmol/L", 2, 8, 4.2, "Serum potassium.", "k"),
-    _num("Na", "Sodium", LAB, "mmol/L", 110, 170, 141, "Serum sodium.", "na"),
+    _num("FBS", "Fasting blood sugar", LAB, "mg/dL", 40, 600, 98, "Fasting plasma glucose.", "fbs", ref=(70, 99),
+         modifiable=True),
+    _num("CR", "Creatinine", LAB, "mg/dL", 0.3, 15, 1.0, "Serum creatinine (kidney function).", "cr",
+         ref=(0.6, 1.3)),
+    _num("TG", "Triglycerides", LAB, "mg/dL", 20, 2000, 122, "Fasting triglycerides.", "tg", ref=(None, 150),
+         modifiable=True),
+    _num("LDL", "LDL cholesterol", LAB, "mg/dL", 10, 400, 100, "'Bad' cholesterol.", "ldl", ref=(None, 100),
+         modifiable=True),
+    _num("HDL", "HDL cholesterol", LAB, "mg/dL", 10, 150, 39, "'Good' cholesterol.", "hdl", ref=(40, None),
+         modifiable=True),
+    _num("BUN", "Blood urea nitrogen", LAB, "mg/dL", 2, 180, 16, "Kidney function marker.", "bun", ref=(7, 20)),
+    _num("ESR", "ESR", LAB, "mm/h", 0, 150, 15, "Erythrocyte sedimentation rate (inflammation marker).",
+         "esr", ref=(None, 20)),
+    _num("HB", "Haemoglobin", LAB, "g/dL", 5, 20, 13.2, "Blood haemoglobin.", "hb", ref=(12, 17.5)),
+    _num("K", "Potassium", LAB, "mmol/L", 2, 8, 4.2, "Serum potassium.", "k", ref=(3.5, 5.0)),
+    _num("Na", "Sodium", LAB, "mmol/L", 110, 170, 141, "Serum sodium.", "na", ref=(135, 145)),
     _num("WBC", "White blood cells", LAB, "x10^3/uL", 1, 50, 7.1,
-         "White cell count as printed on most lab reports (x10^3/uL, same number as x10^9/L).", "wbc", 1000.0),
-    _num("Lymph", "Lymphocytes", LAB, "%", 0, 100, 32, "Lymphocytes as a percentage of white cells.", "lymph"),
-    _num("Neut", "Neutrophils", LAB, "%", 0, 100, 60, "Neutrophils as a percentage of white cells.", "neut"),
-    _num("PLT", "Platelets", LAB, "x10^3/uL", 10, 1000, 210, "Platelet count.", "plt"),
+         "White cell count as printed on most lab reports (x10^3/uL, same number as x10^9/L).", "wbc", 1000.0,
+         ref=(4.0, 11.0)),
+    _num("Lymph", "Lymphocytes", LAB, "%", 0, 100, 32, "Lymphocytes as a percentage of white cells.", "lymph",
+         ref=(20, 40)),
+    _num("Neut", "Neutrophils", LAB, "%", 0, 100, 60, "Neutrophils as a percentage of white cells.", "neut",
+         ref=(40, 70)),
+    _num("PLT", "Platelets", LAB, "x10^3/uL", 10, 1000, 210, "Platelet count.", "plt", ref=(150, 450)),
     _num("EF-TTE", "Ejection fraction", ECHO, "%", 5, 90, 50,
-         "How much blood the left ventricle pumps out with each beat, from a heart ultrasound (echo).", "ef_tte"),
+         "How much blood the left ventricle pumps out with each beat, from a heart ultrasound (echo).", "ef_tte",
+         ref=(50, None)),
     _cat("Region RWMA", "Regional wall-motion abnormality", ECHO, [0, 1, 2, 3, 4], 0,
          "Regional wall-motion abnormality on echo, as coded in the source dataset (0-4; 0 in 217 of 303 patients)."),
     _cat("VHD", "Heart valve disease", ECHO, VHD, "None", "Valvular heart disease severity on echo."),
