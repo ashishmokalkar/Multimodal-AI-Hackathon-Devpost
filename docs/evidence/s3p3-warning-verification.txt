@@ -35,8 +35,16 @@ Live verification:
 - Verification services were stopped; ports 8000, 5173 and 9222 have no
   listeners.
 
-Latest deduplicated local telemetry through 2026-10-10T14:29:06.590Z (not
+Intermediate deduplicated local telemetry through 2026-10-10T14:29:06.590Z (not
 billing): Phase 3 378.2348025 (O 107.887090, X 270.3477125); S3 955.432452
 (O 583.197240, X 372.235212); project 2728.0367695 (O 2184.663865,
 X 543.3729045). X corrective use is 14.9967135 of the additional 30-credit
 allowance; 15.0032865 remains. Later events are excluded.
+
+Publication snapshot through the last recorded event at
+2026-10-10T14:33:51.041Z (deduplicated local telemetry, not billing): Phase 3
+384.1292785 (O 107.887090, X 276.2421885); S3 961.326928 (O 583.197240,
+X 378.129688); project 2733.9312455 (O 2184.663865, X 549.2673805). X
+corrective use is 20.8911895; 9.1088105 remains of the additional 30-credit
+allowance. Documentation, publication and report calls after that event are
+excluded.

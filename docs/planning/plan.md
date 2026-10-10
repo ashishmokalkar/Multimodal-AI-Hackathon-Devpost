@@ -570,7 +570,7 @@ O **15.776210** and X **0** credits at kickoff; this is included in the
 baseline, not added again. The script's exact checkout filter and deduplication
 fields match `scripts/credits.py`; the cutoff excludes later execution calls.
 
-**Latest corrective snapshot through `2026-10-10T14:29:06.590Z`:** P3
+**Intermediate corrective snapshot through `2026-10-10T14:29:06.590Z`:** P3
 **378.2348025** (O **107.887090**, X **270.3477125**); S3 **955.432452**
 (O **583.197240**, X **372.235212**); project **2728.0367695**
 (O **2184.663865**, X **543.3729045**). Corrective X usage since its fresh
@@ -578,6 +578,16 @@ baseline is **14.9967135**, leaving **15.0032865** of D-041's 30-credit X
 allowance. The unchanged 800-credit combined P3 has **421.7651975** remaining;
 S3 and project totals remain below their unchanged caps. These are local
 telemetry, not billing; calls after the last recorded event are excluded.
+
+**Publication snapshot through the last recorded event at
+`2026-10-10T14:33:51.041Z`:** P3 **384.1292785** (O **107.887090**, X
+**276.2421885**); S3 **961.326928** (O **583.197240**, X **378.129688**);
+project **2733.9312455** (O **2184.663865**, X **549.2673805**). Corrective X
+usage from the fresh kickoff baseline is **20.8911895**, leaving **9.1088105**
+of the additional 30-credit X allowance. The unchanged P3 combined allocation
+has **415.8707215** remaining; the original X overrun is not reset. This is
+deduplicated local telemetry, not billing; later documentation/push/reporting
+calls are excluded.
 
 Corrective tasks and acceptance:
 
