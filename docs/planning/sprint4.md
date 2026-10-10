@@ -531,3 +531,13 @@ blocking fixes may change frozen code. No automatic S5 implementation.
 documentation-only closeout. The accepted source baseline above remains the
 code-freeze reference; Human Gate 3 is not inferred from publication, and
 S5 Phase 0 remains unstarted until H approves Gate 3.
+
+**Final human closeout (D-051):** H subsequently selected "Approve Gate 3 and
+begin S5 planning (Recommended)" after O reviewed the closeout and confirmed
+clean matching local/remote hashes at
+`e5117844e07db7196bed8636992627a551b59cdd`. S4 is formally closed;
+S5 planning only is authorised. The last recorded S4 snapshot through
+`2026-10-10T19:14:10.157Z` is **530.509874**, with project
+**3484.2966525**. S5 accounting starts at the recorded transition
+`2026-10-10T19:14:10.661Z`; earlier actuals and overruns are unchanged.
+No new code, PR operation or S5 production is implied.

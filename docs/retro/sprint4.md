@@ -1,9 +1,8 @@
 # Sprint 4 Retrospective - Feedback, release clarity and code freeze
 
-**Status:** The accepted release candidate and D-044 warning carryover were
-accepted at Human Gate 2. The documentation-only retrospective/plan cleanup
-is published for Human Gate 3 review. Gate 3 remains pending; S5 Phase 0 is
-staged but unstarted.
+**Status:** S4 is formally closed at Human Gate 3 (D-051). H accepted the
+documentation-only closeout after Gate 2's release-candidate approval.
+S5 Phase 0 planning is active; production remains gated on S5 Gate 0.
 
 ## What worked
 
@@ -90,8 +89,8 @@ not silently disappear or reopen under S5.
 
 | Action | Owner | Dependency / timing |
 |---|---|---|
-| Review this closeout and explicitly approve S4 Human Gate 3. | H | Pending |
-| Begin only S5 Phase 0 after Gate 3; obtain a detailed plan and separate S5 Gate 0 approval before delivery work. | H/O | Gated on Gate 3 |
+| Review this closeout and explicitly approve S4 Human Gate 3. | H | Completed, D-051 |
+| Agree a detailed S5 plan and separate Gate 0 approval before delivery work. | H/O | Phase 0 active; production gated |
 | Confirm Ashish's ML-section scope and delivery timing; keep the uncertainty open until confirmed. | Faizan/Ashish | S5 Phase 0 |
 | Deliver document/video drafts Oct 12 and finals Oct 13; reserve Oct 14 for submission only. | Faizan; Ashish for ML sections | S5, subject to gates |
 | Keep PR approval/merge separate; no merge or automatic code work is implied. | H | Separate approval |
@@ -102,7 +101,8 @@ The accepted source release candidate and code-freeze baseline is
 `39ffab1c8adecd707c0f40ce826c12a568c41267`. The S4 archive and this
 retrospective are a later documentation-only closeout; their commit is
 reported separately and is not a new source baseline. No tag or branch was
-created. Human Gate 3 remains pending, and S5 has not started.
+created. H subsequently approved Human Gate 3 under D-051, starting S5
+planning without changing that source baseline.
 
 ## Budget
 
@@ -117,3 +117,9 @@ records Phase 3 at **20.601055**, S4 at **516.4153165** (remaining
 local session-store telemetry, not account billing; later calls are excluded
 from this dated snapshot. Historical phase actuals, corrective overrun and
 reallocations above remain unchanged.
+
+Final recorded pre-S5 snapshot through **2026-10-10T19:14:10.157Z**:
+S4 **530.509874**, leaving **169.490126** under 700; project
+**3484.2966525**, leaving **3515.7033475** under 7000. S5 begins at the
+recorded transition **2026-10-10T19:14:10.661Z**. These are local telemetry,
+not billing; the preceding snapshots stay historical and no actual is reset.

@@ -24,6 +24,11 @@ All handovers O → X and X → O pass **through H in chat**. No agent spawns su
   actuals and historical overruns; S5 500, reserve 700 and project 7000 stay
   unchanged. Human gates, scope approvals and repeated-failure rules still
   apply; this does not authorise later phases automatically.
+- **S5 shared budget (D-053):** the existing 500-credit O+X allocation is one
+  shared hard sprint ceiling. Phase/executor/media/publication figures are
+  estimates, not independent stop guards. Include planning, review and Git
+  publication in actuals; no reset, reserve use or automatic underspend
+  transfer. Human gates and frozen-code scope remain mandatory.
 - **Branches:** `main` ← `dev` ← `frontend` (ours) / `ML-dev` (colleague). We only commit to `frontend`. Merges to `dev` happen at sprint end via PR after H approval.
 
 ## 3. Artefacts
@@ -53,6 +58,12 @@ Oct 11; S5 finalises documentation/video/submission readiness Oct 12-13.
 Oct 14 remains submission-only. S4/S5 split the former final sprint's 1200
 credits into 700/500; reserve 700 and project cap 7000 stay unchanged.
 Only separately approved blocking fixes may change code after freeze.
+S5 uses automation-first document/video preparation to fit H's 2-3 hours of
+review/upload availability: a captioned demo without narration, ML drafting
+from pinned evidence followed by Ashish's sign-off, and a bounded existing-
+tool media preflight with a minimal manual fallback. Required exported
+page/duration limits must still be measured. No new agents or automatic
+submission/PR merge follows from automation; each phase is separately gated.
 Every sprint keeps the same shape:
 
 1. **Phase 0 — Discussion & Research** (O + H). Re-read `spec.md`, `decisions.md`, last retro. Confirm or amend the tentative plan for this sprint. Output: `plan.md` for this sprint.

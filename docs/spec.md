@@ -361,9 +361,39 @@ not authorise new features; any blocking frozen-code fix needs H approval.
 S4 Phase 3 retrospective and archive were published as a documentation-only
 closeout on 2026-10-10. The frozen source baseline remains
 `39ffab1c8adecd707c0f40ce826c12a568c41267`; the closeout commit is separate
-and does not represent a code change. Human Gate 3 remains pending. S5 Phase 0
-is staged but unstarted and gated on Gate 3; Ashish's ML-section timing
-remains unconfirmed. No PR merge or S5 delivery is implied.
+and does not represent a code change. H approved Human Gate 3 under D-051
+after the documentation-only closeout at
+`e5117844e07db7196bed8636992627a551b59cdd`; S4 is formally closed and S5
+Phase 0 planning is active. H confirmed during S5 planning that Ashish's
+document-ready ML sections are due Oct 12; exact time/coverage remain to
+confirm so same-day assembly and draft review are not silently assumed.
+No PR merge, frozen-code change or S5 delivery is implied by planning approval.
+
+**S5 production choices (D-052, Gate 0 approved under D-053):** Faizan has 2-3 hours
+for document/video review, uploads and sign-off across Oct 11-13. Use an
+automation-first plan: E prepares a document/PDF of at most six pages, a
+4-5-minute target captioned real-demo video within the required 3-10 minutes,
+and submission-text drafts. H selected no narration. Reuse frozen source,
+accepted S4 evidence and existing Edge/FFmpeg tooling; recording/PDF export
+still need a bounded media preflight after Gate 0. Failed automation switches
+to a minimal human-recording/export fallback rather than repeated harness
+work. No new features, hosting, retraining, dependencies or agents are
+automatically authorised.
+
+H approved drafting ML sections from the pinned reports after Gate 0, then
+having Ashish verify or replace them on Oct 12 before finalisation. His
+delivery hour/coverage remain open; initial drafting need not wait, but
+missing ML sign-off blocks finalisation. Proposed drafts Oct 12 at 16:00
+CEST and finals Oct 13 at 18:00 protect Oct 14 for submission. The proposed
+S5 phase estimates share the existing 500-credit hard O+X sprint ceiling,
+without independent executor/publication micro-limits or budget resets.
+H approved this budget application, milestones and Phase 1 production only
+under D-053; finalisation and submission retain separate human gates.
+The live Devpost page returned 403 during planning, so H must verify current
+form/rules and judge access before final acceptance. No production or
+submission authority follows from the planning choices alone. Phase 1's
+accounting boundary is `2026-10-10T19:26:20.967Z`; frozen source remains
+unchanged and E must stop for Human Gate 1 after the draft package.
 
 ## 8. Clinical safety
 
@@ -408,9 +438,13 @@ polish or CSV work needs a separate H-approved scope/calendar decision.
   4 (D-042). H subsequently closed S3 at Gate 4 with remaining viewport
   evidence carried to S4 (D-044). Deployment, clinical validity and separately
   validated demo-refit metrics are not established.
-- Q3: Faizan remains accountable for the video/document (D-033); M offers ML
-  sections and joint script/architecture input. His contribution timing remains
-  to confirm. Draft Oct 12, final Oct 13; submission-only Oct 14.
+- Q3: Faizan remains accountable for the video/document (D-033), with 2-3 hours
+  for review/uploads/sign-off and automation-first E preparation proposed
+  under D-052. H confirmed Ashish's ML sections for Oct 12; hour/coverage
+  remain open. Draft from existing pinned evidence after Gate 0, with Ashish's
+  sign-off before finalisation. Captioned video without narration; drafts
+  Oct 12, finals Oct 13, submission-only Oct 14. Gate 0/D-053 authorises
+  Phase 1 only; ML verification and current-form/access checks remain open.
 
 ### Current ML handoff (reviewed and approved 2026-10-10)
 
