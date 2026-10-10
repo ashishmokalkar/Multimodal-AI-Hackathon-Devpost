@@ -1,0 +1,465 @@
+import { Bounds, Html, OrbitControls, Stats } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import {
+  Component,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentRef,
+  type MutableRefObject,
+  type ReactNode,
+  type RefObject,
+} from "react";
+import type { ErrorInfo } from "react";
+import { CatmullRomCurve3, Vector3 } from "three";
+import { ArteryScale } from "./ArteryScale";
+import { HeartModel } from "./HeartModel";
+import { HeartbeatLoader } from "../loading/HeartbeatLoader";
+import { useFeatures } from "../../api/hooks";
+import {
+  attributionColor,
+  factorImpact,
+  formatFeatureValue,
+  formatPoints,
+  INSIGHT_TARGETS,
+  TARGET_SHORT,
+} from "../../lib/insights";
+import { useActiveScenario } from "../../store/whatIfStore";
+import { LeftMainMesh, VesselMesh } from "./VesselMesh";
+import {
+  cameraPositionFacing,
+  OVERVIEW_CAMERA_POSITION,
+  OVERVIEW_CAMERA_TARGET,
+} from "../../lib/cameraFocus";
+import { formatProbability, formatTargetUncertainty } from "../../lib/format";
+import {
+  isAwaitingPrediction,
+  usePatientStore,
+} from "../../store/patientStore";
+import { selectedPredictionTarget } from "./probabilityLegendHelpers";
+import {
+  vesselDisplay,
+  vesselIds,
+  vesselMap,
+  type VesselId,
+} from "./vesselMap";
+import { useUiStore } from "../../store/uiStore";
+
+type OrbitControlsImpl = ComponentRef<typeof OrbitControls>;
+
+interface CameraRequest {
+  focusVessel: VesselId | null;
+  sequence: number;
+}
+
+interface HeartSceneProps {
+  cameraRequest: CameraRequest;
+  controlsRef: RefObject<OrbitControlsImpl | null>;
+  setControlsRef: (controls: OrbitControlsImpl | null) => void;
+}
+
+interface OverviewView {
+  position: Vector3;
+  target: Vector3;
+}
+
+interface CameraFocusControllerProps {
+  cameraRequest: CameraRequest;
+  controlsRef: RefObject<OrbitControlsImpl | null>;
+  overviewViewRef: RefObject<OverviewView | null>;
+}
+
+interface OverviewCameraCaptureProps {
+  controlsRef: RefObject<OrbitControlsImpl | null>;
+  overviewViewRef: MutableRefObject<OverviewView | null>;
+}
+
+function OverviewCameraCapture({
+  controlsRef,
+  overviewViewRef,
+}: OverviewCameraCaptureProps) {
+  const { camera, invalidate } = useThree();
+  const startedAtRef = useRef<number | null>(null);
+  const stableFrameCountRef = useRef(0);
+  const previousPositionRef = useRef<Vector3 | null>(null);
+  const previousTargetRef = useRef<Vector3 | null>(null);
+
+  useFrame(() => {
+    if (overviewViewRef.current) {
+      return;
+    }
+    startedAtRef.current ??= performance.now();
+
+    const controls = controlsRef.current;
+    if (!controls) {
+      invalidate();
+      return;
+    }
+
+    const position = camera.position.clone();
+    const target = controls.target.clone();
+    const previousPosition = previousPositionRef.current;
+    const previousTarget = previousTargetRef.current;
+    if (
+      previousPosition &&
+      previousTarget &&
+      position.distanceToSquared(previousPosition) < 1e-10 &&
+      target.distanceToSquared(previousTarget) < 1e-10
+    ) {
+      stableFrameCountRef.current += 1;
+    } else {
+      stableFrameCountRef.current = 0;
+    }
+    previousPositionRef.current = position;
+    previousTargetRef.current = target;
+
+    const fitHasSettled = stableFrameCountRef.current >= 3;
+    const captureDeadlineReached =
+      performance.now() - startedAtRef.current >= 2500;
+    if (fitHasSettled || captureDeadlineReached) {
+      overviewViewRef.current = { position, target };
+      controls.saveState();
+      return;
+    }
+
+    invalidate();
+  });
+
+  return null;
+}
+
+function CameraFocusController({
+  cameraRequest,
+  controlsRef,
+  overviewViewRef,
+}: CameraFocusControllerProps) {
+  const { camera, invalidate } = useThree();
+  const appliedSequence = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (cameraRequest.sequence === appliedSequence.current) {
+      return;
+    }
+    appliedSequence.current = cameraRequest.sequence;
+
+    const controls = controlsRef.current;
+    if (!controls) {
+      return;
+    }
+
+    if (cameraRequest.focusVessel === null) {
+      const overview = overviewViewRef.current;
+      controls.reset();
+      camera.position.copy(
+        overview?.position ?? new Vector3(...OVERVIEW_CAMERA_POSITION),
+      );
+      controls.target.copy(
+        overview?.target ?? new Vector3(...OVERVIEW_CAMERA_TARGET),
+      );
+    } else {
+      const path = vesselMap[cameraRequest.focusVessel].path;
+      const focusPoint = new CatmullRomCurve3(
+        path.map(([x, y, z]) => new Vector3(x, y, z)),
+      ).getPoint(0.5);
+      // orbit round to face the vessel (LCX and RCA run onto the back), keeping a comfortable zoom
+      const distance = Math.min(
+        3.2,
+        Math.max(1.8, camera.position.distanceTo(controls.target)),
+      );
+      const nextCameraPosition = cameraPositionFacing(
+        [focusPoint.x, focusPoint.y, focusPoint.z],
+        distance,
+      );
+      camera.position.set(...nextCameraPosition);
+      controls.target.copy(focusPoint);
+    }
+
+    controls.update();
+    invalidate();
+  }, [
+    camera,
+    cameraRequest.focusVessel,
+    cameraRequest.sequence,
+    controlsRef,
+    invalidate,
+    overviewViewRef,
+  ]);
+
+  return null;
+}
+
+function HeartScene({
+  cameraRequest,
+  controlsRef,
+  setControlsRef,
+}: HeartSceneProps) {
+  const overviewViewRef = useRef<OverviewView | null>(null);
+
+  return (
+    <>
+      <color attach="background" args={["#f4f8f5"]} />
+      <ambientLight intensity={1.35} />
+      <directionalLight position={[4, 5, 5]} intensity={2.2} />
+      <directionalLight position={[-4, -2, -3]} intensity={0.65} />
+      <Bounds fit clip margin={1.2} maxDuration={1}>
+        <HeartModel />
+        <LeftMainMesh />
+        {vesselIds.map((vessel) => (
+          <VesselMesh key={vessel} vessel={vessel} />
+        ))}
+        <OverviewCameraCapture
+          controlsRef={controlsRef}
+          overviewViewRef={overviewViewRef}
+        />
+      </Bounds>
+      <OrbitControls
+        ref={setControlsRef}
+        makeDefault
+        enableDamping
+        dampingFactor={0.08}
+        minDistance={1.4}
+        maxDistance={5.5}
+      />
+      <CameraFocusController
+        cameraRequest={cameraRequest}
+        controlsRef={controlsRef}
+        overviewViewRef={overviewViewRef}
+      />
+      {import.meta.env.DEV &&
+        new URLSearchParams(window.location.search).get("fps") === "1" && (
+          <Stats />
+        )}
+    </>
+  );
+}
+
+interface AssetErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface AssetErrorBoundaryState {
+  error: Error | null;
+}
+
+class AssetErrorBoundary extends Component<
+  AssetErrorBoundaryProps,
+  AssetErrorBoundaryState
+> {
+  state: AssetErrorBoundaryState = { error: null };
+
+  static getDerivedStateFromError(error: Error): AssetErrorBoundaryState {
+    return { error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("Unable to load the local heart model.", error, info);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div
+          className="m-auto max-w-xs rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900"
+          role="alert"
+        >
+          The local heart model could not be loaded. {this.state.error.message}
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export function ViewerPanel() {
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const setControlsRef = useCallback((controls: OrbitControlsImpl | null) => {
+    controlsRef.current = controls;
+  }, []);
+  const [cameraRequest, setCameraRequest] = useState<CameraRequest>({
+    focusVessel: null,
+    sequence: 0,
+  });
+  const selectedVessel = useUiStore((state) => state.selectedVessel);
+  const acceptedPrediction = usePatientStore((state) => state.prediction);
+  const scenario = useActiveScenario();
+  // A what-if scenario, when active, is what the heart shows; the accepted prediction is unchanged.
+  const prediction = scenario ?? acceptedPrediction;
+  const hoveredFactor = useUiStore((state) => state.hoveredFactor);
+  const featuresQuery = useFeatures();
+  const factorDefinition = featuresQuery.data?.find(
+    (feature) => feature.name === hoveredFactor,
+  );
+  const factorValue =
+    hoveredFactor && prediction && !prediction.mock
+      ? INSIGHT_TARGETS.map((target) =>
+          prediction.explanations[target].contributions.find(
+            (item) => item.feature === hoveredFactor,
+          ),
+        ).find(Boolean)?.value
+      : undefined;
+  const impact =
+    hoveredFactor && prediction && !prediction.mock
+      ? factorImpact(prediction.explanations, hoveredFactor)
+      : null;
+  const isPredicting = usePatientStore((state) => state.isPredicting);
+  const awaitingPrediction = usePatientStore(isAwaitingPrediction);
+  const predictionError = usePatientStore((state) => state.predictionError);
+  const { name: selectedTargetName, target: selectedTarget } =
+    selectedPredictionTarget(prediction, selectedVessel);
+  const selectedTargetProbability = selectedTarget?.probability ?? null;
+  const predictionStatus = prediction
+    ? `Current predicted probabilities: CAD ${formatProbability(prediction.cad.probability)}, LAD ${vesselDisplay(prediction, "LAD").percentage}, LCX ${vesselDisplay(prediction, "LCX").percentage}, RCA ${vesselDisplay(prediction, "RCA").percentage}. CAD: ${formatTargetUncertainty(prediction.cad.uncertain)} LAD: ${formatTargetUncertainty(prediction.vessels.LAD.uncertain)} LCX: ${formatTargetUncertainty(prediction.vessels.LCX.uncertain)} RCA: ${formatTargetUncertainty(prediction.vessels.RCA.uncertain)}`
+    : isPredicting
+      ? "A prediction is pending; vessel probabilities are unavailable."
+      : predictionError
+        ? "The latest prediction failed; vessel probabilities are unavailable."
+        : "No current prediction; vessel probabilities are unavailable.";
+
+  const focusVessel = (vessel: VesselId) => {
+    setCameraRequest((request) => ({
+      focusVessel: vessel,
+      sequence: request.sequence + 1,
+    }));
+  };
+  const resetView = () => {
+    setCameraRequest((request) => ({
+      focusVessel: null,
+      sequence: request.sequence + 1,
+    }));
+  };
+
+  return (
+    <section
+      className="panel viewer-panel"
+      aria-labelledby="viewer-panel-heading"
+    >
+      <header className="panel-header viewer-header">
+        <div>
+          <p className="eyebrow">Interactive visualization</p>
+          <h2 id="viewer-panel-heading">3D heart</h2>
+        </div>
+        <span className="viewer-status">
+          <span className="status-dot" aria-hidden="true" />
+          Schematic demo
+        </span>
+      </header>
+      <div className="viewer-stage">
+        <AssetErrorBoundary>
+          <Canvas
+            aria-label={`Interactive 3D heart with schematic LAD, LCX and RCA vessels. ${predictionStatus} Drag to orbit and scroll to zoom.`}
+            camera={{ position: [4, 2.8, 5], fov: 38 }}
+            dpr={[1, 1.5]}
+            frameloop="demand"
+          >
+            <Suspense
+              fallback={
+                <Html center>
+                  <HeartbeatLoader
+                    steps={["Loading the anatomical heart model"]}
+                    title="Preparing the 3D heart"
+                  />
+                </Html>
+              }
+            >
+              <HeartScene
+                cameraRequest={cameraRequest}
+                controlsRef={controlsRef}
+                setControlsRef={setControlsRef}
+              />
+            </Suspense>
+          </Canvas>
+        </AssetErrorBoundary>
+        {awaitingPrediction && (
+          <HeartbeatLoader title="Reading the arteries" variant="stage" />
+        )}
+        {scenario && (
+          <div className="viewer-scenario-badge" role="status">
+            What-if scenario · reset it in the What-if tab
+          </div>
+        )}
+        {impact && hoveredFactor && (
+          <div className="viewer-factor-overlay" role="status">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+              Factor on the heart
+            </p>
+            <p className="text-[12px] font-semibold text-slate-900">
+              {factorDefinition?.label ?? hoveredFactor}
+              {factorValue !== undefined && (
+                <span className="font-normal text-slate-500">
+                  {" "}
+                  · {formatFeatureValue(factorValue, factorDefinition)}
+                </span>
+              )}
+            </p>
+            <div className="mt-1 grid grid-cols-4 gap-1">
+              {INSIGHT_TARGETS.map((target) => (
+                <span
+                  className="rounded-md px-1.5 py-0.5 text-center text-[10px] font-bold tabular-nums text-white"
+                  key={target}
+                  style={{
+                    backgroundColor: attributionColor(impact[target], 1),
+                  }}
+                >
+                  {TARGET_SHORT[target]}{" "}
+                  {formatPoints(impact[target], 0).replace(" pts", "")}
+                </span>
+              ))}
+            </div>
+            <p className="mt-1 text-[9.5px] text-slate-500">
+              Magenta glow raises, blue glow lowers; faded arteries are not
+              moved by this factor.
+            </p>
+          </div>
+        )}
+        <div className="viewer-caption">
+          <span>Schematic vessels; not patient-specific lesion maps.</span>
+          <span>Drag to rotate - Scroll to zoom</span>
+        </div>
+      </div>
+      <div
+        aria-label="Schematic camera controls"
+        className="mx-4 mb-3 flex flex-wrap items-center gap-2"
+        role="group"
+      >
+        <button
+          className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-emerald-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+          type="button"
+          onClick={resetView}
+        >
+          Reset view
+        </button>
+        {vesselIds.map((vessel) => (
+          <button
+            className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-emerald-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            key={vessel}
+            type="button"
+            onClick={() => focusVessel(vessel)}
+          >
+            Focus {vessel}
+          </button>
+        ))}
+      </div>
+      <ArteryScale prediction={prediction} />
+      <p className="viewer-attribution px-5 pb-2 text-[10px] leading-relaxed text-slate-500">
+        {prediction?.mock ? "Mock prediction. " : ""}
+        Heart:{" "}
+        <a
+          className="font-semibold underline"
+          href="/models/ATTRIBUTION.md"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Realistic Human Heart by neshallads (CC BY 4.0)
+        </a>
+        .
+      </p>
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {predictionStatus} Selected target {selectedTargetName}:{" "}
+        {formatProbability(selectedTargetProbability)}.
+      </div>
+    </section>
+  );
+}

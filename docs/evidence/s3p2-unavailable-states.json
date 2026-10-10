@@ -1,0 +1,87 @@
+{
+  "invalidInput": {
+    "value": "",
+    "ariaInvalid": "false"
+  },
+  "invalid": {
+    "label": "invalid input",
+    "status": "Inputs need correction\n\nCorrect invalid feature values in the patient panel, then select Predict.\n\nVessel colours remain neutral until a current prediction is available.",
+    "role": "alert",
+    "alerts": [
+      "Inputs need correction\n\nCorrect invalid feature values in the patient panel, then select Predict.\n\nVessel colours remain neutral until a current prediction is available."
+    ],
+    "probabilityCards": 0,
+    "explanationRows": 0,
+    "callout": "Selected target: LAD — Unavailable\nSelect CAD",
+    "neutralEntries": [
+      "LAD Unavailable",
+      "LAD Unavailable",
+      "LCX Unavailable",
+      "LCX Unavailable",
+      "RCA Unavailable",
+      "RCA Unavailable",
+      "Unavailable",
+      "Unavailable"
+    ],
+    "sample": "Custom patient"
+  },
+  "invalidRecovery": {
+    "label": "sample recovers from invalid input",
+    "status": null,
+    "role": null,
+    "alerts": [],
+    "probabilityCards": 4,
+    "explanationRows": 10,
+    "callout": "Selected target: LAD — 89.0% · elevated · threshold 50.0%\nSelect CAD",
+    "neutralEntries": [
+      "Unavailable",
+      "Unavailable"
+    ],
+    "sample": "Sample patient 1 (synthetic)"
+  },
+  "chestPainBeforeFailure": true,
+  "failure": {
+    "label": "rejected prediction",
+    "status": "Prediction failed\n\nFailed to fetch. No current prediction is available. Correct inputs or select Predict to retry.\n\nVessel colours remain neutral until a current prediction is available.",
+    "role": "alert",
+    "alerts": [
+      "Prediction failed\n\nFailed to fetch. No current prediction is available. Correct inputs or select Predict to retry.\n\nVessel colours remain neutral until a current prediction is available."
+    ],
+    "probabilityCards": 0,
+    "explanationRows": 0,
+    "callout": "Selected target: LAD — Unavailable\nSelect CAD",
+    "neutralEntries": [
+      "LAD Unavailable",
+      "LAD Unavailable",
+      "LCX Unavailable",
+      "LCX Unavailable",
+      "RCA Unavailable",
+      "RCA Unavailable",
+      "Unavailable",
+      "Unavailable"
+    ],
+    "sample": "Custom patient",
+    "chestPain": false
+  },
+  "recovery": {
+    "label": "fresh response after rejection",
+    "status": null,
+    "role": null,
+    "alerts": [],
+    "probabilityCards": 4,
+    "explanationRows": 10,
+    "callout": "Selected target: LAD — 89.0% · elevated · threshold 50.0%\nSelect CAD",
+    "neutralEntries": [
+      "Unavailable",
+      "Unavailable"
+    ],
+    "sample": "Sample patient 1 (synthetic)",
+    "chestPain": true
+  },
+  "fetchEvents": [
+    {
+      "method": "POST",
+      "url": "http://localhost:8000/predict"
+    }
+  ]
+}

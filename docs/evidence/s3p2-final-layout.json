@@ -1,0 +1,187 @@
+{
+  "live1920": {
+    "label": "1920x1080 final Why with LAD",
+    "viewport": [
+      1920,
+      1080,
+      1
+    ],
+    "document": [
+      1920,
+      1080
+    ],
+    "patient": {
+      "client": [
+        381,
+        730
+      ],
+      "scroll": [
+        381,
+        923
+      ]
+    },
+    "results": {
+      "client": [
+        381,
+        818
+      ],
+      "scroll": [
+        381,
+        1402
+      ],
+      "overflow": [
+        "hidden",
+        "auto"
+      ]
+    },
+    "canvas": {
+      "rect": {
+        "x": 649.61,
+        "y": 205.89,
+        "width": 620.77,
+        "height": 591.86
+      },
+      "buffer": [
+        620,
+        591
+      ]
+    },
+    "source": "Mock prediction\nModel version mock-1.0.0",
+    "probabilities": [
+      [
+        "CAD",
+        "75.2%",
+        "false"
+      ],
+      [
+        "LAD",
+        "76.7%",
+        "true"
+      ],
+      [
+        "LCX",
+        "72.9%",
+        "false"
+      ],
+      [
+        "RCA",
+        "74.5%",
+        "false"
+      ]
+    ],
+    "toggle": {
+      "x": 1313.38,
+      "y": 372.58,
+      "width": 352.61,
+      "height": 34
+    },
+    "chart": {
+      "x": 1313.38,
+      "y": 517.58,
+      "width": 352.61,
+      "height": 498
+    },
+    "visibleChartRows": 10,
+    "zeroError": 0.028,
+    "sample": "Custom patient",
+    "chestPain": false,
+    "hud": false
+  },
+  "live1280": {
+    "label": "1280x800 final Inputs with LAD",
+    "viewport": [
+      1280,
+      800,
+      1
+    ],
+    "document": [
+      1280,
+      800
+    ],
+    "patient": {
+      "client": [
+        310,
+        452
+      ],
+      "scroll": [
+        310,
+        923
+      ]
+    },
+    "results": {
+      "client": [
+        310,
+        540
+      ],
+      "scroll": [
+        310,
+        3312
+      ],
+      "overflow": [
+        "hidden",
+        "auto"
+      ]
+    },
+    "canvas": {
+      "rect": {
+        "x": 387.13,
+        "y": 204.2,
+        "width": 505.73,
+        "height": 313.55
+      },
+      "buffer": [
+        505,
+        313
+      ]
+    },
+    "source": "Mock prediction\nModel version mock-1.0.0",
+    "probabilities": [
+      [
+        "CAD",
+        "75.2%",
+        "false"
+      ],
+      [
+        "LAD",
+        "76.7%",
+        "true"
+      ],
+      [
+        "LCX",
+        "72.9%",
+        "false"
+      ],
+      [
+        "RCA",
+        "74.5%",
+        "false"
+      ]
+    ],
+    "toggle": {
+      "x": 935.86,
+      "y": 370.89,
+      "width": 282.13,
+      "height": 34
+    },
+    "chart": null,
+    "visibleChartRows": 0,
+    "zeroError": null,
+    "sample": "Custom patient",
+    "chestPain": false,
+    "hud": false
+  },
+  "screenshots": [
+    {
+      "path": "docs\\evidence\\s3p2-1920x1080.png",
+      "width": 1920,
+      "height": 1080,
+      "bytes": 221539
+    },
+    {
+      "path": "docs\\evidence\\s3p2-1280x800.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 152349
+    }
+  ]
+}
