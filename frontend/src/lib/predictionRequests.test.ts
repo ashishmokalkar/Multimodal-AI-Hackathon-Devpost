@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   PredictionResponseSchema,
+  type FeatureValue,
   type PredictionResponse,
 } from "../api/types";
 import { usePatientStore } from "../store/patientStore";
@@ -50,6 +51,7 @@ beforeEach(() => {
     selectedSampleId: null,
     inputRevision: 0,
     prediction: null,
+    predictionInputs: null,
     predictionError: null,
     isPredicting: false,
     latestPredictionRequestId: 0,
@@ -94,6 +96,25 @@ describe("fresh prediction requests", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("stores the exact request input snapshot with the accepted prediction", async () => {
+    const input = { Age: 60 };
+    let sentInput: Record<string, FeatureValue> | undefined;
+    const response = prediction("095e7b1f-22f0-4ef0-9d30-310f769c2847");
+    const request = requestPredictionForRevision(0, input, async (features) => {
+      sentInput = features;
+      return response;
+    });
+
+    input.Age = 99;
+    await request;
+
+    expect(sentInput).toEqual({ Age: 60 });
+    expect(usePatientStore.getState()).toMatchObject({
+      prediction: response,
+      predictionInputs: { Age: 60 },
+    });
   });
 
   it("ignores a stale rejection after an edit when auto-predict is off", async () => {
@@ -215,6 +236,10 @@ describe("fresh prediction requests", () => {
         throw new Error("Request failed");
       },
     );
-    expect(usePatientStore.getState().predictionError).toBe("Request failed");
+    expect(usePatientStore.getState()).toMatchObject({
+      prediction: null,
+      predictionInputs: null,
+      predictionError: "Request failed",
+    });
   });
 });

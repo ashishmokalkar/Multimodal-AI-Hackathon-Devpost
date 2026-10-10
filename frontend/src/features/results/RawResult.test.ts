@@ -32,7 +32,23 @@ const prediction: PredictionResponse = {
         },
       ],
     },
-    LCX: { base_value: 0.5, contributions: [] },
+    LCX: {
+      base_value: 0.5,
+      contributions: [
+        {
+          feature: "Typical Chest Pain",
+          value: true,
+          contribution: 0.45,
+          direction: "positive",
+        },
+        {
+          feature: "DM",
+          value: false,
+          contribution: 0,
+          direction: "positive",
+        },
+      ],
+    },
     RCA: { base_value: 0.5, contributions: [] },
   },
   risk_summary: "Mock summary.",
@@ -55,6 +71,20 @@ const features: FeatureDefinition[] = [
     unit: "%",
     default: 0,
   },
+  {
+    name: "Typical Chest Pain",
+    label: "Typical chest pain",
+    group: "Symptoms",
+    type: "boolean",
+    default: false,
+  },
+  {
+    name: "DM",
+    label: "Diabetes",
+    group: "Demographics",
+    type: "boolean",
+    default: false,
+  },
 ];
 
 function renderResult(selectedVessel: "LAD" | "LCX" | "RCA" | null) {
@@ -62,6 +92,7 @@ function renderResult(selectedVessel: "LAD" | "LCX" | "RCA" | null) {
     createElement(RawResult, {
       prediction,
       features,
+      predictionInputs: { Age: 60, "EF-TTE": 50 },
       selectedVessel,
       onSelectVessel: () => undefined,
     }),
@@ -72,24 +103,37 @@ describe("RawResult explanation rendering", () => {
   it("uses the selected response values and feature metadata", () => {
     const markup = renderResult("LAD");
 
-    expect(markup).toContain("Leading LAD model contributions");
+    expect(markup).toContain("Why LAD?");
     expect(markup).toContain("Ejection fraction");
     expect(markup).toContain("Input value: 45%");
     expect(markup).toContain("-0.300");
     expect(markup).toContain("scale unconfirmed");
-    expect(markup).not.toContain("67 years");
-    expect(markup).toContain(
-      "not probability-point changes or evidence of causation",
-    );
+    expect(markup).toContain("Horizontal axis: Model contribution");
+    expect(markup).toContain('aria-label="Result detail view"');
+    expect(markup).not.toContain("Input value: 67 years");
+    expect(markup).toContain("scale is unconfirmed");
     expect(markup).not.toContain("verified SHAP");
+  });
+
+  it("keeps CAD and vessel target selection reflected in the explanation content", () => {
+    const cad = renderResult(null);
+    const lcx = renderResult("LCX");
+
+    expect(cad).toContain("Why CAD?");
+    expect(cad).toContain("Input value: 67 years");
+    expect(lcx).toContain("Why LCX?");
+    expect(lcx).toContain("Typical chest pain");
+    expect(lcx).toContain("Input value: Yes");
+    expect(lcx).toContain("+0.450");
+    expect(lcx).toContain("0.000");
   });
 
   it("shows an explicit unavailable message when the selected explanation is empty", () => {
     const markup = renderResult("RCA");
 
-    expect(markup).toContain("Leading RCA model contributions");
+    expect(markup).toContain("Why RCA?");
     expect(markup).toContain(
-      "No model contributions were returned for RCA; no leading drivers are available.",
+      "No model contributions were returned for RCA; no drivers are available.",
     );
   });
 });

@@ -6,6 +6,7 @@ import { useUiStore } from "../../store/uiStore";
 export function ResultsPanel() {
   const featuresQuery = useFeatures();
   const prediction = usePatientStore((state) => state.prediction);
+  const predictionInputs = usePatientStore((state) => state.predictionInputs);
   const predictionError = usePatientStore((state) => state.predictionError);
   const isPredicting = usePatientStore((state) => state.isPredicting);
   const selectedVessel = useUiStore((state) => state.selectedVessel);
@@ -37,7 +38,10 @@ export function ResultsPanel() {
           </p>
         )}
         {featuresQuery.isError && (
-          <p className="mb-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-900" role="alert">
+          <p
+            className="mb-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-900"
+            role="alert"
+          >
             Feature labels and units could not be loaded:{" "}
             {featuresQuery.error.message}
           </p>
@@ -46,6 +50,7 @@ export function ResultsPanel() {
           <RawResult
             prediction={prediction}
             features={featuresQuery.data ?? []}
+            predictionInputs={predictionInputs}
             selectedVessel={selectedVessel}
             onSelectVessel={setSelectedVessel}
           />

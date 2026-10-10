@@ -1,19 +1,19 @@
+import { useState } from "react";
 import type {
+  FeatureValue,
   FeatureDefinition,
   PredictionResponse,
   Target,
 } from "../../api/types";
-import {
-  explanationForSelection,
-  formatContributionInput,
-  leadingContributions,
-} from "../../lib/explanations";
 import { formatProbability } from "../../lib/format";
 import type { VesselId } from "../viewer/vesselMap";
+import { InputsView } from "./InputsView";
+import { WhyView } from "./WhyView";
 
 interface RawResultProps {
   prediction: PredictionResponse;
   features: readonly FeatureDefinition[];
+  predictionInputs: Readonly<Record<string, FeatureValue>> | null;
   selectedVessel: VesselId | null;
   onSelectVessel: (vessel: VesselId | null) => void;
 }
@@ -61,18 +61,12 @@ function ProbabilityReadout({
 export function RawResult({
   prediction,
   features,
+  predictionInputs,
   selectedVessel,
   onSelectVessel,
 }: RawResultProps) {
-  const targetName = selectedVessel ?? "cad";
-  const targetExplanation = explanationForSelection(
-    prediction.explanations,
-    selectedVessel,
-  );
-  const contributions = leadingContributions(
-    targetExplanation.contributions,
-    features,
-  );
+  const [activeView, setActiveView] = useState<"why" | "inputs">("why");
+  const targetName = selectedVessel ?? "CAD";
 
   return (
     <div className="space-y-5">
@@ -98,68 +92,53 @@ export function RawResult({
         artery narrowing.
       </p>
 
-      <section aria-labelledby="contributions-heading">
-        <div className="flex items-center justify-between gap-2">
-          <h3
-            className="text-xs font-semibold uppercase tracking-wide text-slate-700"
-            id="contributions-heading"
-          >
-            Leading {targetName.toUpperCase()} model contributions
-          </h3>
-          <span className="text-right text-[10px] text-slate-500">
-            {prediction.mock
-              ? "Mock · illustrative · scale unconfirmed"
-              : "Model scale unconfirmed"}
-          </span>
-        </div>
-        <p className="mt-1 text-[10px] leading-4 text-slate-500">
-          Signed values are on an unconfirmed model scale, not probability-point
-          changes or evidence of causation.
-        </p>
-        {contributions.length > 0 ? (
-          <ul className="mt-2 divide-y divide-slate-100 rounded-lg border border-slate-200">
-            {contributions.map((contribution, index) => (
-              <li
-                className="flex items-center justify-between gap-3 px-3 py-2 text-xs"
-                key={`${contribution.feature}-${index}`}
-              >
-                <span className="min-w-0">
-                  <span className="block truncate font-medium text-slate-800">
-                    {contribution.label}
-                  </span>
-                  <span className="text-[10px] text-slate-500">
-                    Input value:{" "}
-                    {formatContributionInput(
-                      contribution.value,
-                      contribution.unit,
-                    )}
-                  </span>
-                </span>
-                <span
-                  className={`shrink-0 font-semibold tabular-nums ${
-                    contribution.contribution > 0
-                      ? "text-rose-700"
-                      : contribution.contribution < 0
-                        ? "text-blue-700"
-                        : "text-slate-600"
-                  }`}
-                >
-                  {contribution.contribution > 0 ? "+" : ""}
-                  {contribution.contribution.toFixed(3)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p
-            className="mt-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-600"
-            role="status"
-          >
-            No model contributions were returned for {targetName.toUpperCase()};
-            no leading drivers are available.
-          </p>
-        )}
-      </section>
+      <p className="text-xs font-semibold text-slate-700">
+        Selected explanation target: {targetName}
+      </p>
+      <div
+        aria-label="Result detail view"
+        className="grid grid-cols-2 gap-2"
+        role="group"
+      >
+        <button
+          aria-pressed={activeView === "why"}
+          className={`rounded-lg border px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 ${
+            activeView === "why"
+              ? "border-emerald-700 bg-emerald-50 text-emerald-900"
+              : "border-slate-200 bg-white text-slate-700 hover:border-emerald-400"
+          }`}
+          type="button"
+          onClick={() => setActiveView("why")}
+        >
+          Why?
+        </button>
+        <button
+          aria-pressed={activeView === "inputs"}
+          className={`rounded-lg border px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 ${
+            activeView === "inputs"
+              ? "border-emerald-700 bg-emerald-50 text-emerald-900"
+              : "border-slate-200 bg-white text-slate-700 hover:border-emerald-400"
+          }`}
+          type="button"
+          onClick={() => setActiveView("inputs")}
+        >
+          Inputs
+        </button>
+      </div>
+      {activeView === "why" ? (
+        <WhyView
+          features={features}
+          prediction={prediction}
+          selectedVessel={selectedVessel}
+        />
+      ) : (
+        <InputsView
+          features={features}
+          prediction={prediction}
+          predictionInputs={predictionInputs}
+          selectedVessel={selectedVessel}
+        />
+      )}
 
       <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-600">
         {prediction.risk_summary}

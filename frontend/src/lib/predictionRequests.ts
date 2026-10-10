@@ -33,12 +33,18 @@ export async function requestPredictionForRevision(
   if (requestId === null) {
     return;
   }
+  const inputSnapshot = { ...features };
 
   try {
-    const prediction = await request(features);
+    const prediction = await request({ ...inputSnapshot });
     usePatientStore
       .getState()
-      .resolvePrediction(requestId, expectedRevision, prediction);
+      .resolvePrediction(
+        requestId,
+        expectedRevision,
+        prediction,
+        inputSnapshot,
+      );
   } catch (error) {
     usePatientStore
       .getState()

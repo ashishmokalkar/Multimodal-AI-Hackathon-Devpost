@@ -32,6 +32,7 @@ beforeEach(() => {
     selectedSampleId: null,
     inputRevision: 0,
     prediction: null,
+    predictionInputs: null,
     predictionError: null,
     isPredicting: false,
     latestPredictionRequestId: 0,
@@ -44,33 +45,65 @@ describe("patientStore prediction invalidation", () => {
 
     store.updateFeature("Age", 60);
     expect(usePatientStore.getState().inputRevision).toBe(1);
+    usePatientStore.setState({
+      prediction,
+      predictionInputs: { Age: 67 },
+    });
+    usePatientStore.getState().updateFeature("Age", 61);
+    expect(usePatientStore.getState()).toMatchObject({
+      inputRevision: 2,
+      prediction: null,
+      predictionInputs: null,
+    });
 
     usePatientStore.setState({
       prediction,
+      predictionInputs: { Age: 60 },
       predictionError: "old error",
       isPredicting: true,
     });
     usePatientStore.getState().setFromSample(sample);
     expect(usePatientStore.getState()).toMatchObject({
-      inputRevision: 2,
+      inputRevision: 3,
       selectedSampleId: "sample-1",
       prediction: null,
+      predictionInputs: null,
       predictionError: null,
       isPredicting: false,
     });
 
     usePatientStore.setState({
       prediction,
+      predictionInputs: { Age: 60 },
       predictionError: "old error",
       isPredicting: true,
     });
     usePatientStore.getState().setFeatures({ Age: 55 });
     expect(usePatientStore.getState()).toMatchObject({
-      inputRevision: 3,
+      inputRevision: 4,
       selectedSampleId: null,
       prediction: null,
+      predictionInputs: null,
       predictionError: null,
       isPredicting: false,
+    });
+  });
+
+  it("clears the accepted input snapshot as soon as a replacement request starts", () => {
+    usePatientStore.setState({
+      prediction,
+      predictionInputs: { Age: 67 },
+    });
+
+    const requestId = usePatientStore
+      .getState()
+      .beginPrediction(usePatientStore.getState().inputRevision);
+
+    expect(requestId).not.toBeNull();
+    expect(usePatientStore.getState()).toMatchObject({
+      prediction: null,
+      predictionInputs: null,
+      isPredicting: true,
     });
   });
 });

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { usePatientStore } from "../store/patientStore";
 import { PatientPanel } from "../features/patient/PatientPanel";
+import { ModelMetricsDrawer } from "../features/results/ModelMetricsDrawer";
 import { ResultsPanel } from "../features/results/ResultsPanel";
 import { DisclaimerBanner } from "../features/safety/DisclaimerBanner";
 import { DisclaimerModal } from "../features/safety/DisclaimerModal";
@@ -12,6 +14,10 @@ const DISCLAIMER_STORAGE_KEY = "cad-risk-visualizer-disclaimer-acknowledged";
 
 function AppContent() {
   const metricsQuery = useMetrics();
+  const prediction = usePatientStore((state) => state.prediction);
+  const metricsButtonRef = useRef<HTMLButtonElement>(null);
+  const [isMetricsOpen, setIsMetricsOpen] = useState(false);
+  const closeMetrics = useCallback(() => setIsMetricsOpen(false), []);
   const [isDisclaimerAcknowledged, setIsDisclaimerAcknowledged] = useState(
     () => window.localStorage.getItem(DISCLAIMER_STORAGE_KEY) === "true",
   );
@@ -36,7 +42,7 @@ function AppContent() {
           </div>
           <div className="header-actions">
             <span className="model-version">
-              Model version:{" "}
+              Metrics version:{" "}
               <strong>
                 {metricsQuery.data?.model_version ??
                   (metricsQuery.isPending ? "loading" : "unavailable")}
@@ -44,9 +50,12 @@ function AppContent() {
             </span>
             <button
               className="metrics-button"
+              aria-controls="model-metrics-dialog"
+              aria-expanded={isMetricsOpen}
+              aria-haspopup="dialog"
+              ref={metricsButtonRef}
               type="button"
-              disabled
-              title="Model metrics are planned for a later phase."
+              onClick={() => setIsMetricsOpen(true)}
             >
               Model metrics
             </button>
@@ -70,16 +79,20 @@ function AppContent() {
           <div>Dataset credit: pending</div>
           <div>
             Heart asset:{" "}
-            <a
-              href="/models/ATTRIBUTION.md"
-              rel="noreferrer"
-              target="_blank"
-            >
+            <a href="/models/ATTRIBUTION.md" rel="noreferrer" target="_blank">
               Realistic Human Heart by neshallads (CC BY 4.0)
             </a>
           </div>
         </div>
       </footer>
+
+      <ModelMetricsDrawer
+        metricsQuery={metricsQuery}
+        onClose={closeMetrics}
+        open={isMetricsOpen}
+        predictionVersion={prediction?.model_version ?? null}
+        returnFocusRef={metricsButtonRef}
+      />
 
       {!isDisclaimerAcknowledged && (
         <DisclaimerModal onAcknowledge={acknowledgeDisclaimer} />

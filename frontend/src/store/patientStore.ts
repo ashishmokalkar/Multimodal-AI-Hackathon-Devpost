@@ -10,6 +10,7 @@ interface PatientState {
   selectedSampleId: string | null;
   inputRevision: number;
   prediction: PredictionResponse | null;
+  predictionInputs: Record<string, FeatureValue> | null;
   predictionError: string | null;
   isPredicting: boolean;
   latestPredictionRequestId: number;
@@ -24,6 +25,7 @@ interface PatientState {
     requestId: number,
     expectedRevision: number,
     prediction: PredictionResponse,
+    inputSnapshot: Record<string, FeatureValue>,
   ) => boolean;
   rejectPrediction: (
     requestId: number,
@@ -37,6 +39,7 @@ export const usePatientStore = create<PatientState>((set) => ({
   selectedSampleId: null,
   inputRevision: 0,
   prediction: null,
+  predictionInputs: null,
   predictionError: null,
   isPredicting: false,
   latestPredictionRequestId: 0,
@@ -46,6 +49,7 @@ export const usePatientStore = create<PatientState>((set) => ({
       selectedSampleId: sampleId,
       inputRevision: state.inputRevision + 1,
       prediction: null,
+      predictionInputs: null,
       predictionError: null,
       isPredicting: false,
     })),
@@ -55,6 +59,7 @@ export const usePatientStore = create<PatientState>((set) => ({
       selectedSampleId: sample.id,
       inputRevision: state.inputRevision + 1,
       prediction: null,
+      predictionInputs: null,
       predictionError: null,
       isPredicting: false,
     })),
@@ -64,6 +69,7 @@ export const usePatientStore = create<PatientState>((set) => ({
       selectedSampleId: null,
       inputRevision: state.inputRevision + 1,
       prediction: null,
+      predictionInputs: null,
       predictionError: null,
       isPredicting: false,
     })),
@@ -77,13 +83,19 @@ export const usePatientStore = create<PatientState>((set) => ({
       return {
         latestPredictionRequestId: requestId,
         prediction: null,
+        predictionInputs: null,
         predictionError: null,
         isPredicting: true,
       };
     });
     return requestId;
   },
-  resolvePrediction: (requestId, expectedRevision, prediction) => {
+  resolvePrediction: (
+    requestId,
+    expectedRevision,
+    prediction,
+    inputSnapshot,
+  ) => {
     let accepted = false;
     set((state) => {
       if (
@@ -93,7 +105,12 @@ export const usePatientStore = create<PatientState>((set) => ({
         return state;
       }
       accepted = true;
-      return { prediction, predictionError: null, isPredicting: false };
+      return {
+        prediction,
+        predictionInputs: { ...inputSnapshot },
+        predictionError: null,
+        isPredicting: false,
+      };
     });
     return accepted;
   },
@@ -107,7 +124,12 @@ export const usePatientStore = create<PatientState>((set) => ({
         return state;
       }
       accepted = true;
-      return { prediction: null, predictionError, isPredicting: false };
+      return {
+        prediction: null,
+        predictionInputs: null,
+        predictionError,
+        isPredicting: false,
+      };
     });
     return accepted;
   },
