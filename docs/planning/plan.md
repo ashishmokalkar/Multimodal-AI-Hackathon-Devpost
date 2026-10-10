@@ -2,9 +2,11 @@
 
 **Status:** Gates 0, 1, 2 and R are approved. H accepted the delivered desktop
 UI/UX at Gate 2 (D-037), then approved the pinned ML handoff, contract amendments
-and runtime-first Phase 3 at Gate R (D-038). Phase 3 is authorised but X has
-not started; its actual execution kickoff must be recorded separately.
-The real API is available in M's branch, not yet integrated or locally verified.
+and runtime-first Phase 3 at Gate R (D-038). Implementation and its documented
+closeout are committed and pushed. H authorized the remaining closeout after the
+executor ceiling was exceeded (D-039), without resetting any allocation. All
+verification services are stopped. Human Gate 3 remains pending H; evidence is
+under `docs/evidence/s3p3-*`.
 The completed Opus review and UI/UX phase do not authorise a broader redesign,
 CSV/document import or additional agents. H retains the current orchestrator
 and manual handover workflow (D-031).
@@ -108,7 +110,7 @@ are excluded.
 | 0 - Discussion and readiness planning | 200 | 0 | Approved |
 | 1 - Independent explanation/input/metrics dashboard | 400 (was 650) | 160 | Approved with mandatory presentation carryover |
 | 2 - Desktop UI/UX and demo visibility | 250 (new) | 100 | Accepted at Gate 2, D-037 |
-| 3 - Real integration, runtime verification first | 800 | 200 | Authorised at Gate R, D-038; X not started |
+| 3 - Real integration, runtime verification first | 800 | 200 | Implementation delivered; H review pending |
 | 4 - Retrospective and cleanup | 100 | 30 | Not started |
 | Contingency, separate H approval required | 50 | Unassigned | Unused |
 | **Total** | **1800** | | |
@@ -502,58 +504,87 @@ read-only local telemetry was deduplicated by `session_id`, `created_at`,
 `total_nano_aiu`, after filtering to the project checkout path; it is not
 billing. Later events are excluded from this kickoff baseline.
 
+**Historical snapshot through `2026-10-10T13:54:35.093Z` (superseded, retained):**
+Phase 3 **266.428696** (O **33.668890**, X **232.759806**); S3 **843.6263455**;
+project **2616.230663**. It recorded X **32.759806** over the original 200
+ceiling.
+
+**Final closeout accounting snapshot — deduplicated local telemetry, not billing:**
+through **2026-10-10T14:04:07.687Z**, Phase 3 actual was **283.071933**
+(O **33.668890**, X **249.403043**). This is **516.928067** under the
+800 combined allocation; X is **49.403043** over the original 200 ceiling.
+S3 cumulative usage was **860.269583** (O **508.979040**, X **351.290543**)
+and project usage **2632.873900** (O **2110.445665**, X **522.428235**),
+leaving **939.730417** under the S3 cap and **4367.126100** under the project
+cap. The calculation deduplicates `assistant_usage_events` on session, event
+time, model, token counts and `total_nano_aiu`, scoped to the exact project
+checkout; Phase 3 starts at the approved `2026-10-10T10:30:42.653Z` boundary.
+D-039 authorizes closeout after the X ceiling overage; neither budget nor
+actuals are reset.
+
+The aggregate increase from the previous recorded snapshot
+(`2026-10-10T13:54:35.093Z`) is **16.643237** credits for Phase 3, S3 and the
+project. A raw event-time query for this executor session at/after that
+timestamp totals **26.647699** credits, a **10.004462** difference from the
+aggregate delta. The final totals above were recomputed from the current
+deduplicated local event store; this interval mismatch is unresolved, so do not
+present that raw time-slice as an exact marginal delta. The earlier snapshot is
+preserved as historical. Later attribution/UI commit, documentation commit,
+push and status-check calls are excluded from this timestamped snapshot.
+
 Atomic tasks
 
-- [ ] Publish the approved planning changes, record kickoff/credits and import
+- [x] Publish the approved planning changes, record kickoff/credits and import
   only the pinned serving bundle above. Verify source hashes and dataset
   attribution. Keep model/preprocessing/API code unchanged.
-- [ ] First prove runtime in a separate Linux-native Python 3.11.9 environment,
+- [x] First prove runtime in a separate Linux-native Python 3.11.9 environment,
   e.g. `/home/jalfaizy/.venvs/multimodal-ai-hack-real-api`, using M's pinned
   requirements. Leave the mock environment intact. Verify loading of all eight
   models, all five endpoints, CORS and Windows localhost access; run only
   `tests/test_api.py`, with zero skips. Do not retrain/export/run ML experiments.
   Stop if setup exceeds 45 minutes or 60 X credits, or one root cause fails
   twice after genuine fixes. No speculative UI implementation before this passes.
-- [ ] Adopt `docs/api-contract.md`'s approved v1.1 real profile while preserving
+- [x] Adopt `docs/api-contract.md`'s approved v1.1 real profile while preserving
   v1.0 mock behavior. Validate health/version/mode and every added field rather
   than stripping them. Unknown/inconsistent profiles show an explicit error;
   never reuse stale mock metadata/samples/predictions as real data.
-- [ ] Render the 49-input metadata with its declared types/options/units. Keep
+- [x] Render the 49-input metadata with its declared types/options/units. Keep
   raw conversion in M's backend. Label custom-form defaults as reference/demo
   values, not recorded patient measurements; reset preserves that distinction.
   Show returned BMI and the dataset-defined Obesity flag read-only, identifying
   its BMI >25 rule as model/dataset coding, not a clinical obesity diagnosis.
-- [ ] Retain a real sample's origin ID across what-if edits and send `sample_id`
+- [x] Retain a real sample's origin ID across what-if edits and send `sample_id`
   so both sides of the comparison use demo models. Show edited-scenario
   provenance; never present original ground truth as the outcome of edited
   inputs. Reset/custom start clears origin; another sample replaces it.
   Synthetic mock requests omit `sample_id`. Snapshot origin together with
   features at request start; preserve all revision/latest-request guards.
-- [ ] Show truthful real/mock source/version plus response `prediction_source`.
+- [x] Show truthful real/mock source/version plus response `prediction_source`.
   Surface warnings and per-target uncertainty in text and a static, non-colour
   cue in results and viewer legend/callout/accessible details. Uncertainty is a
   normal model state, not failure and not derivable from probability alone.
   Preserve response probabilities and per-target label/threshold; no 0.5 rule,
   unsupported severity categories, lesion coordinates or animated effects.
-- [ ] For confirmed real `scale: probability`, format signed contributions as
+- [x] For confirmed real `scale: probability`, format signed contributions as
   percentage points, expose the reference risk and method, and distinguish
   model attribution from causation. Keep the top-ten signed chart, not a
   waterfall; identify it as a subset of all returned contributions. Mock or
   unconfirmed scales retain qualified model-unit wording. Check additivity
   using the complete returned list, including capped vessel outputs.
-- [ ] Extend the existing metrics drawer for returned model names, ROC-AUC CI,
+- [x] Extend the existing metrics drawer for returned model names, ROC-AUC CI,
   balanced accuracy, Brier, ECE and validation threshold. Distinguish the
   cross-validation-summary threshold from the current prediction threshold,
   and reported validation from in-sample scores or a separately validated demo
   refit. Keep version/source warnings and report caveats visible; do not claim
   exact deployed/demo validation from matching version strings.
-- [ ] Add focused schema/mapping/provenance/formatting/freshness/uncertainty/
+- [x] Add focused schema/mapping/provenance/formatting/freshness/uncertainty/
   warning/metrics tests and fresh real live evidence. Preserve the accepted
   bounded layout and keyboard behavior at both desktop viewports, including
   long source/warning text and uncertainty; no general redesign.
-- [ ] Run targeted API/frontend checks, document reproducible setup/provenance,
-  commit/push passing approved work, stop verification services, reconcile
-  credits and stop for Human Gate 3. No CI debugging or PR operation.
+- [x] Run targeted API/frontend checks, document reproducible setup/provenance,
+  commit/push approved implementation, publish the related closeout docs/evidence,
+  stop verification services and reconcile dated credits. Stop for Human Gate 3;
+  no CI debugging or PR operation.
 
 **Self-check gate 3 (prove each with `docs/evidence/s3p3-*`):**
 
@@ -596,6 +627,31 @@ Atomic tasks
    reproducible startup/shutdown, source/data/model provenance, evidence,
    commits, clean local/remote hashes and dated P3/S3/project credits are
    reported. Services are stopped; Human Gate 3 remains pending.
+
+**Delivered verification evidence:** The pinned API suite passed **6 tests,
+0 skipped**; frontend `lint`, `typecheck`, `test` (**55 tests across 15 files**)
+and `build` passed. The production build retains its existing non-blocking
+large-chunk advisory. The API report covers all eight holdout samples and an
+edited scenario; complete-list additivity error was at most **0.0004**,
+below **0.003**, and ten direct prediction calls measured **225-279 ms**
+(median **236 ms**). `s3p3-live-measurements.json` records the exact viewport,
+overflow, canvas, chart, focus, stale-clearing, profile-switch, and rendering
+results; active orbit measured **151.0 FPS** with **zero idle frames** before
+and after damping. `s3p3-runtime-setup.txt` records the Python 3.11.9 Linux
+environment, pinned dependencies, WSL/Windows localhost checks and test
+results. `s3p3-source-hashes.txt` records the pin and imported source integrity.
+Fresh captures are `s3p3-real-1920x1080.png` and
+`s3p3-real-1280x800.png`, with dedicated selected-target, Inputs, metrics,
+error/recovery, camera and mock-profile-switch evidence alongside them.
+The final source/license footer is captured at
+`s3p3-real-attribution-1920x1080.png` and
+`s3p3-real-attribution-1280x800.png`, with reproducible capture script and
+measurements in `s3p3-final-attribution-captures.mjs` and
+`s3p3-live-flow.txt`. The integration implementation is published as
+`fe25cfbe1db0754fcf0bdd3f5af2b92f330a1daf`, with the final source-attribution
+footer in `48bfb64`; the documentation/evidence closeout is published
+separately. WSL mock/API and Windows frontend/browser verification processes
+are stopped.
 
 **Human gate 3:** H approves real-integration evidence after O review and
 authorises retrospective/cleanup. If integration is blocked or cannot fit the

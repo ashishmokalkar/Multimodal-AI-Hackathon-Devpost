@@ -49,8 +49,8 @@ interpret different contract versions.
 Source pin: `6d3e403ffae65857124929335bbc534e8fd116c4` on `ML-dev`.
 Read `handover_docs/ML_ANSWERS_FOR_FRONTEND.md`, `api/README.md`,
 `api/schemas.py`, `api/main.py` and `models/manifest.json` at that pin.
-H approved adopting this profile at Gate R; frontend/runtime implementation
-and real-output verification remain Phase 3 work, not completed by this document.
+H approved adopting this profile at Gate R. At approval, frontend/runtime
+implementation and real-output verification remained Phase 3 work.
 
 All five endpoint paths and existing required response fields are retained.
 The input feature vocabulary/domains differ from mock v1.0 even though the
@@ -149,6 +149,18 @@ Shared version strings do not prove that demo refits have separately matching
 validation. Preserve the report's prior-selection/ensemble-optimism caveats;
 do not conflate headline AUC with pooled calibrated AUC or substitute in-sample
 AUC. Existing mismatch/mock/loading/error qualifications still apply.
+
+### Phase 3 local implementation status (2026-10-10; Human Gate 3 pending)
+
+The frontend now validates the supported mock `1.0.0` and real `1.1.0` health
+profiles and their required response additions; it does not fall back between
+services or reuse patient/result data across profiles. The pinned runtime and
+all five endpoints were verified in Ubuntu 24.04 WSL 2 with Python 3.11.9,
+including Windows localhost/CORS. Live workflow, provenance, warning,
+uncertainty, metrics, viewport and active-orbit evidence is under
+`docs/evidence/s3p3-*`. This records local integration only: matching version
+strings do not independently validate demo refits, and no clinical validity
+or deployment claim is made. Human Gate 3 remains for H's review.
 
 ## OpenAPI 3.1 - preserved mock v1.0.0 profile
 

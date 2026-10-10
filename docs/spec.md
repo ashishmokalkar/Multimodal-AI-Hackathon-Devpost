@@ -72,7 +72,10 @@ guidance and the readable zero-aligned signed chart without changing geometry,
 clinical meaning or the API. Exact 1920 x 1080/1280 x 800 captures and
 measurements are under `docs/evidence/s3p2-*`; H approved Human Gate 2 (D-037).
 H then separately approved Gate R and runtime-first integration Phase 3
-(D-038). The real runtime/output integration is not delivered yet.
+(D-038). Phase 3 has now implemented the approved real profile and verified
+the WSL runtime, Windows localhost path and live frontend flow. Evidence is
+under `docs/evidence/s3p3-*`; Human Gate 3 remains pending H review. This is
+local integration evidence, not public deployment or clinical validation.
 Preserve the bounded layout during integration, including long provenance,
 warnings and uncertainty. Small-heart framing and concise explanation copy
 remain separately approved post-integration polish candidates. CSV import
@@ -118,11 +121,14 @@ H approved a separate Linux-native Python 3.11.9 real environment using its
 pinned requirements; do not replace the mock environment. Import only the
 approved `api/`, model artifacts, required `ml/` support, primary XLSX and
 subgroup report files, retaining their root-relative paths. The API depends
-on source data/reports as well as joblib files. WSL model loading/endpoints
-must pass before frontend implementation; stop setup after 45 minutes or
-60 X credits, or two genuine failures for one root cause. Do not retrain,
-export, downgrade model dependencies, retry blocked Windows launchers or merge
-branches. Runtime success remains unverified and required at Gate 3.
+on source data/reports as well as joblib files. The pinned source bytes and
+artifact hashes are recorded in `docs/evidence/s3p3-source-hashes.txt`.
+Runtime setup used the separate home-directory environment and completed in
+4m39s; all eight models, five endpoints, CORS and Windows localhost were
+verified without modifying the mock environment. The approved 45-minute/
+60-credit stop limits were not reached. Do not retrain, export, downgrade
+model dependencies, retry blocked Windows launchers or merge branches.
+Human Gate 3 review is still required.
 
 Extensibility (brief §Technical Considerations): new feature → appears automatically via `GET /features`; new vessel → add entry to `vesselMap.ts` + mesh node name; new model → backend only, metrics drawer is schema-driven.
 
@@ -223,7 +229,26 @@ not a clinical obesity diagnosis. Extend the existing metrics drawer with
 returned validation detail, distinguishing CV-summary thresholds from the
 current decision threshold and reported validation from final/demo fitting
 sets. Matching version strings do not validate the demo refit; retain selection/
-validation caveats from `reports/BEST_MODELS.md`. Phase 3 remains undelivered.
+validation caveats from `reports/BEST_MODELS.md`.
+
+**S3 Phase 3 implementation (2026-10-10; Human Gate 3 pending):** The frontend
+validates health/mode and the approved mock v1.0/real v1.1 profiles separately,
+requires all real-only fields, and clears prediction-dependent data on edits,
+requests, failures and profile changes. The real 49-input schema, sample
+provenance, response-derived values, uncertainty/warnings, probability-point
+explanations and validation metrics are rendered from accepted API responses.
+The imported serving/API/model/preprocessing code remains unchanged; focused
+API/frontend tests and live evidence are under `docs/evidence/s3p3-*`.
+All eight samples plus an edited holdout scenario pass full-list additivity
+checks (maximum observed error 0.0004 against the 0.003 tolerance). The pinned
+API suite passed six tests with no skips; frontend lint/typecheck/test/build
+passed, with 55 tests across 15 files. Live evidence records exact 1920x1080
+and 1280x800 viewports and 151.0 FPS during active orbit. The reproducible
+Windows-frontend/WSL-API setup and shutdown steps are in the root README.
+The footer distinguishes generated synthetic mock records from the real
+Z-Alizadeh Sani extension (UCI #411; source-reported CC BY 4.0). This establishes
+neither independent validation of demo refits nor clinical validity or
+deployment; H's Human Gate 3 remains pending.
 
 ## 8. Clinical safety
 
@@ -243,7 +268,7 @@ validation caveats from `reports/BEST_MODELS.md`. Phase 3 remains undelivered.
 | Heart mesh | *Realistic Human Heart*, neshallads, Sketchfab | CC BY 4.0; attribution beside the distributed model and in `assets/heart/LICENSE.md` | `frontend/public/models/heart.glb` |
 | LAD/LCX/RCA overlays | Project-authored schematic `TubeGeometry` paths | Project-generated; not patient-specific lesion maps | `frontend/src/features/viewer/` |
 | Mock dataset samples | Generated synthetic records; not extracted UCI patients | Project-generated fixtures | `mock-api/data/samples.json` |
-| Real dataset and eight demo patients (approved import, not yet integrated) | Extension of Z-Alizadeh Sani dataset, UCI #411; Alizadehsani, Roshanzamir and Sani (2013) | M reports CC BY 4.0; preserve UCI licence/citation when importing | `data/raw/z_alizadeh_sani_ext/z_alizadeh_sani_ext.xlsx`, real `/patients/samples` |
+| Real dataset and eight demo patients (imported from the approved pin) | Extension of Z-Alizadeh Sani dataset, UCI #411; Alizadehsani, Roshanzamir and Sani (2013) | M reports CC BY 4.0; preserve UCI licence/citation | `data/raw/z_alizadeh_sani_ext/z_alizadeh_sani_ext.xlsx`, real `/patients/samples` |
 
 Asset candidates, rejected options, source URLs, and mesh-addressability findings
 are recorded in `assets/heart/CANDIDATES.md`.
@@ -260,7 +285,9 @@ polish or CSV work needs a separate H-approved scope/calendar decision.
 
 - Q1/Q2: M's serving inputs, target thresholds, probability-scale baseline
   Shapley and `/model/metrics` handoff are supplied and approved under D-038.
-  WSL loading, semantic frontend integration and live Gate 3 evidence remain open.
+  WSL loading, semantic frontend integration and live evidence were verified in
+  Phase 3; H's Human Gate 3 review remains open. Deployment, clinical validity
+  and separately validated demo-refit metrics are not established.
 - Q3: Faizan remains accountable for the video/document (D-033); M offers ML
   sections and joint script/architecture input. His contribution timing remains
   to confirm. Draft Oct 12, final Oct 13; submission-only Oct 14.
@@ -272,10 +299,12 @@ Source: `ML-dev` at `6d3e403ffae65857124929335bbc534e8fd116c4`;
 `models/manifest.json`, `reports/BEST_MODELS.md`. API/model code is from
 `9ddb96b`; the latest commit moves handoff documents and adds UI research.
 The API is declared available now, contract v1.1.0, model version
-`cardiotwin-v2.0.0`. O inspected source, not runtime. Windows verification is
-M's report; WSL remains unverified and is the first approved Phase 3 task.
-Gate R is approved with that explicit risk, not as a runtime-success claim.
-The older evidence below remains historical, not current dependency status.
+`cardiotwin-v2.0.0`. At Gate R, O had inspected the source but not run the
+runtime; Windows verification was M's report and WSL was unverified. X has
+since verified the pinned runtime and local Windows-to-WSL path as recorded
+under `docs/evidence/s3p3-*`. Gate R authorized that bounded attempt; Human
+Gate 3 review is still pending. The older evidence below remains historical,
+not current dependency status.
 
 ### ML branch evidence (reviewed 2026-10-08)
 
