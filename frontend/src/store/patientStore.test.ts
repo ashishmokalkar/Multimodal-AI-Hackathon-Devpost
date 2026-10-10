@@ -35,6 +35,7 @@ beforeEach(() => {
     predictionInputs: null,
     predictionError: null,
     isPredicting: false,
+    predictionStatus: "initial",
     latestPredictionRequestId: 0,
   });
 });
@@ -70,6 +71,7 @@ describe("patientStore prediction invalidation", () => {
       predictionInputs: null,
       predictionError: null,
       isPredicting: false,
+      predictionStatus: "edited",
     });
 
     usePatientStore.setState({
@@ -86,6 +88,7 @@ describe("patientStore prediction invalidation", () => {
       predictionInputs: null,
       predictionError: null,
       isPredicting: false,
+      predictionStatus: "edited",
     });
   });
 
@@ -104,6 +107,7 @@ describe("patientStore prediction invalidation", () => {
       prediction: null,
       predictionInputs: null,
       isPredicting: true,
+      predictionStatus: "pending",
     });
   });
 });

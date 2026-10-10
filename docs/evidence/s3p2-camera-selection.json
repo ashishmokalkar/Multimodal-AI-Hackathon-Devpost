@@ -1,0 +1,35 @@
+{
+  "viewport": [
+    1920,
+    1080
+  ],
+  "transition": "Reset overview, keyboard-select CAD with Space, then LAD with Enter; no Focus control invoked between captures.",
+  "cad": {
+    "selected": "true",
+    "canvas": [
+      649.609375,
+      205.890625,
+      620.765625,
+      591.859375
+    ]
+  },
+  "lad": {
+    "selected": "true",
+    "canvas": [
+      649.609375,
+      205.890625,
+      620.765625,
+      591.859375
+    ]
+  },
+  "cadShot": {
+    "path": "docs\\evidence\\s3p2-camera-cad.png",
+    "width": 1920,
+    "height": 1080
+  },
+  "ladShot": {
+    "path": "docs\\evidence\\s3p2-camera-lad.png",
+    "width": 1920,
+    "height": 1080
+  }
+}

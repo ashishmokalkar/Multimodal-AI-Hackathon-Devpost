@@ -33,10 +33,21 @@
   box-sizing: border-box;
 }
 
+html,
+#root {
+  position: fixed;
+  inset: 0;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 body {
+  height: 100%;
+  min-height: 0;
   min-width: 360px;
-  min-height: 100vh;
   margin: 0;
+  overflow: hidden;
 }
 
 button {
@@ -49,8 +60,12 @@ button:focus-visible {
 }
 
 .app-shell {
-  min-height: 100vh;
-  padding: 26px 32px 18px;
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 12px 32px 8px;
 }
 
 .app-header,
@@ -283,8 +298,8 @@ button:focus-visible {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 23px;
-  padding: 12px 16px;
+  margin-top: 10px;
+  padding: 9px 14px;
   border: 1px solid #eadbb1;
   border-radius: 13px;
   background: #fff9e9;
@@ -308,18 +323,20 @@ button:focus-visible {
 
 .workspace-grid {
   display: grid;
-  grid-template-columns: minmax(235px, 0.93fr) minmax(420px, 1.55fr) minmax(
-      235px,
-      0.93fr
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(230px, 0.95fr) minmax(380px, 1.55fr) minmax(
+      270px,
+      0.95fr
     );
-  gap: 18px;
+  gap: 14px;
   align-items: stretch;
-  min-height: 510px;
-  margin-top: 20px;
+  margin-top: 0;
 }
 
 .panel {
   display: flex;
+  min-height: 0;
   min-width: 0;
   flex-direction: column;
   overflow: hidden;
@@ -334,7 +351,7 @@ button:focus-visible {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 21px 21px 16px;
+  padding: 14px 16px 12px;
   border-bottom: 1px solid #edf1ef;
 }
 
@@ -357,10 +374,21 @@ button:focus-visible {
 
 .panel-body {
   display: flex;
-  flex: 1;
+  min-height: 0;
+  flex: 1 1 0;
   flex-direction: column;
-  justify-content: center;
-  padding: 24px;
+  justify-content: flex-start;
+  overflow-x: hidden;
+  padding: 14px;
+}
+
+.patient-actions {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 9px;
+  padding: 11px 15px;
+  border-top: 1px solid #edf1ef;
+  background: #fbfdfb;
 }
 
 .empty-state {
@@ -400,11 +428,12 @@ button:focus-visible {
 }
 
 .viewer-panel {
-  min-height: 510px;
+  min-height: 0;
 }
 
 .viewer-header {
   align-items: center;
+  padding-block: 10px;
 }
 
 .viewer-status {
@@ -431,10 +460,10 @@ button:focus-visible {
 .viewer-stage {
   position: relative;
   display: flex;
-  min-height: 360px;
-  flex: 1;
+  min-height: 0;
+  flex: 1 1 0;
   flex-direction: column;
-  margin: 16px;
+  margin: 10px 12px 8px;
   overflow: hidden;
   border: 1px solid #e2ece7;
   border-radius: 15px;
@@ -450,28 +479,114 @@ button:focus-visible {
 .viewer-stage canvas {
   display: block;
   width: 100%;
-  min-height: 320px;
-  flex: 1;
+  height: 0;
+  min-height: 0;
+  flex: 1 1 0;
   touch-action: none;
 }
 
 .viewer-caption {
   display: flex;
+  flex: 0 0 auto;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 15px 13px;
+  padding: 0 12px 8px;
   color: #75857e;
   font-size: 10px;
+}
+
+.viewer-panel > [role="group"][aria-label="Schematic camera controls"] {
+  margin: 0 12px 8px;
+}
+
+.viewer-panel > div[aria-live="polite"] {
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  flex: 0 0 44px;
+  overflow: hidden;
 }
 
 .viewer-legend {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 11px;
-  padding: 0 20px 15px;
+  gap: 4px;
+  padding: 0 14px 6px;
   color: #61736b;
+  font-size: 10px;
+}
+
+.viewer-attribution {
+  flex: 0 0 auto;
+  padding-inline: 14px;
+  padding-bottom: 8px;
+}
+
+.prediction-source-badge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+  padding: 8px 10px;
+  border: 1px solid #b8d5c5;
+  border-radius: 10px;
+  background: #f1f8f3;
+  color: #275b43;
   font-size: 11px;
+  line-height: 1.35;
+}
+
+.prediction-source-badge strong {
+  font-size: 12px;
+}
+
+.prediction-source-mock {
+  border-color: #e5cb82;
+  background: #fff8e5;
+  color: #6c5010;
+}
+
+.prediction-status {
+  padding: 12px;
+  border: 1px solid #dce6e1;
+  border-radius: 11px;
+  background: #f7faf8;
+  color: #334b40;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.prediction-status strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #263d33;
+}
+
+.prediction-status p {
+  margin: 0;
+}
+
+.prediction-status .prediction-status-neutral {
+  margin-top: 6px;
+  color: #5f7069;
+  font-size: 11px;
+}
+
+.prediction-status-invalid,
+.prediction-status-error {
+  border-color: #efc7c4;
+  background: #fff5f4;
+  color: #7e2925;
+}
+
+.probability-readout {
+  min-width: 0;
+}
+
+.result-view-toggle button {
+  min-height: 34px;
 }
 
 .legend-swatch {
@@ -487,8 +602,9 @@ button:focus-visible {
   display: flex;
   justify-content: space-between;
   gap: 24px;
-  margin-top: 17px;
-  padding: 13px 2px 0;
+  min-width: 0;
+  margin-top: 0;
+  padding: 8px 2px 0;
   border-top: 1px solid #dce6e1;
   color: #73817c;
   font-size: 10px;
@@ -591,7 +707,7 @@ button:focus-visible {
 
   .workspace-grid {
     grid-template-columns: minmax(220px, 0.9fr) minmax(360px, 1.4fr) minmax(
-        220px,
+        250px,
         0.9fr
       );
     gap: 13px;
@@ -603,13 +719,49 @@ button:focus-visible {
 }
 
 @media (max-width: 900px) {
+  html,
+  body,
+  #root {
+    position: static;
+    inset: auto;
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  body {
+    min-height: 100dvh;
+    overflow: auto;
+  }
+
+  .app-shell {
+    display: block;
+    height: auto;
+    min-height: 100dvh;
+    padding: 22px;
+  }
+
   .workspace-grid {
+    height: auto;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    margin-top: 16px;
+  }
+
+  .patient-panel,
+  .results-panel {
+    min-height: 420px;
+  }
+
+  .viewer-panel {
+    min-height: 440px;
   }
 
   .results-panel {
     grid-column: 1 / -1;
-    min-height: 260px;
+  }
+
+  .app-footer {
+    margin-top: 16px;
   }
 }
 
@@ -646,6 +798,7 @@ button:focus-visible {
   }
 
   .workspace-grid {
+    height: auto;
     grid-template-columns: minmax(0, 1fr);
   }
 

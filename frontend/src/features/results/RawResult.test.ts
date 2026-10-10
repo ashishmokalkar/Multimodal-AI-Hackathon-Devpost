@@ -87,10 +87,13 @@ const features: FeatureDefinition[] = [
   },
 ];
 
-function renderResult(selectedVessel: "LAD" | "LCX" | "RCA" | null) {
+function renderResult(
+  selectedVessel: "LAD" | "LCX" | "RCA" | null,
+  response = prediction,
+) {
   return renderToStaticMarkup(
     createElement(RawResult, {
-      prediction,
+      prediction: response,
       features,
       predictionInputs: { Age: 60, "EF-TTE": 50 },
       selectedVessel,
@@ -108,7 +111,7 @@ describe("RawResult explanation rendering", () => {
     expect(markup).toContain("Input value: 45%");
     expect(markup).toContain("-0.300");
     expect(markup).toContain("scale unconfirmed");
-    expect(markup).toContain("Horizontal axis: Model contribution");
+    expect(markup).toContain("Model contribution");
     expect(markup).toContain('aria-label="Result detail view"');
     expect(markup).not.toContain("Input value: 67 years");
     expect(markup).toContain("scale is unconfirmed");
@@ -126,6 +129,21 @@ describe("RawResult explanation rendering", () => {
     expect(lcx).toContain("Input value: Yes");
     expect(lcx).toContain("+0.450");
     expect(lcx).toContain("0.000");
+  });
+
+  it("prominently identifies mock prediction source and model version", () => {
+    const markup = renderResult(null);
+
+    expect(markup).toContain("Mock prediction");
+    expect(markup).toContain("Model version fixture");
+    expect(markup).not.toContain("Model output</span>");
+  });
+
+  it("does not label non-mock responses as mock predictions", () => {
+    const markup = renderResult(null, { ...prediction, mock: false });
+
+    expect(markup).toContain("Model prediction");
+    expect(markup).not.toContain("Mock prediction");
   });
 
   it("shows an explicit unavailable message when the selected explanation is empty", () => {

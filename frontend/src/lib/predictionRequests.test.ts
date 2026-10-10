@@ -54,6 +54,7 @@ beforeEach(() => {
     predictionInputs: null,
     predictionError: null,
     isPredicting: false,
+    predictionStatus: "initial",
     latestPredictionRequestId: 0,
   });
 });

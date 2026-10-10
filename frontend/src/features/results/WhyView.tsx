@@ -11,6 +11,8 @@ import {
 import type { FeatureDefinition, PredictionResponse } from "../../api/types";
 import {
   explanationForSelection,
+  contributionAxis,
+  formatContributionAxisTick,
   formatContributionInput,
   formatContributionValue,
   leadingContributions,
@@ -48,14 +50,14 @@ export function WhyView({
     features,
     10,
   );
-  const magnitude = Math.max(
-    0,
-    ...contributions.map(({ contribution }) => Math.abs(contribution)),
+  const axis = contributionAxis(
+    contributions.map(({ contribution }) => contribution),
   );
-  const domain: [number, number] = [
-    -Math.max(magnitude, 0.001),
-    Math.max(magnitude, 0.001),
-  ];
+  const chartContributions = contributions.map((item) => ({
+    ...item,
+    chartLabel:
+      item.label.length > 19 ? `${item.label.slice(0, 18)}…` : item.label,
+  }));
 
   return (
     <section aria-labelledby="why-heading">
@@ -87,37 +89,33 @@ export function WhyView({
         <>
           <div
             aria-hidden="true"
-            className="mt-3 min-h-48"
-            style={{ height: Math.max(190, contributions.length * 45 + 58) }}
+            className="mt-2 min-h-48"
+            style={{ height: Math.max(190, contributions.length * 45 + 48) }}
           >
             <ResponsiveContainer height="100%" width="100%">
               <BarChart
-                data={contributions}
+                data={chartContributions}
                 layout="vertical"
                 margin={{ top: 6, right: 6, bottom: 23, left: 0 }}
               >
                 <CartesianGrid horizontal={false} stroke="#e2e8f0" vertical />
                 <XAxis
-                  domain={domain}
-                  label={{
-                    value: "Model contribution",
-                    position: "insideBottom",
-                    offset: -15,
-                    fontSize: 10,
-                    fill: "#475569",
-                  }}
-                  tick={{ fontSize: 9, fill: "#64748b" }}
-                  tickFormatter={(value: number) => value.toFixed(2)}
+                  domain={axis.domain}
+                  tick={{ fontSize: 11, fill: "#64748b" }}
+                  tickFormatter={(value: number) =>
+                    formatContributionAxisTick(value, axis.maxAbs)
+                  }
                   tickLine={false}
+                  ticks={axis.ticks}
                   type="number"
                 />
                 <YAxis
                   axisLine={false}
-                  dataKey="label"
-                  tick={{ fontSize: 9, fill: "#334155" }}
+                  dataKey="chartLabel"
+                  tick={{ fontSize: 11, fill: "#334155" }}
                   tickLine={false}
                   type="category"
-                  width={108}
+                  width={114}
                 />
                 <ReferenceLine stroke="#64748b" strokeDasharray="3 3" x={0} />
                 <Bar dataKey="contribution" maxBarSize={18}>
@@ -131,8 +129,8 @@ export function WhyView({
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-center text-[10px] font-medium text-slate-600">
-            Horizontal axis: Model contribution
+          <p className="text-center text-[11px] font-medium text-slate-600">
+            Model contribution
           </p>
 
           <ol

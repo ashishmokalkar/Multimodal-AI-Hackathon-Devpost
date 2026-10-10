@@ -154,7 +154,10 @@ function HeartScene({
         controlsRef={controlsRef}
         overviewViewRef={overviewViewRef}
       />
-      {import.meta.env.DEV && <Stats />}
+      {import.meta.env.DEV &&
+        new URLSearchParams(window.location.search).get("fps") === "1" && (
+          <Stats />
+        )}
     </>
   );
 }
@@ -360,20 +363,17 @@ export function ViewerPanel() {
       </div>
       <div
         aria-live="polite"
-        className="mx-4 mb-3 flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-800"
+        className="mx-4 mb-3 flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] leading-4 text-slate-800"
       >
-        <span className="flex flex-wrap gap-x-3 gap-y-1">
-          <span>
-            Selected target:{" "}
-            {selectedVessel
-              ? `${selectedVessel} (${vesselMap[selectedVessel].label})`
-              : "CAD"}{" "}
-            — {formatProbability(selectedTargetProbability)}
+        <span className="flex min-w-0 flex-nowrap gap-x-3">
+          <span className="whitespace-nowrap">
+            Selected target: {selectedTargetName} —{" "}
+            {formatProbability(selectedTargetProbability)}
             {selectedTarget &&
-              ` · model label ${selectedTarget.label} · model threshold ${formatProbability(selectedTarget.threshold)}`}
+              ` · ${selectedTarget.label} · threshold ${formatProbability(selectedTarget.threshold)}`}
           </span>
           {hoveredVessel && (
-            <span>
+            <span className="whitespace-nowrap">
               Hovering: {hoveredVessel} ({vesselMap[hoveredVessel].label}) —{" "}
               {vesselDisplay(prediction, hoveredVessel).percentage}
             </span>
@@ -389,8 +389,7 @@ export function ViewerPanel() {
           </button>
         )}
       </div>
-      <p className="px-5 pb-2 text-[10px] leading-relaxed text-slate-500">
-        Vessel paths are schematic, not patient-specific lesion maps.{" "}
+      <p className="viewer-attribution px-5 pb-2 text-[10px] leading-relaxed text-slate-500">
         {prediction?.mock ? "Mock prediction. " : ""}
         Heart:{" "}
         <a

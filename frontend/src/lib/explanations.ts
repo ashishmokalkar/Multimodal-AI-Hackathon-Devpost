@@ -154,5 +154,47 @@ export function formatContributionInput(
 }
 
 export function formatContributionValue(value: number): string {
-  return `${value > 0 ? "+" : ""}${value.toFixed(3)}`;
+  const formatted =
+    value !== 0 && Math.abs(value) < 0.001
+      ? value.toString()
+      : value.toFixed(3);
+  return `${value > 0 ? "+" : ""}${formatted}`;
+}
+
+export function contributionAxis(values: readonly number[]): {
+  domain: [number, number];
+  ticks: number[];
+  maxAbs: number;
+} {
+  const maxAbs = values.reduce(
+    (maximum, value) =>
+      Number.isFinite(value) ? Math.max(maximum, Math.abs(value)) : maximum,
+    0,
+  );
+  const extent = maxAbs || 0.001;
+
+  return {
+    domain: [-extent, extent],
+    ticks: maxAbs === 0 ? [0] : [-extent, -extent / 2, 0, extent / 2, extent],
+    maxAbs,
+  };
+}
+
+export function formatContributionAxisTick(
+  value: number,
+  maxAbs: number,
+): string {
+  if (value === 0 || maxAbs === 0) {
+    return "0.00";
+  }
+
+  const step = maxAbs / 2;
+  const precision = Math.max(2, Math.ceil(-Math.log10(step)) + 1);
+  if (precision > 12) {
+    return value.toExponential(2);
+  }
+
+  const formatted = value.toFixed(precision);
+  const trimmed = formatted.replace(/(\.\d*?[1-9])0+$|\.0+$/, "$1");
+  return Number(trimmed) === 0 ? value.toExponential(2) : trimmed;
 }

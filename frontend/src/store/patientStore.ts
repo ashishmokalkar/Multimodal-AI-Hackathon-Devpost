@@ -4,6 +4,7 @@ import type {
   PredictionResponse,
   SamplePatient,
 } from "../api/types";
+import type { PredictionStatus } from "../lib/predictionStatus";
 
 interface PatientState {
   features: Record<string, FeatureValue>;
@@ -13,7 +14,9 @@ interface PatientState {
   predictionInputs: Record<string, FeatureValue> | null;
   predictionError: string | null;
   isPredicting: boolean;
+  predictionStatus: PredictionStatus;
   latestPredictionRequestId: number;
+  setPredictionStatus: (status: PredictionStatus) => void;
   setFeatures: (
     features: Record<string, FeatureValue>,
     sampleId?: string | null,
@@ -42,7 +45,9 @@ export const usePatientStore = create<PatientState>((set) => ({
   predictionInputs: null,
   predictionError: null,
   isPredicting: false,
+  predictionStatus: "initial",
   latestPredictionRequestId: 0,
+  setPredictionStatus: (predictionStatus) => set({ predictionStatus }),
   setFeatures: (features, sampleId = null) =>
     set((state) => ({
       features,
@@ -52,6 +57,10 @@ export const usePatientStore = create<PatientState>((set) => ({
       predictionInputs: null,
       predictionError: null,
       isPredicting: false,
+      predictionStatus:
+        state.inputRevision > 0 || state.latestPredictionRequestId > 0
+          ? "edited"
+          : "initial",
     })),
   setFromSample: (sample) =>
     set((state) => ({
@@ -62,6 +71,7 @@ export const usePatientStore = create<PatientState>((set) => ({
       predictionInputs: null,
       predictionError: null,
       isPredicting: false,
+      predictionStatus: "edited",
     })),
   updateFeature: (name, value) =>
     set((state) => ({
@@ -72,6 +82,7 @@ export const usePatientStore = create<PatientState>((set) => ({
       predictionInputs: null,
       predictionError: null,
       isPredicting: false,
+      predictionStatus: "edited",
     })),
   beginPrediction: (expectedRevision) => {
     let requestId: number | null = null;
@@ -86,6 +97,7 @@ export const usePatientStore = create<PatientState>((set) => ({
         predictionInputs: null,
         predictionError: null,
         isPredicting: true,
+        predictionStatus: "pending",
       };
     });
     return requestId;
@@ -110,6 +122,7 @@ export const usePatientStore = create<PatientState>((set) => ({
         predictionInputs: { ...inputSnapshot },
         predictionError: null,
         isPredicting: false,
+        predictionStatus: "ready",
       };
     });
     return accepted;
@@ -129,6 +142,7 @@ export const usePatientStore = create<PatientState>((set) => ({
         predictionInputs: null,
         predictionError,
         isPredicting: false,
+        predictionStatus: "error",
       };
     });
     return accepted;

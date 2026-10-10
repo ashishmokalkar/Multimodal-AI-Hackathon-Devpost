@@ -131,7 +131,7 @@ describe("WhyView", () => {
     const listItems = markup.match(/<li\b/g) ?? [];
 
     expect(listItems).toHaveLength(10);
-    expect(markup).toContain("Horizontal axis: Model contribution");
+    expect(markup).toContain("Model contribution");
     expect(markup).toContain(
       'aria-label="CAD contribution values and input values"',
     );

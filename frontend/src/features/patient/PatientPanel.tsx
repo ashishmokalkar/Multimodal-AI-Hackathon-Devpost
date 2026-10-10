@@ -95,9 +95,14 @@ export function PatientPanel() {
   const selectedSampleId = usePatientStore((state) => state.selectedSampleId);
   const inputRevision = usePatientStore((state) => state.inputRevision);
   const isPredicting = usePatientStore((state) => state.isPredicting);
+  const prediction = usePatientStore((state) => state.prediction);
+  const predictionError = usePatientStore((state) => state.predictionError);
   const setFeatures = usePatientStore((state) => state.setFeatures);
   const setFromSample = usePatientStore((state) => state.setFromSample);
   const updateFeature = usePatientStore((state) => state.updateFeature);
+  const setPredictionStatus = usePatientStore(
+    (state) => state.setPredictionStatus,
+  );
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [autoPredict, setAutoPredict] = useState(true);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
@@ -177,6 +182,7 @@ export function PatientPanel() {
       const parsed = validationSchema.safeParse(features);
       if (!parsed.success) {
         setShowValidationErrors(true);
+        setPredictionStatus("invalid");
         return;
       }
 
@@ -189,7 +195,7 @@ export function PatientPanel() {
           }),
       );
     },
-    [mutatePrediction, validationSchema],
+    [mutatePrediction, setPredictionStatus, validationSchema],
   );
 
   useEffect(() => {
@@ -217,10 +223,40 @@ export function PatientPanel() {
     validation?.success,
   ]);
 
+  useEffect(() => {
+    if (
+      prediction ||
+      isPredicting ||
+      predictionError ||
+      !validation ||
+      (inputRevision === 0 && Object.keys(patientFeatures).length === 0)
+    ) {
+      return;
+    }
+
+    if (!validation.success) {
+      setPredictionStatus("invalid");
+    } else if (inputRevision > 0) {
+      setPredictionStatus(autoPredict ? "auto-updating" : "edited");
+    }
+  }, [
+    autoPredict,
+    inputRevision,
+    isPredicting,
+    patientFeatures,
+    prediction,
+    predictionError,
+    setPredictionStatus,
+    validation,
+  ]);
+
   const handlePredict = () => {
     setShowValidationErrors(true);
     cancelAutoPredict.current?.();
     cancelAutoPredict.current = null;
+    if (validation && !validation.success) {
+      setPredictionStatus("invalid");
+    }
     void requestPrediction(patientFeatures, inputRevision);
   };
 
@@ -233,7 +269,10 @@ export function PatientPanel() {
   };
 
   return (
-    <section className="panel min-h-0" aria-labelledby="patient-panel-heading">
+    <section
+      className="panel patient-panel min-h-0"
+      aria-labelledby="patient-panel-heading"
+    >
       <header className="panel-header">
         <div>
           <p className="eyebrow">Input workspace</p>
@@ -241,7 +280,7 @@ export function PatientPanel() {
         </div>
       </header>
       <div className="panel-body !justify-start gap-4 overflow-y-auto">
-        <div className="space-y-2">
+        <div className="shrink-0 space-y-2">
           <label
             className="block text-xs font-semibold text-slate-700"
             htmlFor="sample-patient"
@@ -298,7 +337,7 @@ export function PatientPanel() {
             openGroup === null ? groups[0]?.[0] === group : openGroup === group;
           return (
             <section
-              className="overflow-hidden rounded-xl border border-slate-200"
+              className="shrink-0 overflow-hidden rounded-xl border border-slate-200"
               key={group}
             >
               <h3>
@@ -420,13 +459,13 @@ export function PatientPanel() {
             </section>
           );
         })}
-
+      </div>
+      <div className="patient-actions">
         {showValidationErrors && validation && !validation.success && (
           <p className="text-xs text-red-700" role="alert">
             Correct the highlighted values before requesting a prediction.
           </p>
         )}
-
         <label className="flex items-center gap-2 text-xs text-slate-700">
           <input
             checked={autoPredict}

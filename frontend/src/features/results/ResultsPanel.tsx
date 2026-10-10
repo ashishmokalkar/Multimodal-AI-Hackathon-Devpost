@@ -1,5 +1,6 @@
 import { RawResult } from "./RawResult";
 import { useFeatures } from "../../api/hooks";
+import { predictionStatusCopy } from "../../lib/predictionStatus";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 
@@ -9,6 +10,15 @@ export function ResultsPanel() {
   const predictionInputs = usePatientStore((state) => state.predictionInputs);
   const predictionError = usePatientStore((state) => state.predictionError);
   const isPredicting = usePatientStore((state) => state.isPredicting);
+  const predictionStatus = usePatientStore((state) => state.predictionStatus);
+  const currentStatus = prediction
+    ? "ready"
+    : isPredicting
+      ? "pending"
+      : predictionError
+        ? "error"
+        : predictionStatus;
+  const statusCopy = predictionStatusCopy(currentStatus, predictionError);
   const selectedVessel = useUiStore((state) => state.selectedVessel);
   const setSelectedVessel = useUiStore((state) => state.setSelectedVessel);
 
@@ -24,19 +34,6 @@ export function ResultsPanel() {
         </div>
       </header>
       <div className="panel-body !justify-start overflow-y-auto">
-        {isPredicting && (
-          <p className="mb-4 text-xs text-slate-600" role="status">
-            Calculating predicted probabilities…
-          </p>
-        )}
-        {predictionError && (
-          <p
-            className="mb-4 rounded-lg bg-red-50 p-3 text-xs text-red-800"
-            role="alert"
-          >
-            Prediction failed: {predictionError}
-          </p>
-        )}
         {featuresQuery.isError && (
           <p
             className="mb-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-900"
@@ -55,19 +52,15 @@ export function ResultsPanel() {
             onSelectVessel={setSelectedVessel}
           />
         ) : (
-          !isPredicting &&
-          !predictionError && (
-            <div className="empty-state">
-              <div className="empty-state-mark" aria-hidden="true">
-                %
-              </div>
-              <h3>Predicted outcomes</h3>
-              <p>
-                Choose a sample patient or enter clinical features to see
-                predicted CAD and vessel probabilities.
-              </p>
-              <p className="text-xs text-slate-500">
-                Vessel colours are neutral until a current prediction is
+          statusCopy && (
+            <div
+              className={`prediction-status prediction-status-${currentStatus}`}
+              role={statusCopy.role}
+            >
+              <strong>{statusCopy.label}</strong>
+              <p>{statusCopy.message}</p>
+              <p className="prediction-status-neutral">
+                Vessel colours remain neutral until a current prediction is
                 available.
               </p>
             </div>

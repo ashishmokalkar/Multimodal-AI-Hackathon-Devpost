@@ -7,6 +7,8 @@ import type {
 import {
   explanationForSelection,
   explanationTargetFor,
+  contributionAxis,
+  formatContributionAxisTick,
   formatContributionValue,
   formatContributionInput,
   groupPredictionInputs,
@@ -167,6 +169,18 @@ describe("explanation selection and presentation", () => {
     expect(formatContributionValue(0)).toBe("0.000");
     expect(formatContributionValue(0.1)).toBe("+0.100");
     expect(formatContributionValue(-0.2)).toBe("-0.200");
+    expect(formatContributionValue(0.0004)).toBe("+0.0004");
+    expect(formatContributionValue(-0.0004)).toBe("-0.0004");
+  });
+
+  it("uses a symmetric zero-aligned axis and readable labels for small and zero values", () => {
+    const axis = contributionAxis([-0.0004, 0.0002, 0]);
+
+    expect(axis.domain).toEqual([-0.0004, 0.0004]);
+    expect(axis.ticks).toEqual([-0.0004, -0.0002, 0, 0.0002, 0.0004]);
+    expect(formatContributionAxisTick(0, axis.maxAbs)).toBe("0.00");
+    expect(formatContributionAxisTick(0.0002, axis.maxAbs)).not.toBe("0.00");
+    expect(contributionAxis([0, -0]).ticks).toEqual([0]);
   });
 
   it("groups accepted input snapshots and preserves missing versus zero attribution", () => {
