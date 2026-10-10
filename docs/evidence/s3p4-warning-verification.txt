@@ -1,0 +1,52 @@
+Sprint 3 Phase 4 warning verification - partial; Human Gate 4 pending
+====================================================================
+
+The historical blocker is documented in docs/evidence/s3p3-warning-verification.txt.
+This run used headed Microsoft Edge 155.0.4283.45 in kiosk mode on Windows,
+with a 1920x1080 display and DPR 1. The browser content viewport was set to the
+exact CSS sizes below; PNG dimensions and window.innerWidth/innerHeight agree.
+The real API health response was status=ok, mock=false,
+contract_version=1.1.0, model_version=cardiotwin-v2.0.0. The frontend showed
+the real profile; no mock fallback was used.
+
+Saved patient-20 screenshots:
+- docs/evidence/s3p4-warning-patient20-1920x1080-closed.png
+- docs/evidence/s3p4-warning-patient20-1920x1080-open.png
+- docs/evidence/s3p4-warning-patient20-1280x800-closed.png
+- docs/evidence/s3p4-warning-patient20-1280x800-open.png
+- docs/evidence/s3p4-warning-layout-keyboard.json (raw measurements and OS
+  keyboard results)
+
+Both PNGs at each size have exact content dimensions. Patient 20, the real
+model/version badge, the prediction source, four target cards, warning count
+and Predict action are visible without results-panel scrolling. The expanded
+1920x1080 image shows: "Validated accuracy is lower for patients aged 65 or
+over (ROC-AUC CAD 0.85, LAD 0.81, LCX 0.65, RCA 0.68)." The 1280x800 expanded
+image shows the same text. Document overflow measured 0 CSS px in all four
+captures.
+
+1920x1080: closed canvas 620.766x590.859 CSS px; open canvas
+620.766x591.859 CSS px; variation 1 px. The >=480 px threshold is met.
+
+1280x800: warning and probabilities are visibly present, but the first closed
+measurement (620.766x591.859 CSS px) was taken immediately after applying the
+new viewport. The later expanded-state measurement was 509.734x362.546 CSS px.
+This is not a settled closed/open pair, so the <=2 px variation criterion is
+inconclusive. No canvas-threshold wait loop or third attempt was made.
+
+Keyboard/empty-warning blockers:
+- Pointer input focused and opened the native summary. Windows OS SendKeys
+  Enter did not change its open state on either viewport; the run records
+  passed=false. Pointer opening is not claimed as keyboard proof.
+- A real API prediction using the documented reference defaults should return
+  an empty warning list, but the attempt to select Custom patient remained on
+  patient-20. No live empty-warning screenshots were produced.
+- Existing S3 rendering/store regressions cover the empty status and freshness
+  clearing, but tests are not live proof. H must manually verify Tab/Enter
+  disclosure activation and the Custom-patient response at both sizes, then
+  review settled 1280x800 canvas measurements before Gate 4.
+
+The four patient-20 captures establish the visible warning count and full text,
+not complete Gate 4 acceptance. Gate 4 remains pending; S3 is not closed.
+Verification services (WSL API, Windows frontend, Edge) were stopped after
+capture. No frontend, backend, model, dependency, PR or merge changes were made.

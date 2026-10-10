@@ -74,8 +74,9 @@ measurements are under `docs/evidence/s3p2-*`; H approved Human Gate 2 (D-037).
 H then separately approved Gate R and runtime-first integration Phase 3
 (D-038). Phase 3 has now implemented the approved real profile and verified
 the WSL runtime, Windows localhost path and live frontend flow. Evidence is
-under `docs/evidence/s3p3-*`; Human Gate 3 remains pending H review. This is
-local integration evidence, not public deployment or clinical validation.
+under `docs/evidence/s3p3-*`. H closed Phase 3 at Human Gate 3 with explicit
+warning-evidence carryover to Phase 4 (D-042). This is local integration
+evidence, not complete warning verification, deployment or clinical validation.
 Preserve the bounded layout during integration, including long provenance,
 warnings and uncertainty. Small-heart framing and concise explanation copy
 remain separately approved post-integration polish candidates. CSV import
@@ -128,7 +129,8 @@ Runtime setup used the separate home-directory environment and completed in
 verified without modifying the mock environment. The approved 45-minute/
 60-credit stop limits were not reached. Do not retrain, export, downgrade
 model dependencies, retry blocked Windows launchers or merge branches.
-Human Gate 3 review is still required.
+Human Gate 3 is approved with D-042's warning-evidence carryover; Gate 4 must
+resolve that evidence before Sprint 3 closes.
 
 Extensibility (brief §Technical Considerations): new feature → appears automatically via `GET /features`; new vessel → add entry to `vesselMap.ts` + mesh node name; new model → backend only, metrics drawer is schema-driven.
 
@@ -231,7 +233,7 @@ current decision threshold and reported validation from final/demo fitting
 sets. Matching version strings do not validate the demo refit; retain selection/
 validation caveats from `reports/BEST_MODELS.md`.
 
-**S3 Phase 3 implementation (2026-10-10; Human Gate 3 pending):** The frontend
+**S3 Phase 3 implementation (2026-10-10; Gate 3 approved with D-042 carryover):** The frontend
 validates health/mode and the approved mock v1.0/real v1.1 profiles separately,
 requires all real-only fields, and clears prediction-dependent data on edits,
 requests, failures and profile changes. The real 49-input schema, sample
@@ -248,11 +250,12 @@ Windows-frontend/WSL-API setup and shutdown steps are in the root README.
 The footer distinguishes generated synthetic mock records from the real
 Z-Alizadeh Sani extension (UCI #411; source-reported CC BY 4.0). This establishes
 neither independent validation of demo refits nor clinical validity or
-deployment; H's Human Gate 3 remains pending.
+deployment. H closed Phase 3 with the unverified warning live checks explicitly
+carried into Phase 4, not certified by that approval.
 
 **Gate 3 review correction (D-041):** The core integration is supported, but
 response warnings were placed after the chart/input table and risk summary,
-so initial desktop captures did not reveal their existence. Before Gate 3,
+so initial desktop captures did not reveal their existence. Acceptance requires:
 show a compact warning count/status beside the probability/source summary at
 1920x1080 and 1280x800, with keyboard-accessible full response text. Preserve
 the bounded layout and clear warning UI on every prediction invalidation;
@@ -265,7 +268,26 @@ The correction places a compact count beside the probabilities and uses native
 say “none returned” without reassurance; mock v1.0 explicitly says real-model
 warning assessment is unavailable. Focused UI/store regressions pass. Exact
 1920x1080/1280x800 live acceptance evidence remains incomplete after repeated
-CDP canvas-sizing failures; keep Gate 3 pending until that evidence is reviewed.
+CDP canvas-sizing failures. H explicitly moved those remaining checks into
+Phase 4 and closed Phase 3 (D-042). Phase 4 bundles a materially different
+headed-browser verification route with retrospective/cleanup; missing saved
+captures, live keyboard activation and closed/open canvas measurements stay
+open until reviewed. Gate 4 requires them before S3 closes, unless H explicitly
+revises the gate. Product/API requirements and all existing budget limits are
+unchanged; this is not permission for broader UI implementation.
+
+**Phase 4 evidence status (D-042/D-043; Gate 4 pending):** Headed Edge captured
+patient 20 with the real model/version, four probabilities and the visible
+warning count at both exact screenshot sizes; expanded captures show the full
+age-related reliability caution. Document overflow measured 0 CSS px. At
+1920x1080 the canvas measured 590.859 px closed and 591.859 px expanded. At
+1280x800 the first closed-state canvas measurement was taken before resizing
+settled and differs from the later expanded measurement; no stable pair is
+claimed. Windows OS `SendKeys` did not activate the focused disclosure, and the
+attempt to select Custom patient did not produce a live empty-warning response.
+The four patient-20 images and raw measurements are under
+`docs/evidence/s3p4-warning-*`; empty-warning and keyboard evidence remain open
+for H's manual check. S3 is not closed and Gate 4 is not passed.
 
 ## 8. Clinical safety
 
@@ -306,7 +328,8 @@ polish or CSV work needs a separate H-approved scope/calendar decision.
 - Q1/Q2: M's serving inputs, target thresholds, probability-scale baseline
   Shapley and `/model/metrics` handoff are supplied and approved under D-038.
   WSL loading, semantic frontend integration and live evidence were verified in
-  Phase 3; H's Human Gate 3 review remains open. Deployment, clinical validity
+  Phase 3; H approved Human Gate 3 with warning live evidence carried to Phase
+  4 (D-042). That evidence and Gate 4 remain open. Deployment, clinical validity
   and separately validated demo-refit metrics are not established.
 - Q3: Faizan remains accountable for the video/document (D-033); M offers ML
   sections and joint script/architecture input. His contribution timing remains
@@ -323,8 +346,8 @@ The API is declared available now, contract v1.1.0, model version
 runtime; Windows verification was M's report and WSL was unverified. X has
 since verified the pinned runtime and local Windows-to-WSL path as recorded
 under `docs/evidence/s3p3-*`. Gate R authorized that bounded attempt; Human
-Gate 3 review is still pending. The older evidence below remains historical,
-not current dependency status.
+Gate 3 is approved with D-042's warning-evidence carryover to Gate 4. The older
+evidence below remains historical, not current dependency status.
 
 ### ML branch evidence (reviewed 2026-10-08)
 

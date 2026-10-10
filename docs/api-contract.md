@@ -157,7 +157,7 @@ validation. Preserve the report's prior-selection/ensemble-optimism caveats;
 do not conflate headline AUC with pooled calibrated AUC or substitute in-sample
 AUC. Existing mismatch/mock/loading/error qualifications still apply.
 
-### Phase 3 local implementation status (2026-10-10; Human Gate 3 pending)
+### Phase 3 local implementation status (2026-10-10; Gate 3 approved with carryover)
 
 The frontend now validates the supported mock `1.0.0` and real `1.1.0` health
 profiles and their required response additions; it does not fall back between
@@ -167,7 +167,20 @@ including Windows localhost/CORS. Live workflow, provenance, warning,
 uncertainty, metrics, viewport and active-orbit evidence is under
 `docs/evidence/s3p3-*`. This records local integration only: matching version
 strings do not independently validate demo refits, and no clinical validity
-or deployment claim is made. Human Gate 3 remains for H's review.
+or deployment claim is made. H closed Phase 3 at Human Gate 3 with the remaining
+warning live evidence carried into Phase 4 (D-042). This changes the evidence
+schedule, not the contract or warning requirements: saved exact-viewport
+captures, real keyboard disclosure activation and closed/open layout proof
+remain open, and Gate 4 requires them before Sprint 3 closes.
+
+Phase 4 published four headed-Edge patient-20 captures at the two requested
+viewport sizes, showing the real source/version, probabilities, warning count
+and expanded reliability text. The 1920x1080 canvas pair is within the 2 px
+variation limit; the 1280x800 closed capture preceded completed resize settling,
+so its canvas pair is inconclusive. OS keyboard activation and a live
+empty-warning capture were not verified; no contract behavior has changed.
+Gate 4 remains pending, and local integration does not establish deployment or
+clinical validation.
 
 ## OpenAPI 3.1 - preserved mock v1.0.0 profile
 
