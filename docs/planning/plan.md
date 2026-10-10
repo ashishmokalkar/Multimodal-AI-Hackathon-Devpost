@@ -45,6 +45,15 @@ project total **1875.5055785**, with **5124.4944215** remaining under the
 of X's ceiling remaining. These are deduplicated local telemetry totals through
 the stated snapshot, not billing; later review/publication calls are excluded.
 
+Post-publication reconciliation through **2026-10-10T08:53:41.268Z**:
+Phase 1 actual **32.928544** (O **0**, X **32.928544**); cumulative S3
+**105.417119** (O **71.455220**, X **33.961899**); project total
+**1878.0214365**, leaving **5121.9785635** under the 7000 cap. Phase 1
+remaining is **617.071456** combined and **127.071456** on X's ceiling.
+This supersedes the 08:51:50.334Z snapshot for current totals; that earlier
+dated snapshot remains historical. Usage is local deduplicated telemetry,
+not billing; final confirmation/report calls after this timestamp are excluded.
+
 Allocations approved at Gate 0 (D-034):
 
 | Phase | Combined allocation | X ceiling | State |

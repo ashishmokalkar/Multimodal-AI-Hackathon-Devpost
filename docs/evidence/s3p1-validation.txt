@@ -28,6 +28,11 @@ CAD/LAD/LCX/RCA probabilities changed from 0.8821/0.8901/0.8690/0.8778 to
 Editing cleared prior patient results and made vessels neutral before manual
 Predict. Live screenshots include Why, Inputs, changed prediction, stale-cleared
 state, and the mock-labelled metrics drawer.
+At live startup the Linux `/health` request and Windows
+`http://localhost:8000/health` both returned
+`{"status":"ok","model_version":"mock-1.0.0","contract_version":"1.0.0","mock":true}`;
+the Windows frontend at `http://localhost:5173` returned HTTP 200. Both
+verification services were stopped after evidence capture.
 
 Keyboard evidence: trusted headless Edge input activated Inputs with Enter,
 Why with Space, and LAD selection with Space. The metrics drawer kept focus
