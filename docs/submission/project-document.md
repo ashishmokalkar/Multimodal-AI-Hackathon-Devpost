@@ -2,7 +2,7 @@
 
 **Project-document draft | 10 October 2026 | source freeze:** `39ffab1c8adecd707c0f40ce826c12a568c41267`
 
-> **Review status:** Draft only. Ashish must verify the dataset/preprocessing, model, validation, subgroup and demo-model statements before finalisation. This is a local prototype, not a deployed or clinically validated system.
+> **Review status:** Corrected review candidate, not final. H's full PDF/video review and current Devpost-form/access check, plus Ashish's verification of the dataset, preprocessing, model, validation, subgroup and demo-model statements, remain pending before finalisation. This is a local prototype, not a deployed or clinically validated system.
 
 ## 1. Problem and system
 
@@ -22,7 +22,7 @@ The pinned real profile uses the Extension of the Z-Alizadeh Sani dataset (UCI M
 
 The checked-in loader maps raw sex, yes/no, valve-disease and bundle-branch-block categories to numeric codes; maps the four labels; and rejects unmapped values or missing values rather than silently filling them. `Exertional CP` is dropped because it is constant in this dataset. Feature construction includes candidate clinical scores, ratios, counts and interactions; the selected inputs differ by target. Data-dependent transformations and feature selection are fitted within training folds. The API and model inputs exclude **LAD, LCX, RCA and Cath** as predictors; they are labels only, preventing target leakage.
 
-Eight non-synthetic sample patients are served with ground truth for demonstration. The pinned demo estimators were refitted without those eight rows; the final estimators use all 303 rows. A sample ID is retained across edits to keep a paired what-if request on the demo-model path. Ground truth describes the original sample, not an edited profile. Requests without a sample ID use the final models. The response reports the actual source; the frontend does not infer or recompute it.
+Eight non-synthetic sample patients are served with ground truth for demonstration. The pinned demo estimators were refitted without those eight rows; the final estimators use all 303 rows. For a valid prediction request, a valid sample ID or an exact match to a public sample's supported features selects the demo models; otherwise the API uses the final models. Unknown sample IDs are rejected. A sample ID is retained across edits to keep a paired what-if request on the demo-model path. Ground truth describes the original sample, not an edited profile. The response reports the actual source; the frontend does not infer or recompute it.
 
 <!-- pagebreak -->
 
@@ -30,14 +30,16 @@ Eight non-synthetic sample patients are served with ground truth for demonstrati
 
 The pinned model version is `cardiotwin-v2.0.0`. The four targets use independently selected estimators: Explainable Boosting Machine (CAD), CatBoost (LAD), XGBoost (LCX), and an eight-estimator logistic stack (RCA). Probabilities are calibrated; thresholds are target-specific. The real service caps each served vessel probability at the served CAD probability. Equal values alone do not prove that this cap changed a result.
 
-The report uses ten repeats of five-fold stratified cross-validation on fixed folds. Decisions were made using repeats 0–4 and the table reports ROC-AUC on repeats 5–9; the CAD champion carries a small earlier selection effect, and the report notes mild optimism in ensemble comparisons. Thresholds and calibration were fitted inside outer training folds. Values below are cross-validation estimates, not clinical validation or independently validated metrics for the demo refits.
+The report uses ten repeats of five-fold stratified cross-validation on fixed folds. Decisions were made using repeats 0–4 and the headline ROC-AUC below is the reported mean per-fold result on repeats 5–9, with the report's 95% confidence interval; the CAD champion carries a small earlier selection effect, and the report notes mild optimism in ensemble comparisons. This is distinct from the pooled calibrated AUC over each repeat's five test folds, which is 0.932 for CAD, 0.864 for LAD, 0.767 for LCX and 0.762 for RCA. Accuracy, precision, recall and F1 are threshold-rule metrics from Platt-calibrated probabilities at target-specific thresholds selected to maximize balanced accuracy. Calibration and thresholds were fitted inside outer training folds. All figures are cross-validation estimates, not clinical validation or independent validation of the final all-patient or demo-model refits.
 
-| Target | Model | ROC-AUC (95% CI) | Accuracy | Precision | Recall | F1 |
+| Target | Model | Mean per-fold ROC-AUC (95% CI) | Accuracy* | Precision* | Recall* | F1* |
 |---|---|---:|---:|---:|---:|---:|
 | CAD | EBM | 0.939 (0.908-0.962) | 0.867 | 0.944 | 0.867 | 0.903 |
 | LAD | CatBoost | 0.866 (0.824-0.905) | 0.781 | 0.811 | 0.820 | 0.813 |
 | LCX | XGBoost | 0.784 (0.727-0.824) | 0.683 | 0.577 | 0.746 | 0.646 |
 | RCA | 8-model logistic stack | 0.767 (0.715-0.811) | 0.669 | 0.546 | 0.736 | 0.625 |
+
+*Accuracy, precision, recall and F1 are reported for the calibrated, target-threshold classification rule; they are not ROC-AUC aggregation measures.
 
 The cohort is small and comes from one dataset. Performance is weaker for some subgroups, notably older patients in the reported analysis. These results do not establish generalisation to other hospitals or populations, prospective benefit, or clinical safety.
 
@@ -49,7 +51,7 @@ The frontend uses React, TypeScript, Three.js and React Three Fiber. The license
 
 The vessel palette represents absolute 0–100% predicted probability. The returned decision threshold is a separate marker; it is not the 50% colour midpoint. Neither probability nor threshold is a percentage of anatomical narrowing. The UI retains response provenance, uncertainty and warnings alongside all four predictions.
 
-The **Why?** view displays signed contributions on the served probability scale. A contribution of `+0.12` means +12 probability points relative to the response's reference patient; it does not mean a relative 12% change, causal benefit or treatment effect. The visible top-ten chart is a subset, not a complete additive waterfall. The **Inputs** view keeps accepted values, units, groups and returned derived values available for inspection.
+The **Why?** view uses baseline Shapley attribution with 32 input orderings on the served calibrated probability, including the CAD cap for vessel probabilities. Its baseline risk is the model prediction for a reference-input profile, not measured population prevalence. Contributions are signed probability points: `+0.12` means +12 points relative to that baseline prediction, not a relative 12% change, causal benefit or treatment effect. The visible top-ten chart is a subset, not a complete additive waterfall. The **Inputs** view keeps accepted values, units, groups and returned derived values available for inspection.
 
 **Request path:** React dashboard -> supported `/features`, `/patients/samples`, `/predict` and `/model/metrics` endpoints -> pinned FastAPI real profile -> manifest-selected model artifacts. Contract `1.1.0` and response provenance are shown in the UI. The application presents returned predictions without recomputing them.
 

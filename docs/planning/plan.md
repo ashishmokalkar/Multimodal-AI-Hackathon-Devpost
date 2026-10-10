@@ -177,6 +177,15 @@ leaving **281.558841** under S5 500 and **3297.2621885** under project
 Phase 2, including O handover/review. These are local telemetry, not billing;
 later calls are excluded and no prior actual or boundary is reset.
 
+**Phase 2 executor kickoff:** `2026-10-10T20:25:34.316Z`. The fresh
+pre-correction snapshot through `2026-10-10T20:27:17.267Z` records Phase 2
+**16.6247525**, S5 **235.0659115**, and project **3719.362564**. It leaves
+**264.9340885** under the shared S5 ceiling and **3280.637436** under the
+project cap; Phase 1 remains **218.441159**. This uses the local session
+store's deduplicated event fields and repository working-directory filter,
+not account billing. It includes available O/E work since the unchanged
+boundaries; no actuals were reset.
+
 ## Phase 0 - Discussion and research (complete)
 
 **Goal:** Agree a feasible, evidence-based submission plan and owners that

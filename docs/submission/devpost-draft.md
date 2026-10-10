@@ -1,8 +1,10 @@
 # Devpost project text — draft
 
-**Status:** Not mapped to a live Devpost form. The current form and its
-requirements still require H's manual check; the planning fetch returned
-HTTP 403. All text below is a draft, not a submission or final claim.
+**Status:** Corrected review candidate, not mapped to a live Devpost form.
+The current form and its requirements still require H's manual check; the
+planning fetch returned HTTP 403. Ashish's ML verification and H's full
+document/video review are also pending. All text below is a draft, not a
+submission or final claim.
 
 ## Project title
 
@@ -24,13 +26,18 @@ warnings and explanation—without presenting a prediction as a diagnosis.
 ## What it does
 
 Users choose one of eight real dataset demonstration patients or enter the
-complete supported structured profile. A local FastAPI service returns CAD,
-LAD, LCX and RCA predictions. The React dashboard keeps model/source
-provenance, target thresholds, uncertainty and response warnings visible.
-Users can rotate and zoom the heart, select a vessel, inspect signed
-probability-point contributions in **Why?**, and review inputs and derived
-values in **Inputs**. Editing clears stale output while a fresh prediction is
-requested; retaining the sample ID supports a paired demo-model comparison.
+complete supported structured profile. A valid sample ID or an exact match
+to a public sample's supported features selects demo estimators; other valid
+profiles use final estimators. A local FastAPI service returns CAD, LAD, LCX
+and RCA predictions. The React dashboard keeps model/source provenance,
+target thresholds, uncertainty and response warnings visible. Users can
+rotate and zoom the heart, select a vessel, inspect signed probability-point
+contributions in **Why?**, and review inputs and derived values in **Inputs**.
+The explanation uses baseline Shapley attribution with 32 input orderings on
+the served calibrated probability, including the CAD cap for vessel outputs.
+Its reference risk is a model prediction for reference inputs, not measured
+population prevalence. Editing clears stale output while a fresh prediction
+is requested; retaining a sample ID supports a paired demo-model comparison.
 
 The 3D coronary paths are schematic and not patient-specific lesion maps.
 This prototype accepts structured clinical, ECG, laboratory and
@@ -46,12 +53,16 @@ The frontend displays these responses rather than recomputing model outputs.
 
 The dataset contains 303 records from the Extension of the Z-Alizadeh Sani
 dataset (UCI #411). The model report uses fixed-fold repeated stratified
-cross-validation; its reported ROC-AUC values are CAD 0.939, LAD 0.866,
-LCX 0.784 and RCA 0.767, with target-specific confidence intervals recorded
-in `reports/BEST_MODELS.md`. These are cross-validation estimates, not
-clinical or external validation. The CAD champion has a documented selection
-caveat; the demo estimators' refitting does not create separate validation
-metrics.
+cross-validation. The reported mean per-fold ROC-AUC values on repeats r5-r9
+are CAD 0.939, LAD 0.866, LCX 0.784 and RCA 0.767, with target-specific
+confidence intervals in `reports/BEST_MODELS.md`. The separate pooled
+calibrated AUCs are 0.932, 0.864, 0.767 and 0.762; accuracy, precision,
+recall and F1 use Platt-calibrated probabilities with target-specific
+threshold rules selected to maximize balanced accuracy. These are
+cross-validation estimates, not clinical or external validation or
+independent validation of the final/demo refits. The CAD champion has a
+documented selection caveat, and ensemble comparisons have a mild-optimism
+caveat.
 
 ## Safety and limitations
 
