@@ -118,6 +118,16 @@ describe("InputsView", () => {
     expect(markup).toContain("Not returned");
     expect(markup).toContain("0.000");
     expect(markup).toContain("Unavailable");
+    expect(markup).toContain(
+      'aria-label="Demographics patient inputs and contributions"',
+    );
+    expect(markup).toContain('role="region" tabindex="0"');
+    expect(markup).toContain("Method and reference details");
+    expect(markup).toContain("Not returned by mock v1.0.");
+    expect(markup).toContain("Missing values are unavailable");
+    expect(markup).not.toContain(
+      '<details class="contribution-method-details" open',
+    );
   });
 
   it("does not invent any input values when there is no accepted snapshot", () => {
@@ -164,6 +174,9 @@ describe("InputsView", () => {
 
     expect(markup).toContain("Probability scale");
     expect(markup).toContain("Reference model risk: 50.0%");
+    expect(markup).toContain(
+      "Baseline Shapley on served probability (32 orderings).",
+    );
     expect(markup).toContain("-20.00 percentage points");
     expect(markup).toContain("BMI: 27.5");
     expect(markup).toContain("Obesity dataset flag: Yes");

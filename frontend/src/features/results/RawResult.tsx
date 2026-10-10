@@ -5,10 +5,7 @@ import type {
   PredictionResponse,
   Target,
 } from "../../api/types";
-import {
-  formatProbability,
-  formatTargetUncertainty,
-} from "../../lib/format";
+import { formatProbability, formatTargetUncertainty } from "../../lib/format";
 import type { VesselId } from "../viewer/vesselMap";
 import { InputsView } from "./InputsView";
 import { WhyView } from "./WhyView";
@@ -71,14 +68,13 @@ export function RawResult({
   const [activeView, setActiveView] = useState<"why" | "inputs">("why");
   const targets = [
     ["CAD", prediction.cad],
-    ...(["LAD", "LCX", "RCA"] as const).map((vessel) => [
-      vessel,
-      prediction.vessels[vessel],
-    ] as const),
+    ...(["LAD", "LCX", "RCA"] as const).map(
+      (vessel) => [vessel, prediction.vessels[vessel]] as const,
+    ),
   ] as const;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-1">
       <div
         aria-label="Prediction source and version"
         className={`prediction-source-badge ${
@@ -88,21 +84,22 @@ export function RawResult({
         <strong>
           {prediction.mock ? "Mock prediction" : "Real-model prediction"}
         </strong>
-        <span>Model version {prediction.model_version}</span>
+        <span aria-label={`Model version ${prediction.model_version}`}>
+          Model {prediction.model_version}
+        </span>
       </div>
       {!prediction.mock && (
-        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[10px] leading-4 text-slate-700">
-          <strong>
+        <p className="scenario-provenance text-[10px] leading-4 text-slate-600">
+          <strong className="mr-1 font-semibold text-slate-800">
             {isEditedScenario
-              ? "Edited dataset-sample scenario"
+              ? "Edited dataset sample"
               : sampleId
-                ? "Original dataset-sample scenario"
-                : "Custom input scenario"}
+                ? "Original dataset sample"
+                : "Custom input"}
           </strong>
-          <p className="mt-1 break-words">
-            Prediction source: {prediction.prediction_source}
-          </p>
-        </div>
+          <span aria-hidden="true"> · </span>
+          <span>Source: {prediction.prediction_source}</span>
+        </p>
       )}
       <div className="grid grid-cols-4 gap-1.5">
         <ProbabilityReadout
@@ -150,10 +147,10 @@ export function RawResult({
       <p className="text-[10px] leading-4 text-slate-600">
         {prediction.mock
           ? "Model-set uncertainty is not returned by mock v1.0."
-          : `90% prediction-set state (not an error): ${targets
+          : `90% sets (not an error): ${targets
               .map(
                 ([label, target]) =>
-                  `${label}: ${target.uncertain ? "uncertain" : "single-answer set"}`,
+                  `${label} ${target.uncertain ? "uncertain" : "single answer"}`,
               )
               .join(" · ")}`}
       </p>

@@ -72,7 +72,12 @@ const realExplanation = {
   scale: "probability" as const,
   method: "Baseline Shapley on served probability (32 orderings).",
   contributions: [
-    { feature: "F0", value: 67, contribution: 0.12, direction: "positive" as const },
+    {
+      feature: "F0",
+      value: 67,
+      contribution: 0.12,
+      direction: "positive" as const,
+    },
   ],
 };
 const realTarget = { ...target, uncertain: false };
@@ -164,6 +169,7 @@ describe("WhyView", () => {
     expect(markup).toContain(
       'aria-label="CAD contribution values and input values"',
     );
+    expect(markup).toContain('tabindex="0"');
     expect(markup).toContain("Input value: 67 years");
     expect(markup).toContain("-0.900");
     expect(markup).toContain("+0.900");
@@ -189,5 +195,34 @@ describe("WhyView", () => {
     );
     expect(markup).toContain("a subset of the full response");
     expect(markup).not.toContain("scale unconfirmed");
+  });
+
+  it("puts the signed chart before full methodology while keeping its qualification visible", () => {
+    const markup = renderToStaticMarkup(
+      createElement(WhyView, {
+        prediction: realPrediction,
+        features,
+        selectedVessel: null,
+      }),
+    );
+    const chartIndex = markup.indexOf(
+      'aria-hidden="true" class="mt-2 min-h-48"',
+    );
+    const detailsIndex = markup.indexOf(
+      '<details class="contribution-method-details',
+    );
+    const visibleSummary = markup.slice(0, chartIndex);
+
+    expect(chartIndex).toBeGreaterThan(-1);
+    expect(detailsIndex).toBeGreaterThan(chartIndex);
+    expect(visibleSummary).toContain(
+      "percentage points from reference risk 18.0%",
+    );
+    expect(visibleSummary).toContain("subset");
+    expect(visibleSummary).toContain("causal effect");
+    expect(markup.slice(detailsIndex)).toContain(
+      "Baseline Shapley on served probability (32 orderings).",
+    );
+    expect(markup.slice(detailsIndex)).toContain("<summary");
   });
 });
