@@ -395,6 +395,24 @@ submission authority follows from the planning choices alone. Phase 1's
 accounting boundary is `2026-10-10T19:26:20.967Z`; frozen source remains
 unchanged and E must stop for Human Gate 1 after the draft package.
 
+**S5 Gate 1 (D-054):** E published draft source/PDF, captions/storyboard,
+Devpost text and retained a captioned real-demo video. The PDF is five pages;
+the video is 4:21, H.264 1920x1080 without audio. The published draft closeout
+is `8e64e069dc2330463758aea0022aee62e230bbd4`; application source remains
+frozen at `39ffab1c8adecd707c0f40ce826c12a568c41267`.
+O reviewed draft text, PDF text/page count, video metadata, the first-page
+preview and five retained frames, not full playback or all-page visual review.
+H approved Gate 1 with explicit carryover into Phase 2: H's full PDF/video
+review and current Devpost-form check remain mandatory before Gate 2.
+Ashish's ML sign-off remains open. Approved document corrections clarify
+exact-match sample routing without an ID, headline versus calibrated/
+threshold-metric aggregation, and baseline Shapley on served probability
+with 32 orderings. Correct review candidates may be prepared now, but do
+not remove draft/pending-review status or claim final acceptance before the
+outstanding confirmations. No footage re-recording or frozen-code change
+is implied. Phase 2 begins `2026-10-10T20:23:07.549Z`; S5's shared 500
+ceiling, manual handovers and separately gated submission remain unchanged.
+
 ## 8. Clinical safety
 
 - Modal on first load (acknowledge required), persistent header banner, footer. Text: *"For decision-support and educational purposes only. Not a substitute for formal diagnostic imaging or clinical judgement."*

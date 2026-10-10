@@ -1,8 +1,9 @@
 # Sprint 5 Plan - Submission readiness
 
-**Status:** H approved S5 Human Gate 0 and authorised Phase 1 only (D-053).
-Phase 0 is complete; the Phase 1 draft package is delivered.
-Human Gate 1 is pending, and Phases 2/3 are not authorised.
+**Status:** H approved S5 Human Gate 1 with explicit draft-review/form-check
+carryover and three document corrections (D-054). Phase 1 is accepted with
+those open items; Phase 2 is authorised, with its manual handover pending.
+Human Gate 2 is pending; Phase 3/submission is not authorised.
 S4 remains closed under D-051 after documentation-only closeout
 `e5117844e07db7196bed8636992627a551b59cdd`.
 The frozen code remains `39ffab1c8adecd707c0f40ce826c12a568c41267`.
@@ -124,8 +125,8 @@ source and do not assume the default branch contains it.
 | Phase | Combined O+X estimate | Actual |
 |---|---:|---|
 | 0 - Planning | 150 | 90.225900 through the recorded pre-Phase-1 cutoff below |
-| 1 - Automated draft package | 220 | 83.292451 through the Gate 1 snapshot below |
-| 2 - Finalisation and access checks | 90 | Not started |
+| 1 - Automated draft package | 220 | 128.215259 through the recorded pre-Phase-2 cutoff below |
+| 2 - Finalisation and access checks | 90 | Authorised; O handover work accruing |
 | 3 - Submission, retrospective and cleanup | 40 | Not started |
 | **S5 total** | **500 hard sprint ceiling** | Includes all planning/review/publication |
 
@@ -167,6 +168,15 @@ The last recorded pre-boundary snapshot through
 **3425.4774475** under project 7000. Later calls are excluded; actuals and
 the S5 start boundary are not reset.
 
+**Gate 1 accounting boundary:** Phase 2 begins
+**2026-10-10T20:23:07.549Z**, after H's approval with carryover. The last
+recorded pre-boundary snapshot through **2026-10-10T20:23:07.478Z** is
+Phase 1 **128.215259**, S5 **218.441159**, project **3702.7378115**,
+leaving **281.558841** under S5 500 and **3297.2621885** under project
+7000. Events before the boundary remain Phase 1; events at/after it are
+Phase 2, including O handover/review. These are local telemetry, not billing;
+later calls are excluded and no prior actual or boundary is reset.
+
 ## Phase 0 - Discussion and research (complete)
 
 **Goal:** Agree a feasible, evidence-based submission plan and owners that
@@ -204,7 +214,7 @@ have explicit owners/fallbacks rather than being represented as verified.
 Phase 1 (Recommended)". Only Phase 1 is authorised; no later gate, frozen-code
 change, agent, PR operation or final submission is implied.
 
-## Phase 1 - Automated draft package (drafts delivered; Human Gate 1 pending)
+## Phase 1 - Automated draft package (accepted with carryover, D-054)
 
 **Goal:** Deliver reviewable document, captioned demo and submission-text
 drafts with minimal H production time.
@@ -228,26 +238,44 @@ executor/media/publication ceiling within the approved shared sprint budget.
 - [ ] H checks the current Devpost form and requests Ashish's ML verification;
   incorporate confirmed requirements without assuming extra scope.
 
-**Executor self-check gate 1:** Passed for the delivered artifacts. The
+**Executor self-check gate 1 report:** E reported passed for the delivered artifacts. The
 exported PDF is 5 pages; the playable real-demo rough cut is 4:21 with 22
 burned-in captions and a VTT sidecar. Live response, warning, selection,
 explanation, input-edit/freshness and metrics-limitations interactions are
-shown at 1920x1080. Document, captions and Devpost text retain consistent
-source, provenance, licence and safety qualifications. See
+shown at 1920x1080. Document, captions and Devpost text retain
+provenance, licence and safety qualifications. See
 `docs/evidence/s5p1-package-verification.txt`. No unsupported clinical,
 deployment, image-import or patient-specific lesion claim is made.
 
-**Human Gate 1 remains pending.** H must check the current Devpost form,
-requirements and judge-access/upload mechanics; Ashish must verify or replace
-the ML/data/evaluation statements. The planning fetch returned HTTP 403, so the
-current form was not independently verified. These are finalisation blockers,
-not executor artifact passes or approval to start Phase 2.
+**O review:** Local/origin hashes match at
+`8e64e069dc2330463758aea0022aee62e230bbd4`; the tree is clean and changes
+since the frozen source are documentation/evidence only. O confirmed the
+PDF's five-page text extraction and the video's 261-second H.264/no-audio
+metadata; reviewed source drafts, the first-page preview and five retained
+video frames. O did not watch the full video or visually inspect all PDF
+pages. Three document corrections below are required; E's reported artifact
+pass does not establish fully verified content or human acceptance.
 
-**Human Gate 1:** H reviews drafts and the form/dependency status, then
-explicitly approves the consolidated finalisation batch. No Phase 2 starts
-from E's draft report alone.
+**Human Gate 1:** Approved with explicit carryover under D-054. H selected
+"Approve Gate 1 with the three document corrections; carry my full draft
+review and Devpost-form check into Phase 2 before final acceptance".
+This accepts the draft package for finalisation, not a completed human
+playback/page/form check. Ashish's ML sign-off, H's full PDF/video review and
+the current-form/access checks remain blockers to Gate 2. The planning fetch
+returned 403; do not convert that uncertainty into verified current rules.
 
-## Phase 2 - Finalisation and access checks (not started)
+### Gate 1 correction and carryover ledger
+
+| ID | Disposition / owner | Required correction or evidence |
+|---|---|---|
+| S5-F01 | Approved; E, ML verification by Ashish | Document section 2 incorrectly says every request without a sample ID uses final models. `api/main.py` also detects an exact feature match to a public sample. State: a valid ID or exact public-sample match selects demo models; otherwise final models. Preserve retained-origin what-if behavior. |
+| S5-F02 | Approved; E, ML verification by Ashish | Label headline ROC-AUC as the reported mean per-fold result; distinguish its aggregation from pooled calibrated AUC and the calibrated, threshold-rule classification metrics. Source `reports/BEST_MODELS.md` sections Champions/Post-processing and `models/manifest.json`; keep approved numbers/caveats, do not recalculate or claim validation of the final served/demo capped outputs. |
+| S5-F03 | Approved; E, ML verification by Ashish | Name the real API baseline Shapley attribution method with 32 orderings on served calibrated/capped probability. Explain that reference risk is for reference inputs, not observed population prevalence; keep signed probability-point, top-ten-subset and noncausal qualifications. |
+| H full draft review | Carried to Phase 2; H | Read every exported PDF page and watch the full captioned video; forward one consolidated feedback batch. O's sampled frame/text review is not this human check. |
+| Current Devpost form | Carried to Phase 2; H | Verify deadline, required fields/assets, upload/link mechanics and judge access against the live form. Report any new requirement needing a scope decision. |
+| ML sign-off | Open; Ashish via H, due Oct 12 | Verify/replace data, preprocessing, estimators, CV/aggregation, subgroup and demo-model statements; H forwards confirmation/corrections. Hour/coverage remain unconfirmed. |
+
+## Phase 2 - Finalisation and access checks (authorised; handover pending)
 
 **Goal:** Produce the accepted final document/video and a submission-ready
 set of links by Oct 13.
@@ -256,6 +284,13 @@ set of links by Oct 13.
 
 **Atomic tasks:**
 
+- [ ] E publishes pending O Gate 1/plan/spec/decision updates through H's
+  manual handover, preserving existing changes and the frozen source.
+- [ ] Implement S5-F01/F02/F03 in document source and regenerated PDF;
+  reconcile corresponding submission-text/storyboard wording where needed.
+  The existing footage need not be re-recorded for these document corrections.
+- [ ] H reads all PDF pages and watches the full captioned cut, then forwards
+  consolidated feedback; complete the carried current Devpost-form check.
 - [ ] Integrate Ashish's verified ML sections/sign-off and H's approved
   feedback; reconcile document, captions and submission claims.
 - [ ] Export/check the final at-most-six-page PDF and 3-10-minute captioned
@@ -269,8 +304,16 @@ set of links by Oct 13.
   Escalate any frozen-code or deployment requirement for separate H approval;
   do not autonomously merge, publish to a cloud host or retrain.
 
+Prepare corrected review candidates now. Until H's review/form results and
+Ashish's sign-off arrive, retain explicit pending-review status; do not strip
+draft qualifications, invent confirmation or claim final readiness. Publish
+completed work and report the precise outstanding inputs rather than polling
+or keeping helpers running. Resume this same phase when H forwards them;
+there is no new subphase budget or automatic approval.
+
 **Self-check gate 2:** Final exported assets meet measured page/duration
-limits; Ashish's ML sign-off and H's feedback are recorded; document, YouTube
+limits; S5-F01/F02/F03, Ashish's ML sign-off, H's full draft review and feedback
+are recorded as completed; document, YouTube
 and source links are accessible as intended for judges; form requirements,
 attributions, reproducibility qualifications and safety claims are checked.
 No unresolved submission blocker is silently carried as a pass.
