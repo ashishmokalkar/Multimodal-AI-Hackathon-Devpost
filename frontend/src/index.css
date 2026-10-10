@@ -700,6 +700,48 @@ button:focus-visible {
   background: var(--green-dark);
 }
 
+@media (min-width: 901px) and (max-height: 820px) {
+  .app-shell {
+    gap: 8px;
+    padding-block: 8px 6px;
+  }
+
+  .viewer-header {
+    padding-block: 8px;
+  }
+
+  .viewer-stage {
+    margin: 6px 10px 4px;
+  }
+
+  .viewer-caption {
+    gap: 6px;
+    padding: 0 8px 4px;
+  }
+
+  .viewer-panel > [role="group"][aria-label="Schematic camera controls"] {
+    gap: 6px;
+    margin: 0 10px 4px;
+  }
+
+  .viewer-panel > div[aria-live="polite"] {
+    height: 38px;
+    min-height: 38px;
+    max-height: 38px;
+    flex-basis: 38px;
+  }
+
+  .viewer-legend {
+    gap: 2px;
+    padding: 0 10px 3px;
+  }
+
+  .viewer-attribution {
+    padding-inline: 10px;
+    padding-bottom: 4px;
+  }
+}
+
 @media (max-width: 1120px) {
   .app-shell {
     padding-inline: 22px;

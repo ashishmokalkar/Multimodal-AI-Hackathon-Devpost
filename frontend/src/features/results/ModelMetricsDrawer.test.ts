@@ -43,6 +43,32 @@ const metrics: MetricsResponse = {
 };
 
 const returnFocusRef = createRef<HTMLButtonElement>();
+const realTargetMetrics = {
+  accuracy: 0.81,
+  precision: 0.82,
+  recall: 0.83,
+  f1: 0.84,
+  roc_auc: 0.85,
+  roc_auc_ci95: [0.8, 0.9] as [number, number],
+  balanced_accuracy: 0.86,
+  brier: 0.123,
+  ece: 0.045,
+  threshold: 0.68,
+  model: "Explainable Boosting Machine (EBM)",
+};
+const realMetrics: MetricsResponse = {
+  model_version: "cardiotwin-v2.0.0",
+  validation: "Fixed-fold repeated stratified cross-validation",
+  n_samples: 303,
+  trained_at: "2026-10-10T10:22:44Z",
+  targets: {
+    cad: realTargetMetrics,
+    LAD: { ...realTargetMetrics, model: "CatBoost" },
+    LCX: { ...realTargetMetrics, model: "XGBoost" },
+    RCA: { ...realTargetMetrics, model: "Stacked ensemble of 8 models" },
+  },
+  mock: false,
+};
 
 function render(
   query: {
@@ -54,12 +80,16 @@ function render(
     refetch: () => Promise<unknown>;
   },
   predictionVersion: string | null = null,
+  predictionMock: boolean | null = null,
+  predictionSource: string | null = null,
 ) {
   return renderToStaticMarkup(
     createElement(ModelMetricsDrawer, {
       open: true,
       onClose: () => undefined,
       predictionVersion,
+      predictionMock,
+      predictionSource,
       returnFocusRef,
       metricsQuery: query,
     }),
@@ -144,5 +174,54 @@ describe("ModelMetricsDrawer", () => {
       "Model metrics are unavailable; no values are being substituted.",
     );
     expect(unavailable).not.toContain("Accuracy");
+  });
+
+  it("shows real estimator and validation metrics with fitting-set caveats", () => {
+    const markup = render(
+      {
+        data: realMetrics,
+        isError: false,
+        isFetching: false,
+        isPending: false,
+        error: null,
+        refetch: async () => undefined,
+      },
+      "cardiotwin-v2.0.0",
+      false,
+      "Dataset patient 20: scored by models trained without this patient",
+    );
+
+    expect(markup).toContain("ROC-AUC 95% CI");
+    expect(markup).toContain("80.0%–90.0%");
+    expect(markup).toContain("Balanced accuracy");
+    expect(markup).toContain("Brier score");
+    expect(markup).toContain("0.123");
+    expect(markup).toContain("0.045");
+    expect(markup).toContain("CV-summary threshold");
+    expect(markup).toContain("Explainable Boosting Machine (EBM)");
+    expect(markup).toContain("demo-model refit");
+    expect(markup).toContain("pooled calibrated AUC");
+    expect(markup).toContain("Dataset patient 20");
+    expect(markup).toContain("not clinical validation");
+  });
+
+  it("does not pair real metrics with a mock prediction of the same version", () => {
+    const markup = render(
+      {
+        data: realMetrics,
+        isError: false,
+        isFetching: false,
+        isPending: false,
+        error: null,
+        refetch: async () => undefined,
+      },
+      "cardiotwin-v2.0.0",
+      true,
+    );
+
+    expect(markup).toContain("Source mismatch");
+    expect(markup).not.toContain(
+      "Metrics and the accepted prediction identify version",
+    );
   });
 });

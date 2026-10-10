@@ -54,6 +54,45 @@ const prediction: PredictionResponse = {
   risk_summary: "Mock summary.",
   mock: true,
 };
+const realTarget = { ...target, uncertain: true };
+const realExplanation = {
+  base_value: 0.42,
+  scale: "probability" as const,
+  method: "Baseline Shapley on served probability (32 orderings).",
+  contributions: [
+    { feature: "Age", value: 67, contribution: 0.12, direction: "positive" as const },
+  ],
+};
+const realPrediction: PredictionResponse = {
+  ...prediction,
+  model_version: "cardiotwin-v2.0.0",
+  cad: realTarget,
+  vessels: {
+    LAD: realTarget,
+    LCX: { ...realTarget, uncertain: false },
+    RCA: realTarget,
+  },
+  explanations: {
+    cad: realExplanation,
+    LAD: {
+      ...realExplanation,
+      contributions: [
+        { feature: "EF-TTE", value: 45, contribution: -0.3, direction: "negative" },
+      ],
+    },
+    LCX: {
+      ...realExplanation,
+      contributions: [
+        { feature: "Typical Chest Pain", value: "Typical", contribution: 0.45, direction: "positive" },
+      ],
+    },
+    RCA: { ...realExplanation, contributions: [] },
+  },
+  mock: false,
+  warnings: ["An input was outside the training range."],
+  derived: { BMI: 27.5, Obesity: true },
+  prediction_source: "Final models trained on all 303 patients",
+};
 const features: FeatureDefinition[] = [
   {
     name: "Age",
@@ -90,12 +129,16 @@ const features: FeatureDefinition[] = [
 function renderResult(
   selectedVessel: "LAD" | "LCX" | "RCA" | null,
   response = prediction,
+  isEditedScenario = false,
+  sampleId: string | null = null,
 ) {
   return renderToStaticMarkup(
     createElement(RawResult, {
       prediction: response,
       features,
       predictionInputs: { Age: 60, "EF-TTE": 50 },
+      isEditedScenario,
+      sampleId,
       selectedVessel,
       onSelectVessel: () => undefined,
     }),
@@ -140,10 +183,40 @@ describe("RawResult explanation rendering", () => {
   });
 
   it("does not label non-mock responses as mock predictions", () => {
-    const markup = renderResult(null, { ...prediction, mock: false });
+    const markup = renderResult(null, realPrediction);
 
-    expect(markup).toContain("Model prediction");
+    expect(markup).toContain("Real-model prediction");
     expect(markup).not.toContain("Mock prediction");
+  });
+
+  it("uses confirmed probability-scale units and displays real prediction provenance", () => {
+    const markup = renderResult(null, realPrediction);
+
+    expect(markup).toContain("+12.00 percentage points");
+    expect(markup).toContain("Reference model risk: 42.0%");
+    expect(markup).toContain(
+      "Baseline Shapley on served probability (32 orderings).",
+    );
+    expect(markup).toContain("Final models trained on all 303 patients");
+    expect(markup).toContain("Model warnings (1)");
+    expect(markup).not.toContain("scale unconfirmed");
+  });
+
+  it("labels a changed real sample as an edited scenario", () => {
+    const markup = renderResult(
+      null,
+      {
+        ...realPrediction,
+        prediction_source:
+          "Dataset patient 20: scored by models trained without this patient",
+      },
+      true,
+      "patient-20",
+    );
+
+    expect(markup).toContain("Edited dataset-sample scenario");
+    expect(markup).toContain("Prediction source:");
+    expect(markup).toContain("trained without this patient");
   });
 
   it("shows an explicit unavailable message when the selected explanation is empty", () => {

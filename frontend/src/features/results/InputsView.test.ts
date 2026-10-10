@@ -40,6 +40,30 @@ const prediction: PredictionResponse = {
   risk_summary: "Mock-only fixture.",
   mock: true,
 };
+const realExplanation = {
+  ...prediction.explanations.cad,
+  scale: "probability" as const,
+  method: "Baseline Shapley on served probability (32 orderings).",
+};
+const realPrediction: PredictionResponse = {
+  ...prediction,
+  cad: { ...prediction.cad, uncertain: false },
+  vessels: {
+    LAD: { ...prediction.vessels.LAD, uncertain: false },
+    LCX: { ...prediction.vessels.LCX, uncertain: false },
+    RCA: { ...prediction.vessels.RCA, uncertain: false },
+  },
+  mock: false,
+  warnings: [],
+  derived: { BMI: 27.5, Obesity: true },
+  prediction_source: "Final models trained on all 303 patients",
+  explanations: {
+    cad: realExplanation,
+    LAD: { ...realExplanation, contributions: [] },
+    LCX: { ...realExplanation, contributions: [] },
+    RCA: { ...realExplanation, contributions: [] },
+  },
+};
 
 const features: FeatureDefinition[] = [
   {
@@ -126,5 +150,23 @@ describe("InputsView", () => {
     expect(markup).toContain("-0.250");
     expect(markup).not.toContain("67 years");
     expect(markup).not.toContain("-0.200");
+  });
+
+  it("shows real reference-risk units and returned derived values without clinical classification", () => {
+    const markup = renderToStaticMarkup(
+      createElement(InputsView, {
+        prediction: realPrediction,
+        features,
+        predictionInputs: { Age: 51 },
+        selectedVessel: null,
+      }),
+    );
+
+    expect(markup).toContain("Probability scale");
+    expect(markup).toContain("Reference model risk: 50.0%");
+    expect(markup).toContain("-20.00 percentage points");
+    expect(markup).toContain("BMI: 27.5");
+    expect(markup).toContain("Obesity dataset flag: Yes");
+    expect(markup).toContain("not a clinical obesity diagnosis");
   });
 });

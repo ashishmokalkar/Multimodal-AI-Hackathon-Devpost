@@ -5,9 +5,10 @@ import type {
 } from "../../api/types";
 import {
   formatContributionInput,
-  formatContributionValue,
+  formatExplanationContribution,
   groupPredictionInputs,
 } from "../../lib/explanations";
+import { formatProbability } from "../../lib/format";
 import type { VesselId } from "../viewer/vesselMap";
 
 interface InputsViewProps {
@@ -25,6 +26,8 @@ export function InputsView({
 }: InputsViewProps) {
   const target = selectedVessel ?? "CAD";
   const explanation = prediction.explanations[selectedVessel ?? "cad"];
+  const probabilityScale =
+    !prediction.mock && explanation.scale === "probability";
   const groups = groupPredictionInputs(
     features,
     predictionInputs,
@@ -43,7 +46,7 @@ export function InputsView({
         <span className="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-900">
           {prediction.mock
             ? "Mock · illustrative · scale unconfirmed"
-            : "Model scale unconfirmed"}
+            : "Probability scale · model attribution"}
         </span>
       </div>
       <p className="mt-2 text-[11px] leading-5 text-slate-600">
@@ -51,7 +54,26 @@ export function InputsView({
         response contribution. Missing input values are unavailable; missing
         contributions are not returned. No clinical range classification is
         applied.
+        {probabilityScale &&
+          ` Reference model risk: ${formatProbability(explanation.base_value)}. Method: ${explanation.method ?? "unavailable"} Contribution unit: percentage points; attribution is not causation.`}
       </p>
+
+      {!prediction.mock && (
+        <section
+          aria-label="API-derived patient values"
+          className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700"
+        >
+          <h4 className="font-semibold text-slate-800">
+            API-derived values · read-only
+          </h4>
+          <p className="mt-1">BMI: {String(prediction.derived.BMI)}</p>
+          <p>
+            Obesity dataset flag: {prediction.derived.Obesity ? "Yes" : "No"}.
+            The dataset codes this as BMI &gt;25; it is not a clinical obesity
+            diagnosis.
+          </p>
+        </section>
+      )}
 
       {groups.length === 0 ? (
         <p
@@ -112,7 +134,12 @@ export function InputsView({
                           <td className="px-3 py-2 tabular-nums text-slate-700">
                             {row.contribution === null
                               ? "Not returned"
-                              : formatContributionValue(row.contribution)}
+                              : formatExplanationContribution(
+                                  row.contribution,
+                                  probabilityScale
+                                    ? "probability"
+                                    : undefined,
+                                )}
                           </td>
                         </tr>
                       ))}

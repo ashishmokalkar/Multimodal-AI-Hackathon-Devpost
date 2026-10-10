@@ -8,6 +8,10 @@ export function ResultsPanel() {
   const featuresQuery = useFeatures();
   const prediction = usePatientStore((state) => state.prediction);
   const predictionInputs = usePatientStore((state) => state.predictionInputs);
+  const selectedSampleId = usePatientStore((state) => state.selectedSampleId);
+  const sampleOriginFeatures = usePatientStore(
+    (state) => state.sampleOriginFeatures,
+  );
   const predictionError = usePatientStore((state) => state.predictionError);
   const isPredicting = usePatientStore((state) => state.isPredicting);
   const predictionStatus = usePatientStore((state) => state.predictionStatus);
@@ -21,6 +25,18 @@ export function ResultsPanel() {
   const statusCopy = predictionStatusCopy(currentStatus, predictionError);
   const selectedVessel = useUiStore((state) => state.selectedVessel);
   const setSelectedVessel = useUiStore((state) => state.setSelectedVessel);
+  const isEditedScenario =
+    prediction?.mock === false &&
+    selectedSampleId !== null &&
+    sampleOriginFeatures !== null &&
+    predictionInputs !== null &&
+    (Object.keys(sampleOriginFeatures).length !==
+      Object.keys(predictionInputs).length ||
+      Object.entries(sampleOriginFeatures).some(
+        ([feature, value]) =>
+          !Object.prototype.hasOwnProperty.call(predictionInputs, feature) ||
+          !Object.is(predictionInputs[feature], value),
+      ));
 
   return (
     <section
@@ -48,6 +64,8 @@ export function ResultsPanel() {
             prediction={prediction}
             features={featuresQuery.data ?? []}
             predictionInputs={predictionInputs}
+            isEditedScenario={isEditedScenario}
+            sampleId={selectedSampleId}
             selectedVessel={selectedVessel}
             onSelectVessel={setSelectedVessel}
           />

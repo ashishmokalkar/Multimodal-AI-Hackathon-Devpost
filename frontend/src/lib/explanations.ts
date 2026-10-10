@@ -161,6 +161,17 @@ export function formatContributionValue(value: number): string {
   return `${value > 0 ? "+" : ""}${formatted}`;
 }
 
+export function formatExplanationContribution(
+  value: number,
+  scale: "probability" | undefined,
+): string {
+  if (scale === "probability") {
+    const points = value * 100;
+    return `${points > 0 ? "+" : ""}${points.toFixed(2)} percentage points`;
+  }
+  return formatContributionValue(value);
+}
+
 export function contributionAxis(values: readonly number[]): {
   domain: [number, number];
   ticks: number[];

@@ -16,6 +16,8 @@ interface ModelMetricsDrawerProps {
   open: boolean;
   onClose: () => void;
   predictionVersion: string | null;
+  predictionMock: boolean | null;
+  predictionSource: string | null;
   returnFocusRef: RefObject<HTMLButtonElement | null>;
   metricsQuery: MetricsQueryState;
 }
@@ -27,18 +29,67 @@ const targets = [
   { key: "RCA", label: "RCA" },
 ] as const;
 
-const metrics = [
+const metricRows = [
   { key: "accuracy", label: "Accuracy" },
   { key: "precision", label: "Precision" },
   { key: "recall", label: "Recall" },
   { key: "f1", label: "F1" },
   { key: "roc_auc", label: "ROC-AUC" },
+  { key: "roc_auc_ci95", label: "ROC-AUC 95% CI" },
+  { key: "balanced_accuracy", label: "Balanced accuracy" },
+  { key: "brier", label: "Brier score" },
+  { key: "ece", label: "Expected calibration error (ECE)" },
+  {
+    key: "threshold",
+    label: "CV-summary threshold (not patient threshold)",
+  },
+  { key: "model", label: "Returned estimator" },
 ] as const;
+
+type TargetMetricsValue = MetricsResponse["targets"]["cad"];
+
+function formatMetricValue(
+  key: (typeof metricRows)[number]["key"],
+  target: TargetMetricsValue,
+): string {
+  switch (key) {
+    case "accuracy":
+      return formatProbability(target.accuracy);
+    case "precision":
+      return formatProbability(target.precision);
+    case "recall":
+      return formatProbability(target.recall);
+    case "f1":
+      return formatProbability(target.f1);
+    case "roc_auc":
+      return formatProbability(target.roc_auc);
+    case "roc_auc_ci95":
+      return "roc_auc_ci95" in target
+        ? `${formatProbability(target.roc_auc_ci95[0])}–${formatProbability(target.roc_auc_ci95[1])}`
+        : "Not provided by mock v1.0";
+    case "balanced_accuracy":
+      return "balanced_accuracy" in target
+        ? formatProbability(target.balanced_accuracy)
+        : "Not provided by mock v1.0";
+    case "brier":
+      return "brier" in target ? target.brier.toFixed(3) : "Not provided by mock v1.0";
+    case "ece":
+      return "ece" in target ? target.ece.toFixed(3) : "Not provided by mock v1.0";
+    case "threshold":
+      return "threshold" in target
+        ? formatProbability(target.threshold)
+        : "Not provided by mock v1.0";
+    case "model":
+      return "model" in target ? target.model : "Not provided by mock v1.0";
+  }
+}
 
 export function ModelMetricsDrawer({
   open,
   onClose,
   predictionVersion,
+  predictionMock,
+  predictionSource,
   returnFocusRef,
   metricsQuery,
 }: ModelMetricsDrawerProps) {
@@ -100,6 +151,10 @@ export function ModelMetricsDrawer({
     data !== undefined &&
     predictionVersion !== null &&
     data.model_version !== predictionVersion;
+  const hasSourceMismatch =
+    data !== undefined &&
+    predictionMock !== null &&
+    data.mock !== predictionMock;
 
   return (
     <div
@@ -201,22 +256,42 @@ export function ModelMetricsDrawer({
                 </p>
               )}
 
-              {hasVersionMismatch ? (
+              {hasSourceMismatch ? (
+                <p className="metrics-version-warning" role="alert">
+                  Source mismatch: these {data.mock ? "mock" : "real API"} metrics
+                  do not match the{" "}
+                  {predictionMock ? "mock" : "real API"} accepted prediction.
+                  They are not presented as validating that prediction.
+                </p>
+              ) : hasVersionMismatch ? (
                 <p className="metrics-version-warning" role="alert">
                   Version mismatch: these metrics describe {data.model_version},
                   while the accepted prediction uses {predictionVersion}. They
                   do not validate the currently displayed prediction.
                 </p>
+              ) : predictionVersion && !data.mock ? (
+                <p className="metrics-state" role="status">
+                  Matching version {predictionVersion} does not establish that
+                  cross-validation metrics separately validate the demo-model
+                  refit. These remain model-level metrics, not this patient’s
+                  prediction.
+                </p>
               ) : predictionVersion ? (
                 <p className="metrics-state" role="status">
-                  Metrics and the accepted prediction both identify model
-                  version {predictionVersion}. Model-level metrics do not
-                  describe this individual prediction.
+                  Metrics and the accepted prediction identify version{" "}
+                  {predictionVersion}; model-level metrics do not describe this
+                  individual prediction.
                 </p>
               ) : (
                 <p className="metrics-state" role="status">
                   No current accepted prediction is available for version
                   comparison.
+                </p>
+              )}
+
+              {predictionSource && (
+                <p className="metrics-state">
+                  Accepted prediction fitting-set source: {predictionSource}
                 </p>
               )}
 
@@ -263,7 +338,7 @@ export function ModelMetricsDrawer({
                     </tr>
                   </thead>
                   <tbody>
-                    {metrics.map((metric) => (
+                    {metricRows.map((metric) => (
                       <tr
                         className="border-t border-slate-100"
                         key={metric.key}
@@ -276,11 +351,12 @@ export function ModelMetricsDrawer({
                         </th>
                         {targets.map((target) => (
                           <td
-                            className="px-3 py-3 tabular-nums text-slate-800"
+                            className="break-words px-3 py-3 tabular-nums text-slate-800"
                             key={target.key}
                           >
-                            {formatProbability(
-                              data.targets[target.key][metric.key],
+                            {formatMetricValue(
+                              metric.key,
+                              data.targets[target.key],
                             )}
                           </td>
                         ))}
@@ -289,6 +365,16 @@ export function ModelMetricsDrawer({
                   </tbody>
                 </table>
               </div>
+              {!data.mock && (
+                <p className="metrics-state">
+                  Validation-report caveats: the CAD selection has a modest
+                  selection effect, and ensemble comparisons have mild
+                  optimism. Headline per-fold mean ROC-AUC is not the pooled
+                  calibrated AUC; these results are not clinical validation or
+                  in-sample scores. The validation threshold above is distinct
+                  from each patient prediction’s returned decision threshold.
+                </p>
+              )}
             </>
           )}
         </div>

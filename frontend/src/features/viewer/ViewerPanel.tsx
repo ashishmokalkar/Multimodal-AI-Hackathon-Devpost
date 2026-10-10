@@ -1,5 +1,5 @@
 import { Bounds, Html, OrbitControls, Stats } from "@react-three/drei";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   Component,
   Suspense,
@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
   type ComponentRef,
+  type MutableRefObject,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -20,7 +21,11 @@ import {
   OVERVIEW_CAMERA_POSITION,
   OVERVIEW_CAMERA_TARGET,
 } from "../../lib/cameraFocus";
-import { formatProbability } from "../../lib/format";
+import {
+  formatProbability,
+  formatTargetUncertainty,
+  formatTargetUncertaintyShort,
+} from "../../lib/format";
 import { usePatientStore } from "../../store/patientStore";
 import {
   vesselDisplay,
@@ -54,6 +59,65 @@ interface CameraFocusControllerProps {
   overviewViewRef: RefObject<OverviewView | null>;
 }
 
+interface OverviewCameraCaptureProps {
+  controlsRef: RefObject<OrbitControlsImpl | null>;
+  overviewViewRef: MutableRefObject<OverviewView | null>;
+}
+
+function OverviewCameraCapture({
+  controlsRef,
+  overviewViewRef,
+}: OverviewCameraCaptureProps) {
+  const { camera, invalidate } = useThree();
+  const startedAtRef = useRef<number | null>(null);
+  const stableFrameCountRef = useRef(0);
+  const previousPositionRef = useRef<Vector3 | null>(null);
+  const previousTargetRef = useRef<Vector3 | null>(null);
+
+  useFrame(() => {
+    if (overviewViewRef.current) {
+      return;
+    }
+    startedAtRef.current ??= performance.now();
+
+    const controls = controlsRef.current;
+    if (!controls) {
+      invalidate();
+      return;
+    }
+
+    const position = camera.position.clone();
+    const target = controls.target.clone();
+    const previousPosition = previousPositionRef.current;
+    const previousTarget = previousTargetRef.current;
+    if (
+      previousPosition &&
+      previousTarget &&
+      position.distanceToSquared(previousPosition) < 1e-10 &&
+      target.distanceToSquared(previousTarget) < 1e-10
+    ) {
+      stableFrameCountRef.current += 1;
+    } else {
+      stableFrameCountRef.current = 0;
+    }
+    previousPositionRef.current = position;
+    previousTargetRef.current = target;
+
+    const fitHasSettled = stableFrameCountRef.current >= 3;
+    const captureDeadlineReached =
+      performance.now() - startedAtRef.current >= 2500;
+    if (fitHasSettled || captureDeadlineReached) {
+      overviewViewRef.current = { position, target };
+      controls.saveState();
+      return;
+    }
+
+    invalidate();
+  });
+
+  return null;
+}
+
 function CameraFocusController({
   cameraRequest,
   controlsRef,
@@ -75,6 +139,7 @@ function CameraFocusController({
 
     if (cameraRequest.focusVessel === null) {
       const overview = overviewViewRef.current;
+      controls.reset();
       camera.position.copy(
         overview?.position ?? new Vector3(...OVERVIEW_CAMERA_POSITION),
       );
@@ -114,7 +179,6 @@ function HeartScene({
   controlsRef,
   setControlsRef,
 }: HeartSceneProps) {
-  const { camera } = useThree();
   const overviewViewRef = useRef<OverviewView | null>(null);
 
   return (
@@ -128,18 +192,15 @@ function HeartScene({
         clip
         margin={1.2}
         maxDuration={1}
-        onFit={({ center, distance }) => {
-          const direction = camera.position.clone().sub(center).normalize();
-          overviewViewRef.current = {
-            position: center.clone().addScaledVector(direction, distance),
-            target: center.clone(),
-          };
-        }}
       >
         <HeartModel />
         {vesselIds.map((vessel) => (
           <VesselMesh key={vessel} vessel={vessel} />
         ))}
+        <OverviewCameraCapture
+          controlsRef={controlsRef}
+          overviewViewRef={overviewViewRef}
+        />
       </Bounds>
       <OrbitControls
         ref={setControlsRef}
@@ -221,7 +282,7 @@ export function ViewerPanel() {
   const selectedTargetName = selectedVessel ?? "CAD";
   const selectedTargetProbability = selectedTarget?.probability ?? null;
   const predictionStatus = prediction
-    ? `Current predicted probabilities: CAD ${formatProbability(prediction.cad.probability)}, LAD ${vesselDisplay(prediction, "LAD").percentage}, LCX ${vesselDisplay(prediction, "LCX").percentage}, RCA ${vesselDisplay(prediction, "RCA").percentage}.`
+    ? `Current predicted probabilities: CAD ${formatProbability(prediction.cad.probability)}, LAD ${vesselDisplay(prediction, "LAD").percentage}, LCX ${vesselDisplay(prediction, "LCX").percentage}, RCA ${vesselDisplay(prediction, "RCA").percentage}. CAD: ${formatTargetUncertainty(prediction.cad.uncertain)} LAD: ${formatTargetUncertainty(prediction.vessels.LAD.uncertain)} LCX: ${formatTargetUncertainty(prediction.vessels.LCX.uncertain)} RCA: ${formatTargetUncertainty(prediction.vessels.RCA.uncertain)}`
     : isPredicting
       ? "A prediction is pending; vessel probabilities are unavailable."
       : predictionError
@@ -319,7 +380,7 @@ export function ViewerPanel() {
       >
         <div className="space-y-1">
           <p className="text-[10px] font-semibold text-slate-600">
-            Predicted probability · not percentage artery narrowing
+            Predicted probability (not narrowing) · 90% set status
           </p>
           <div
             aria-hidden="true"
@@ -345,8 +406,9 @@ export function ViewerPanel() {
                   className="h-3 w-3 rounded-full border border-white shadow-sm"
                   style={{ backgroundColor: display.color }}
                 />
-                <span>
-                  {vessel} {display.percentage}
+                <span className="whitespace-nowrap">
+                  {vessel} {display.percentage} ·{" "}
+                  {formatTargetUncertaintyShort(display.target?.uncertain)}
                 </span>
               </span>
             );
@@ -370,7 +432,7 @@ export function ViewerPanel() {
             Selected target: {selectedTargetName} —{" "}
             {formatProbability(selectedTargetProbability)}
             {selectedTarget &&
-              ` · ${selectedTarget.label} · threshold ${formatProbability(selectedTarget.threshold)}`}
+              ` · ${selectedTarget.label} · threshold ${formatProbability(selectedTarget.threshold)} · ${formatTargetUncertaintyShort(selectedTarget.uncertain)}`}
           </span>
           {hoveredVessel && (
             <span className="whitespace-nowrap">

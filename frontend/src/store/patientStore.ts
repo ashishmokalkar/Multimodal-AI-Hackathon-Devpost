@@ -9,6 +9,7 @@ import type { PredictionStatus } from "../lib/predictionStatus";
 interface PatientState {
   features: Record<string, FeatureValue>;
   selectedSampleId: string | null;
+  sampleOriginFeatures: Record<string, FeatureValue> | null;
   inputRevision: number;
   prediction: PredictionResponse | null;
   predictionInputs: Record<string, FeatureValue> | null;
@@ -16,11 +17,9 @@ interface PatientState {
   isPredicting: boolean;
   predictionStatus: PredictionStatus;
   latestPredictionRequestId: number;
+  resetForProfileChange: () => void;
   setPredictionStatus: (status: PredictionStatus) => void;
-  setFeatures: (
-    features: Record<string, FeatureValue>,
-    sampleId?: string | null,
-  ) => void;
+  setFeatures: (features: Record<string, FeatureValue>) => void;
   setFromSample: (sample: SamplePatient) => void;
   updateFeature: (name: string, value: FeatureValue) => void;
   beginPrediction: (expectedRevision: number) => number | null;
@@ -40,6 +39,7 @@ interface PatientState {
 export const usePatientStore = create<PatientState>((set) => ({
   features: {},
   selectedSampleId: null,
+  sampleOriginFeatures: null,
   inputRevision: 0,
   prediction: null,
   predictionInputs: null,
@@ -47,11 +47,25 @@ export const usePatientStore = create<PatientState>((set) => ({
   isPredicting: false,
   predictionStatus: "initial",
   latestPredictionRequestId: 0,
+  resetForProfileChange: () =>
+    set((state) => ({
+      features: {},
+      selectedSampleId: null,
+      sampleOriginFeatures: null,
+      inputRevision: state.inputRevision + 1,
+      prediction: null,
+      predictionInputs: null,
+      predictionError: null,
+      isPredicting: false,
+      predictionStatus: "initial",
+      latestPredictionRequestId: state.latestPredictionRequestId + 1,
+    })),
   setPredictionStatus: (predictionStatus) => set({ predictionStatus }),
-  setFeatures: (features, sampleId = null) =>
+  setFeatures: (features) =>
     set((state) => ({
       features,
-      selectedSampleId: sampleId,
+      selectedSampleId: null,
+      sampleOriginFeatures: null,
       inputRevision: state.inputRevision + 1,
       prediction: null,
       predictionInputs: null,
@@ -66,6 +80,7 @@ export const usePatientStore = create<PatientState>((set) => ({
     set((state) => ({
       features: sample.features,
       selectedSampleId: sample.id,
+      sampleOriginFeatures: { ...sample.features },
       inputRevision: state.inputRevision + 1,
       prediction: null,
       predictionInputs: null,
@@ -76,7 +91,6 @@ export const usePatientStore = create<PatientState>((set) => ({
   updateFeature: (name, value) =>
     set((state) => ({
       features: { ...state.features, [name]: value },
-      selectedSampleId: null,
       inputRevision: state.inputRevision + 1,
       prediction: null,
       predictionInputs: null,

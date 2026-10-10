@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { useFeatures, usePredict, useSamples } from "../../api/hooks";
+import {
+  useApiProfile,
+  useFeatures,
+  usePredict,
+  useSamples,
+} from "../../api/hooks";
 import { FeatureValueSchema } from "../../api/types";
 import type { FeatureDefinition, FeatureValue } from "../../api/types";
 import {
@@ -87,6 +92,8 @@ function errorMessage(error: unknown): string {
 }
 
 export function PatientPanel() {
+  const profileQuery = useApiProfile();
+  const profile = profileQuery.isSuccess ? profileQuery.data : null;
   const featuresQuery = useFeatures();
   const samplesQuery = useSamples();
   const predictionMutation = usePredict();
@@ -179,6 +186,9 @@ export function PatientPanel() {
       if (!validationSchema) {
         return;
       }
+      if (!profile) {
+        return;
+      }
       const parsed = validationSchema.safeParse(features);
       if (!parsed.success) {
         setShowValidationErrors(true);
@@ -189,13 +199,16 @@ export function PatientPanel() {
       await requestPredictionForRevision(
         expectedRevision,
         parsed.data,
-        (validFeatures) =>
+        (validFeatures, sampleId) =>
           mutatePrediction({
             features: validFeatures,
+            ...(profile.mode === "real" && sampleId
+              ? { sample_id: sampleId }
+              : {}),
           }),
       );
     },
-    [mutatePrediction, setPredictionStatus, validationSchema],
+    [mutatePrediction, profile, setPredictionStatus, validationSchema],
   );
 
   useEffect(() => {
@@ -328,6 +341,12 @@ export function PatientPanel() {
           {featuresQuery.isPending && (
             <p className="text-xs text-slate-500" role="status">
               Loading feature definitions…
+            </p>
+          )}
+          {profile?.mode === "real" && (
+            <p className="text-[11px] leading-4 text-slate-600" role="note">
+              Reference/demo defaults are starting values, not recorded patient
+              measurements. Dataset samples are real holdout demonstrations.
             </p>
           )}
         </div>

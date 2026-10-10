@@ -17,14 +17,14 @@ export const FeatureSchema = z.object({
   default: FeatureValueSchema,
   options: z.array(FeatureValueSchema).optional(),
   description: z.string().optional(),
-});
+}).strict();
 
 export const HealthResponseSchema = z.object({
   status: z.enum(["ok", "degraded"]),
-  model_version: z.string(),
-  contract_version: z.string(),
+  model_version: z.string().min(1),
+  contract_version: z.string().min(1),
   mock: z.boolean(),
-});
+}).strict();
 
 export const VesselGroundTruthSchema = z.object({
   LAD: z.boolean(),
@@ -49,7 +49,12 @@ export const TargetSchema = z.object({
   probability: z.number().min(0).max(1),
   label: z.string(),
   threshold: z.number().min(0).max(1),
+  uncertain: z.boolean().optional(),
 });
+
+const RealTargetSchema = TargetSchema.extend({
+  uncertain: z.boolean(),
+}).strict();
 
 export const ContributionSchema = z.object({
   feature: z.string(),
@@ -61,13 +66,26 @@ export const ContributionSchema = z.object({
 export const ExplanationSchema = z.object({
   base_value: z.number().min(0).max(1),
   contributions: z.array(ContributionSchema),
+  scale: z.literal("probability").optional(),
+  method: z.string().optional(),
 });
+
+const RealExplanationSchema = ExplanationSchema.extend({
+  scale: z.literal("probability"),
+  method: z.string().min(1),
+}).strict();
 
 export const VesselTargetsSchema = z.object({
   LAD: TargetSchema,
   LCX: TargetSchema,
   RCA: TargetSchema,
 });
+
+const RealVesselTargetsSchema = z.object({
+  LAD: RealTargetSchema,
+  LCX: RealTargetSchema,
+  RCA: RealTargetSchema,
+}).strict();
 
 export const TargetExplanationsSchema = z.object({
   cad: ExplanationSchema,
@@ -76,15 +94,43 @@ export const TargetExplanationsSchema = z.object({
   RCA: ExplanationSchema,
 });
 
-export const PredictionResponseSchema = z.object({
+const RealTargetExplanationsSchema = z.object({
+  cad: RealExplanationSchema,
+  LAD: RealExplanationSchema,
+  LCX: RealExplanationSchema,
+  RCA: RealExplanationSchema,
+}).strict();
+
+const PredictionResponseBaseSchema = z.object({
   request_id: z.string().uuid(),
-  model_version: z.string(),
+  model_version: z.string().min(1),
+  risk_summary: z.string(),
+});
+
+const MockPredictionResponseSchema = PredictionResponseBaseSchema.extend({
   cad: TargetSchema,
   vessels: VesselTargetsSchema,
   explanations: TargetExplanationsSchema,
-  risk_summary: z.string(),
-  mock: z.boolean(),
+  mock: z.literal(true),
 });
+
+const RealPredictionResponseSchema = PredictionResponseBaseSchema.extend({
+  cad: RealTargetSchema,
+  vessels: RealVesselTargetsSchema,
+  explanations: RealTargetExplanationsSchema,
+  warnings: z.array(z.string()),
+  derived: z.object({
+    BMI: z.number().finite(),
+    Obesity: z.boolean(),
+  }).strict(),
+  prediction_source: z.string().min(1),
+  mock: z.literal(false),
+}).strict();
+
+export const PredictionResponseSchema = z.discriminatedUnion("mock", [
+  MockPredictionResponseSchema,
+  RealPredictionResponseSchema,
+]);
 
 export const TargetMetricsSchema = z.object({
   accuracy: z.number().min(0).max(1),
@@ -94,23 +140,56 @@ export const TargetMetricsSchema = z.object({
   roc_auc: z.number().min(0).max(1),
 });
 
-export const MetricsResponseSchema = z.object({
-  model_version: z.string(),
+const RealTargetMetricsSchema = TargetMetricsSchema.extend({
+  roc_auc_ci95: z.tuple([
+    z.number().min(0).max(1),
+    z.number().min(0).max(1),
+  ]).refine(([lower, upper]) => lower <= upper, {
+    message: "ROC-AUC confidence interval must be ordered.",
+  }),
+  balanced_accuracy: z.number().min(0).max(1),
+  brier: z.number().finite().min(0).max(1),
+  ece: z.number().finite().min(0).max(1),
+  threshold: z.number().min(0).max(1),
+  model: z.string().min(1),
+}).strict();
+
+const MetricsResponseBaseSchema = z.object({
+  model_version: z.string().min(1),
   validation: z.string(),
   n_samples: z.number().int().min(1),
   trained_at: z.string().datetime(),
+});
+
+const MockMetricsResponseSchema = MetricsResponseBaseSchema.extend({
   targets: z.object({
     cad: TargetMetricsSchema,
     LAD: TargetMetricsSchema,
     LCX: TargetMetricsSchema,
     RCA: TargetMetricsSchema,
   }),
-  mock: z.boolean(),
+  mock: z.literal(true),
 });
+
+const RealMetricsResponseSchema = MetricsResponseBaseSchema.extend({
+  targets: z.object({
+    cad: RealTargetMetricsSchema,
+    LAD: RealTargetMetricsSchema,
+    LCX: RealTargetMetricsSchema,
+    RCA: RealTargetMetricsSchema,
+  }).strict(),
+  mock: z.literal(false),
+}).strict();
+
+export const MetricsResponseSchema = z.discriminatedUnion("mock", [
+  MockMetricsResponseSchema,
+  RealMetricsResponseSchema,
+]);
 
 export const PredictRequestSchema = z.object({
   features: z.record(z.string(), FeatureValueSchema),
-});
+  sample_id: z.string().min(1).optional(),
+}).strict();
 
 export const ValidationErrorItemSchema = z.object({
   loc: z.array(z.union([z.string(), z.number().int()])),

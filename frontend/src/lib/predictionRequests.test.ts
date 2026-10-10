@@ -3,6 +3,7 @@ import {
   PredictionResponseSchema,
   type FeatureValue,
   type PredictionResponse,
+  type SamplePatient,
 } from "../api/types";
 import { usePatientStore } from "../store/patientStore";
 import {
@@ -49,6 +50,7 @@ beforeEach(() => {
   usePatientStore.setState({
     features: { Age: 60 },
     selectedSampleId: null,
+    sampleOriginFeatures: null,
     inputRevision: 0,
     prediction: null,
     predictionInputs: null,
@@ -115,6 +117,38 @@ describe("fresh prediction requests", () => {
     expect(usePatientStore.getState()).toMatchObject({
       prediction: response,
       predictionInputs: { Age: 60 },
+    });
+  });
+
+  it("snapshots the real sample origin with edited input features", async () => {
+    const sample: SamplePatient = {
+      id: "patient-1",
+      label: "Dataset patient",
+      features: { Age: 60 },
+      synthetic: false,
+    };
+    usePatientStore.getState().setFromSample(sample);
+    usePatientStore.getState().updateFeature("Age", 61);
+    const state = usePatientStore.getState();
+    let sentSampleId: string | null = null;
+    let sentFeatures: Record<string, FeatureValue> | undefined;
+
+    await requestPredictionForRevision(
+      state.inputRevision,
+      state.features,
+      async (features, sampleId) => {
+        sentFeatures = features;
+        sentSampleId = sampleId;
+        return prediction("095e7b1f-22f0-4ef0-9d30-310f769c2847");
+      },
+    );
+
+    expect(sentSampleId).toBe("patient-1");
+    expect(sentFeatures).toEqual({ Age: 61 });
+    expect(usePatientStore.getState()).toMatchObject({
+      selectedSampleId: "patient-1",
+      sampleOriginFeatures: { Age: 60 },
+      predictionInputs: { Age: 61 },
     });
   });
 
@@ -227,7 +261,7 @@ describe("fresh prediction requests", () => {
       prediction: null,
       isPredicting: false,
     });
-    expect(usePatientStore.getState().predictionError).toContain("request_id");
+    expect(usePatientStore.getState().predictionError).toContain("mock");
 
     usePatientStore.getState().updateFeature("Age", 61);
     await requestPredictionForRevision(

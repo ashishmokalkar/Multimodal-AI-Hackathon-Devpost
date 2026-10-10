@@ -10,6 +10,12 @@ import {
   type PredictionResponse,
   type SamplePatient,
 } from "./types";
+import {
+  parseApiProfile,
+  validateFeaturesForProfile,
+  validateSamplesForProfile,
+  type ApiProfile,
+} from "./profile";
 
 const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
@@ -39,25 +45,56 @@ async function requestJson<T>(
   return schema.parse(body);
 }
 
-export function fetchFeatures(): Promise<FeatureDefinition[]> {
-  return requestJson("/features", FeatureSchema.array());
+export function fetchHealth(): Promise<ApiProfile> {
+  return requestJson("/health", { parse: parseApiProfile });
 }
 
-export function fetchSamples(): Promise<SamplePatient[]> {
-  return requestJson("/patients/samples", SamplePatientSchema.array());
+export async function fetchFeatures(
+  profile: ApiProfile,
+): Promise<FeatureDefinition[]> {
+  const definitions = await requestJson("/features", FeatureSchema.array());
+  return validateFeaturesForProfile(profile, definitions);
+}
+
+export async function fetchSamples(
+  profile: ApiProfile,
+): Promise<SamplePatient[]> {
+  const samples = await requestJson("/patients/samples", SamplePatientSchema.array());
+  return validateSamplesForProfile(profile, samples);
 }
 
 export function postPredict(
   request: PredictRequest,
+  profile: ApiProfile,
 ): Promise<PredictionResponse> {
   const payload = PredictRequestSchema.parse(request);
+  const profileRequest =
+    profile.mode === "real"
+      ? payload
+      : { features: payload.features };
   return requestJson("/predict", PredictionResponseSchema, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(profileRequest),
+  }).then((prediction) => {
+    if (prediction.mock !== (profile.mode === "mock")) {
+      throw new Error(
+        `The API response mode changed during the request; expected ${profile.mode}.`,
+      );
+    }
+    return prediction;
   });
 }
 
-export function fetchMetrics(): Promise<MetricsResponse> {
-  return requestJson("/model/metrics", MetricsResponseSchema);
+export function fetchMetrics(
+  profile: ApiProfile,
+): Promise<MetricsResponse> {
+  return requestJson("/model/metrics", MetricsResponseSchema).then((metrics) => {
+    if (metrics.mock !== (profile.mode === "mock")) {
+      throw new Error(
+        `The API metrics mode changed during the request; expected ${profile.mode}.`,
+      );
+    }
+    return metrics;
+  });
 }

@@ -5,7 +5,10 @@ import type {
   PredictionResponse,
   Target,
 } from "../../api/types";
-import { formatProbability } from "../../lib/format";
+import {
+  formatProbability,
+  formatTargetUncertainty,
+} from "../../lib/format";
 import type { VesselId } from "../viewer/vesselMap";
 import { InputsView } from "./InputsView";
 import { WhyView } from "./WhyView";
@@ -14,6 +17,8 @@ interface RawResultProps {
   prediction: PredictionResponse;
   features: readonly FeatureDefinition[];
   predictionInputs: Readonly<Record<string, FeatureValue>> | null;
+  isEditedScenario: boolean;
+  sampleId: string | null;
   selectedVessel: VesselId | null;
   onSelectVessel: (vessel: VesselId | null) => void;
 }
@@ -31,7 +36,7 @@ function ProbabilityReadout({
 }) {
   return (
     <button
-      aria-label={`Select ${label}. Predicted probability ${formatProbability(target.probability)}. Model label ${target.label}. Threshold ${formatProbability(target.threshold)}.`}
+      aria-label={`Select ${label}. Predicted probability ${formatProbability(target.probability)}. Model label ${target.label}. Threshold ${formatProbability(target.threshold)}. ${formatTargetUncertainty(target.uncertain)}`}
       aria-pressed={selected}
       className={`probability-readout rounded-xl border bg-white p-2 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 ${
         selected
@@ -46,11 +51,10 @@ function ProbabilityReadout({
         <span className="text-[15px] font-semibold tabular-nums text-slate-900">
           {formatProbability(target.probability)}
         </span>
+        <span className="text-[9px] leading-3 text-slate-600">
+          {target.label} · threshold {formatProbability(target.threshold)}
+        </span>
       </div>
-      <p className="sr-only">Predicted {target.label}</p>
-      <p className="sr-only">
-        Model threshold {formatProbability(target.threshold)}
-      </p>
     </button>
   );
 }
@@ -59,10 +63,19 @@ export function RawResult({
   prediction,
   features,
   predictionInputs,
+  isEditedScenario,
+  sampleId,
   selectedVessel,
   onSelectVessel,
 }: RawResultProps) {
   const [activeView, setActiveView] = useState<"why" | "inputs">("why");
+  const targets = [
+    ["CAD", prediction.cad],
+    ...(["LAD", "LCX", "RCA"] as const).map((vessel) => [
+      vessel,
+      prediction.vessels[vessel],
+    ] as const),
+  ] as const;
 
   return (
     <div className="space-y-3">
@@ -73,10 +86,24 @@ export function RawResult({
         }`}
       >
         <strong>
-          {prediction.mock ? "Mock prediction" : "Model prediction"}
+          {prediction.mock ? "Mock prediction" : "Real-model prediction"}
         </strong>
         <span>Model version {prediction.model_version}</span>
       </div>
+      {!prediction.mock && (
+        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[10px] leading-4 text-slate-700">
+          <strong>
+            {isEditedScenario
+              ? "Edited dataset-sample scenario"
+              : sampleId
+                ? "Original dataset-sample scenario"
+                : "Custom input scenario"}
+          </strong>
+          <p className="mt-1 break-words">
+            Prediction source: {prediction.prediction_source}
+          </p>
+        </div>
+      )}
       <div className="grid grid-cols-4 gap-1.5">
         <ProbabilityReadout
           label="CAD"
@@ -94,6 +121,16 @@ export function RawResult({
           />
         ))}
       </div>
+      <p className="text-[10px] leading-4 text-slate-600">
+        {prediction.mock
+          ? "Model-set uncertainty is not returned by mock v1.0."
+          : `90% prediction-set state (not an error): ${targets
+              .map(
+                ([label, target]) =>
+                  `${label}: ${target.uncertain ? "uncertain" : "single-answer set"}`,
+              )
+              .join(" · ")}`}
+      </p>
       <p className="text-[10px] leading-4 text-slate-500">
         Predicted probabilities are model outputs, not diagnoses or percentage
         artery narrowing.
@@ -147,6 +184,27 @@ export function RawResult({
       <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-600">
         {prediction.risk_summary}
       </p>
+      {!prediction.mock && (
+        <div
+          className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-5 text-amber-950"
+          role={prediction.warnings.length > 0 ? "note" : "status"}
+        >
+          <strong>
+            {prediction.warnings.length > 0
+              ? `Model warnings (${prediction.warnings.length})`
+              : "No response warnings"}
+          </strong>
+          {prediction.warnings.length > 0 ? (
+            <ul className="mt-1 list-disc space-y-1 pl-4">
+              {prediction.warnings.map((warning, index) => (
+                <li key={`${index}-${warning}`}>{warning}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-1">The API returned an empty warnings list.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

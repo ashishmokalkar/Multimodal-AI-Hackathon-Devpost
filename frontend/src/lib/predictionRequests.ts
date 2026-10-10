@@ -22,6 +22,7 @@ export async function requestPredictionForRevision(
   features: Record<string, FeatureValue>,
   request: (
     features: Record<string, FeatureValue>,
+    sampleId: string | null,
   ) => Promise<PredictionResponse>,
 ): Promise<void> {
   const store = usePatientStore.getState();
@@ -34,9 +35,10 @@ export async function requestPredictionForRevision(
     return;
   }
   const inputSnapshot = { ...features };
+  const sampleIdSnapshot = store.selectedSampleId;
 
   try {
-    const prediction = await request({ ...inputSnapshot });
+    const prediction = await request({ ...inputSnapshot }, sampleIdSnapshot);
     usePatientStore
       .getState()
       .resolvePrediction(

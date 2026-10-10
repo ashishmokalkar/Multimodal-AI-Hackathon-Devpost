@@ -30,6 +30,7 @@ beforeEach(() => {
   usePatientStore.setState({
     features: {},
     selectedSampleId: null,
+    sampleOriginFeatures: null,
     inputRevision: 0,
     prediction: null,
     predictionInputs: null,
@@ -53,6 +54,8 @@ describe("patientStore prediction invalidation", () => {
     usePatientStore.getState().updateFeature("Age", 61);
     expect(usePatientStore.getState()).toMatchObject({
       inputRevision: 2,
+      selectedSampleId: null,
+      sampleOriginFeatures: null,
       prediction: null,
       predictionInputs: null,
     });
@@ -67,11 +70,20 @@ describe("patientStore prediction invalidation", () => {
     expect(usePatientStore.getState()).toMatchObject({
       inputRevision: 3,
       selectedSampleId: "sample-1",
+      sampleOriginFeatures: { Age: 67 },
       prediction: null,
       predictionInputs: null,
       predictionError: null,
       isPredicting: false,
       predictionStatus: "edited",
+    });
+    usePatientStore.getState().updateFeature("Age", 68);
+    expect(usePatientStore.getState()).toMatchObject({
+      inputRevision: 4,
+      selectedSampleId: "sample-1",
+      sampleOriginFeatures: { Age: 67 },
+      prediction: null,
+      predictionInputs: null,
     });
 
     usePatientStore.setState({
@@ -82,13 +94,37 @@ describe("patientStore prediction invalidation", () => {
     });
     usePatientStore.getState().setFeatures({ Age: 55 });
     expect(usePatientStore.getState()).toMatchObject({
-      inputRevision: 4,
+      inputRevision: 5,
       selectedSampleId: null,
+      sampleOriginFeatures: null,
       prediction: null,
       predictionInputs: null,
       predictionError: null,
       isPredicting: false,
       predictionStatus: "edited",
+    });
+  });
+
+  it("invalidates in-flight predictions and sample provenance when the API profile changes", () => {
+    usePatientStore.getState().setFromSample(sample);
+    usePatientStore
+      .getState()
+      .beginPrediction(usePatientStore.getState().inputRevision);
+    const previousRequestId =
+      usePatientStore.getState().latestPredictionRequestId;
+
+    usePatientStore.getState().resetForProfileChange();
+
+    expect(usePatientStore.getState()).toMatchObject({
+      features: {},
+      selectedSampleId: null,
+      sampleOriginFeatures: null,
+      prediction: null,
+      predictionInputs: null,
+      predictionError: null,
+      isPredicting: false,
+      predictionStatus: "initial",
+      latestPredictionRequestId: previousRequestId + 1,
     });
   });
 

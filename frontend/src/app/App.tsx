@@ -1,5 +1,9 @@
-import { useCallback, useRef, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { usePatientStore } from "../store/patientStore";
 import { PatientPanel } from "../features/patient/PatientPanel";
 import { ModelMetricsDrawer } from "../features/results/ModelMetricsDrawer";
@@ -8,19 +12,41 @@ import { DisclaimerBanner } from "../features/safety/DisclaimerBanner";
 import { DisclaimerModal } from "../features/safety/DisclaimerModal";
 import { DISCLAIMER_TEXT } from "../features/safety/disclaimer";
 import { ViewerPanel } from "../features/viewer/ViewerPanel";
-import { useMetrics } from "../api/hooks";
+import { useApiProfile, useMetrics } from "../api/hooks";
+import { useUiStore } from "../store/uiStore";
 
 const DISCLAIMER_STORAGE_KEY = "cad-risk-visualizer-disclaimer-acknowledged";
 
 function AppContent() {
+  const queryClient = useQueryClient();
+  const profileQuery = useApiProfile();
+  const profile = profileQuery.isSuccess ? profileQuery.data : null;
   const metricsQuery = useMetrics();
   const prediction = usePatientStore((state) => state.prediction);
+  const previousProfileId = useRef<string | null>(null);
   const metricsButtonRef = useRef<HTMLButtonElement>(null);
   const [isMetricsOpen, setIsMetricsOpen] = useState(false);
   const closeMetrics = useCallback(() => setIsMetricsOpen(false), []);
   const [isDisclaimerAcknowledged, setIsDisclaimerAcknowledged] = useState(
     () => window.localStorage.getItem(DISCLAIMER_STORAGE_KEY) === "true",
   );
+
+  useLayoutEffect(() => {
+    const nextProfileId = profile?.id ?? null;
+    if (previousProfileId.current !== nextProfileId) {
+      if (previousProfileId.current !== null) {
+        usePatientStore.getState().resetForProfileChange();
+        useUiStore.getState().setSelectedVessel(null);
+        setIsMetricsOpen(false);
+      }
+      previousProfileId.current = nextProfileId;
+      queryClient.removeQueries({
+        predicate: (query) =>
+          query.queryKey[0] === "api-profile-data" &&
+          query.queryKey[1] !== nextProfileId,
+      });
+    }
+  }, [profile?.id, queryClient]);
 
   const acknowledgeDisclaimer = () => {
     window.localStorage.setItem(DISCLAIMER_STORAGE_KEY, "true");
@@ -41,11 +67,14 @@ function AppContent() {
             </div>
           </div>
           <div className="header-actions">
-            <span className="model-version">
-              Metrics version:{" "}
+            <span aria-live="polite" className="model-version">
+              API profile:{" "}
               <strong>
-                {metricsQuery.data?.model_version ??
-                  (metricsQuery.isPending ? "loading" : "unavailable")}
+                {profile
+                  ? `${profile.mode === "mock" ? "Mock v1.0.0" : "Real v1.1.0"} · ${profile.health.model_version}`
+                  : profileQuery.isPending
+                    ? "checking"
+                    : "unavailable"}
               </strong>
             </span>
             <button
@@ -53,6 +82,7 @@ function AppContent() {
               aria-controls="model-metrics-dialog"
               aria-expanded={isMetricsOpen}
               aria-haspopup="dialog"
+              disabled={!profile}
               ref={metricsButtonRef}
               type="button"
               onClick={() => setIsMetricsOpen(true)}
@@ -62,15 +92,40 @@ function AppContent() {
           </div>
         </div>
         <DisclaimerBanner />
+        {profileQuery.isPending && (
+          <p className="prediction-status prediction-status-pending" role="status">
+            Checking API health and contract profile…
+          </p>
+        )}
+        {profileQuery.isError && (
+          <div className="prediction-status prediction-status-error" role="alert">
+            <p>
+              The configured API is unavailable or unsupported:{" "}
+              {profileQuery.error.message} No mock fallback is used.
+            </p>
+            <button
+              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold"
+              disabled={profileQuery.isFetching}
+              type="button"
+              onClick={() => void profileQuery.refetch()}
+            >
+              {profileQuery.isFetching ? "Checking…" : "Retry API profile"}
+            </button>
+          </div>
+        )}
       </header>
 
       <main
         className="workspace-grid"
         aria-label="Clinical visualization workspace"
       >
-        <PatientPanel />
+        <PatientPanel
+          key={`patient-${profile?.id ?? "api-profile-unavailable"}`}
+        />
         <ViewerPanel />
-        <ResultsPanel />
+        <ResultsPanel
+          key={`results-${profile?.id ?? "api-profile-unavailable"}`}
+        />
       </main>
 
       <footer className="app-footer">
@@ -91,6 +146,10 @@ function AppContent() {
         onClose={closeMetrics}
         open={isMetricsOpen}
         predictionVersion={prediction?.model_version ?? null}
+        predictionMock={prediction?.mock ?? null}
+        predictionSource={
+          prediction?.mock === false ? prediction.prediction_source : null
+        }
         returnFocusRef={metricsButtonRef}
       />
 

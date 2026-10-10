@@ -14,9 +14,10 @@ import {
   contributionAxis,
   formatContributionAxisTick,
   formatContributionInput,
-  formatContributionValue,
+  formatExplanationContribution,
   leadingContributions,
 } from "../../lib/explanations";
+import { formatProbability } from "../../lib/format";
 import type { VesselId } from "../viewer/vesselMap";
 
 interface WhyViewProps {
@@ -50,11 +51,19 @@ export function WhyView({
     features,
     10,
   );
+  const probabilityScale =
+    !prediction.mock && explanation.scale === "probability";
+  const chartValues = contributions.map(({ contribution }) =>
+    probabilityScale ? contribution * 100 : contribution,
+  );
   const axis = contributionAxis(
-    contributions.map(({ contribution }) => contribution),
+    chartValues,
   );
   const chartContributions = contributions.map((item) => ({
     ...item,
+    contribution: probabilityScale
+      ? item.contribution * 100
+      : item.contribution,
     chartLabel:
       item.label.length > 19 ? `${item.label.slice(0, 18)}…` : item.label,
   }));
@@ -68,13 +77,15 @@ export function WhyView({
         <span className="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-900">
           {prediction.mock
             ? "Mock · illustrative · scale unconfirmed"
-            : "Model scale unconfirmed"}
+            : probabilityScale
+              ? "Probability scale · percentage points"
+              : "Model scale unconfirmed"}
         </span>
       </div>
       <p className="mt-2 text-[11px] leading-5 text-slate-600">
-        Signed model contributions are shown separately from predicted
-        probability. The scale is unconfirmed; values are not probability-point
-        changes, and signs are not clinical benefit or harm assessments.
+        {probabilityScale
+          ? `Baseline Shapley values on the served probability; the chart shows the 10 largest absolute contributions, a subset of the full response. Reference model risk: ${formatProbability(explanation.base_value)}. Method: ${explanation.method} Attribution is not causation.`
+          : "Mock contributions are illustrative signed model units; their scale is unconfirmed. The chart shows up to 10 returned contributions, not an additive waterfall. Signs do not indicate clinical benefit, harm, or causation."}
       </p>
 
       {contributions.length === 0 ? (
@@ -131,6 +142,7 @@ export function WhyView({
           </div>
           <p className="text-center text-[11px] font-medium text-slate-600">
             Model contribution
+            {probabilityScale ? " (percentage points)" : ""}
           </p>
 
           <ol
@@ -153,7 +165,10 @@ export function WhyView({
                 </span>
                 <span className="shrink-0 text-right font-semibold tabular-nums text-slate-800">
                   <span className="sr-only">Model contribution: </span>
-                  {formatContributionValue(item.contribution)}
+                {formatExplanationContribution(
+                  item.contribution,
+                  probabilityScale ? "probability" : undefined,
+                )}
                 </span>
               </li>
             ))}

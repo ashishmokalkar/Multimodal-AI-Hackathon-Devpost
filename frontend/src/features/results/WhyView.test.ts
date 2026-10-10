@@ -67,6 +67,35 @@ const prediction: PredictionResponse = {
   risk_summary: "Mock-only fixture.",
   mock: true,
 };
+const realExplanation = {
+  base_value: 0.18,
+  scale: "probability" as const,
+  method: "Baseline Shapley on served probability (32 orderings).",
+  contributions: [
+    { feature: "F0", value: 67, contribution: 0.12, direction: "positive" as const },
+  ],
+};
+const realTarget = { ...target, uncertain: false };
+const realPrediction: PredictionResponse = {
+  ...prediction,
+  model_version: "cardiotwin-v2.0.0",
+  cad: realTarget,
+  vessels: {
+    LAD: realTarget,
+    LCX: realTarget,
+    RCA: realTarget,
+  },
+  explanations: {
+    cad: realExplanation,
+    LAD: realExplanation,
+    LCX: realExplanation,
+    RCA: realExplanation,
+  },
+  mock: false,
+  warnings: [],
+  derived: { BMI: 24.2, Obesity: false },
+  prediction_source: "Final models trained on all 303 patients",
+};
 
 const features: FeatureDefinition[] = [
   ...baseContributions.map(({ feature }) => ({
@@ -141,5 +170,24 @@ describe("WhyView", () => {
     expect(markup).not.toContain("Label F9");
     expect(markup).toContain("Label F10");
     expect(markup.indexOf("Label F0")).toBeLessThan(markup.indexOf("Label F1"));
+  });
+
+  it("shows real probability contributions as percentage points with method and reference risk", () => {
+    const markup = renderToStaticMarkup(
+      createElement(WhyView, {
+        prediction: realPrediction,
+        features,
+        selectedVessel: null,
+      }),
+    );
+
+    expect(markup).toContain("Model contribution (percentage points)");
+    expect(markup).toContain("+12.00 percentage points");
+    expect(markup).toContain("Reference model risk: 18.0%");
+    expect(markup).toContain(
+      "Baseline Shapley on served probability (32 orderings).",
+    );
+    expect(markup).toContain("a subset of the full response");
+    expect(markup).not.toContain("scale unconfirmed");
   });
 });
