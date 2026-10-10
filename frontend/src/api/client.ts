@@ -60,9 +60,13 @@ export async function fetchFeatures(
 
 export async function fetchSamples(
   profile: ApiProfile,
+  featureNames?: readonly string[],
 ): Promise<SamplePatient[]> {
-  const samples = await requestJson("/patients/samples", SamplePatientSchema.array());
-  return validateSamplesForProfile(profile, samples);
+  const samples = await requestJson(
+    "/patients/samples",
+    SamplePatientSchema.array(),
+  );
+  return validateSamplesForProfile(profile, samples, featureNames);
 }
 
 export function postPredict(
@@ -71,9 +75,7 @@ export function postPredict(
 ): Promise<PredictionResponse> {
   const payload = PredictRequestSchema.parse(request);
   const profileRequest =
-    profile.mode === "real"
-      ? payload
-      : { features: payload.features };
+    profile.mode === "real" ? payload : { features: payload.features };
   return requestJson("/predict", PredictionResponseSchema, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -88,17 +90,17 @@ export function postPredict(
   });
 }
 
-export function fetchMetrics(
-  profile: ApiProfile,
-): Promise<MetricsResponse> {
-  return requestJson("/model/metrics", MetricsResponseSchema).then((metrics) => {
-    if (metrics.mock !== (profile.mode === "mock")) {
-      throw new Error(
-        `The API metrics mode changed during the request; expected ${profile.mode}.`,
-      );
-    }
-    return metrics;
-  });
+export function fetchMetrics(profile: ApiProfile): Promise<MetricsResponse> {
+  return requestJson("/model/metrics", MetricsResponseSchema).then(
+    (metrics) => {
+      if (metrics.mock !== (profile.mode === "mock")) {
+        throw new Error(
+          `The API metrics mode changed during the request; expected ${profile.mode}.`,
+        );
+      }
+      return metrics;
+    },
+  );
 }
 
 export function fetchImportance(

@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import type { Target } from "../../api/types";
-import { colorScale } from "../../lib/colorScale";
+import { targetColor } from "../../lib/colorScale";
 import { formatProbability } from "../../lib/format";
 import {
   FLOW_ARTERIES,
@@ -408,7 +408,7 @@ export function ArteryFlow({
                 y={node.y}
               />
               <rect
-                fill={colorScale(target.probability)}
+                fill={targetColor(node.artery)}
                 height={node.barH}
                 rx={3}
                 stroke={isSelected ? "#0f172a" : "none"}

@@ -1,9 +1,11 @@
 import { LOWER_COLOR, RAISE_COLOR } from "../../lib/insights";
 import type { DriverSummary } from "../../lib/summary";
-import { colorScale } from "../../lib/colorScale";
+import { targetColor, type TargetId } from "../../lib/colorScale";
 
 interface DriversChartProps {
   summary: DriverSummary;
+  /** Target shown ("cad" or an artery), for its colour. */
+  targetId: TargetId;
   /** "coronary artery disease" or an artery name, used in the title. */
   subject: string;
   activeFactor: string | null;
@@ -21,6 +23,7 @@ const signed = (points: number) =>
  */
 export function DriversChart({
   summary,
+  targetId,
   subject,
   activeFactor,
   onHoverFactor,
@@ -66,7 +69,9 @@ export function DriversChart({
         <span className="drivers-journey-stop">
           <span
             className="drivers-journey-value"
-            style={{ color: colorScale(summary.finalPercent / 100) }}
+            style={{
+              color: targetColor(targetId),
+            }}
           >
             {final}%
           </span>

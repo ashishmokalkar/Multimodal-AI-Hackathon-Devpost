@@ -20,10 +20,9 @@ results in an interactive 3D heart.
 
 ## Run the frontend
 
-The tested and recommended Node.js version is **24.19.0** (`frontend/.nvmrc`);
-the package declares a compatibility lower bound of **20.19.0**, which does
-not mean every compatible version has been tested. The pinned package manager
-is pnpm **12.9.1** through Corepack.
+The required Node.js version is **24.19.0** or newer (`frontend/.nvmrc` pins
+24.19.0, which CI uses, and `package.json` `engines` matches). The pinned
+package manager is pnpm **12.9.1** through Corepack.
 
 From a repository checkout with Node.js installed:
 

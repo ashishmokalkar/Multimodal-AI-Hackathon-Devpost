@@ -1,7 +1,8 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import type { FeatureDefinition, PredictionResponse } from "../../api/types";
+import { loadWhyView } from "./lazyWhyView";
 import { RawResult } from "./RawResult";
 
 const target = {
@@ -161,6 +162,13 @@ function renderResult(
 }
 
 describe("RawResult explanation rendering", () => {
+  beforeAll(async () => {
+    // first render starts the lazy import; once it resolves, later renders use the loaded component
+    renderResult(null);
+    await loadWhyView();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
   it("uses the selected response values and feature metadata", () => {
     const markup = renderResult("LAD");
 
@@ -253,7 +261,10 @@ describe("RawResult explanation rendering", () => {
 
     expect(markup).toContain("Edited dataset-sample scenario");
     expect(markup).toContain("Prediction source:");
-    expect(markup).toContain("trained without this patient");
+    expect(markup).toContain(
+      "What-if edit of Dataset patient 20; scored by the models trained without that patient.",
+    );
+    expect(markup).not.toContain("trained without this patient");
   });
 
   it("shows an explicit unavailable message when the selected explanation is empty", () => {

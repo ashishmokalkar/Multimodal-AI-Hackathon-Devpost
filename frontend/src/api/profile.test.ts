@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { FeatureDefinition, SamplePatient } from "./types";
 import {
+  REQUIRED_REAL_FEATURES,
   parseApiProfile,
   validateFeaturesForProfile,
   validateSamplesForProfile,
@@ -36,21 +37,22 @@ function feature(
   };
 }
 
+const SPECIAL: Record<string, FeatureDefinition> = {
+  BBB: feature("BBB", "categorical", ["None", "LBBB", "RBBB"]),
+  VHD: feature("VHD", "categorical", ["None", "Mild", "Moderate", "Severe"]),
+  "Function Class": feature("Function Class", "categorical", [0, 1, 2, 3]),
+  "Chest Pain": feature("Chest Pain", "categorical", [
+    "None",
+    "Typical",
+    "Atypical",
+    "Non-anginal",
+  ]),
+  Smoking: feature("Smoking", "categorical", ["Never", "Former", "Current"]),
+  WBC: feature("WBC", "number", undefined, "x10^3/uL"),
+};
+
 function realFeatures(): FeatureDefinition[] {
-  return [
-    feature("BBB", "categorical", ["None", "LBBB", "RBBB"]),
-    feature("VHD", "categorical", ["None", "Mild", "Moderate", "Severe"]),
-    feature("Function Class", "categorical", [0, 1, 2, 3]),
-    feature("Chest Pain", "categorical", [
-      "None",
-      "Typical",
-      "Atypical",
-      "Non-anginal",
-    ]),
-    feature("Smoking", "categorical", ["Never", "Former", "Current"]),
-    feature("WBC", "number", undefined, "x10^3/uL"),
-    ...Array.from({ length: 43 }, (_, index) => feature(`Input ${index + 1}`)),
-  ];
+  return REQUIRED_REAL_FEATURES.map((name) => SPECIAL[name] ?? feature(name));
 }
 
 function realSamples(): SamplePatient[] {
@@ -95,16 +97,27 @@ describe("API profile validation", () => {
       validateFeaturesForProfile(realProfile, realFeatures()),
     ).toHaveLength(49);
     expect(
-      validateFeaturesForProfile(mockProfile, [
-        feature("Mock-only field"),
-      ]),
+      validateFeaturesForProfile(mockProfile, [feature("Mock-only field")]),
     ).toHaveLength(1);
 
-    const duplicate = realFeatures();
-    duplicate[48] = feature("WBC");
+    const duplicate = [...realFeatures(), feature("WBC")];
     expect(() => validateFeaturesForProfile(realProfile, duplicate)).toThrow(
-      "49 unique inputs",
+      "unique",
     );
+
+    // new inputs can be added without a frontend change; required ones cannot disappear
+    expect(
+      validateFeaturesForProfile(realProfile, [
+        ...realFeatures(),
+        feature("New biomarker"),
+      ]),
+    ).toHaveLength(50);
+    expect(() =>
+      validateFeaturesForProfile(
+        realProfile,
+        realFeatures().filter((item) => item.name !== "LDL"),
+      ),
+    ).toThrow("missing required inputs LDL");
 
     const wrongUnit = realFeatures().map((item) =>
       item.name === "WBC" ? { ...item, unit: "uL" } : item,
@@ -114,10 +127,10 @@ describe("API profile validation", () => {
     );
   });
 
-  it("requires eight unique, non-synthetic real sample patients", () => {
-    expect(
-      validateSamplesForProfile(realProfile, realSamples()),
-    ).toHaveLength(8);
+  it("requires unique, non-synthetic real sample patients whose inputs match the features", () => {
+    expect(validateSamplesForProfile(realProfile, realSamples())).toHaveLength(
+      8,
+    );
     expect(
       validateSamplesForProfile(mockProfile, [
         { id: "synthetic", label: "Mock", features: {}, synthetic: true },
@@ -128,6 +141,20 @@ describe("API profile validation", () => {
     syntheticSample[0] = { ...syntheticSample[0], synthetic: true };
     expect(() =>
       validateSamplesForProfile(realProfile, syntheticSample),
-    ).toThrow("eight unique, non-synthetic");
+    ).toThrow("unique, non-synthetic");
+
+    const names = realFeatures().map((item) => item.name);
+    expect(
+      validateSamplesForProfile(realProfile, realSamples().slice(0, 3), names),
+    ).toHaveLength(3);
+    expect(() => validateSamplesForProfile(realProfile, [], names)).toThrow(
+      "at least one",
+    );
+    expect(() =>
+      validateSamplesForProfile(realProfile, realSamples(), [
+        ...names,
+        "New biomarker",
+      ]),
+    ).toThrow("match the feature list");
   });
 });

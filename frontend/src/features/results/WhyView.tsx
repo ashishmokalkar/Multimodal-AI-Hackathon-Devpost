@@ -72,7 +72,7 @@ export function WhyView({
         <h3 className="text-sm font-semibold text-slate-800" id="why-heading">
           Why {target}?
         </h3>
-        <span className="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-900">
+        <span className="rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-900">
           {prediction.mock
             ? "Mock · illustrative · scale unconfirmed"
             : probabilityScale
@@ -80,12 +80,10 @@ export function WhyView({
               : "Model scale unconfirmed"}
         </span>
       </div>
-      <p className="mt-1 text-[10px] leading-4 text-slate-600">
+      <p className="mt-1 text-[12px] leading-5 text-slate-600">
         {probabilityScale
-          ? `Signed baseline Shapley values in percentage points from reference risk ${formatProbability(explanation.base_value)}. Top ten from the full response are a subset, not a waterfall, causal effect, or clinical benefit/harm claim.`
-          : prediction.mock
-            ? "Illustrative signed model units; scale and reference-risk interpretation are unconfirmed. Top ten returned values are a subset, not an additive waterfall, cause, or clinical benefit/harm claim."
-            : "Signed real-model contributions; scale and reference-risk interpretation are unconfirmed. Top ten returned values are a subset, not an additive waterfall, cause, or clinical benefit/harm claim."}
+          ? `Bars show how much each input moved this patient's probability, in percentage points from the reference patient's ${formatProbability(explanation.base_value)}. Top 10 shown.`
+          : "Bars show each input's signed contribution to this estimate. Top 10 shown."}
       </p>
 
       {contributions.length === 0 ? (
@@ -158,7 +156,7 @@ export function WhyView({
                   <span className="block font-medium text-slate-800">
                     {item.label}
                   </span>
-                  <span className="text-[10px] text-slate-500">
+                  <span className="text-[11px] text-slate-500">
                     Input value:{" "}
                     {formatContributionInput(item.value, item.unit)}
                   </span>
@@ -175,7 +173,7 @@ export function WhyView({
           </ol>
         </>
       )}
-      <details className="contribution-method-details mt-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] leading-4 text-slate-700">
+      <details className="contribution-method-details mt-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] leading-5 text-slate-700">
         <summary className="cursor-pointer font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
           Method and reference details
         </summary>

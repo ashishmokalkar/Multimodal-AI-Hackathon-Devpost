@@ -1,34 +1,41 @@
-type RGB = readonly [red: number, green: number, blue: number];
+export type TargetId = "cad" | "LAD" | "LCX" | "RCA";
 
-// Colour-blind-safe risk ramp (blue -> amber -> magenta), checked for CVD separation and >= 3:1 contrast on the
-// light canvas. Red-green is avoided because about 1 in 12 men cannot tell those apart.
-const LOW: RGB = [0x3a, 0x7b, 0xbf];
-const MID: RGB = [0xc9, 0x84, 0x00];
-const HIGH: RGB = [0xb0, 0x12, 0x7a];
+/**
+ * One fixed, distinct colour per artery, used on the heart, the legend, the artery cards and the charts so each
+ * artery is recognisable everywhere. Validated for colour-vision-deficiency separation and bright enough to read
+ * against the dark heart; always shown next to the artery's name. Risk is shown by numbers, threshold marks,
+ * "Flagged" labels, and on the heart by tags, thickness and glow, not by hue.
+ */
+export const ARTERY_COLORS: Record<Exclude<TargetId, "cad">, string> = {
+  LAD: "#3b82f6",
+  LCX: "#f59e0b",
+  RCA: "#14b8a6",
+};
 
-export const COLOR_SCALE_GRADIENT =
-  "linear-gradient(90deg, #3a7bbf 0%, #c98400 50%, #b0127a 100%)";
+/** Overall CAD is not an artery, so it uses the neutral brand colour. */
+export const CAD_IDENTITY_COLOR = "#236b56";
 
-function blend(start: RGB, end: RGB, amount: number): RGB {
-  return [
-    start[0] + (end[0] - start[0]) * amount,
-    start[1] + (end[1] - start[1]) * amount,
-    start[2] + (end[2] - start[2]) * amount,
-  ];
+/** Neutral track for legends: position, not colour, shows how far a chance is from its threshold. */
+export const NEUTRAL_TRACK_GRADIENT =
+  "linear-gradient(90deg, #e2e8f0 0%, #94a3b8 100%)";
+
+/** Colour that identifies a target. */
+export function targetColor(target: TargetId): string {
+  return target === "cad" ? CAD_IDENTITY_COLOR : ARTERY_COLORS[target];
 }
 
-export function colorScale(probability: number): string {
-  if (!Number.isFinite(probability)) {
-    throw new RangeError("Probability must be a finite number.");
+/**
+ * Position on a legend track (0-1) relative to a target's own decision threshold: 0..threshold maps to 0..0.5 and
+ * threshold..1 maps to 0.5..1, so the middle of the track is always "at this target's threshold".
+ */
+export function thresholdPosition(
+  probability: number,
+  threshold = 0.5,
+): number {
+  if (!Number.isFinite(probability) || !Number.isFinite(threshold)) {
+    throw new RangeError("Probability and threshold must be finite numbers.");
   }
-
-  const position = Math.min(1, Math.max(0, probability));
-  const color =
-    position <= 0.5
-      ? blend(LOW, MID, position * 2)
-      : blend(MID, HIGH, (position - 0.5) * 2);
-
-  return `#${color
-    .map((channel) => Math.round(channel).toString(16).padStart(2, "0"))
-    .join("")}`;
+  const p = Math.min(1, Math.max(0, probability));
+  const t = Math.min(0.999, Math.max(0.001, threshold));
+  return p < t ? (p / t) * 0.5 : 0.5 + ((p - t) / (1 - t)) * 0.5;
 }

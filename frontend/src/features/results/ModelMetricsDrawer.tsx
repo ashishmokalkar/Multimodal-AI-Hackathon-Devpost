@@ -216,12 +216,8 @@ export function ModelMetricsDrawer({
               Thresholds and served probabilities
             </h3>
             <p>
-              Each target has its own decision threshold, so target labels can
-              differ even when probabilities are equal. In the real API
-              profile, each served vessel probability is capped at the served
-              CAD probability; equal values alone do not show that the cap
-              changed an output. This app displays the returned outputs without
-              recomputing them.
+              Each target has its own decision threshold, and each artery
+              probability is capped at the CAD probability.
             </p>
           </section>
 

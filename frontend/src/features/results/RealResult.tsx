@@ -30,6 +30,14 @@ export function RealResult({
   const shown = scenario ?? prediction;
   const baseline = scenario ? prediction : null;
   const warnings = shown.mock ? [] : shown.warnings;
+  const backendSource = prediction.mock ? "mock" : prediction.prediction_source;
+  // The backend describes the original sample; for edited inputs say what was actually scored.
+  const sampleName = backendSource.startsWith("Dataset patient")
+    ? backendSource.split(":")[0]
+    : (sampleId ?? "the dataset sample");
+  const predictionSourceText = isEditedScenario
+    ? `What-if edit of ${sampleName}; scored by the models trained without that patient.`
+    : backendSource;
 
   const cadDrivers = useMemo(
     () => buildDrivers(shown.explanations.cad, features, shown.cad.probability),
@@ -98,6 +106,7 @@ export function RealResult({
         activeFactor={hoveredFactor}
         subject={subject}
         summary={drivers}
+        targetId={selectedVessel ?? "cad"}
         onBack={selectedVessel ? () => onSelectVessel(null) : undefined}
         onHoverFactor={setHoveredFactor}
       />
@@ -190,7 +199,7 @@ export function RealResult({
             </span>
             <span className="prediction-source-detail">
               Model version {prediction.model_version} · Prediction source:{" "}
-              {prediction.mock ? "mock" : prediction.prediction_source}
+              {predictionSourceText}
             </span>
           </div>
         </div>

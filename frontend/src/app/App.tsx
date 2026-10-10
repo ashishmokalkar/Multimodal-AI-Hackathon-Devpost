@@ -1,4 +1,11 @@
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   QueryClient,
   QueryClientProvider,
@@ -11,7 +18,7 @@ import { ResultsPanel } from "../features/results/ResultsPanel";
 import { DisclaimerBanner } from "../features/safety/DisclaimerBanner";
 import { DisclaimerModal } from "../features/safety/DisclaimerModal";
 import { DISCLAIMER_TEXT } from "../features/safety/disclaimer";
-import { ViewerPanel } from "../features/viewer/ViewerPanel";
+import { HeartbeatLoader } from "../features/loading/HeartbeatLoader";
 import {
   useApiProfile,
   useFeatures,
@@ -19,6 +26,13 @@ import {
   useMetrics,
 } from "../api/hooks";
 import { useUiStore } from "../store/uiStore";
+
+// The 3D viewer carries three.js, react-three-fiber and drei; load it in its own chunk.
+const ViewerPanel = lazy(() =>
+  import("../features/viewer/ViewerPanel").then((module) => ({
+    default: module.ViewerPanel,
+  })),
+);
 
 const DISCLAIMER_STORAGE_KEY = "cad-risk-visualizer-disclaimer-acknowledged";
 
@@ -103,12 +117,18 @@ function AppContent() {
         </div>
         <DisclaimerBanner />
         {profileQuery.isPending && (
-          <p className="prediction-status prediction-status-pending" role="status">
+          <p
+            className="prediction-status prediction-status-pending"
+            role="status"
+          >
             Checking API health and contract profile…
           </p>
         )}
         {profileQuery.isError && (
-          <div className="prediction-status prediction-status-error" role="alert">
+          <div
+            className="prediction-status prediction-status-error"
+            role="alert"
+          >
             <p>
               The configured API is unavailable or unsupported:{" "}
               {profileQuery.error.message} No mock fallback is used.
@@ -132,7 +152,22 @@ function AppContent() {
         <PatientPanel
           key={`patient-${profile?.id ?? "api-profile-unavailable"}`}
         />
-        <ViewerPanel />
+        <Suspense
+          fallback={
+            <section
+              aria-label="3D heart loading"
+              className="panel viewer-panel"
+            >
+              <HeartbeatLoader
+                steps={["Loading the 3D viewer"]}
+                title="Preparing the 3D heart"
+                variant="stage"
+              />
+            </section>
+          }
+        >
+          <ViewerPanel />
+        </Suspense>
         <ResultsPanel
           key={`results-${profile?.id ?? "api-profile-unavailable"}`}
         />

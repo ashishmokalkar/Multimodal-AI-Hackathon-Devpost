@@ -131,7 +131,7 @@ export function ExplainHub({
       <div className="insight-view" key={`${view}-${target}`} role="tabpanel">
         {view === "why" && (
           <>
-            <p className="mb-1 text-[11px] leading-4 text-slate-600">
+            <p className="mb-1 text-[12px] leading-5 text-slate-600">
               Starting from a typical patient, each bar adds or subtracts
               percentage points until it reaches this patient&apos;s estimate.
               Hover a bar to see it on the heart.
@@ -139,6 +139,7 @@ export function ExplainHub({
             <Waterfall
               activeFactor={hoveredFactor}
               data={waterfall}
+              targetId={target}
               targetLabel={label}
               onHoverFactor={setHoveredFactor}
             />
@@ -199,11 +200,10 @@ export function ExplainHub({
         )}
       </div>
 
-      <p className="mt-2 text-[10px] leading-4 text-slate-500">
+      <p className="mt-2 text-[11px] leading-4 text-slate-500">
         Method: {explanation.method ?? "not returned"} Compared with a typical
         patient (median measurements, no risk factors); contributions add up
-        exactly to the estimate and describe the model&apos;s reasoning, not
-        causes.
+        exactly to the estimate.
       </p>
     </section>
   );

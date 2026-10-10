@@ -27,9 +27,9 @@ import {
   TARGET_SHORT,
 } from "../../lib/insights";
 import { useActiveScenario } from "../../store/whatIfStore";
-import { VesselMesh } from "./VesselMesh";
+import { LeftMainMesh, VesselMesh } from "./VesselMesh";
 import {
-  cameraPositionForTarget,
+  cameraPositionFacing,
   OVERVIEW_CAMERA_POSITION,
   OVERVIEW_CAMERA_TARGET,
 } from "../../lib/cameraFocus";
@@ -163,10 +163,14 @@ function CameraFocusController({
       const focusPoint = new CatmullRomCurve3(
         path.map(([x, y, z]) => new Vector3(x, y, z)),
       ).getPoint(0.5);
-      const nextCameraPosition = cameraPositionForTarget(
-        [camera.position.x, camera.position.y, camera.position.z],
-        [controls.target.x, controls.target.y, controls.target.z],
+      // orbit round to face the vessel (LCX and RCA run onto the back), keeping a comfortable zoom
+      const distance = Math.min(
+        3.2,
+        Math.max(1.8, camera.position.distanceTo(controls.target)),
+      );
+      const nextCameraPosition = cameraPositionFacing(
         [focusPoint.x, focusPoint.y, focusPoint.z],
+        distance,
       );
       camera.position.set(...nextCameraPosition);
       controls.target.copy(focusPoint);
@@ -201,6 +205,7 @@ function HeartScene({
       <directionalLight position={[-4, -2, -3]} intensity={0.65} />
       <Bounds fit clip margin={1.2} maxDuration={1}>
         <HeartModel />
+        <LeftMainMesh />
         {vesselIds.map((vessel) => (
           <VesselMesh key={vessel} vessel={vessel} />
         ))}

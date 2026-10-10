@@ -1,7 +1,12 @@
 import { Html } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import { CatmullRomCurve3, Vector3, type MeshStandardMaterial } from "three";
+import {
+  BackSide,
+  CatmullRomCurve3,
+  Vector3,
+  type MeshStandardMaterial,
+} from "three";
 import {
   factorImpact,
   formatPoints,
@@ -12,6 +17,7 @@ import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 import { useActiveScenario } from "../../store/whatIfStore";
 import {
+  LEFT_MAIN_PATH,
   vesselMap,
   vesselDisplay,
   type VesselId,
@@ -33,6 +39,25 @@ function prefersReducedMotion(): boolean {
   );
 }
 
+/** Left main coronary artery: the short trunk LAD and LCX branch from. Not a predicted target, so neutral grey. */
+export function LeftMainMesh() {
+  const curve = useMemo(
+    () =>
+      new CatmullRomCurve3(
+        LEFT_MAIN_PATH.map(([x, y, z]) => new Vector3(x, y, z)),
+      ),
+    [],
+  );
+  return (
+    <mesh name="LeftMain" raycast={() => null}>
+      <tubeGeometry
+        args={[curve, 12, 0.02, VESSEL_TUBE_RADIAL_SEGMENTS, false]}
+      />
+      <meshStandardMaterial color="#8a939c" metalness={0.03} roughness={0.4} />
+    </mesh>
+  );
+}
+
 export function VesselMesh({ vessel }: VesselMeshProps) {
   const definition = vesselMap[vessel];
   const curve = useMemo(
@@ -44,8 +69,14 @@ export function VesselMesh({ vessel }: VesselMeshProps) {
   );
   const tooltipPosition = useMemo(() => curve.getPoint(0.5), [curve]);
   const labelPosition = useMemo(() => curve.getPoint(0.82), [curve]);
+  // risk tag on the part of each vessel that faces the default camera
+  const tagPosition = useMemo(
+    () => curve.getPoint(vessel === "LAD" ? 0.55 : 0.3),
+    [curve, vessel],
+  );
   const isHovered = useUiStore((state) => state.hoveredVessel === vessel);
   const isSelected = useUiStore((state) => state.selectedVessel === vessel);
+  const anySelected = useUiStore((state) => state.selectedVessel !== null);
   const hoveredFactor = useUiStore((state) => state.hoveredFactor);
   const setHoveredVessel = useUiStore((state) => state.setHoveredVessel);
   const setSelectedVessel = useUiStore((state) => state.setSelectedVessel);
@@ -60,10 +91,21 @@ export function VesselMesh({ vessel }: VesselMeshProps) {
       : null;
   const affected = impact !== null && Math.abs(impact) >= IMPACT_FLOOR;
   const dimmed = impact !== null && !affected;
+  // another artery is selected: fade this one so the selection stands out (factor hover takes priority)
+  const selectionDimmed =
+    impact === null && anySelected && !isSelected && !isHovered;
   const uncertain = display.target?.uncertain === true;
+  // colour shows which artery; risk is shown by the tag, thickness and glow
+  const flagged =
+    display.target !== null &&
+    display.target.probability >= display.target.threshold;
   const pulse =
-    uncertain && impact === null && !isHovered && !prefersReducedMotion();
-  const radius = affected ? 0.03 : isSelected ? 0.025 : 0.018;
+    uncertain &&
+    impact === null &&
+    !isHovered &&
+    !selectionDimmed &&
+    !prefersReducedMotion();
+  const radius = affected ? 0.03 : isSelected ? 0.032 : flagged ? 0.024 : 0.015;
   const emissiveColor = affected
     ? impact > 0
       ? RAISE_COLOR
@@ -74,8 +116,10 @@ export function VesselMesh({ vessel }: VesselMeshProps) {
     : isHovered
       ? 0.9
       : isSelected
-        ? 0.45
-        : 0;
+        ? 0.6
+        : flagged
+          ? 0.35
+          : 0;
   const materialRef = useRef<MeshStandardMaterial>(null);
   const invalidate = useThree((state) => state.invalidate);
 
@@ -131,12 +175,33 @@ export function VesselMesh({ vessel }: VesselMeshProps) {
           emissive={emissiveIntensity > 0 ? emissiveColor : "#000000"}
           emissiveIntensity={emissiveIntensity}
           metalness={0.03}
-          opacity={dimmed ? 0.25 : 1}
+          opacity={dimmed ? 0.25 : selectionDimmed ? 0.35 : 1}
           ref={materialRef}
           roughness={0.3}
-          transparent={dimmed}
+          transparent={dimmed || selectionDimmed}
         />
       </mesh>
+      {isSelected && (
+        // soft white halo behind the selected artery, visible at overview zoom
+        <mesh raycast={() => null}>
+          <tubeGeometry
+            args={[
+              curve,
+              VESSEL_TUBE_TUBULAR_SEGMENTS,
+              radius * 1.6,
+              VESSEL_TUBE_RADIAL_SEGMENTS,
+              false,
+            ]}
+          />
+          <meshBasicMaterial
+            color="#ffffff"
+            depthWrite={false}
+            opacity={0.55}
+            side={BackSide}
+            transparent
+          />
+        </mesh>
+      )}
       {affected && (
         <Html center position={labelPosition} style={{ pointerEvents: "none" }}>
           <span
@@ -144,6 +209,17 @@ export function VesselMesh({ vessel }: VesselMeshProps) {
             style={{ backgroundColor: impact > 0 ? RAISE_COLOR : LOWER_COLOR }}
           >
             {vessel} {formatPoints(impact, 0)}
+          </span>
+        </Html>
+      )}
+      {display.target && !affected && !isHovered && (
+        <Html center position={tagPosition} style={{ pointerEvents: "none" }}>
+          <span
+            className={`vessel-risk-tag ${flagged ? "vessel-risk-tag-flagged" : ""}`}
+          >
+            <i aria-hidden="true" style={{ backgroundColor: color }} />
+            {vessel} {Math.round(display.target.probability * 100)}%
+            {flagged ? " ▲" : ""}
           </span>
         </Html>
       )}

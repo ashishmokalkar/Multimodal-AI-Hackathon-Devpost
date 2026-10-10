@@ -216,10 +216,13 @@ describe("WhyView", () => {
     expect(chartIndex).toBeGreaterThan(-1);
     expect(detailsIndex).toBeGreaterThan(chartIndex);
     expect(visibleSummary).toContain(
-      "percentage points from reference risk 18.0%",
+      "percentage points from the reference patient&#x27;s 18.0%",
     );
-    expect(visibleSummary).toContain("subset");
-    expect(visibleSummary).toContain("causal effect");
+    expect(visibleSummary).toContain("Top 10 shown.");
+    // caveats appear once, inside the method details, not repeated above the chart
+    expect(visibleSummary).not.toContain("subset");
+    expect(visibleSummary).not.toContain("causal");
+    expect(markup.slice(detailsIndex)).toContain("not causation");
     expect(markup.slice(detailsIndex)).toContain(
       "Baseline Shapley on served probability (32 orderings).",
     );

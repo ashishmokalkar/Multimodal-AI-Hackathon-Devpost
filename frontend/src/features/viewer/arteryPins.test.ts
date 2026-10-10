@@ -36,4 +36,37 @@ describe("placePins", () => {
         ?.lane,
     ).toBe(1);
   });
+
+  it("places each artery relative to its own threshold, matching its colour", () => {
+    const fixture = {
+      vessels: {
+        LAD: {
+          probability: 0.55,
+          label: "x",
+          threshold: 0.55,
+          uncertain: false,
+        },
+        LCX: {
+          probability: 0.55,
+          label: "x",
+          threshold: 0.32,
+          uncertain: false,
+        },
+        RCA: {
+          probability: 0.2,
+          label: "x",
+          threshold: 0.36,
+          uncertain: false,
+        },
+      },
+    } as unknown as PredictionResponse;
+    const pins = placePins(fixture);
+    const at = (vessel: string) => pins.find((pin) => pin.vessel === vessel);
+
+    expect(at("LAD")?.position).toBeCloseTo(0.5);
+    // same probability, lower threshold: further towards "above threshold"
+    expect(at("LCX")?.position).toBeGreaterThan(0.5);
+    expect(at("RCA")?.position).toBeLessThan(0.5);
+    expect(at("LCX")?.probability).toBe(0.55);
+  });
 });

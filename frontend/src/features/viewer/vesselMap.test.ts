@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { PredictionResponse } from "../../api/types";
-import { colorScale } from "../../lib/colorScale";
+import { ARTERY_COLORS } from "../../lib/colorScale";
 import { formatProbability } from "../../lib/format";
 import {
   PROCEDURAL_VESSEL_TRIANGLES,
@@ -71,14 +71,15 @@ describe("vesselMap", () => {
 
         expect(display.target).toBe(fixture.vessels[vessel]);
         expect(display.probability).toBe(probability);
-        expect(display.color).toBe(colorScale(probability));
+        // each artery keeps its own colour whatever its probability
+        expect(display.color).toBe(ARTERY_COLORS[vessel]);
         expect(display.percentage).toBe(formatProbability(probability));
       }
     }
     expect(vesselDisplay(fixtures[0], "LAD")).toMatchObject({
       probability: 0,
       percentage: "0.0%",
-      color: colorScale(0),
+      color: ARTERY_COLORS.LAD,
     });
   });
 

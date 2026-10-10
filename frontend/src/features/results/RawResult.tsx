@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import type {
   FeatureValue,
   FeatureDefinition,
@@ -8,7 +8,9 @@ import type { VesselId } from "../viewer/vesselMap";
 import { RealResult } from "./RealResult";
 import { InputsView } from "./InputsView";
 import { RiskOverview } from "./RiskOverview";
-import { WhyView } from "./WhyView";
+
+import { loadWhyView } from "./lazyWhyView";
+const WhyView = lazy(loadWhyView);
 
 export interface RawResultProps {
   prediction: PredictionResponse;
@@ -73,13 +75,13 @@ function MockResult({
       />
       {prediction.mock ? (
         <p
-          className="response-warning-status rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] leading-4 text-slate-700"
+          className="response-warning-status rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] leading-4 text-slate-700"
           role="status"
         >
           Real-model warning assessment is unavailable in mock v1.0.
         </p>
       ) : prediction.warnings.length > 0 ? (
-        <details className="response-warning-disclosure rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-[10px] leading-4 text-amber-950">
+        <details className="response-warning-disclosure rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-[11px] leading-4 text-amber-950">
           <summary className="cursor-pointer font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800">
             Model warnings ({prediction.warnings.length}) - Show details
           </summary>
@@ -91,7 +93,7 @@ function MockResult({
         </details>
       ) : (
         <p
-          className="response-warning-status rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] leading-4 text-slate-700"
+          className="response-warning-status rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] leading-4 text-slate-700"
           role="status"
         >
           Response warnings: none returned; this is not clinical reassurance.
@@ -131,11 +133,19 @@ function MockResult({
             </button>
           </div>
           {activeView === "why" ? (
-            <WhyView
-              features={features}
-              prediction={prediction}
-              selectedVessel={selectedVessel}
-            />
+            <Suspense
+              fallback={
+                <p className="text-xs text-slate-500" role="status">
+                  Loading the explanation chart…
+                </p>
+              }
+            >
+              <WhyView
+                features={features}
+                prediction={prediction}
+                selectedVessel={selectedVessel}
+              />
+            </Suspense>
           ) : (
             <InputsView
               features={features}
@@ -151,11 +161,11 @@ function MockResult({
         {prediction.risk_summary}
       </p>
       {prediction.mock && (
-        <p className="text-[10px] leading-4 text-slate-600">
+        <p className="text-[11px] leading-4 text-slate-600">
           Model-set uncertainty is not returned by mock v1.0.
         </p>
       )}
-      <p className="text-[10px] leading-4 text-slate-500">
+      <p className="text-[11px] leading-4 text-slate-500">
         Predicted probabilities are model outputs, not diagnoses or percentage
         artery narrowing.
       </p>

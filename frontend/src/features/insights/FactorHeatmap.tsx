@@ -39,13 +39,18 @@ export function FactorHeatmap({
   onHoverFactor,
 }: FactorHeatmapProps) {
   const maxAbs = rows.reduce(
-    (max, row) => Math.max(max, ...INSIGHT_TARGETS.map((t) => Math.abs(row.cells[t]))),
+    (max, row) =>
+      Math.max(max, ...INSIGHT_TARGETS.map((t) => Math.abs(row.cells[t]))),
     0,
   );
   if (rows.length === 0) {
     return (
-      <p className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600" role="status">
-        Every input equals the typical patient&apos;s value, so no factor moves the estimate.
+      <p
+        className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600"
+        role="status"
+      >
+        Every input equals the typical patient&apos;s value, so no factor moves
+        the estimate.
       </p>
     );
   }
@@ -57,14 +62,17 @@ export function FactorHeatmap({
         </caption>
         <thead>
           <tr>
-            <th className="w-[38%] text-left text-[10px] font-semibold text-slate-500" scope="col">
+            <th
+              className="w-[38%] text-left text-[11px] font-semibold text-slate-500"
+              scope="col"
+            >
               Factor
             </th>
             {INSIGHT_TARGETS.map((target) => (
               <th key={target} scope="col">
                 <button
                   aria-pressed={selected === target}
-                  className={`w-full rounded-md px-1 py-1 text-[10px] font-bold transition ${
+                  className={`w-full rounded-md px-1 py-1 text-[11px] font-bold transition ${
                     selected === target
                       ? "bg-slate-900 text-white"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -82,7 +90,9 @@ export function FactorHeatmap({
           {rows.map((row, index) => (
             <tr
               className={`insight-heatmap-row cursor-pointer ${
-                activeFactor !== null && activeFactor !== row.feature ? "opacity-40" : ""
+                activeFactor !== null && activeFactor !== row.feature
+                  ? "opacity-40"
+                  : ""
               }`}
               key={row.feature}
               style={{ animationDelay: `${index * 40}ms` }}
@@ -92,9 +102,15 @@ export function FactorHeatmap({
               onMouseEnter={() => onHoverFactor(row.feature)}
               onMouseLeave={() => onHoverFactor(null)}
             >
-              <th className="truncate pr-1 text-left font-semibold text-slate-800" scope="row" title={`${row.label}: ${row.valueText}`}>
+              <th
+                className="truncate pr-1 text-left font-semibold text-slate-800"
+                scope="row"
+                title={`${row.label}: ${row.valueText}`}
+              >
                 {row.label}
-                <span className="block truncate text-[9.5px] font-normal text-slate-500">{row.valueText}</span>
+                <span className="block truncate text-[11px] font-normal text-slate-500">
+                  {row.valueText}
+                </span>
               </th>
               {INSIGHT_TARGETS.map((target) => (
                 <td
@@ -114,13 +130,21 @@ export function FactorHeatmap({
           ))}
         </tbody>
       </table>
-      <div className="mt-2 flex items-center justify-between gap-2 text-[10px] text-slate-500">
+      <div className="mt-2 flex items-center justify-between gap-2 text-[11px] text-slate-500">
         <span className="inline-flex items-center gap-1">
-          <span className="h-2.5 w-2.5 rounded-sm" style={{ background: LOWER_COLOR }} /> lowers
+          <span
+            className="h-2.5 w-2.5 rounded-sm"
+            style={{ background: LOWER_COLOR }}
+          />{" "}
+          lowers
         </span>
         <span>cells = percentage points vs a typical patient</span>
         <span className="inline-flex items-center gap-1">
-          raises <span className="h-2.5 w-2.5 rounded-sm" style={{ background: RAISE_COLOR }} />
+          raises{" "}
+          <span
+            className="h-2.5 w-2.5 rounded-sm"
+            style={{ background: RAISE_COLOR }}
+          />
         </span>
       </div>
     </div>

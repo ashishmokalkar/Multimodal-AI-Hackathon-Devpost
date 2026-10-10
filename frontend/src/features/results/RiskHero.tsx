@@ -1,5 +1,5 @@
 import type { Target } from "../../api/types";
-import { colorScale } from "../../lib/colorScale";
+import { targetColor } from "../../lib/colorScale";
 import {
   driverSentence,
   headlineDrivers,
@@ -28,7 +28,7 @@ function point(probability: number, radius = R) {
 
 const ARC = `M${CX - R},${CY} A${R},${R} 0 0 1 ${CX + R},${CY}`;
 
-/** Semicircle gauge: fill = probability in the risk colours, dark tick = decision threshold. */
+/** Semicircle gauge: fill = probability, dark tick = decision threshold. */
 function Gauge({
   target,
   baseline,
@@ -48,7 +48,7 @@ function Gauge({
         className="risk-gauge-fill"
         d={ARC}
         pathLength={100}
-        stroke={colorScale(value)}
+        stroke={targetColor("cad")}
         strokeDasharray={`${value * 100} 100`}
       />
       {ghost && (

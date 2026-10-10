@@ -38,10 +38,13 @@ export function useFeatures() {
 
 export function useSamples() {
   const profile = useActiveProfile();
+  // samples are checked against the served feature names, so wait for /features
+  const featureNames = useFeatures().data?.map((feature) => feature.name);
   return useQuery({
     queryKey: ["api-profile-data", profile?.id, "samples"],
-    queryFn: () => requireProfile(profile, fetchSamples),
-    enabled: profile !== null,
+    queryFn: () =>
+      requireProfile(profile, (active) => fetchSamples(active, featureNames)),
+    enabled: profile !== null && featureNames !== undefined,
     staleTime: Infinity,
   });
 }

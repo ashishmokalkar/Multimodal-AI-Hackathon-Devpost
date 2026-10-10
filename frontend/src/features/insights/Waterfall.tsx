@@ -1,10 +1,16 @@
 import type { Waterfall as WaterfallData } from "../../lib/insights";
-import { attributionColor, formatPoints, NEUTRAL_COLOR } from "../../lib/insights";
-import { colorScale } from "../../lib/colorScale";
+import {
+  attributionColor,
+  formatPoints,
+  NEUTRAL_COLOR,
+} from "../../lib/insights";
+import { targetColor, type TargetId } from "../../lib/colorScale";
 
 interface WaterfallProps {
   data: WaterfallData;
   targetLabel: string;
+  /** Target shown ("cad" or an artery), for the final bar's colour. */
+  targetId?: TargetId;
   activeFactor: string | null;
   onHoverFactor: (feature: string | null) => void;
 }
@@ -37,9 +43,23 @@ function clip(text: string, max: number) {
  * Additive waterfall from the reference ("typical") patient to this patient. Every bar starts where the previous
  * one ended, so the chart visibly adds up to the probability the model returned.
  */
-export function Waterfall({ data, targetLabel, activeFactor, onHoverFactor }: WaterfallProps) {
+export function Waterfall({
+  data,
+  targetLabel,
+  targetId = "cad",
+  activeFactor,
+  onHoverFactor,
+}: WaterfallProps) {
   const rows: Row[] = [
-    { kind: "base", key: "__base", label: "Typical patient", sub: "reference", start: 0, end: data.basePercent, points: 0 },
+    {
+      kind: "base",
+      key: "__base",
+      label: "Typical patient",
+      sub: "reference",
+      start: 0,
+      end: data.basePercent,
+      points: 0,
+    },
     ...data.steps.map((step): Row => ({
       kind: "step",
       key: step.feature,
@@ -62,7 +82,15 @@ export function Waterfall({ data, targetLabel, activeFactor, onHoverFactor }: Wa
           },
         ]
       : []),
-    { kind: "final", key: "__final", label: `This patient · ${targetLabel}`, sub: "model estimate", start: 0, end: data.finalPercent, points: 0 },
+    {
+      kind: "final",
+      key: "__final",
+      label: `This patient · ${targetLabel}`,
+      sub: "model estimate",
+      start: 0,
+      end: data.finalPercent,
+      points: 0,
+    },
   ];
   const height = TOP + rows.length * ROW_H + 26;
 
@@ -75,8 +103,19 @@ export function Waterfall({ data, targetLabel, activeFactor, onHoverFactor }: Wa
     >
       {[0, 25, 50, 75, 100].map((tick) => (
         <g key={tick}>
-          <line className="stroke-slate-200" x1={x(tick)} x2={x(tick)} y1={TOP - 6} y2={height - 22} />
-          <text className="fill-slate-400 text-[9px]" textAnchor="middle" x={x(tick)} y={height - 8}>
+          <line
+            className="stroke-slate-200"
+            x1={x(tick)}
+            x2={x(tick)}
+            y1={TOP - 6}
+            y2={height - 22}
+          />
+          <text
+            className="fill-slate-400 text-[9px]"
+            textAnchor="middle"
+            x={x(tick)}
+            y={height - 8}
+          >
             {tick}%
           </text>
         </g>
@@ -90,7 +129,12 @@ export function Waterfall({ data, targetLabel, activeFactor, onHoverFactor }: Wa
         y1={TOP - 12}
         y2={height - 22}
       />
-      <text className="fill-slate-700 text-[9px] font-semibold" textAnchor="middle" x={x(data.thresholdPercent)} y={TOP - 15}>
+      <text
+        className="fill-slate-700 text-[9px] font-semibold"
+        textAnchor="middle"
+        x={x(data.thresholdPercent)}
+        y={TOP - 15}
+      >
         threshold {data.thresholdPercent.toFixed(0)}%
       </text>
 
@@ -104,9 +148,10 @@ export function Waterfall({ data, targetLabel, activeFactor, onHoverFactor }: Wa
           row.kind === "base"
             ? NEUTRAL_COLOR
             : row.kind === "final"
-              ? colorScale(data.finalPercent / 100)
+              ? targetColor(targetId)
               : attributionColor(points);
-        const dimmed = activeFactor !== null && isFactor && activeFactor !== row.key;
+        const dimmed =
+          activeFactor !== null && isFactor && activeFactor !== row.key;
         const next = rows[index + 1];
         return (
           <g
@@ -122,21 +167,37 @@ export function Waterfall({ data, targetLabel, activeFactor, onHoverFactor }: Wa
           >
             {/* full-row hit area: SVG groups only receive pointer events over painted shapes */}
             <rect
-              className={isFactor && activeFactor === row.key ? "fill-slate-100" : ""}
-              fill={isFactor && activeFactor === row.key ? undefined : "transparent"}
+              className={
+                isFactor && activeFactor === row.key ? "fill-slate-100" : ""
+              }
+              fill={
+                isFactor && activeFactor === row.key ? undefined : "transparent"
+              }
               height={ROW_H - 2}
               rx={6}
               width={WIDTH}
               x={0}
               y={y - 2}
             />
-            <text className={`text-[10.5px] ${row.kind === "final" ? "fill-slate-900 font-bold" : "fill-slate-800 font-semibold"}`} x={4} y={y + 11}>
+            <text
+              className={`text-[10.5px] ${row.kind === "final" ? "fill-slate-900 font-bold" : "fill-slate-800 font-semibold"}`}
+              x={4}
+              y={y + 11}
+            >
               {clip(row.label, 24)}
             </text>
             <text className="fill-slate-500 text-[9px]" x={4} y={y + 22}>
               {clip(row.sub, 28)}
             </text>
-            <rect className="insight-waterfall-bar" fill={fill} height={16} rx={4} width={width} x={left} y={y + 5} />
+            <rect
+              className="insight-waterfall-bar"
+              fill={fill}
+              height={16}
+              rx={4}
+              width={width}
+              x={left}
+              y={y + 5}
+            />
             {next && next.kind !== "final" && (
               <line
                 className="stroke-slate-400"
@@ -149,7 +210,9 @@ export function Waterfall({ data, targetLabel, activeFactor, onHoverFactor }: Wa
             )}
             <text
               className="text-[10px] font-bold tabular-nums"
-              fill={row.kind === "base" || row.kind === "final" ? "#1f2937" : fill}
+              fill={
+                row.kind === "base" || row.kind === "final" ? "#1f2937" : fill
+              }
               x={Math.min(WIDTH - 2, Math.max(left + width, x(row.start)) + 4)}
               y={y + 17}
             >

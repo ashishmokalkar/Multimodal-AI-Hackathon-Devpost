@@ -40,35 +40,20 @@ function render(selectedVessel: "LAD" | "LCX" | "RCA" | null) {
 }
 
 describe("ProbabilityLegend", () => {
-  it("marks the selected target threshold, including CAD and endpoint thresholds", () => {
-    const cad = render(null);
-    expect(cad).toContain("Selected-target decision threshold for CAD:");
-    expect(cad).toContain("0.0%");
-    expect(cad).toContain('data-threshold-marker="true"');
-    expect(cad).toContain("left:0%;transform:translateX(0)");
-
-    const lad = render("LAD");
-    expect(lad).toContain("Selected-target decision threshold for LAD:");
-    expect(lad).toContain("100.0%");
-    expect(lad).toContain("left:100%;transform:translateX(-100%)");
-
-    const lcx = render("LCX");
-    expect(lcx).toContain("Selected-target decision threshold for LCX:");
-    expect(lcx).toContain("50.0%");
-    expect(lcx).toContain("left:50%;transform:translateX(-50%)");
-    expect(lcx).toContain("50% colour midpoint");
-    expect(lcx).toContain(
-      "The 50% colour midpoint is not a decision threshold",
-    );
+  it("labels the legend as artery colours, with no threshold marker", () => {
+    const markup = render("LCX");
+    expect(markup).toContain("Artery colours");
+    expect(markup).not.toContain('data-threshold-marker="true"');
   });
 
-  it("keeps absolute probability colours equal and hides the marker without a prediction", () => {
+  it("gives each artery its own colour and keeps the percentages", () => {
     const markup = render("RCA");
     const swatchColors = [
       ...markup.matchAll(/background-color: ?([^;"]+)/g),
     ].map((match) => match[1]);
     expect(swatchColors).toHaveLength(4);
-    expect(new Set(swatchColors.slice(0, 3)).size).toBe(1);
+    expect(new Set(swatchColors.slice(0, 3)).size).toBe(3);
+    expect(markup).toContain("LAD 60.0%");
 
     const unavailable = renderToStaticMarkup(
       createElement(ProbabilityLegend, {
@@ -76,8 +61,6 @@ describe("ProbabilityLegend", () => {
         selectedVessel: "LAD",
       }),
     );
-    expect(unavailable).not.toContain('data-threshold-marker="true"');
-    expect(unavailable).not.toContain("Selected-target decision threshold for");
     expect(unavailable).toContain("Unavailable");
   });
 

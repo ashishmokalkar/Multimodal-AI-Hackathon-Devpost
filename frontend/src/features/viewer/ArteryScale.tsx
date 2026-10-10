@@ -1,5 +1,5 @@
 import type { PredictionResponse } from "../../api/types";
-import { COLOR_SCALE_GRADIENT } from "../../lib/colorScale";
+import { NEUTRAL_TRACK_GRADIENT } from "../../lib/colorScale";
 import { formatProbability, formatTargetUncertainty } from "../../lib/format";
 import { useUiStore } from "../../store/uiStore";
 import { UNAVAILABLE_VESSEL_COLOR, vesselMap } from "./vesselMap";
@@ -12,17 +12,18 @@ interface ArteryScaleProps {
 const LANE_H = 20;
 
 /** Labels near either end of the scale hang inwards so they stay inside the panel. */
-function pinAlign(probability: number): string {
-  return probability < EDGE
+function pinAlign(position: number): string {
+  return position < EDGE
     ? "artery-pin-start"
-    : probability > 1 - EDGE
+    : position > 1 - EDGE
       ? "artery-pin-end"
       : "";
 }
 
 /**
- * The 3D colour legend as a chart: the probability colour scale with each artery pinned where its estimate sits,
- * so colour on the heart can be read back to a number. Pins mirror the heart's hover and selection.
+ * Legend under the heart: each artery, in its own colour, is pinned on a neutral track by how its chance compares
+ * with its own decision threshold (the middle of the track), labelled with its actual probability. Pins mirror the
+ * heart's hover and selection.
  */
 export function ArteryScale({ prediction }: ArteryScaleProps) {
   const hoveredVessel = useUiStore((state) => state.hoveredVessel);
@@ -34,13 +35,14 @@ export function ArteryScale({ prediction }: ArteryScaleProps) {
 
   return (
     <div
-      aria-label="Predicted probability colour legend"
+      aria-label="Colour legend: probability relative to each artery's own decision threshold"
       className="artery-scale"
       role="group"
     >
       <div className="artery-scale-head">
         <p>
-          Artery colour = predicted probability <span>(not % narrowing)</span>
+          Each artery against its own threshold{" "}
+          <span>(chance, not % narrowing)</span>
         </p>
         <span className="artery-scale-note">
           <i aria-hidden="true" className="artery-scale-pulse" /> pulsing =
@@ -67,10 +69,10 @@ export function ArteryScale({ prediction }: ArteryScaleProps) {
               hoveredVessel === pin.vessel || selectedVessel === pin.vessel;
             return (
               <div
-                className={`artery-pin ${pinAlign(pin.probability)} ${active ? "artery-pin-active" : ""}`}
+                className={`artery-pin ${pinAlign(pin.position)} ${active ? "artery-pin-active" : ""}`}
                 key={pin.vessel}
                 style={{
-                  left: `${pin.probability * 100}%`,
+                  left: `${pin.position * 100}%`,
                   height: (lanes - pin.lane) * LANE_H + 6,
                 }}
               >
@@ -114,13 +116,15 @@ export function ArteryScale({ prediction }: ArteryScaleProps) {
       <div
         aria-hidden="true"
         className="artery-scale-bar"
-        style={{ background: COLOR_SCALE_GRADIENT }}
-      />
+        style={{ background: NEUTRAL_TRACK_GRADIENT }}
+      >
+        <span className="artery-scale-threshold" />
+      </div>
       <div aria-hidden="true" className="artery-scale-ticks">
         <span>0%</span>
-        <span>25%</span>
-        <span>50%</span>
-        <span>75%</span>
+        <span>below threshold</span>
+        <span className="artery-scale-ticks-mid">threshold</span>
+        <span>above threshold</span>
         <span>100%</span>
       </div>
     </div>

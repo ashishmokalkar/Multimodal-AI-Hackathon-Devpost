@@ -1,5 +1,5 @@
 import type { PredictionResponse, Target } from "../../api/types";
-import { colorScale } from "../../lib/colorScale";
+import { targetColor } from "../../lib/colorScale";
 import { formatProbability, formatTargetUncertainty } from "../../lib/format";
 import { formatPoints, toPoints } from "../../lib/insights";
 import { useUiStore } from "../../store/uiStore";
@@ -100,7 +100,7 @@ function RiskRow({
           className="risk-fill"
           style={{
             width: pct(target.probability),
-            background: colorScale(target.probability),
+            background: targetColor(id === "CAD" ? "cad" : id),
           }}
         />
         {baseline && (
@@ -132,7 +132,7 @@ function RiskRow({
 }
 
 /**
- * Bullet-chart overview of all four estimates: fill = probability (risk colour scale), tick = decision threshold,
+ * Bullet-chart overview of all four estimates: fill = probability (in each target's colour), tick = decision threshold,
  * chips = threshold status and the 90% prediction-set state. Hovering an artery row highlights it on the 3D heart.
  */
 export function RiskOverview({

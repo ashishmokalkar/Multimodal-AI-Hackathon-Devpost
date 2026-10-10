@@ -1,5 +1,5 @@
 import type { FeatureDefinition, PredictionResponse } from "../../api/types";
-import { colorScale } from "../../lib/colorScale";
+import { targetColor } from "../../lib/colorScale";
 import {
   FLOW_ARTERIES,
   formatPoints,
@@ -32,6 +32,15 @@ export function ArteryList({
 }: ArteryListProps) {
   const setHoveredVessel = useUiStore((state) => state.setHoveredVessel);
   const setHoveredFactor = useUiStore((state) => state.setHoveredFactor);
+  // compare probabilities with thresholds (not label text, which differs between API profiles)
+  const cadFlagged = prediction.cad.probability >= prediction.cad.threshold;
+  const disagreement = cadFlagged
+    ? []
+    : FLOW_ARTERIES.filter(
+        (artery) =>
+          prediction.vessels[artery].probability >=
+          prediction.vessels[artery].threshold,
+      );
 
   return (
     <section aria-labelledby="artery-list-heading" className="result-section">
@@ -41,6 +50,20 @@ export function ArteryList({
       <p className="result-section-lead">
         Chance of at least 50% narrowing in each main artery.
       </p>
+      {disagreement.length > 0 && (
+        <p className="artery-disagreement" role="note">
+          <span aria-hidden="true">ⓘ</span>
+          <span>
+            {disagreement.join(", ")} {disagreement.length > 1 ? "are" : "is"}{" "}
+            above{" "}
+            {disagreement.length > 1
+              ? "their own thresholds"
+              : "its own threshold"}{" "}
+            while overall CAD is below its threshold. Each target uses a
+            separately tuned threshold.
+          </span>
+        </p>
+      )}
       <ul className="artery-list">
         {FLOW_ARTERIES.map((artery) => {
           const target = prediction.vessels[artery];
@@ -68,6 +91,13 @@ export function ArteryList({
               >
                 <span className="artery-item-head">
                   <span>
+                    <i
+                      aria-hidden="true"
+                      className="artery-item-dot"
+                      style={{
+                        backgroundColor: targetColor(artery),
+                      }}
+                    />
                     <strong>{artery}</strong>{" "}
                     <span className="artery-item-name">
                       {ARTERY_INFO[artery].name}
@@ -91,7 +121,7 @@ export function ArteryList({
                     className="artery-bar-fill"
                     style={{
                       width: pct(target.probability),
-                      background: colorScale(target.probability),
+                      background: targetColor(artery),
                     }}
                   />
                   {before && (

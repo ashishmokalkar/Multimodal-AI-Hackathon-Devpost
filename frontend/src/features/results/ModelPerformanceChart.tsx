@@ -136,7 +136,7 @@ export function ModelPerformanceChart({ data }: ModelPerformanceChartProps) {
                 <strong className="block text-xs text-slate-900">
                   {target.label}
                 </strong>
-                <span className="block truncate text-[10px] text-slate-500">
+                <span className="block truncate text-[11px] text-slate-500">
                   {model ?? target.name}
                 </span>
               </span>
@@ -154,7 +154,7 @@ export function ModelPerformanceChart({ data }: ModelPerformanceChartProps) {
         })}
       </div>
 
-      <dl className="mt-2 grid gap-x-4 gap-y-1 border-t border-slate-100 pt-2 text-[10px] leading-4 text-slate-500 sm:grid-cols-3">
+      <dl className="mt-2 grid gap-x-4 gap-y-1 border-t border-slate-100 pt-2 text-[11px] leading-4 text-slate-500 sm:grid-cols-3">
         <div>
           <dt className="inline font-semibold text-slate-700">ROC-AUC</dt>{" "}
           <dd className="inline">

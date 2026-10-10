@@ -43,7 +43,7 @@ export function InputsView({
         >
           Inputs for {target}
         </h3>
-        <span className="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-900">
+        <span className="rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-900">
           {prediction.mock
             ? "Mock · illustrative · scale unconfirmed"
             : probabilityScale
@@ -51,16 +51,20 @@ export function InputsView({
               : "Model scale unconfirmed"}
         </span>
       </div>
-      <p className="mt-1 text-[10px] leading-4 text-slate-600">
-        Values use the accepted prediction snapshot unless the response returns
-        an attributed input value. Missing values are unavailable; missing
-        contributions were not returned. No clinical ranges are applied.
+      <p className="mt-1 text-[12px] leading-5 text-slate-600">
+        Each input used for this prediction, with its model contribution.
       </p>
-      <details className="contribution-method-details mt-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] leading-4 text-slate-700">
+      <details className="contribution-method-details mt-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] leading-5 text-slate-700">
         <summary className="cursor-pointer font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
           Method and reference details
         </summary>
         <div className="mt-2 space-y-1">
+          <p>
+            Values use the accepted prediction snapshot unless the response
+            returns an attributed input value. Missing values are unavailable;
+            missing contributions were not returned. No clinical ranges are
+            applied.
+          </p>
           {probabilityScale ? (
             <>
               <p>
@@ -144,7 +148,7 @@ export function InputsView({
                 >
                   <table className="w-full border-collapse text-left text-xs">
                     <thead>
-                      <tr className="border-b border-slate-100 text-[10px] uppercase tracking-wide text-slate-500">
+                      <tr className="border-b border-slate-100 text-[11px] uppercase tracking-wide text-slate-500">
                         <th className="px-3 py-2 font-semibold" scope="col">
                           Patient input
                         </th>
