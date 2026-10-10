@@ -198,8 +198,27 @@ describe("RawResult explanation rendering", () => {
       "Baseline Shapley on served probability (32 orderings).",
     );
     expect(markup).toContain("Final models trained on all 303 patients");
-    expect(markup).toContain("Model warnings (1)");
+    expect(markup).toContain("<details");
+    expect(markup).toContain("Model warnings (1) - Show details");
+    expect(markup).toContain("An input was outside the training range.");
     expect(markup).not.toContain("scale unconfirmed");
+  });
+
+  it("distinguishes an empty real warning list from unavailable mock assessment", () => {
+    const emptyRealWarnings = renderResult(null, {
+      ...realPrediction,
+      warnings: [],
+    });
+    const mock = renderResult(null, prediction);
+
+    expect(emptyRealWarnings).toContain(
+      "Response warnings: none returned; this is not clinical reassurance.",
+    );
+    expect(emptyRealWarnings).not.toContain("Model warnings (");
+    expect(mock).toContain(
+      "Real-model warning assessment is unavailable in mock v1.0.",
+    );
+    expect(mock).not.toContain("Response warnings: none returned");
   });
 
   it("labels a changed real sample as an edited scenario", () => {

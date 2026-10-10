@@ -121,6 +121,32 @@ export function RawResult({
           />
         ))}
       </div>
+      {prediction.mock ? (
+        <p
+          className="response-warning-status rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] leading-4 text-slate-700"
+          role="status"
+        >
+          Real-model warning assessment is unavailable in mock v1.0.
+        </p>
+      ) : prediction.warnings.length > 0 ? (
+        <details className="response-warning-disclosure rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-[10px] leading-4 text-amber-950">
+          <summary className="cursor-pointer font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800">
+            Model warnings ({prediction.warnings.length}) - Show details
+          </summary>
+          <ul className="mt-1 list-disc space-y-1 pl-4">
+            {prediction.warnings.map((warning, index) => (
+              <li key={`${index}-${warning}`}>{warning}</li>
+            ))}
+          </ul>
+        </details>
+      ) : (
+        <p
+          className="response-warning-status rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] leading-4 text-slate-700"
+          role="status"
+        >
+          Response warnings: none returned; this is not clinical reassurance.
+        </p>
+      )}
       <p className="text-[10px] leading-4 text-slate-600">
         {prediction.mock
           ? "Model-set uncertainty is not returned by mock v1.0."
@@ -184,27 +210,6 @@ export function RawResult({
       <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-600">
         {prediction.risk_summary}
       </p>
-      {!prediction.mock && (
-        <div
-          className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-5 text-amber-950"
-          role={prediction.warnings.length > 0 ? "note" : "status"}
-        >
-          <strong>
-            {prediction.warnings.length > 0
-              ? `Model warnings (${prediction.warnings.length})`
-              : "No response warnings"}
-          </strong>
-          {prediction.warnings.length > 0 ? (
-            <ul className="mt-1 list-disc space-y-1 pl-4">
-              {prediction.warnings.map((warning, index) => (
-                <li key={`${index}-${warning}`}>{warning}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-1">The API returned an empty warnings list.</p>
-          )}
-        </div>
-      )}
     </div>
   );
 }

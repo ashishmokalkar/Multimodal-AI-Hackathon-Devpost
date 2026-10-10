@@ -25,6 +25,44 @@ const prediction: PredictionResponse = {
   risk_summary: "Fixture response.",
   mock: true,
 };
+const realTarget = { ...target, uncertain: false };
+const realExplanation = {
+  base_value: 0.5,
+  contributions: [],
+  scale: "probability" as const,
+  method: "Fixture attribution",
+};
+const warningPrediction: PredictionResponse = {
+  ...prediction,
+  cad: realTarget,
+  vessels: { LAD: realTarget, LCX: realTarget, RCA: realTarget },
+  explanations: {
+    cad: realExplanation,
+    LAD: realExplanation,
+    LCX: realExplanation,
+    RCA: realExplanation,
+  },
+  mock: false,
+  warnings: ["Fixture reliability warning."],
+  derived: { BMI: 24.2, Obesity: false },
+  prediction_source: "Fixture source",
+};
+
+function acceptWarningPrediction() {
+  const state = usePatientStore.getState();
+  const requestId = state.beginPrediction(state.inputRevision);
+  if (requestId === null) {
+    throw new Error("Fixture prediction request could not start.");
+  }
+  const accepted = usePatientStore
+    .getState()
+    .resolvePrediction(requestId, state.inputRevision, warningPrediction, {
+      Age: 67,
+    });
+  if (!accepted) {
+    throw new Error("Fixture warning prediction was not accepted.");
+  }
+}
 
 beforeEach(() => {
   usePatientStore.setState({
@@ -145,5 +183,40 @@ describe("patientStore prediction invalidation", () => {
       isPredicting: true,
       predictionStatus: "pending",
     });
+  });
+
+  it("clears accepted warning-bearing results on edits, sample/reset changes, replacement requests, errors, and profile changes", () => {
+    usePatientStore.getState().setFeatures({ Age: 67 });
+    acceptWarningPrediction();
+    expect(usePatientStore.getState().prediction).toMatchObject({
+      mock: false,
+      warnings: ["Fixture reliability warning."],
+    });
+
+    usePatientStore.getState().updateFeature("Age", 68);
+    expect(usePatientStore.getState().prediction).toBeNull();
+
+    acceptWarningPrediction();
+    usePatientStore.getState().setFromSample(sample);
+    expect(usePatientStore.getState().prediction).toBeNull();
+
+    usePatientStore.getState().setFeatures({ Age: 55 });
+    expect(usePatientStore.getState().prediction).toBeNull();
+
+    acceptWarningPrediction();
+    const revision = usePatientStore.getState().inputRevision;
+    const requestId = usePatientStore.getState().beginPrediction(revision);
+    expect(usePatientStore.getState().prediction).toBeNull();
+    if (requestId === null) {
+      throw new Error("Replacement prediction request could not start.");
+    }
+    usePatientStore
+      .getState()
+      .rejectPrediction(requestId, revision, "Fixture request failed.");
+    expect(usePatientStore.getState().prediction).toBeNull();
+
+    acceptWarningPrediction();
+    usePatientStore.getState().resetForProfileChange();
+    expect(usePatientStore.getState().prediction).toBeNull();
   });
 });
