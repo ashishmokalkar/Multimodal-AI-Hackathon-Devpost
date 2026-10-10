@@ -1,0 +1,34 @@
+S5 Phase 1 submission-draft verification
+Date: 2026-10-10
+Frozen application source: 39ffab1c8adecd707c0f40ce826c12a568c41267
+
+Project document
+- Source: docs/submission/project-document.md
+- Export: docs/submission/project-document.pdf (564,741 bytes)
+- Measured pages: 5, including references (Poppler pdftotext form-feed count).
+- Text extraction: 8,830 characters; no unresolved renderer placeholder. Dataset citation, model-library licences, heart attribution and references are present.
+- Visual review: docs/evidence/s5p1-project-document-page1.png. The exported first page has a readable title, draft/ML-review qualification, overview and accepted S4 illustration.
+- The PDF uses a temporary one-off Markdown-to-HTML conversion and the installed Edge print-to-PDF; no package or repository dependency was added.
+
+Interactive video
+- Bounded media preflight: 2026-10-10T21:34:54.743+02:00 to 2026-10-10T22:14:23.605+02:00 (39m 28.862s; within the 45-minute limit).
+- Final captioned MP4: C:\Users\faiza\.copilot\session-state\a09f2e0c-1c86-4f55-9bb5-eddc7544a9e9\files\s5-submission\s5p1-demo-captioned.mp4
+- Raw real-browser recording: C:\Users\faiza\.copilot\session-state\a09f2e0c-1c86-4f55-9bb5-eddc7544a9e9\files\s5-submission\s5p1-demo-raw.mp4
+- Measured final duration: 261.0 seconds (4:21); H.264, 1920x1080, 7,097,500 bytes, no audio track. FFmpeg decoded the complete output without errors.
+- The 22-cue sidecar is docs/submission/demo-captions.vtt; captions are also burned in at x=650, y=680 inside the central viewer area. Review frames in C:\Users\faiza\.copilot\session-state\a09f2e0c-1c86-4f55-9bb5-eddc7544a9e9\files\s5-submission\s5p1-preview-warning-final.png, s5p1-preview-cleared-final.png, s5p1-preview-response-final.png, s5p1-preview-metrics-final.png and s5p1-preview-closing-final.png.
+- Capture method: Edge native CDP Page.startScreencast streamed the live page to FFmpeg at a 1920x1080 CSS viewport, DPR 1. The real API reported mock=false, contract 1.1.0 and cardiotwin-v2.0.0. Input actions used CDP browser mouse/keyboard input, not DOM-dispatched events.
+- Recorded actions: patient 20 real prediction; heart orbit/zoom; LAD selection; expanded reliability warning; Why and Inputs; age edit 65 to 66 with stale output cleared; explicit fresh response retaining patient-20 demo provenance; validation metrics and limitations; source attribution. The captured response was not selected or edited to force a particular prediction change.
+- Session record: C:\Users\faiza\.copilot\session-state\a09f2e0c-1c86-4f55-9bb5-eddc7544a9e9\files\s5-submission\s5p1-recording-log.json
+- A system-wide desktop preflight included unrelated foreground content and was discarded. The final capture is page-scoped and contains only the real application. The raw encoded stream was retimed from its observed frame-write rate to the measured 4:21 wall-clock sequence; VTT cue times follow the recorded actions.
+
+Claims and remaining draft-review blockers
+- Document, captions and Devpost text use the same model/dataset figures and safety qualifications. Metrics are cross-validation estimates; CAD selection and ensemble-comparison caveats are retained. No clinical validation, external validation, deployment, image import, or lesion-localisation claim is made.
+- The current Devpost form/rules and link/upload/access mechanics remain unverified by the executor; the saved handover records a planning fetch that returned HTTP 403. H must check the live form manually.
+- Ashish must verify or replace the dataset/preprocessing, estimator, validation, subgroup and demo-refit statements before finalisation. His exact verification hour and coverage remain unconfirmed.
+- H has not approved finalisation, uploads or submission. Human Gate 1 remains pending.
+
+Credits
+- Execution kickoff: 2026-10-10T19:29:02.337Z (21:29:02.337 CEST).
+- Fresh pre-production baseline through 2026-10-10T19:30:54.536Z: Phase 1 14.351153; S5 104.577053; project 3588.873706.
+- Gate 1 snapshot through 2026-10-10T20:11:10.665Z: Phase 1 62.520601; S5 152.746501; project 3637.043153. This left 347.253499 under S5 500 and 3362.956847 under project 7000.
+- Deduplicated local telemetry, not account billing. Later documentation publication calls are excluded; boundaries and actuals were not reset.

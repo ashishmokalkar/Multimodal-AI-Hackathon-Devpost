@@ -1,7 +1,7 @@
 # Sprint 5 Plan - Submission readiness
 
 **Status:** H approved S5 Human Gate 0 and authorised Phase 1 only (D-053).
-Phase 0 is complete; the manual executor handover is being prepared.
+Phase 0 is complete; the Phase 1 draft package is delivered.
 Human Gate 1 is pending, and Phases 2/3 are not authorised.
 S4 remains closed under D-051 after documentation-only closeout
 `e5117844e07db7196bed8636992627a551b59cdd`.
@@ -124,7 +124,7 @@ source and do not assume the default branch contains it.
 | Phase | Combined O+X estimate | Actual |
 |---|---:|---|
 | 0 - Planning | 150 | 90.225900 through the recorded pre-Phase-1 cutoff below |
-| 1 - Automated draft package | 220 | Authorised; O handover work accruing, E not yet started |
+| 1 - Automated draft package | 220 | 62.520601 through the Gate 1 snapshot below |
 | 2 - Finalisation and access checks | 90 | Not started |
 | 3 - Submission, retrospective and cleanup | 40 | Not started |
 | **S5 total** | **500 hard sprint ceiling** | Includes all planning/review/publication |
@@ -139,6 +139,24 @@ Deduplicated local telemetry through **2026-10-10T19:21:14.774Z** records S5
 **65.799120** (X 0), project **3550.0957725**, leaving **434.200880** under
 S5 500 and **3449.9042275** under project 7000. This is a historical
 snapshot, not billing.
+
+**Phase 1 execution kickoff and fresh baseline:** execution began at
+**2026-10-10T19:29:02.337Z** (21:29:02.337 CEST), separately from the
+Phase 1 accounting boundary. The refreshed deduplicated local snapshot through
+**2026-10-10T19:30:54.536Z** records Phase 1 **14.351153**, S5
+**104.577053**, and project **3588.873706**. Ten Phase 1 usage events were
+recorded from **19:26:59.480Z** through the cutoff; this includes O handover/
+review and executor kickoff work, not only production. The snapshot is local
+telemetry, not billing; later calls are excluded. Neither accounting boundary
+nor prior actuals were reset.
+
+**Phase 1 Gate 1 snapshot:** through **2026-10-10T20:11:10.665Z**,
+deduplicated local telemetry records Phase 1 **62.520601**, S5
+**152.746501**, and project **3637.043153**. This includes 107 Phase 1 usage
+events from **19:26:59.480Z** through the cutoff. It leaves **347.253499**
+under the shared S5 ceiling and **3362.956847** under the project cap. These
+are local telemetry, not billing; later documentation publication calls are
+excluded. Accounting boundaries and prior actuals remain unchanged.
 
 **Gate 0 accounting boundary:** Phase 1 begins
 **2026-10-10T19:26:20.967Z**, after H's approval. Events before it remain
@@ -186,7 +204,7 @@ have explicit owners/fallbacks rather than being represented as verified.
 Phase 1 (Recommended)". Only Phase 1 is authorised; no later gate, frozen-code
 change, agent, PR operation or final submission is implied.
 
-## Phase 1 - Automated draft package (authorised; handover pending)
+## Phase 1 - Automated draft package (drafts delivered; Human Gate 1 pending)
 
 **Goal:** Deliver reviewable document, captioned demo and submission-text
 drafts with minimal H production time.
@@ -196,27 +214,34 @@ executor/media/publication ceiling within the approved shared sprint budget.
 
 **Atomic tasks:**
 
-- [ ] Publish the pending O approval/planning documentation on `frontend`
+- [x] Publish the pending O approval/planning documentation on `frontend`
   through the H-forwarded handover; preserve all existing edits and source
   freeze. No renewed O Git authority or PR operation is implied.
-- [ ] Draft the six-page-maximum document from pinned sources and accepted
+- [x] Draft the six-page-maximum document from pinned sources and accepted
   screenshots; identify ML statements awaiting Ashish's verification.
-- [ ] Prepare captioned storyboard/script and submission-text draft,
+- [x] Prepare captioned storyboard/script and submission-text draft,
   including accurate method, safety, provenance, licence and limitation copy.
-- [ ] Complete the bounded media preflight with existing Edge/FFmpeg; produce
+- [x] Complete the bounded media preflight with existing Edge/FFmpeg; produce
   a real interactive rough cut and readable PDF, or report the exact fallback.
-- [ ] Check exported page count, actual video duration/playback, readable
+- [x] Check exported page count, actual video duration/playback, readable
   captions and source/claim consistency; provide file paths and pending items.
 - [ ] H checks the current Devpost form and requests Ashish's ML verification;
   incorporate confirmed requirements without assuming extra scope.
 
-**Self-check gate 1:** A PDF of at most six pages, a playable 3-10-minute
-captioned real-demo draft and submission-text draft exist at reported paths;
-core workflow/technical implementation and safety are visible, unsupported
-claims are excluded and ML verification gaps are explicit. Page count and
-duration are measured, not inferred from source length or the storyboard.
-Media fallbacks must still satisfy the required outputs. Record the live
-form check or leave it as an explicit blocker for H.
+**Executor self-check gate 1:** Passed for the delivered artifacts. The
+exported PDF is 5 pages; the playable real-demo rough cut is 4:21 with 22
+burned-in captions and a VTT sidecar. Live response, warning, selection,
+explanation, input-edit/freshness and metrics-limitations interactions are
+shown at 1920x1080. Document, captions and Devpost text retain consistent
+source, provenance, licence and safety qualifications. See
+`docs/evidence/s5p1-package-verification.txt`. No unsupported clinical,
+deployment, image-import or patient-specific lesion claim is made.
+
+**Human Gate 1 remains pending.** H must check the current Devpost form,
+requirements and judge-access/upload mechanics; Ashish must verify or replace
+the ML/data/evaluation statements. The planning fetch returned HTTP 403, so the
+current form was not independently verified. These are finalisation blockers,
+not executor artifact passes or approval to start Phase 2.
 
 **Human Gate 1:** H reviews drafts and the form/dependency status, then
 explicitly approves the consolidated finalisation batch. No Phase 2 starts
