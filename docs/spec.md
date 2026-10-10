@@ -65,9 +65,14 @@ with prominent source/version, explicit state guidance and a zero-aligned,
 readable signed chart. Verify at actual 1920 x 1080 and 1280 x 800 viewports,
 not from full-page screenshot height. The precise resize cause needs live
 reproduction. H approved Gate 1 with mandatory presentation carryover and
-authorised UI/UX Phase 2, not real integration. The UX changes are not yet
-implemented; geometry, clinical meaning and the API stay unchanged. Integration
-is Phase 3 and requires UI/UX Gate 2 plus the separate readiness Gate R.
+authorised UI/UX Phase 2, not real integration. Phase 2 implemented the
+viewport-bounded desktop workspace, independently scrolling patient/results
+panels, stable canvas, compact prediction/source summaries, distinct state
+guidance and the readable zero-aligned signed chart without changing geometry,
+clinical meaning or the API. Exact 1920 x 1080/1280 x 800 captures and
+measurements are under `docs/evidence/s3p2-*`; the self-check is submitted for
+Human Gate 2, which remains pending. Integration is Phase 3 and still requires
+that gate plus the separate readiness Gate R.
 
 ## 4. Architecture
 

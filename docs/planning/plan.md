@@ -1,7 +1,8 @@
 # Sprint 3 Plan - Dashboard, UI/UX and gated real integration
 
 **Status:** Gates 0 and 1 are approved; Phase 1 functional delivery is accepted
-with presentation gaps explicitly carried into mandatory UI/UX Phase 2 (D-036).
+with presentation gaps carried into the completed UI/UX Phase 2. Phase 2 evidence
+is submitted for Human Gate 2; real integration and Gate R remain blocked.
 H approved S2 Gate 3
 and continuation in this session (D-031), then approved re-planning for
 independent mock-dashboard work while M's reply is pending (D-032).
@@ -9,7 +10,7 @@ H approved the detailed delivery scope, allocations and dates below.
 H requested one
 Opus 5.5 extra-high read-only UI/UX review and a revised plan for the next phase.
 The review is complete; H approved Phase 2 UI/UX and the budget reallocation
-below. X recorded its execution kickoff and fresh usage baseline at
+below. X recorded its actual execution kickoff and fresh baseline at
 **2026-10-10T09:29:01.027Z**. Real integration is
 Phase 3 and remains blocked behind the UI/UX gate and Gate R.
 
@@ -91,9 +92,9 @@ usage before the UI/UX boundary is **308.9651975** (O including reviewer
 The pre-Phase-2 baseline is **2154.058090** project / **381.4537725** S3.
 Phase 2 recorded O planning usage is **6.870500**, X **0**; cumulative
 project is **2160.928590**, S3 **388.3242725**, leaving **4839.071410**
-overall. Later gate-documentation/handover calls are excluded. X has not
-started Phase 2 at this earlier snapshot; do not treat its whole-session usage
-as a phase delta.
+overall. Later gate-documentation/handover calls are excluded. This historical
+snapshot predates X's Phase 2 kickoff; do not treat whole-session usage as a
+phase delta.
 
 X execution kickoff and fresh deduplicated baseline: **2026-10-10T09:29:01.027Z**.
 At that boundary Phase 2 usage is **17.5195375** (O **14.5381000**, X
@@ -110,7 +111,7 @@ are excluded.
 |---|---:|---:|---|
 | 0 - Discussion and readiness planning | 200 | 0 | Approved |
 | 1 - Independent explanation/input/metrics dashboard | 400 (was 650) | 160 | Approved with mandatory presentation carryover |
-| 2 - Desktop UI/UX and demo visibility | 250 (new) | 100 | Authorised; X kickoff pending |
+| 2 - Desktop UI/UX and demo visibility | 250 (new) | 100 | Delivered; Gate 2 pending H |
 | 3 - Real integration, only after readiness approval | 800 | 200 | Blocked on M handoff and preceding gates |
 | 4 - Retrospective and cleanup | 100 | 30 | Not started |
 | Contingency, separate H approval required | 50 | Unassigned | Unused |
@@ -272,32 +273,32 @@ usable in the actual desktop demo viewport without changing model behavior.
 **Allocation:** 250 O+X; X ceiling 100.
 Prerequisites: Human Gate 1 and explicit re-plan/reallocation approval
 (both approved under D-036). Accounting begins at
-**2026-10-10T09:26:56.101Z**; X records its fresh execution kickoff and
-baseline. Do not reset Phase 1's actual usage.
+**2026-10-10T09:26:56.101Z**; X's execution kickoff and fresh baseline are
+recorded below. Do not reset Phase 1's actual usage.
 
 Atomic tasks
 
-- [ ] Reproduce the reported canvas growth/cropping before changing layout.
+- [x] Reproduce the reported canvas growth/cropping before changing layout.
   Establish a viewport-bounded desktop workspace with independent patient/
   results scrolling and stable canvas dimensions across Why?/Inputs and
   prediction states. Keep Predict/auto-predict actions, viewer focus/reset,
   legend and selected-target callout visible. Fix sizing at the layout root;
   do not reset the camera on tab/target changes to mask cropping.
-- [ ] Compact CAD/vessel readouts and expose one prominent prediction-source/
+- [x] Compact CAD/vessel readouts and expose one prominent prediction-source/
   version badge beside them: "Mock prediction" for mock responses and a truthful
   model-output label otherwise. Provide distinct initial, edited/manual,
   auto-debounce/updating, pending, invalid and error guidance using existing
   state or minimal shared UI state. Never retain old probabilities to fill space.
-- [ ] Improve the signed chart's scale/labels: explicit zero-aligned tick with
+- [x] Improve the signed chart's scale/labels: explicit zero-aligned tick with
   symmetric ticks/domain, readable feature/tick text and one axis title.
   Preserve exact accessible numeric values, full feature names in the numeric
   alternative, signed/missing/zero semantics and unconfirmed-scale wording.
-- [ ] Preserve keyboard view/target selection, modal focus/Escape/restoration,
+- [x] Preserve keyboard view/target selection, modal focus/Escape/restoration,
   safety/source/asset labels, 55-input editing and request freshness. Keep
   diagnostic FPS HUD off the ordinary demo view while allowing intentional
   measurement. No geometry/default-camera redesign or permanent vessel-label
   overlay work is required in this phase.
-- [ ] Run focused regression checks and capture actual-viewport mock evidence,
+- [x] Run focused regression checks and capture actual-viewport mock evidence,
   canvas stability and active-orbit performance; commit/push passing changes
   and stop for Gate 2. No ML/schema/dependency/asset changes.
 
@@ -335,6 +336,61 @@ Atomic tasks
    viewport, with actual canvas/DPR/device/method recorded; demand rendering
    settles when idle. Lint/typecheck/test/build pass; report committed/pushed
    hashes, clean status and dated Phase 2/S3/project credits.
+
+**Self-check gate 2 (X evidence submitted; Human Gate 2 pending):**
+
+1. **Passed:** Reproduction captures `s3p2-before-1920x1080.png` and
+   `s3p2-before-1280x800.png` show the original document growth/canvas cropping.
+   Final exact-viewport captures are `s3p2-1920x1080.png` and
+   `s3p2-1280x800.png`. Document dimensions are exactly the viewport at both
+   sizes. At 1920 x 1080, patient/results scrollports are 730/818 CSS px high
+   with content heights 923/1402 px. At 1280 x 800, they are 452/540 px high
+   with content heights 923/1422 px. The complete heart, legend, selected-target
+   callout, viewer controls, Predict actions and probabilities remain in view.
+   The canvas is 620.77 x 591.86 CSS px at 1080p and 505.73 x 313.55 CSS px at
+   800p, DPR 1.
+2. **Passed:** `s3p2-live-measurements.json` records identical canvas bounds
+   through default CAD, LAD selection, Why?/Inputs, edit invalidation, pending
+   and fresh-response states at each fixed viewport (0 CSS px measured change).
+   `s3p2-camera-cad.png` and `s3p2-camera-lad.png` show the same overview after
+   ordinary target selection; only explicit focus/reset controls affect the view.
+3. **Passed:** A fresh synthetic Sample patient 1 response with Typical Chest
+   Pain true returned CAD/LAD/LCX/RCA probabilities 88.2/89.0/86.9/87.8%.
+   Toggling it false produced a new accepted response of 75.2/76.7/72.9/74.5%.
+   The 1920 screenshot shows all four readouts, “Mock prediction”/version,
+   Why?/Inputs and ten visible chart rows. At 1280 x 800 all probabilities,
+   source/version and view controls remain visible; chart content scrolls
+   internally. Values were read from the live mock flow, not reused from older
+   screenshot evidence.
+4. **Passed:** The 0.00 tick centre aligns with its zero reference line within
+   0.03 CSS px. Chart and feature labels are 11 CSS px; full accessible numeric
+   alternatives retain feature names and signed values. Existing tests cover
+   mixed signs, all-zero and small nonzero ticks without zero-rounding.
+5. **Passed:** `s3p2-live-measurements.json` records Enter/Space target and
+   view selection, keyboard Reset/focus, plus drawer focus containment,
+   Escape and restoration at both viewports. `s3p2-unavailable-states.json`
+   records immediate clearing/neutral vessels for invalid input and a rejected
+   live request, explicit alerts and successful sample recovery.
+6. **Passed:** On the HP Victus demo laptop, Edge 155 used the AMD Radeon 760M
+   WebGL2 renderer at a 1920 x 1080 viewport, DPR 1 and 620 x 591 drawing
+   buffer. Active orbit measured **144.3 rendered clears/second**; the demand
+   renderer produced zero further frames over each 1.5-second idle check,
+   including after damping settled. Diagnostic FPS HUD is absent from ordinary
+   screenshots. Frontend lint, typecheck, build passed; Vitest passed 12 files
+   and 38 tests. The build retains its non-blocking >500 kB chunk advisory.
+
+Final deduplicated local telemetry through **2026-10-10T10:20:43.447Z**:
+Phase 2 **130.311761** credits (O **72.291720**, X **58.020041**), leaving
+**119.688239** of the combined allocation and **41.979959** of X's ceiling.
+Relative to X's 09:29 kickoff baseline, the measured increment is
+**112.7922235** (O **57.753620**, X **55.0386035**). Cumulative S3 is
+**511.7655335** (O **418.571940**, X **93.1935935**); project total is
+**2284.369851** (O **2020.038565**, X **264.331286**). This leaves
+**1288.2344665** under the S3 cap and **4715.630149** under the project cap.
+The read-only local
+session-store query uses the project's checkout-path filter and distinct
+deduplication fields from `scripts/credits.py`; these are telemetry, not
+billing. Events after the stated snapshot are excluded.
 
 **Human gate 2:** H approves the measured demo layout, truthful states and
 readability after O review, then revisits M's readiness. Real integration
