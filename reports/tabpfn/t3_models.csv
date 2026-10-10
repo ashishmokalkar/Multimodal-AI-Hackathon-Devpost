@@ -1,0 +1,5 @@
+target,auc_default,auc_tune_r0r2,auc_tuned,tuned_vs_default,tuned_vs_default_se,auc_seedbag5,seedbag_vs_single,final_run,auc_final,best_phase3,auc_best_phase3,tabpfn_vs_best_phase3,tabpfn_vs_best_phase3_se,tabpfn_vs_best_phase3_keep,tabpfn_rank,n_models
+cad,0.9310,0.9446,0.9337,0.0027,0.0036,0.9310,-0.0027,tp3_tabpfn_tuned,0.9337,ebm,0.9389,-0.0052,0.0081,False,4,11
+lad,0.8427,0.8541,0.8427,0.0000,0.0002,0.8423,-0.0004,tp3_tabpfn_tuned,0.8427,svm_rbf,0.8613,-0.0186,0.0099,False,9,11
+lcx,0.7423,0.7496,0.7504,0.0080,0.0067,0.7478,-0.0026,tp3_tabpfn_tuned,0.7504,random_forest,0.7720,-0.0216,0.0161,False,5,11
+rca,0.7385,0.7386,0.7387,0.0002,0.0025,0.7384,-0.0003,tp3_tabpfn_tuned,0.7387,logreg,0.7517,-0.0130,0.0132,False,3,11

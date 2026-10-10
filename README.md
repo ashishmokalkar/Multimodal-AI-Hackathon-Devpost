@@ -10,7 +10,7 @@
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-eb6834?logo=scikitlearn&logoColor=white)
 ![Gradient boosting](https://img.shields.io/badge/XGBoost%20%C2%B7%20LightGBM%20%C2%B7%20CatBoost-GBMs-1baf7a)
 ![Optuna](https://img.shields.io/badge/Optuna-tuning-4a3aa7)
-![Tests](https://img.shields.io/badge/tests-46%20passing-0ca30c)
+![Tests](https://img.shields.io/badge/tests-61%20passing-0ca30c)
 ![License](https://img.shields.io/badge/license-Apache%202.0-52514e)
 
 [Competition page](https://multimodal-ai-hackathon-2026-7.devpost.com/) · [Plan](plan.md) · [EDA report](reports/EDA.md) · [Feature report](reports/PHASE2_FEATURES.md) · [Model report](reports/PHASE3_MODELS.md)
@@ -29,16 +29,17 @@
 <img src="reports/figures/progress.png" alt="Best cross-validated ROC-AUC after each phase" width="100%">
 </div>
 
-| Target | What it means | Best model | ROC-AUC | 95% CI | Accuracy* | Untuned baseline | Goal |
-|---|---|---|:---:|:---:|:---:|:---:|:---:|
-| **CAD** | any coronary artery ≥ 50% narrowed | EBM (glassbox GAM) | **0.939** | 0.908–0.962 | 0.884 | 0.925 | 0.94 |
-| **LAD** | left anterior descending stenosis | SVM-RBF | **0.861** | 0.815–0.902 | 0.800 | 0.851 | 0.87 |
-| **LCX** | left circumflex stenosis | Random forest (5-seed bag) | **0.772** | 0.717–0.818 | 0.689 | 0.744 | 0.78 |
-| **RCA** | right coronary artery stenosis | Elastic-net logistic regression | **0.752** | 0.694–0.802 | 0.698 | 0.718 | 0.76 |
+| Target | What it means | Final model | ROC-AUC | 95% CI | Accuracy* | Balanced acc.* | ECE | Untuned baseline | Goal |
+|---|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **CAD** | any coronary artery ≥ 50% narrowed | EBM (glassbox GAM) | **0.939** | 0.908–0.962 | 0.867 | 0.868 | 0.040 | 0.925 | 0.94 |
+| **LAD** | left anterior descending stenosis | CatBoost (+ Duke score) | **0.866** | 0.824–0.905 | 0.781 | 0.773 | 0.047 | 0.851 | 0.87 |
+| **LCX** | left circumflex stenosis | XGBoost (+ 10 clinical risk scores) | **0.784** | 0.727–0.824 | 0.683 | 0.695 | 0.053 | 0.744 | 0.78 ✅ |
+| **RCA** | right coronary artery stenosis | Logistic stack of 8 models | **0.767** | 0.715–0.811 | 0.669 | 0.682 | 0.047 | 0.718 | 0.76 ✅ |
 
-<sub>All scores are repeated stratified 5-fold CV on folds the tuning never saw (repeats r5–r9). CIs are a 1,000× patient bootstrap.
-\*Accuracy at a 0.5 threshold; per-target threshold tuning comes in phase 8. The baseline used the EDA's own folds, so the stage-to-stage
-steps in the chart are indicative, not paired.</sub>
+<sub>All scores are repeated stratified 5-fold CV on repeats r5–r9, which no decision ever used (choices were made on r0–r4). CIs are a 1,000× patient bootstrap.
+\*At the per-target threshold that maximises balanced accuracy, after Platt calibration (ECE = expected calibration error).
+Full write-up, including TabPFN, AutoGluon and everything that did not help: **[reports/BEST_MODELS.md](reports/BEST_MODELS.md)**.
+The baseline used the EDA's own folds, so the stage-to-stage steps in the chart are indicative, not paired.</sub>
 
 ---
 
@@ -285,10 +286,12 @@ Rigorous checks surfaced real problems before they reached the results:
 | P3 · Model zoo + tuning | ✅ | 10 families, Optuna, seed bagging, leaderboards |
 | P4 · Multi-label strategy | ✅ | hierarchical `P(CAD)·P(v\|CAD)` and stacking: no significant AUC gain, better calibration ([report](reports/PHASE4_STRATEGIES.md)) |
 | P5 · External data | ✅ | 605 UCI vessel-labelled patients harmonised; **no gain** due to cohort shift ([report](reports/PHASE5_EXTERNAL.md)) |
-| P6 · Feature selection | ⏳ | per-target, inside CV |
-| P7 · Ensembling | 🔜 | hill-climbing / stacking with nested CV |
-| P8 · Calibration + thresholds | 🔜 | Platt/beta, per-target thresholds, conformal uncertainty |
-| P9 · Export | 🔜 | `models/*.joblib`, `metrics.json` for the 3D dashboard |
+| TabPFN | ✅ | v2.5–v3.5, tuning, fine-tuning: best untuned model, never beats the re-tuned zoo ([report](reports/TABPFN.md)) |
+| Plan v2 · full GPU search | ✅ | cleaning, risk-score features, selection, 27 AutoGluon families, stacking, AngioCAD, grand ensembles ([plan](plan_v2.md)) |
+| P8 · Calibration + thresholds | ✅ | Platt calibration, balanced-accuracy thresholds, P(vessel) ≤ P(CAD), 90% conformal sets |
+| P9 · Export | ✅ | `models/*.joblib` + `manifest.json`, CPU-only, 6–86 ms per patient ([report](reports/BEST_MODELS.md)) |
+| Real-model API | ✅ | FastAPI, frontend contract v1.1.0, per-input explanations in probability points, hold-out demo patients ([api/README.md](api/README.md)) |
+| 3D dashboard | ⏳ | React Three Fiber frontend on the `frontend` branch |
 
 Detailed plan: **[plan.md](plan.md)**
 
@@ -302,7 +305,7 @@ python -m venv .venv
 pip install -r requirements.txt
 
 python scripts/download_data.py             # fetch + checksum the UCI dataset
-pytest -q                                   # 46 tests
+pytest -q                                   # 48 tests
 
 python -m ml.eda                            # EDA tables + figures      (~12 min)
 python -m ml.run_baselines                  # P1 baselines              (~1 min)
@@ -311,6 +314,8 @@ python -m ml.run_models --target lcx        # P3 zoo + tuning, per target (~20 m
 python -m ml.run_strategies                 # P4 multi-label strategies (~10 min)
 python -m ml.run_external                   # P5 UCI external data      (~25 min)
 python -m ml.report_figures                 # README figures            (seconds)
+python -m ml.export                         # refit + export final models (~3 min)
+python -m uvicorn api.main:app --port 8000  # real-model API for the dashboard
 ```
 
 Every scored run is appended to [`reports/experiments.csv`](reports/experiments.csv) with its git hash.
@@ -331,6 +336,7 @@ Every scored run is appended to [`reports/experiments.csv`](reports/experiments.
 │   ├── models.py        # model registry, search spaces, seed bagging
 │   ├── strategies.py    # hierarchical, stacked and pooled (external data) strategies
 │   ├── external.py      # UCI Heart Disease raw-file parser + harmonisation
+│   ├── selection.py     # fold-fitted feature selectors
 │   ├── cv.py            # fixed folds, CV runner, OOF store, experiment log
 │   ├── evaluate.py      # metrics, bootstrap CIs, calibration, corrected paired test
 │   ├── eda.py · run_baselines.py · run_features.py · run_models.py · run_strategies.py · run_external.py · report_figures.py

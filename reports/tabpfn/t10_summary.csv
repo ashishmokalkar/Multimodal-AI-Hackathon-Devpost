@@ -1,0 +1,20 @@
+target,variant,auc,brier,ece,accuracy,best_phase3,auc_best_phase3,vs_best,vs_best_se,beats_best,worse_than_best
+cad,T3 tuned (F2),0.9337,0.0885,0.0356,0.8779,ebm,0.9389,-0.0052,0.0081,False,False
+cad,T8 wide-tuned,0.9350,0.0902,0.0572,0.8799,ebm,0.9389,-0.0039,0.0085,False,False
+cad,T9 post-hoc ensemble,0.9347,0.0881,0.0369,0.8805,ebm,0.9389,-0.0042,0.0086,False,False
+cad,T9 ensemble + best phase-3 (equal),0.9392,0.0848,0.0366,0.8812,ebm,0.9389,0.0002,0.0044,False,False
+lad,T3 tuned (F2),0.8427,0.1549,0.0705,0.7981,svm_rbf,0.8613,-0.0186,0.0099,False,True
+lad,T8 wide-tuned,0.8559,0.1498,0.0821,0.8113,svm_rbf,0.8613,-0.0054,0.0090,False,False
+lad,T9 post-hoc ensemble,0.8558,0.1504,0.0824,0.8073,svm_rbf,0.8613,-0.0055,0.0090,False,False
+lad,T8 + S1 hierarchical,0.8638,0.1483,0.0811,0.7962,svm_rbf,0.8613,0.0025,0.0137,False,False
+lad,T9 ensemble + best phase-3 (equal),0.8606,0.1453,0.0656,0.8159,svm_rbf,0.8613,-0.0007,0.0059,False,False
+lcx,T3 tuned (F2),0.7504,0.2033,0.0822,0.6792,random_forest,0.7720,-0.0216,0.0161,False,True
+lcx,T8 wide-tuned,0.7521,0.2034,0.0813,0.6765,random_forest,0.7720,-0.0199,0.0119,False,True
+lcx,T9 post-hoc ensemble,0.7527,0.2009,0.0797,0.6812,random_forest,0.7720,-0.0193,0.0124,False,True
+lcx,T8 + S1 hierarchical,0.7565,0.1962,0.0599,0.6727,random_forest,0.7720,-0.0155,0.0180,False,False
+lcx,T9 ensemble + best phase-3 (equal),0.7608,0.1944,0.0523,0.6984,random_forest,0.7720,-0.0112,0.0089,False,True
+rca,T3 tuned (F2),0.7387,0.2071,0.0969,0.6626,logreg,0.7517,-0.0130,0.0132,False,False
+rca,T8 wide-tuned,0.7382,0.2054,0.0839,0.6851,logreg,0.7517,-0.0135,0.0132,False,True
+rca,T9 post-hoc ensemble,0.7381,0.2042,0.0769,0.6831,logreg,0.7517,-0.0136,0.0123,False,True
+rca,T8 + S1 hierarchical,0.7368,0.1992,0.0333,0.6712,logreg,0.7517,-0.0149,0.0127,False,True
+rca,T9 ensemble + best phase-3 (equal),0.7453,0.1974,0.0578,0.6859,logreg,0.7517,-0.0063,0.0079,False,False

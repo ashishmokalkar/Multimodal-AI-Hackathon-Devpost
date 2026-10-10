@@ -1,0 +1,5 @@
+target,best_phase3,corr_tabpfn_best,auc_best,auc_tabpfn,auc_best+tabpfn,auc_top3,auc_top3+tabpfn,best+tabpfn_vs_best,best+tabpfn_vs_best_se,best+tabpfn_vs_best_keep,adding_tabpfn_to_top3,adding_tabpfn_to_top3_se,adding_tabpfn_to_top3_keep
+cad,ebm,0.9601,0.9389,0.9337,0.9382,0.9416,0.9412,-0.0007,0.0051,False,-0.0005,0.0021,False
+lad,svm_rbf,0.9600,0.8613,0.8427,0.8545,0.8627,0.8572,-0.0068,0.0061,False,-0.0055,0.0040,False
+lcx,random_forest,0.9451,0.7720,0.7504,0.7591,0.7745,0.7683,-0.0129,0.0115,False,-0.0063,0.0061,False
+rca,logreg,0.9414,0.7517,0.7387,0.7462,0.7516,0.7501,-0.0055,0.0090,False,-0.0015,0.0040,False

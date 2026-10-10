@@ -14,7 +14,8 @@ We win by **(a) a real gain on LCX and RCA, and (b) validation rigour that stand
 | P3 Model zoo + tuning | ✅ | **0.939 / 0.861 / 0.772 / 0.752** | [PHASE3_MODELS.md](reports/PHASE3_MODELS.md) |
 | P4 Multi-label strategy | ✅ | no significant gain; S0 kept, S1 = calibrated, consistent ensemble candidate | [PHASE4_STRATEGIES.md](reports/PHASE4_STRATEGIES.md) |
 | P5 External data (UCI) | ✅ | no gain: cohort shift (transfer AUC 0.63–0.71); pooling hurts, UCI-score feature neutral | [PHASE5_EXTERNAL.md](reports/PHASE5_EXTERNAL.md) |
-| P6/P7 Selection + ensembling | ⏳ next | | |
+| TabPFN (v2.5–v3.5) | ✅ | ties at best; never kept | [TABPFN.md](reports/TABPFN.md) |
+| Plan v2 (S1–S9: GPU search, AutoGluon, ensembles, post-processing, export) | ✅ | **0.939 / 0.866 / 0.784 / 0.767** | [BEST_MODELS.md](reports/BEST_MODELS.md) |
 
 ---
 

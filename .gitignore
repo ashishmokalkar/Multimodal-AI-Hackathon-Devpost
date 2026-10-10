@@ -17,3 +17,4 @@ data/processed/*
 Thumbs.db
 .vscode/
 .idea/
+.venv-ag/

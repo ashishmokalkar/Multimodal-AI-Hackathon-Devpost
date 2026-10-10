@@ -28,8 +28,9 @@ RAW_DIR = ROOT / "data" / "raw"
 @dataclass(frozen=True)
 class Dataset:
     url: str
+    # sha256 of the zip archive; "" means `url` is a per-file template with a {name} placeholder (no archive)
     zip_sha256: str
-    # Member name inside the zip -> local filename under data/raw/<key>/
+    # Member name inside the zip (or remote file name) -> local filename under data/raw/<key>/
     files: dict[str, str]
     # Expected sha256 of each extracted local file
     file_sha256: dict[str, str]
@@ -58,6 +59,15 @@ DATASETS: dict[str, Dataset] = {
             "WARNING": "01ae7cb6ab43a387b206f7127ce81869639d9d3076d447c12d7df17ad583f954",
         },
     ),
+    # External data (plan v2, E1-E3): AngioCAD, Isfahan 2025, 377 patients with segment-level stenosis grades.
+    # Zenodo record 15826856, CC BY 4.0 (doi 10.1016/j.cmpb.2026.109368).
+    "angiocad": Dataset(
+        url="https://zenodo.org/records/15826856/files/{name}?download=1",
+        zip_sha256="",
+        files={"AngioCAD_Features.xlsx": "AngioCAD_Features.xlsx", "AngioCAD_Labels.xlsx": "AngioCAD_Labels.xlsx"},
+        file_sha256={"AngioCAD_Features.xlsx": "978f2415ab52f11724e1ef00bb63597b8497487afd84b97f7112fc7975a33295",
+                     "AngioCAD_Labels.xlsx": "5bba3f4ba8bed0df0d2f412d5e2ca6deacca0eff20d531a599fe1b8f4d897425"},
+    ),
 }
 
 
@@ -70,6 +80,19 @@ def download(key: str, ds: Dataset, force: bool) -> None:
     targets = [out_dir / name for name in ds.files.values()]
     if not force and all(p.exists() and sha256(p.read_bytes()) == ds.file_sha256[p.name] for p in targets):
         print(f"[{key}] already present and verified")
+        return
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    if not ds.zip_sha256:   # individual files, no archive
+        for remote, local_name in ds.files.items():
+            url = ds.url.format(name=remote)
+            print(f"[{key}] downloading {url}")
+            resp = requests.get(url, timeout=60)
+            resp.raise_for_status()
+            if sha256(resp.content) != ds.file_sha256[local_name]:
+                sys.exit(f"[{key}] checksum mismatch for {remote}; upstream file may have changed")
+            (out_dir / local_name).write_bytes(resp.content)
+            print(f"[{key}] wrote {(out_dir / local_name).relative_to(ROOT)}")
         return
 
     print(f"[{key}] downloading {ds.url}")

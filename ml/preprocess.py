@@ -68,8 +68,22 @@ class OneHotCategoricals(BaseEstimator, TransformerMixin):
         return X.drop(columns=self.cols_)
 
 
-def linear_pipeline(estimator, robust: bool = True) -> Pipeline:
-    """One-hot categoricals -> [winsorise -> log1p skewed] -> standardise -> estimator (LR / SVM / kNN)."""
-    steps = [("onehot", OneHotCategoricals())]
-    steps += [("winsor", Winsorizer()), ("log", LogSkewed())] if robust else []
-    return Pipeline(steps + [("scale", StandardScaler()), ("model", estimator)])
+def linear_pipeline(estimator, robust: bool = True, scaling: str | None = None, onehot: bool = True) -> Pipeline:
+    """[one-hot categoricals] -> scaling -> estimator (LR / SVM / kNN).
+
+    scaling: "robust" (winsorise P1/P99 -> log1p skewed -> standardise; the default via robust=True),
+    "standard" (standardise only), "quantile" (rank -> normal scores, fitted on the training fold).
+    """
+    from sklearn.preprocessing import QuantileTransformer
+
+    scaling = scaling or ("robust" if robust else "standard")
+    steps = [("onehot", OneHotCategoricals())] if onehot else []
+    if scaling == "robust":
+        steps += [("winsor", Winsorizer()), ("log", LogSkewed()), ("scale", StandardScaler())]
+    elif scaling == "standard":
+        steps += [("scale", StandardScaler())]
+    elif scaling == "quantile":
+        steps += [("scale", QuantileTransformer(n_quantiles=100, output_distribution="normal"))]
+    else:
+        raise ValueError(f"unknown scaling {scaling!r}")
+    return Pipeline(steps + [("model", estimator)])

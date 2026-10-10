@@ -1,0 +1,5 @@
+target,n_shared_features,zalizadeh_to_angiocad_auc,angiocad_to_zalizadeh_auc
+cad,18,0.7838,0.6775
+lad,20,0.7196,0.6874
+lcx,20,0.6551,0.7018
+rca,18,0.6572,0.6118

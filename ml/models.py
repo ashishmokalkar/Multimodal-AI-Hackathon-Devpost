@@ -9,6 +9,7 @@ Add a model by adding one `ModelSpec` to `REGISTRY`.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import Callable
 
@@ -48,7 +49,7 @@ class SeedBag(ClassifierMixin, BaseEstimator):
         spec = REGISTRY[self.name]
         seeds = range(self.n_seeds) if spec.stochastic else [0]
         self.models_ = [fit_weighted(spec.build(self.params, SEED + s), X, y, sample_weight) for s in seeds]
-        self.classes_ = np.array([0, 1])
+        self.classes_ = np.unique(y)
         return self
 
     def predict_proba(self, X):
@@ -77,23 +78,28 @@ def make(name: str, params: dict | None = None, n_seeds: int = 1):
 # ----------------------------------------------------------------------------- builders
 def _logreg(p, seed):
     # sklearn >= 1.8: elastic-net is selected by l1_ratio alone (0 = L2, 1 = L1).
-    return linear_pipeline(LogisticRegression(solver="saga", C=p["C"], l1_ratio=p["l1_ratio"],
+    return _lin(p, LogisticRegression(solver="saga", C=p["C"], l1_ratio=p["l1_ratio"],
                                               class_weight=p["class_weight"], max_iter=20000, random_state=seed))
+
+
+def _lin(p, estimator):
+    """Linear-family preprocessing; plan v2 passes the per-label S1 choice as params "scaling" / "onehot"."""
+    return linear_pipeline(estimator, scaling=p.get("scaling", "robust"), onehot=p.get("onehot", True))
 
 
 def _svm(p, seed):
     svc = SVC(C=p["C"], gamma=p["gamma"], class_weight=p["class_weight"], random_state=seed)
     # Platt scaling averaged over 5 internal splits: a single Platt fit on ~200 rows can collapse
     # (seen on LAD: one fold's probabilities all ~0.1), which breaks pooled AUC and calibration.
-    return linear_pipeline(CalibratedClassifierCV(svc, method="sigmoid", cv=5, ensemble=True))
+    return _lin(p, CalibratedClassifierCV(svc, method="sigmoid", cv=5, ensemble=True))
 
 
 def _knn(p, seed):
-    return linear_pipeline(KNeighborsClassifier(n_neighbors=p["n_neighbors"], weights=p["weights"]))
+    return _lin(p, KNeighborsClassifier(n_neighbors=p["n_neighbors"], weights=p["weights"]))
 
 
 def _gnb(p, seed):
-    return linear_pipeline(GaussianNB(var_smoothing=p["var_smoothing"]))
+    return _lin(p, GaussianNB(var_smoothing=p["var_smoothing"]))
 
 
 def _forest(cls):
@@ -127,9 +133,171 @@ def _ebm(p, seed):
     return ExplainableBoostingClassifier(**p, random_state=seed, n_jobs=1)
 
 
+_UNTHROTTLED = False
+
+
+def _disable_power_throttling() -> None:
+    """Windows 11 runs background processes in 'efficiency mode' (EcoQoS: E-cores, no turbo), which made TabPFN
+    ~5x slower in long background runs. Opt this process out once (no-op elsewhere)."""
+    global _UNTHROTTLED
+    if _UNTHROTTLED or os.name != "nt":
+        return
+    import ctypes
+
+    class _State(ctypes.Structure):
+        _fields_ = [("Version", ctypes.c_ulong), ("ControlMask", ctypes.c_ulong), ("StateMask", ctypes.c_ulong)]
+
+    state = _State(1, 0x1, 0)  # PROCESS_POWER_THROTTLING_EXECUTION_SPEED controlled, and switched off
+    kernel32 = ctypes.windll.kernel32
+    kernel32.GetCurrentProcess.restype = ctypes.c_void_p
+    kernel32.SetProcessInformation(ctypes.c_void_p(kernel32.GetCurrentProcess()), 4,  # ProcessPowerThrottling
+                                   ctypes.byref(state), ctypes.sizeof(state))
+    _UNTHROTTLED = True
+
+
+def weight_mask(sample_weight: np.ndarray, seed: int) -> np.ndarray:
+    """Rows to keep for a model without sample weights: all rows with w >= 1, a seeded fraction w of the rest."""
+    w = np.asarray(sample_weight, dtype=float)
+    return (w >= 1) | (np.random.default_rng(seed).random(len(w)) < w)
+
+
+class TabPFN(ClassifierMixin, BaseEstimator):
+    """TabPFN v3.5 (GPU when available, else CPU), with its inference options exposed as flat params for tuning.
+
+    TabPFN learns in context, so `fit` only stores the training rows; the network (~1.5 GB per instance) is
+    built in `predict_proba` and freed afterwards. A SeedBag of TabPFNs therefore holds one network at a time.
+    TabPFN has no sample weights: `fit(..., sample_weight=w)` subsamples instead (see `weight_mask`).
+    Torch threads per process: `n_threads`, else the TABPFN_THREADS environment variable (CV folds already run
+    in parallel, so few processes with several threads beat many single-threaded ones).
+    """
+
+    def __init__(self, n_estimators=8, softmax_temperature=0.9, average_before_softmax=False,
+                 balance_probabilities=False, polynomial_features="no", fingerprint_feature=True,
+                 outlier_removal_std="auto", preprocess=None, categorical_encoding=None, explicit_categoricals=False,
+                 feature_shift="shuffle", class_shift="shuffle", subsample_samples=None, version=None, random_state=0,
+                 n_threads=None):
+        self.n_estimators = n_estimators
+        self.softmax_temperature = softmax_temperature
+        self.average_before_softmax = average_before_softmax
+        self.balance_probabilities = balance_probabilities
+        self.polynomial_features = polynomial_features
+        self.fingerprint_feature = fingerprint_feature
+        self.outlier_removal_std = outlier_removal_std
+        self.preprocess = preprocess
+        self.categorical_encoding = categorical_encoding
+        self.explicit_categoricals = explicit_categoricals
+        self.feature_shift = feature_shift
+        self.class_shift = class_shift
+        self.subsample_samples = subsample_samples
+        self.version = version
+        self.random_state = random_state
+        self.n_threads = n_threads
+
+    def fit(self, X, y, sample_weight=None):
+        if sample_weight is not None:
+            keep = weight_mask(sample_weight, self.random_state)
+            X, y = X[keep], np.asarray(y)[keep]
+        self.X_, self.y_ = X, np.asarray(y)
+        self.classes_ = np.unique(self.y_)
+        return self
+
+    def predict_proba(self, X):
+        import torch
+        from tabpfn import TabPFNClassifier
+
+        _disable_power_throttling()
+        threads = self.n_threads or int(os.environ.get("TABPFN_THREADS", 0))
+        if threads:
+            torch.set_num_threads(threads)
+        config = {"POLYNOMIAL_FEATURES": self.polynomial_features, "FINGERPRINT_FEATURE": self.fingerprint_feature,
+                  "OUTLIER_REMOVAL_STD": self.outlier_removal_std, "FEATURE_SHIFT_METHOD": self.feature_shift,
+                  "CLASS_SHIFT_METHOD": self.class_shift, "SUBSAMPLE_SAMPLES": self.subsample_samples}
+        if self.preprocess is not None or self.categorical_encoding is not None:
+            config["PREPROCESS_TRANSFORMS"] = _tabpfn_transforms(self.preprocess, self.categorical_encoding)
+        cats = None
+        if self.explicit_categoricals and hasattr(self.X_, "columns"):
+            cats = [i for i, c in enumerate(self.X_.columns) if c in TABPFN_CATEGORICALS]
+        kwargs = dict(n_estimators=self.n_estimators, softmax_temperature=self.softmax_temperature,
+                      average_before_softmax=self.average_before_softmax, balance_probabilities=self.balance_probabilities,
+                      categorical_features_indices=cats or None, inference_config=config, device=_tabpfn_device(),
+                      random_state=self.random_state)
+        if self.version is None:   # default checkpoint (v3.5)
+            model = TabPFNClassifier(**kwargs)
+        else:                      # e.g. "v2.5", "v2.6", "v3": that checkpoint with its own default settings
+            from tabpfn.constants import ModelVersion
+
+            model = TabPFNClassifier.create_default_for_version(ModelVersion(self.version), **kwargs)
+        return model.fit(self.X_, self.y_).predict_proba(X)
+
+
+class FinetunedTabPFN(ClassifierMixin, BaseEstimator):
+    """TabPFN fine-tuned on the training fold (GPU). Early stopping uses an inner validation split of the training
+    fold only; like `TabPFN`, the network is built at predict time and freed afterwards."""
+
+    def __init__(self, epochs=30, learning_rate=1e-5, weight_decay=0.01, validation_split_ratio=0.2,
+                 n_estimators_final_inference=8, version=None, random_state=0):
+        self.epochs = epochs
+        self.learning_rate = learning_rate
+        self.weight_decay = weight_decay
+        self.validation_split_ratio = validation_split_ratio
+        self.n_estimators_final_inference = n_estimators_final_inference
+        self.version = version
+        self.random_state = random_state
+
+    def fit(self, X, y):
+        self.X_, self.y_ = X, np.asarray(y)
+        self.classes_ = np.unique(self.y_)
+        return self
+
+    def predict_proba(self, X):
+        from tabpfn.finetuning.finetuned_classifier import FinetunedTabPFNClassifier
+
+        version = None
+        if self.version is not None:
+            from tabpfn.constants import ModelVersion
+
+            version = ModelVersion(self.version)
+        model = FinetunedTabPFNClassifier(
+            device=_tabpfn_device(), epochs=self.epochs, learning_rate=self.learning_rate,
+            weight_decay=self.weight_decay, validation_split_ratio=self.validation_split_ratio,
+            n_estimators_final_inference=self.n_estimators_final_inference, eval_metric="roc_auc",
+            save_checkpoint_interval=None, random_state=self.random_state, model_version=version)
+        return model.fit(self.X_, self.y_).predict_proba(X)
+
+
+def _tabpfn_device() -> str:
+    """TABPFN_DEVICE if set, else the GPU when one is visible to torch."""
+    import torch
+
+    return os.environ.get("TABPFN_DEVICE") or ("cuda" if torch.cuda.is_available() else "cpu")
+
+
+# Multi-level categoricals in our data (binary columns are detected as categorical by TabPFN anyway).
+TABPFN_CATEGORICALS = ["chest_pain_type", "smoking", "vhd", "region_rwma", "function_class"]
+# Feature transforms per ensemble member: v3.5's default is "none"; "mix" alternates raw and power-transformed members.
+_TABPFN_PREPROCESS = {"none": ["none"], "safepower": ["safepower"], "quantile": ["quantile_uni_coarse"],
+                      "squash": ["squashing_scaler_default"], "robust": ["robust"], "mix": ["none", "safepower"]}
+
+
+def _tabpfn_transforms(preprocess, categorical_encoding):
+    from tabpfn.preprocessing import PreprocessorConfig
+
+    return [PreprocessorConfig(name, categorical_name=categorical_encoding or "ordinal_shuffled",
+                               max_features_per_estimator=768)
+            for name in _TABPFN_PREPROCESS[preprocess or "none"]]
+
+
+def _tabpfn_ft(p, seed):
+    return FinetunedTabPFN(**p, random_state=seed)
+
+
+_TABPFN_DEFAULTS = {"n_estimators": 8, "softmax_temperature": 0.9, "average_before_softmax": False,
+                    "balance_probabilities": False, "polynomial_features": "no", "fingerprint_feature": True,
+                    "outlier_removal_std": "auto"}
+
+
 def _tabpfn(p, seed):
-    from tabpfn import TabPFNClassifier
-    return TabPFNClassifier(n_estimators=p["n_estimators"], device="cpu", random_state=seed)
+    return TabPFN(**p, random_state=seed)
 
 
 # ----------------------------------------------------------------------------- search spaces
@@ -204,14 +372,23 @@ REGISTRY: dict[str, ModelSpec] = {
         lambda t: {"interactions": t.suggest_int("interactions", 0, 10),
                    "learning_rate": t.suggest_float("learning_rate", 0.005, 0.05, log=True),
                    "max_bins": t.suggest_categorical("max_bins", [16, 32, 64, 128]), "outer_bags": 8}),
-    "tabpfn": ModelSpec("other", _tabpfn, {"n_estimators": 8}, None),
+    "tabpfn": ModelSpec(
+        "other", _tabpfn, _TABPFN_DEFAULTS,
+        lambda t: {"n_estimators": t.suggest_categorical("n_estimators", [4, 8, 16]),
+                   "softmax_temperature": t.suggest_float("softmax_temperature", 0.5, 1.2),
+                   "average_before_softmax": t.suggest_categorical("average_before_softmax", [False, True]),
+                   "balance_probabilities": t.suggest_categorical("balance_probabilities", [False, True]),
+                   "polynomial_features": t.suggest_categorical("polynomial_features", ["no", 25]),
+                   "fingerprint_feature": t.suggest_categorical("fingerprint_feature", [True, False]),
+                   "outlier_removal_std": t.suggest_categorical("outlier_removal_std", ["auto", 6.0, None])}),
+    "tabpfn_ft": ModelSpec("other", _tabpfn_ft, {"epochs": 30, "learning_rate": 1e-5}, None),
 }
 
 
 def available(name: str) -> bool:
     """True if the model's backend can be built and fitted here (TabPFN needs an accepted licence)."""
     try:
-        if name == "tabpfn":
+        if name.startswith("tabpfn"):
             from tabpfn.browser_auth import get_cached_token
             return get_cached_token() is not None
         make(name)
