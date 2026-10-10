@@ -15,7 +15,6 @@ import {
   vesselMap,
   vesselDisplay,
   type VesselId,
-  type VesselDisplay,
   VESSEL_TUBE_RADIAL_SEGMENTS,
   VESSEL_TUBE_TUBULAR_SEGMENTS,
 } from "./vesselMap";
@@ -31,38 +30,6 @@ function prefersReducedMotion(): boolean {
   return (
     typeof window !== "undefined" &&
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-  );
-}
-
-interface VesselLabelProps {
-  vessel: VesselId;
-  position: Vector3;
-  display: VesselDisplay;
-  isHovered: boolean;
-  isSelected: boolean;
-}
-
-export function VesselLabel({
-  vessel,
-  position,
-  display,
-  isHovered,
-  isSelected,
-}: VesselLabelProps) {
-  if (!isHovered && !isSelected) {
-    return null;
-  }
-
-  const definition = vesselMap[vessel];
-  return (
-    <Html center position={position} style={{ pointerEvents: "none" }}>
-      <span className="whitespace-nowrap rounded-full bg-slate-900 px-2 py-1 text-[10px] font-semibold text-white shadow-lg">
-        {isSelected ? "Selected" : "Hover"}: {vessel} · {definition.label} ·{" "}
-        {display.percentage}
-        {display.target ? ` · ${display.target.label}` : ""}
-        {display.target?.uncertain ? " · uncertain" : ""}
-      </span>
-    </Html>
   );
 }
 
@@ -180,13 +147,19 @@ export function VesselMesh({ vessel }: VesselMeshProps) {
           </span>
         </Html>
       )}
-      <VesselLabel
-        display={display}
-        isHovered={isHovered}
-        isSelected={isSelected}
-        position={tooltipPosition}
-        vessel={vessel}
-      />
+      {isHovered && (
+        <Html
+          center
+          position={tooltipPosition}
+          style={{ pointerEvents: "none" }}
+        >
+          <span className="whitespace-nowrap rounded-full bg-slate-900 px-2 py-1 text-[10px] font-semibold text-white shadow-lg">
+            {vessel} · {definition.label} · {display.percentage}
+            {display.target ? ` · ${display.target.label}` : ""}
+            {uncertain ? " · uncertain" : ""}
+          </span>
+        </Html>
+      )}
     </>
   );
 }

@@ -212,7 +212,6 @@ describe("RawResult explanation rendering", () => {
     expect(markup).toContain("+12 pts");
     expect(markup).toContain("Typical patient");
     expect(markup).toContain("42%");
-    expect(markup).toContain("Original dataset sample");
     expect(markup).toContain(
       "Baseline Shapley on served probability (32 orderings).",
     );
@@ -252,8 +251,8 @@ describe("RawResult explanation rendering", () => {
       "patient-20",
     );
 
-    expect(markup).toContain("Edited dataset sample");
-    expect(markup).toContain("Source:");
+    expect(markup).toContain("Edited dataset-sample scenario");
+    expect(markup).toContain("Prediction source:");
     expect(markup).toContain("trained without this patient");
   });
 

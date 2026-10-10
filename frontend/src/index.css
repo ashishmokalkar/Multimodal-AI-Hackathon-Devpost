@@ -1957,36 +1957,8 @@ button:focus-visible {
 }
 
 .artery-scale-bar {
-  position: relative;
   height: 8px;
   border-radius: 999px;
-}
-
-.artery-scale-threshold {
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  width: 3px;
-  border-radius: 2px;
-  background: #0f172a;
-  box-shadow: 0 0 0 1.5px #ffffff;
-}
-
-.artery-scale-threshold-note {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 3px;
-  font-size: 10.5px;
-  color: #475569;
-}
-
-.artery-scale-threshold-note i {
-  display: inline-block;
-  width: 3px;
-  height: 11px;
-  border-radius: 2px;
-  background: #0f172a;
 }
 
 .artery-scale-ticks {
