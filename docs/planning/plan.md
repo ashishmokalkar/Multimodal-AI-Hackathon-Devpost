@@ -1,7 +1,7 @@
 # Sprint 3 Plan - Dashboard and separately gated real integration
 
-**Status:** Gate 0 is approved and Phase 1 is authorised (D-034), with its
-execution kickoff recorded by X. H approved S2 Gate 3
+**Status:** Gate 0 is approved and Phase 1 is delivered by X; its self-check
+evidence is submitted and Human Gate 1 is pending H. H approved S2 Gate 3
 and continuation in this session (D-031), then approved re-planning for
 independent mock-dashboard work while M's reply is pending (D-032).
 H approved the detailed delivery scope, allocations and dates below.
@@ -36,6 +36,14 @@ and project usage of **1845.0928925**, leaving **5154.9071075** under the
 project cap. This is the Phase 1 baseline; S3 cumulative usage includes
 Phase 0 and handover activity before this boundary. Phase 1 allocation and
 X ceiling remain 650 and 160. Figures are deduplicated local telemetry, not billing.
+
+Phase 1 delivery snapshot through **2026-10-10T08:51:50.334Z**:
+Phase 1 actual **30.4126855** credits (O **0**, X **30.4126855**);
+cumulative S3 **102.9012605** (O **71.455220**, X **31.4460405**);
+project total **1875.5055785**, with **5124.4944215** remaining under the
+7000 cap. Phase 1 has **619.5873145** combined allocation and **129.5873145**
+of X's ceiling remaining. These are deduplicated local telemetry totals through
+the stated snapshot, not billing; later review/publication calls are excluded.
 
 Allocations approved at Gate 0 (D-034):
 
@@ -114,7 +122,7 @@ independent dashboard Phase 1 (Recommended)", approving the detailed plan,
 allocations, calendar/checkpoints and submission dates (D-034).
 Gate R and Phase 2 are not implicitly approved.
 
-## Phase 1 - Independent explanation/input/metrics dashboard (authorised; underway)
+## Phase 1 - Independent explanation/input/metrics dashboard (delivered; Gate 1 pending)
 
 **Goal:** Make the existing mock prediction interpretable through selected-target
 charts, physiological inputs and transparent metrics without new backend assumptions.
@@ -153,28 +161,28 @@ Atomic tasks
 - [ ] Add focused tests and fresh live mock evidence, run existing frontend
   checks, commit/push in-scope work and stop for Gate 1.
 
-**Self-check gate 1:**
+**Self-check gate 1 (X evidence submitted; awaiting H approval):**
 
-1. Distinct CAD/LAD/LCX/RCA fixtures verify target switching, top-ten cap,
+1. **Passed:** Distinct CAD/LAD/LCX/RCA fixtures verify target switching, top-ten cap,
    stable absolute ordering, positive/negative/zero values, labels/units and
    explicit empty output. Numeric accessible output matches plotted values.
-2. Input/table fixtures distinguish missing attribution from returned zero,
+2. **Passed:** Input/table fixtures distinguish missing attribution from returned zero,
    preserve response input values and units, and clear patient prediction detail
    after edits/pending/error. Existing race tests still pass.
-3. Metrics fixtures cover all targets/metadata, mock labels, loading/error/retry,
+3. **Passed:** Metrics fixtures cover all targets/metadata, mock labels, loading/error/retry,
    version mismatch and no fabricated metric fallback.
-4. Live screenshots show the sample -> selected vessel -> Why?/Inputs story,
+4. **Passed:** Live screenshots show the sample -> selected vessel -> Why?/Inputs story,
    a changed fresh prediction and cleared stale output, plus the metrics drawer.
    Keyboard view navigation and drawer open/close/Escape/focus restoration work;
    focus cannot escape an open modal. ARIA tab semantics, if used, are complete.
-5. The 3D viewer, probability/selection correspondence, orbit/zoom and safety/
+5. **Passed:** The 3D viewer, probability/selection correspondence, orbit/zoom and safety/
    mock/synthetic/schematic qualifications remain intact. No schema/backend/
    dependency changes or unconfirmed clinical/explanation claims are introduced.
-6. Lint/typecheck/test/build pass. Evidence is under `docs/evidence/s3p1-*`;
-   commit/push, clean status and dated phase/sprint/project credits are reported.
+6. **Passed:** Lint/typecheck/test/build pass. Evidence is under `docs/evidence/s3p1-*`;
+   passing changes are committed/pushed, branch status and dated phase/sprint/project credits are reported.
    CI remains informational, with no waiting/debugging.
 
-**Human gate 1:** H approves the independent dashboard after O review and
+**Human gate 1 (pending):** H approves the independent dashboard after O review and
 revisits M's readiness/calendar. Approval alone does not authorise Phase 2;
 Gate R must also pass. Missing handoff triggers explicit re-planning, not an
 automatic real-backend claim or a silent Oct 14 delivery extension.

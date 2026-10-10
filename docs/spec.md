@@ -143,7 +143,11 @@ integration window is provisional. During S3 planning, H allowed an independent
 mock-dashboard plan while M's response is pending (D-032); contract changes,
 delivery date and runtime/model handoff remain required at the separate
 real-integration readiness gate. H approved S3 Gate 0 and authorised independent
-Phase 1 only (D-034); its implementation kickoff is pending.
+Phase 1 only (D-034). X implemented and locally verified the mock-backed Why?/
+Inputs dashboard and metrics drawer, with evidence under `docs/evidence/s3p1-*`;
+Human Gate 1 is pending. This remains mock-only and does not authorize Phase 2
+or establish real-backend compatibility. Gate R remains separate and blocked on
+M's contract/runtime/model handoff and H's approval.
 
 ## 8. Clinical safety
 
