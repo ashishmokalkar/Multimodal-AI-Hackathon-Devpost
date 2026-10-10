@@ -131,7 +131,13 @@ function AppContent() {
       <footer className="app-footer">
         <p>{DISCLAIMER_TEXT}</p>
         <div className="footer-credits">
-          <div>Dataset credit: pending</div>
+          <div>
+            {profile?.mode === "real"
+              ? "Dataset: Z-Alizadeh Sani extension (UCI #411; source-reported CC BY 4.0)."
+              : profile?.mode === "mock"
+                ? "Dataset: project-generated synthetic sample records."
+                : "Dataset attribution appears after the API profile is checked."}
+          </div>
           <div>
             Heart asset:{" "}
             <a href="/models/ATTRIBUTION.md" rel="noreferrer" target="_blank">
