@@ -1,0 +1,92 @@
+S5 Phase 2 corrected review candidates
+Date: 2026-10-10
+Status: Corrected drafts published; Human Gate 2 pending
+Frozen application source: 39ffab1c8adecd707c0f40ce826c12a568c41267
+
+Publication
+- Approved Phase 2 planning edits: 3333f5b1be503f2fd993d31f8a569caf4270a566
+- Corrected candidate package: 48384c56f357b690d9c8dd5eaacd86dddf2e8731
+- Local HEAD and origin/frontend matched at the candidate publication cutoff.
+- No application, API, model, data, dependency or runtime source changed.
+
+Correction outcomes
+- S5-F01: project-document section 2 and Devpost now state that a valid
+  sample ID or exact public-sample feature match selects demo models; other
+  valid requests use final models. Unknown IDs are rejected. The sample ID
+  remains attached to edits for paired what-if behavior.
+- S5-F02: the headline ROC-AUC is labelled the reported mean per-fold result
+  on repeats r5-r9. The separate pooled calibrated AUC values are 0.932,
+  0.864, 0.767 and 0.762 for CAD/LAD/LCX/RCA. Accuracy, precision, recall and
+  F1 are identified as calibrated threshold-rule metrics. Existing sourced
+  values and selection/validation caveats remain; no metrics were recalculated
+  and neither final nor demo refits are claimed to be independently validated.
+- S5-F03: document, Devpost draft and storyboard identify baseline Shapley
+  attribution with 32 input orderings on served calibrated/capped probability.
+  The reference risk is a prediction for reference inputs, not measured
+  population prevalence. Signed probability-point, top-ten-subset and
+  noncausal qualifications remain.
+
+Project document candidate
+- Source: docs/submission/project-document.md
+- Export: docs/submission/project-document.pdf (577061 bytes)
+- Source SHA-256: F8BEC120ADC9A695F7A11181926477F55890848B53063A790E9059175F0B0520
+- PDF SHA-256: 06D3ED90502D6F5B8EBF1784E4E3E62BADAFDE4A91E47D09F22FDC17F7B7AE32
+- Measured page count: 5 by pdftotext form-feed count; references included.
+- Extracted text: 9907 characters. Each page has nonempty extracted text:
+  1330, 1485, 1781, 1462 and 2194 non-whitespace characters.
+- Source/PDF content comparison: 626 unique source tokens, 626 unique PDF
+  tokens, zero source tokens absent from the PDF. All correction-specific
+  phrases were present in extracted text.
+- Visual review: five 794x1122 print-width previews were generated from the
+  same Markdown source, renderer and page typography and inspected page by
+  page. They show all five sections, the reused dashboard illustration,
+  evaluation table and references legibly within their page frames:
+  C:\Users\faiza\.copilot\session-state\a09f2e0c-1c86-4f55-9bb5-eddc7544a9e9\files\s5p2-review-candidate\page-preview-1.png
+  through page-preview-5.png. Human full-PDF visual review remains pending.
+- Tested with the installed PowerShell ConvertFrom-Markdown renderer and
+  Microsoft Edge PDF export; no new package or dependency was added.
+
+Video and package checks
+- Original rough cut and raw recording remain unchanged and outside Git.
+- Existing captioned video:
+  C:\Users\faiza\.copilot\session-state\a09f2e0c-1c86-4f55-9bb5-eddc7544a9e9\files\s5-submission\s5p1-demo-captioned.mp4
+- ffprobe reports 261 seconds, H.264, 1920x1080, 7097500 bytes, no audio.
+  The existing S5 Phase 1 evidence records the full decode/caption review;
+  no video re-recording or playback review was repeated.
+- The Devpost source link points to frozen commit
+  39ffab1c8adecd707c0f40ce826c12a568c41267, which exists locally. The PDF
+  is absent from that frozen-source commit; the draft identifies the current
+  document path and explicitly leaves final upload/link pending.
+- Local manifest, report, requirements, dataset workbook, contract, README
+  and all four final/demo model artifacts are present. This is not a judge-
+  access check or a fresh runtime setup test.
+
+Open inputs and access blockers
+- H's full review of every PDF page and the complete video, plus consolidated
+  feedback, has not been forwarded.
+- H's live Devpost form check (deadline, required fields/assets, upload/link
+  mechanics and judge access) is still open; the planning fetch returned 403.
+- Ashish's verification/corrections for data, preprocessing, estimators,
+  evaluation/aggregation, subgroups and demo-model statements remain open.
+- No finalization, H upload, public-access test, submission or Human Gate 2
+  pass is claimed.
+
+Credits
+- Phase 2 executor kickoff: 2026-10-10T20:25:34.316Z.
+- Fresh pre-correction snapshot through 2026-10-10T20:27:17.267Z: Phase 2
+  16.6247525; S5 235.0659115; project 3719.362564. Phase 1 remained
+  218.441159. Remaining under S5 500: 264.9340885; under project 7000:
+  3280.637436.
+- Corrected-candidate cutoff through 2026-10-10T20:37:26.184Z: Phase 2
+  24.344199; S5 242.785358; project 3727.0820105. Phase 1 remained
+  218.441159. Remaining under S5 500: 257.214642; under project 7000:
+  3272.9179895.
+- Deduplicated local session-store telemetry filtered to the repository
+  working directory, not account billing. Existing boundaries and actuals
+  were not reset. Status-publication and reporting calls after the cutoff
+  are excluded.
+
+Helpers
+- Only isolated Edge PDF-export/review processes started for this work were
+  stopped. The review port 42678 has no listener. No Vite/API service was
+  started or stopped.

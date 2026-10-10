@@ -2,8 +2,9 @@
 
 **Status:** H approved S5 Human Gate 1 with explicit draft-review/form-check
 carryover and three document corrections (D-054). Phase 1 is accepted with
-those open items; Phase 2 is authorised, with its manual handover pending.
-Human Gate 2 is pending; Phase 3/submission is not authorised.
+those open items; Phase 2 is active and corrected review candidates are
+published. Finalisation awaits H/M inputs. Human Gate 2 is pending;
+Phase 3/submission is not authorised.
 S4 remains closed under D-051 after documentation-only closeout
 `e5117844e07db7196bed8636992627a551b59cdd`.
 The frozen code remains `39ffab1c8adecd707c0f40ce826c12a568c41267`.
@@ -126,7 +127,7 @@ source and do not assume the default branch contains it.
 |---|---:|---|
 | 0 - Planning | 150 | 90.225900 through the recorded pre-Phase-1 cutoff below |
 | 1 - Automated draft package | 220 | 128.215259 through the recorded pre-Phase-2 cutoff below |
-| 2 - Finalisation and access checks | 90 | Authorised; O handover work accruing |
+| 2 - Finalisation and access checks | 90 | 24.344199 through 2026-10-10T20:37:26.184Z; corrected candidates only |
 | 3 - Submission, retrospective and cleanup | 40 | Not started |
 | **S5 total** | **500 hard sprint ceiling** | Includes all planning/review/publication |
 
@@ -185,6 +186,15 @@ project cap; Phase 1 remains **218.441159**. This uses the local session
 store's deduplicated event fields and repository working-directory filter,
 not account billing. It includes available O/E work since the unchanged
 boundaries; no actuals were reset.
+
+**Phase 2 corrected-candidate cutoff (Human Gate 2 remains pending):** through
+`2026-10-10T20:37:26.184Z`, deduplicated local telemetry records Phase 2
+**24.344199**, S5 **242.785358**, and project **3727.0820105**. It leaves
+**257.214642** under the shared S5 ceiling and **3272.9179895** under the
+project cap; Phase 1 remains **218.441159**. This is local telemetry, not
+billing. It uses the same event deduplication and repository filter as the
+pre-correction snapshot; the boundaries and actuals were not reset. Later
+status-publication and reporting calls are excluded.
 
 ## Phase 0 - Discussion and research (complete)
 
@@ -277,14 +287,14 @@ returned 403; do not convert that uncertainty into verified current rules.
 
 | ID | Disposition / owner | Required correction or evidence |
 |---|---|---|
-| S5-F01 | Approved; E, ML verification by Ashish | Document section 2 incorrectly says every request without a sample ID uses final models. `api/main.py` also detects an exact feature match to a public sample. State: a valid ID or exact public-sample match selects demo models; otherwise final models. Preserve retained-origin what-if behavior. |
-| S5-F02 | Approved; E, ML verification by Ashish | Label headline ROC-AUC as the reported mean per-fold result; distinguish its aggregation from pooled calibrated AUC and the calibrated, threshold-rule classification metrics. Source `reports/BEST_MODELS.md` sections Champions/Post-processing and `models/manifest.json`; keep approved numbers/caveats, do not recalculate or claim validation of the final served/demo capped outputs. |
-| S5-F03 | Approved; E, ML verification by Ashish | Name the real API baseline Shapley attribution method with 32 orderings on served calibrated/capped probability. Explain that reference risk is for reference inputs, not observed population prevalence; keep signed probability-point, top-ten-subset and noncausal qualifications. |
+| S5-F01 | Implemented in corrected candidate; Ashish verification pending | Section 2 and Devpost now say a valid sample ID or exact public-sample feature match selects demo models; other valid requests use final models. Unknown IDs are rejected and retained-origin paired what-if behavior is preserved. |
+| S5-F02 | Implemented in corrected candidate; Ashish verification pending | The document and Devpost distinguish reported mean per-fold ROC-AUC, pooled calibrated AUC and calibrated threshold-rule classification metrics. Existing values and selection/validation caveats are preserved; no metrics were recalculated and final/demo refits are not represented as independently validated. |
+| S5-F03 | Implemented in corrected candidate; Ashish verification pending | The document, Devpost and storyboard name baseline Shapley with 32 orderings on served calibrated/capped probability; reference risk is for reference inputs, not measured prevalence. Signed probability-point, top-ten-subset and noncausal qualifications remain. |
 | H full draft review | Carried to Phase 2; H | Read every exported PDF page and watch the full captioned video; forward one consolidated feedback batch. O's sampled frame/text review is not this human check. |
 | Current Devpost form | Carried to Phase 2; H | Verify deadline, required fields/assets, upload/link mechanics and judge access against the live form. Report any new requirement needing a scope decision. |
 | ML sign-off | Open; Ashish via H, due Oct 12 | Verify/replace data, preprocessing, estimators, CV/aggregation, subgroup and demo-model statements; H forwards confirmation/corrections. Hour/coverage remain unconfirmed. |
 
-## Phase 2 - Finalisation and access checks (authorised; handover pending)
+## Phase 2 - Finalisation and access checks (active; finalisation awaiting H/M)
 
 **Goal:** Produce the accepted final document/video and a submission-ready
 set of links by Oct 13.
@@ -293,9 +303,9 @@ set of links by Oct 13.
 
 **Atomic tasks:**
 
-- [ ] E publishes pending O Gate 1/plan/spec/decision updates through H's
+- [x] E publishes pending O Gate 1/plan/spec/decision updates through H's
   manual handover, preserving existing changes and the frozen source.
-- [ ] Implement S5-F01/F02/F03 in document source and regenerated PDF;
+- [x] Implement S5-F01/F02/F03 in document source and regenerated PDF;
   reconcile corresponding submission-text/storyboard wording where needed.
   The existing footage need not be re-recorded for these document corrections.
 - [ ] H reads all PDF pages and watches the full captioned cut, then forwards
@@ -319,6 +329,14 @@ draft qualifications, invent confirmation or claim final readiness. Publish
 completed work and report the precise outstanding inputs rather than polling
 or keeping helpers running. Resume this same phase when H forwards them;
 there is no new subphase budget or automatic approval.
+
+**Corrected review candidates published:** commit
+`48384c56f357b690d9c8dd5eaacd86dddf2e8731` updates the document source/PDF,
+Devpost draft and storyboard. The PDF is five pages and its extracted text
+matches all 626 unique source tokens. The unchanged captioned video remains
+4:21. These are still drafts: H's full PDF/video review and form/access check,
+Ashish's ML verification, final uploads and judge-accessible links remain
+open. No Gate 2 approval or finalisation is claimed.
 
 **Self-check gate 2:** Final exported assets meet measured page/duration
 limits; S5-F01/F02/F03, Ashish's ML sign-off, H's full draft review and feedback

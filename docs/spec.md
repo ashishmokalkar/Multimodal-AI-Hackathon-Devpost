@@ -413,6 +413,15 @@ outstanding confirmations. No footage re-recording or frozen-code change
 is implied. Phase 2 begins `2026-10-10T20:23:07.549Z`; S5's shared 500
 ceiling, manual handovers and separately gated submission remain unchanged.
 
+**S5 Phase 2 corrected candidates (2026-10-10):** E published corrected
+review candidates in `48384c56f357b690d9c8dd5eaacd86dddf2e8731`. The
+document source, five-page PDF, Devpost draft and storyboard incorporate
+S5-F01/F02/F03; the original 4:21 captioned rough cut was not re-recorded.
+The package remains in draft status. H's full document/video review and
+current-form/access check, plus Ashish's ML verification, remain pending and
+block finalisation and Human Gate 2. No upload, submission, source change or
+Gate 2 approval is implied.
+
 ## 8. Clinical safety
 
 - Modal on first load (acknowledge required), persistent header banner, footer. Text: *"For decision-support and educational purposes only. Not a substitute for formal diagnostic imaging or clinical judgement."*
