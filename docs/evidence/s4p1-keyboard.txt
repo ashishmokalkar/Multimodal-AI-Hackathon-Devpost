@@ -25,4 +25,5 @@ model was still loading at 1920x1080 and before the 1280x800 resize had settled.
 Those images and canvas measurements are not used as layout evidence. Use
 `s4p1-before-*` and `s4p1-release-*` for the settled before/after captures and
 measurements; the keyboard focus sequence above is independent of those
-screenshots.
+screenshots. A single readiness-aware capture retry timed out waiting for the
+heart scene and wrote no images; no further capture retries were made.

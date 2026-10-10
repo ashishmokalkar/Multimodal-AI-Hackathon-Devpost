@@ -227,11 +227,11 @@ The separate D-044 empty-warning captures and settled warning canvas pair
 remain Phase 2 work; they are not claimed passed here.
 
 Latest deduplicated local telemetry snapshot through
-**2026-10-10T16:23:44.069Z**: Phase 1 **43.2409575** (O **15.843140**,
-X **27.3978175**); S4 **79.870487**; project **3033.657266** credits. These
-are local telemetry, not billing; later documentation publication calls are
-excluded. Phase 1 remains within 350 combined / 120 X, S4 within 700, and the
-project within 7000; no ceiling or prior actual was reset.
+**2026-10-10T16:25:31.778Z**: Phase 1 **48.6943595** (O **15.843140**,
+X **32.8512195**); S4 **85.3238895**; project **3039.110668** credits. These
+are local telemetry, not billing; later calls are excluded. Phase 1 remains
+within 350 combined / 120 X, S4 within 700, and the project within 7000; no
+ceiling or prior actual was reset.
 
 **Human Gate 1:** H reviews O's assessment and authorises Phase 2 only after
 accepting clarity/behavior evidence and explicitly setting its X ceiling and
