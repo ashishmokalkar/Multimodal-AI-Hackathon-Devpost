@@ -30,5 +30,5 @@ Claims and remaining draft-review blockers
 Credits
 - Execution kickoff: 2026-10-10T19:29:02.337Z (21:29:02.337 CEST).
 - Fresh pre-production baseline through 2026-10-10T19:30:54.536Z: Phase 1 14.351153; S5 104.577053; project 3588.873706.
-- Gate 1 snapshot through 2026-10-10T20:11:10.665Z: Phase 1 62.520601; S5 152.746501; project 3637.043153. This left 347.253499 under S5 500 and 3362.956847 under project 7000.
-- Deduplicated local telemetry, not account billing. Later documentation publication calls are excluded; boundaries and actuals were not reset.
+- Gate 1 snapshot through 2026-10-10T20:16:09.417Z: Phase 1 83.292451; S5 173.518351; project 3657.815003. This left 326.481649 under S5 500 and 3342.184997 under project 7000.
+- Deduplicated local telemetry, not account billing. Later accounting-record publication calls are excluded; boundaries and actuals were not reset.

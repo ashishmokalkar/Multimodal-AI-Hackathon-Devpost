@@ -124,7 +124,7 @@ source and do not assume the default branch contains it.
 | Phase | Combined O+X estimate | Actual |
 |---|---:|---|
 | 0 - Planning | 150 | 90.225900 through the recorded pre-Phase-1 cutoff below |
-| 1 - Automated draft package | 220 | 62.520601 through the Gate 1 snapshot below |
+| 1 - Automated draft package | 220 | 83.292451 through the Gate 1 snapshot below |
 | 2 - Finalisation and access checks | 90 | Not started |
 | 3 - Submission, retrospective and cleanup | 40 | Not started |
 | **S5 total** | **500 hard sprint ceiling** | Includes all planning/review/publication |
@@ -150,13 +150,13 @@ review and executor kickoff work, not only production. The snapshot is local
 telemetry, not billing; later calls are excluded. Neither accounting boundary
 nor prior actuals were reset.
 
-**Phase 1 Gate 1 snapshot:** through **2026-10-10T20:11:10.665Z**,
-deduplicated local telemetry records Phase 1 **62.520601**, S5
-**152.746501**, and project **3637.043153**. This includes 107 Phase 1 usage
-events from **19:26:59.480Z** through the cutoff. It leaves **347.253499**
-under the shared S5 ceiling and **3362.956847** under the project cap. These
-are local telemetry, not billing; later documentation publication calls are
-excluded. Accounting boundaries and prior actuals remain unchanged.
+**Phase 1 Gate 1 snapshot:** through **2026-10-10T20:16:09.417Z**,
+deduplicated local telemetry records Phase 1 **83.292451**, S5
+**173.518351**, and project **3657.815003**. This includes 130 Phase 1 usage
+events from **19:26:59.480Z** through the cutoff. It leaves **326.481649**
+under the shared S5 ceiling and **3342.184997** under the project cap. These
+are local telemetry, not billing; later accounting-record publication calls
+are excluded. Accounting boundaries and prior actuals remain unchanged.
 
 **Gate 0 accounting boundary:** Phase 1 begins
 **2026-10-10T19:26:20.967Z**, after H's approval. Events before it remain
