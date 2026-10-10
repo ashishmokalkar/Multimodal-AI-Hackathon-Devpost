@@ -1,6 +1,10 @@
 # Sprint 4 Plan - Feedback and code completion
 
-**Status:** Human Gate 0 is approved; Phase 1 is authorised (D-045).
+**Status:** Human Gates 0 and 1 are approved. Phase 1 is accepted; H authorised
+the bounded Phase 2 feedback/hardening batch under D-047. Feedback from a
+review of older `cbb9d95` is triaged below; only S4-F01/F04/F06/F08/F09 and
+the existing release-candidate/carryover tasks enter this batch. Deferred or
+no-change items do not reopen implementation scope.
 H approved S3 Gate 4 with explicit evidence carryover and closed S3 (D-044).
 H manually confirmed keyboard opening/closing of patient 20's warning and the
 qualified empty-warning status after selecting Custom patient. The settled
@@ -38,8 +42,8 @@ authorised.
 | Phase | Combined ceiling | X ceiling | Status |
 |---|---:|---:|---|
 | 0 - Discussion and research | 100 | 0 | Gate 0 approved |
-| 1 - Summary-first results and explanations | 350 | 120 | Authorised now |
-| 2 - Release-candidate hardening and carryover verification | 150 | Requires H approval at Gate 1 | Not authorised |
+| 1 - Summary-first results and explanations | 350 | 120 | Accepted at Gate 1 |
+| 2 - Bounded feedback, release-candidate hardening and carryover | 150 | 100; carryover corrective limit 60 cumulative, overlapping | Authorised by D-047 |
 | 3 - Retrospective and code-freeze cleanup | 50 | Requires H approval at Gate 2 | Not authorised |
 | Contingency | 50 | Requires separate H approval | Unused |
 | **S4 total** | **700** | | |
@@ -60,10 +64,31 @@ No ceiling or prior actual is reset.
 
 D-041/D-043's historical corrective X usage remains **36.7557225** of 40
 at S3 closeout. D-044's carried warning evidence remains open in Phase 2.
-Gate 1 must explicitly address its residual funding and Phase 2 X ceiling;
-do not silently reset or evade that historical guard. New density-fix
-regressions are Phase 1 work; do not misclassify old carryover work to spend
-outside its approved allowance.
+D-047 extends that historical corrective limit from 40 to 60 for carried
+warning evidence only, overlapping Phase 2's 100 X ceiling. No historical
+actual is reset. Phase 1 density work is not corrective warning work;
+an unrestricted time slice from D-041 through Phase 1 would wrongly charge
+it to the repair allowance. X must record separate start/end cutoffs for
+the carried warning block and its related reporting in Phase 2.
+
+**Gate 1 closing snapshot:** through **2026-10-10T16:44:45.686Z**, final
+recorded Phase 1 is **116.6821095** (O **77.943840**, X **38.7382695**),
+S4 **153.3116395** and project **3107.098418**. Remaining: **233.3178905**
+under Phase 1, **81.2617305** under its X ceiling, **546.6883605** under S4
+and **3892.901582** overall. These are deduplicated local telemetry, not
+billing; later calls are excluded. Phase 2 accounting starts at the recorded
+post-approval boundary **2026-10-10T16:44:46.230Z**; prior events remain Phase
+1, events at/after it are Phase 2. X takes a fresh execution baseline.
+
+X execution kickoff: **2026-10-10T16:48:20.983Z** (2026-10-10
+18:48:20.983 CEST). Fresh deduplicated local snapshot through
+**2026-10-10T16:49:20.971Z**: Phase 2 **18.982270** (O **15.183870**,
+X **3.798400**); S4 **172.2939095**; project **3126.080688**. These are
+local telemetry, not billing; later calls are excluded. The carried-warning
+block has not started at this snapshot; its separate interval must include
+capture and related reporting. Historical corrective use remains **36.7557225**
+of the cumulative 60 limit, leaving **23.2442775**. No prior actual or ceiling
+is reset.
 
 ## Phase 0 - Discussion and readiness planning (approved)
 
@@ -233,23 +258,96 @@ are local telemetry, not billing; later calls are excluded. Phase 1 remains
 within 350 combined / 120 X, S4 within 700, and the project within 7000; no
 ceiling or prior actual was reset.
 
-**Human Gate 1:** H reviews O's assessment and authorises Phase 2 only after
-accepting clarity/behavior evidence and explicitly setting its X ceiling and
-any needed carryover-verification allowance. No automatic Phase 2 start.
+**Human Gate 1: approved (D-047).** H selected "Approve Gate 1 and the bounded
+Phase 2 batch (Recommended)" after O's evidence review and feedback triage.
+Approves Phase 2's closed batch, 150 combined/100 X, and 20 further corrective
+X credits (60 cumulative) overlapping that X ceiling. No other changes,
+cleanup, PR operation, agents or later phases are authorised.
 
-## Phase 2 - Release-candidate hardening and carryover verification (unstarted)
+**O review (2026-10-10):** The settled release captures, row bounds and
+independent keyboard trace support the self-check. Three full chart rows are
+visible at 1280x800, text is 11 CSS px, overflow is zero and canvas dimensions
+are unchanged. Source/probabilities/thresholds/warnings/uncertainty remain
+visible; methods and ten-row numeric/input detail are reachable. The scoped
+source changes preserve model/store/viewer behavior. Accept the reported
+frontend checks without rerunning them; the discarded loading-race captures
+are not gate evidence. Human approval and D-044 carryover remain separate.
 
-**Goal:** Prove the final integrated workflow and complete D-044's remaining
-warning evidence before code freeze.
+## Feedback ledger - current review intake
 
-**Allocation:** 150 O+X. X ceiling/carryover allowance need H approval at Gate 1.
-Prerequisite: Human Gate 1.
+Source: H forwarded a Track A frontend review of `cbb9d95` after Phase 1 was
+published at `fe652ed12f99d47238556f03b9371d81ffb8dfb4`. O checked current
+source, approved semantics and published evidence. Review severity/order are
+suggestions, not automatically accepted defects. The workflow in
+`docs/workflow.md` applies; H approved only the listed batch under D-047.
+
+| ID | Review claim | Assessment and evidence | Disposition / owner |
+|---|---|---|---|
+| S4-F01 | Colours ignore different target thresholds | `colorScale.ts` and the legend encode absolute probability, as required by spec section 6; labels use returned thresholds. Equal probabilities intentionally have equal colours. Threshold-relative colours would change the shared legend meaning, not repair a broken mapping. The potential confusion is valid. | Approved D-047: retain absolute colours and add a clearly labelled selected-target decision-threshold marker using the response threshold; X. No hard-coded thresholds/severity categories. |
+| S4-F02 | Edits must clear `sample_id` | `api/main.py` selects demo models whenever a valid ID is supplied. D-038 and the contract intentionally retain origin across edits for same-model paired what-if comparisons; the UI labels edited scenarios. Clearing it would confound input and fitting-set changes. | No request/store/backend change. Preserve origin and accepted snapshots. Explain the policy in portable usage documentation; any different policy needs H/M agreement. |
+| S4-F03 | Tubes are schematic/front-facing, no left main or torso | `vesselMap.ts` is the D-012 schematic fallback; the GLB has no artery nodes. The brief permits a heart without a torso. Anatomical fidelity remains a real rubric limitation, but unverified repositioning is not a validated correction. | Deferred: new assets, left-main geometry and anatomical rework need separate scope and reviewed orientation/asset evidence. Keep schematic/non-lesion wording; H/M for future scope. |
+| S4-F04 | Selection changes only radius | `VesselMesh.tsx` already increases radius and selected emissive intensity (0.45); hover adds intensity/tooltip. A selected in-scene label is still a reasonable clarity improvement. | Approved D-047: persistent selected-vessel label using existing Html/tooltip pattern, preserving probability hues, neutral state and camera behavior; X. No postprocessing/glow package or fading that changes risk encoding. |
+| S4-F05 | Exact 49-input/8-sample guards prevent extension | `profile.ts` really enforces the pinned v1.1 handoff counts. This is an acknowledged extensibility constraint, not proof that arbitrary extra features will be served correctly: the pinned API validates its fixed feature set and models. Counts alone are also not a general schema-evolution strategy. | Deferred coordinated API/profile-extension work. Preserve duplicate/leakage/type/unit/profile guards; do not loosen frontend counts alone or claim arbitrary runtime extensibility. Document the current boundary; H/M for contract evolution. |
+| S4-F06 | Capped vessels can be elevated while CAD is not | `ml/export.py` caps probabilities, not labels. Different per-target decision thresholds can legitimately yield different binary labels even when P(vessel) <= P(CAD); equality alone does not prove capping occurred. | Approved D-047: concise explanation in existing model detail/usage docs of independent thresholds and served probability capping; X. No output recomputation, backend change or equality-based fabricated cap flag. |
+| S4-F07 | Large bundle/GLB requires splitting/compression | Existing large-chunk advisory and asset size are known; accepted interaction evidence shows no demonstrated new performance regression. The old review's precise bundle size is not a current gate measurement. Compression/decoders and lazy loading alter loading paths. | Deferred unless a measured demo startup/performance blocker justifies a separate bounded change. No new decoder/dependency or full performance rerun merely for this suggestion. |
+| S4-F08 | Personal README paths obstruct reproduction | Confirmed absolute user paths and a stale `backend/` layout description in README. Local instructions are useful but cannot be the only judge-facing route. | Approved D-047: repo-relative generic setup/start/checks for the tested Linux/Ubuntu runtime, optional Windows/WSL adaptation and accurate root `api/`/`models/` layout; X. Preserve pinned dependencies and safety constraints. |
+| S4-F09 | Node pin conflicts with engines minimum | `.nvmrc` pins 24.19.0; `engines` declares >=20.19.0. A tested/recommended version and a compatibility lower bound need not be equal; do not claim every eligible version was tested. README's "requires" wording is imprecise. | Approved D-047: clarify recommended/tested Node 24.19.0 and pnpm 12.9.1 versus declared compatibility range; X with S4-F08. Do not arbitrarily narrow engines or change the pin. |
+| S4-F10 | Disclaimer modal appears once | Persistent banner/footer meet the visible-disclaimer requirement; first-visit acknowledgement is intentional. | No change. Retain always-visible banner/footer and current acknowledgement behavior. |
+
+**Approved batch (D-047):** S4-F01/F04/F06/F08/F09 plus existing Phase 2
+release-candidate/carryover tasks. Phase 2 is 150 combined/100 X; D-041/D-043
+corrective total is extended from 40 to 60 for carried warning evidence,
+overlapping (not added to) that X ceiling. Original actuals/overruns, S4 700,
+S5 500, reserve 700, project 7000 and end Oct 11 code freeze remain intact.
+F02/F03/F05/F07/F10 stay outside the implementation batch.
+
+## Phase 2 - Bounded feedback and release-candidate verification (authorised)
+
+**Goal:** Improve threshold/selection clarity and portable setup, then prove
+the final integrated workflow and D-044 carryover before code freeze.
+
+**Allocation:** 150 O+X; X ceiling 100. H adds 20 corrective X credits for
+carried warning work, extending its cumulative limit to 60; historical use
+at S3 closeout is 36.7557225, leaving 23.2442775 before further carried work.
+Limits overlap, not add. Record a separate warning-work interval; do not
+charge unrelated Phase 1/2 tasks to it or exclude related verification/report
+calls. Prerequisite: Human Gate 1, approved in D-047.
 
 Atomic tasks
 
-- [ ] Confirm only demonstrated residual defects, intended demo machine,
-  startup/reproducibility and final patient -> prediction -> vessel ->
-  explanation -> edit/fresh-response story; no new feature expansion.
+- [ ] Publish O's approved workflow/ledger/plan/spec/decisions and take an
+  actual X execution kickoff/baseline. Map each report item to its feedback
+  ID and evidence; approval is not verification.
+- [ ] S4-F01: add a selected-target decision-threshold marker to the existing
+  absolute 0-100% probability legend, positioned from the current response.
+  Include CAD when selected, use clear text distinguishing decision threshold
+  from colour midpoint/uncertainty, and hide the marker when no accepted
+  target is available. Check 0/1 endpoints and narrow layout. Keep colourScale
+  and swatches probability-only, with no changed thresholds or labels.
+- [ ] S4-F04: extend the existing Html/tooltip pattern for a persistent
+  selected-vessel label. Keep one label per vessel when hovered/selected,
+  current-only risk text, neutral unavailable state, pointer interaction
+  and ordinary-selection camera position unchanged. Clear selected overlay
+  when CAD is selected; no new glow/decoder/package or geometry rework.
+- [ ] S4-F06: explain independently tuned target thresholds and the served
+  CAD cap in the existing model detail view and usage docs. Different labels
+  are not necessarily contradictory. Do not infer a per-patient capping event
+  from equal values, recompute labels/probabilities or claim clinical coherence.
+- [ ] S4-F08/F09: make setup/check/start instructions usable from a generic
+  repo checkout in the tested Ubuntu/Linux environment, with optional WSL
+  adaptation and accurate root API/models layout. Distinguish Node's tested/
+  recommended pin from declared compatibility; keep all existing pins and
+  the mock route. Verify commands in the existing environment, without
+  unnecessary reinstall/new environment/host protection changes.
+  Describe paired what-if origin and pinned schema limits truthfully.
+- [ ] Add targeted marker/label/detail regressions and preserve Phase 1's
+  three-row visibility, thresholds, probability hues, accessible numeric/
+  input detail and accepted-response clearing. Run the appropriate frontend
+  lint/typecheck/test/build checks; no API/model change or repeated suite
+  merely because old feedback suggested one.
+- [ ] Confirm intended demo machine and rehearse the final patient ->
+  prediction -> vessel -> explanation -> edit/fresh-response story using
+  the same demo-model origin; keep custom/final source distinct.
 - [ ] Complete missing real empty-state captures at both exact viewports and
   settled 1280x800 warning closed/open measurements; check remaining
   viewport-specific keyboard proof after Phase 1. Preserve overflow <=2 CSS
@@ -264,6 +362,19 @@ Atomic tasks
 deferred by H; D-044's remaining warning evidence is complete; the final
 local demo is reproducible and truthful; relevant checks/evidence/source/
 dated credits agree. No implied public deployment or clinical validation.
+
+Specifically prove F01's marker position from returned thresholds (including
+boundary fixtures), unchanged absolute colours and disappearance on
+invalidation; F04's persistent label from result/viewer selection without
+camera movement or stale risk; F06's qualified explanation without altered
+outputs; F08/F09's generic commands and accurate tested/pinned wording.
+At both desktop viewports keep visible source/probabilities/warning status,
+the bounded viewer and 1280x800 three-row Why? criterion from Gate 1.
+Preserve the full metadata/inputs/model detail and warning keyboard routes.
+Publish a feedback-ID -> commit/evidence mapping, marking implemented items
+as awaiting human verification until Gate 2. Deferred/no-change IDs stay
+visible. Stop on the applicable combined/X/corrective guards or genuine
+repeated failure; no CI debugging, PR work or later phase start.
 
 **Human Gate 2:** H accepts the release candidate and authorises cleanup.
 Incomplete evidence requires an explicit decision, not another silent carry.

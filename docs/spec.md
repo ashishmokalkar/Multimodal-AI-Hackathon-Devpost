@@ -176,7 +176,7 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 - Vessel geometry: D-012's approved fallback is active. Project-authored `TubeGeometry` meshes named `LAD`, `LCX`, and `RCA` follow hand-authored `CatmullRomCurve3` paths. They are schematic, not patient-specific lesion maps. The LAD 0.80, LCX 0.30, and RCA 0.55 values used during S1 were illustrative fixtures only; runtime probabilities are never hard-coded.
 - S2's mock-based viewer maps only the current accepted `PredictionResponse` to per-vessel colours, summaries, hover details, and selection details. When a current response is unavailable, all vessels use a distinct neutral colour and no old probability or contribution is shown. These mock-driven updates are not real-model integration.
 - Loading: `useGLTF` (drei); use Draco only if needed and serve its decoder locally. `<Bounds fit>` on load; `frameloop="demand"`; `dpr={[1, 1.5]}`. No runtime asset/decoder CDN calls.
-- Colour mapping: probability → `d3-scale`-style interpolation green (#2e7d32) → amber (#f9a825) → red (#c62828), with vessel labels and numeric values as a secondary encoding. The continuous legend shows 0-100% predicted probability, not clinical severity cutoffs or percentage artery narrowing; unavailable values have a distinct neutral encoding.
+- Colour mapping: probability → `d3-scale`-style interpolation green (#2e7d32) → amber (#f9a825) → red (#c62828), with vessel labels and numeric values as a secondary encoding. The continuous legend shows 0-100% predicted probability, not clinical severity cutoffs or percentage artery narrowing; unavailable values have a distinct neutral encoding. D-047 authorises a separate selected-target decision-threshold marker from the accepted response, without changing probability hues or treating 50% as a classification boundary.
 - Interaction: `OrbitControls` (damped), hover → emissive highlight + tooltip, click → select using the existing emissive highlight and shared results selection. Keyboard-operable result controls provide an alternative to 3D picking. Basic manual LAD/LCX/RCA focus controls and Reset frame the schematic geometry; result selection itself does not change the camera. Focus translates the camera and orbit target together to preserve the current orbit and zoom. No unverified anatomical-view labels or elaborate flyTo animation.
 - Performance target: ≥50 fps during active rendering/interaction at 1080p; heart plus vessels ≤150k triangles total; GLB ≤8 MB. Phase 3 measured results are recorded with the evidence for the Gate 3 handoff.
 - Loading/error states are shown explicitly. The GLB and all its embedded textures are local; no runtime asset or decoder CDN is used.
@@ -184,6 +184,11 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
   controls and viewer legend/callout/accessible details. It is neither an error
   nor an invented quantitative interval. Keep continuous probability colours;
   no pulsing/glow redesign, severity categories, global tint or lesion locations.
+- D-047 authorises a persistent selected-vessel label using the existing Html
+  tooltip pattern, retaining selected emissive/radius cues and probability
+  hues. Hover/selection must not duplicate the same label or intercept picking.
+  CAD clears the selected overlay; unavailable state has no stale risk or
+  threshold marker. Ordinary selection still does not move the camera.
 
 ## 7. Interpretability presentation
 
@@ -316,6 +321,22 @@ qualifications, freshness and the bounded viewer/layout. No new backend/
 model/API semantics, assets, imports, geometry, packages or broader redesign.
 Phase 1 requires before/after desktop evidence and existing frontend checks.
 Later hardening completes D-044's open evidence before end Oct 11 code freeze.
+
+**S4 feedback/hardening (D-047):** H accepted Phase 1 and approved only feedback
+IDs F01/F04/F06/F08/F09 plus existing release-candidate/carryover checks.
+Add the threshold marker and selected label described above; clarify independent
+thresholds and served vessel-probability capping in existing model details,
+without recomputing outputs or inferring capping from equality. Make generic
+repo-relative setup instructions for the tested Linux runtime and optional
+WSL adaptation; distinguish tested Node 24.19.0 from the declared engine range.
+Retain sample origin through edits, the pinned profile guards, schematic
+geometry, asset/dependency/loading paths and disclaimer behavior. Anatomy,
+contract extension and bundle optimisation remain separately scoped/deferred.
+Preserve Phase 1's readability and complete D-044's remaining evidence before
+code freeze. Phase 2 is 150 combined/100 X; the warning corrective limit is
+explicitly extended to 60 cumulative, overlapping, with no reset of history.
+Approval is not implementation/verification; use the workflow/plan feedback
+ledger and Human Gate 2 to close the batch.
 
 S4 completes code under a 700-credit cap; S5 finalises the submission Oct
 12-13 under 500, splitting the existing 1200 allocation (D-045). Draft/final

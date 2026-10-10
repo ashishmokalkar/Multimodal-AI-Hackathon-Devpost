@@ -66,6 +66,35 @@ Deferring a particular gate item requires H's explicit approval and a logged dec
 
 No phase starts until the previous phase's human gate is approved. If a self-check fails twice **for the same root cause after a genuine fix attempt**, X stops and reports; O re-plans rather than X looping. Auto-fixable lint/format errors never count as failures — X runs the fixer (`ruff check --fix && ruff format`, `pnpm format`, `pnpm lint --fix`) and re-checks (D-015). Before stopping for any reason, X commits and pushes all work that passes typecheck/tests, so nothing is left only in the working tree.
 
+### Feedback intake and incorporation
+
+Feedback is evidence to assess, not automatic implementation authority. O keeps
+one compact ledger in the current `plan.md`, archived with the sprint; no
+separate feedback sprint or agent is implied.
+
+1. **Capture:** assign a stable sprint feedback ID; record the source/reviewed
+   commit, claim, expected behavior and relevant rubric or requirement.
+2. **Verify:** compare against current code/evidence and approved decisions.
+   Separate reproduced defects, usability/rubric improvements, intentional
+   behavior, outdated findings and unverified claims. Record evidence or the
+   specific missing check; do not accept the reviewer's severity as fact.
+3. **Triage:** record disposition (`proposed`, `approved`, `implemented`,
+   `verified`, `deferred`, or `no change`), owner, rationale and dependency.
+   Reconcile conflicting advice against the contract/model semantics; changes
+   to either need H approval and M's relevant agreement, not a frontend guess.
+4. **Approve a batch:** H approves the closed scope, exclusions, acceptance,
+   credit ceilings and calendar at a human gate. Incorporate approved changes
+   into plan/spec/decisions before a single manual handover to X. New feedback
+   during execution is queued unless H explicitly changes the active batch.
+5. **Implement and prove:** X reports each approved ID, change/commit and
+   measurable evidence, preserving existing behavior. Reuse accepted checks;
+   an automation failure is not a product defect or a live pass. Stop at the
+   phase gate or applicable credit/repeated-failure limit.
+6. **Close:** O checks the evidence; H approves the human gate. Only then mark
+   the item verified. Retain deferred/no-change items with reasons rather
+   than silently dropping them. After code freeze, only H-approved blocking
+   fixes may enter S5; suggestions do not reopen development.
+
 ## 6. Handover format (O → X)
 
 O produces a single chat block that H pastes into the executor session. It must be **self-contained** (X has no memory of previous phases beyond what is in the repo):
@@ -90,6 +119,7 @@ Commit as you go; do not touch files outside: <paths>.
 ## Report: Sprint N / Phase M
 Commits: <hashes>
 Gate evidence: criterion -> evidence
+Feedback batch (if applicable): ID -> change/commit -> evidence -> unresolved status
 Deviations from handover: ...
 Open questions / blockers: ...
 Estimated credits used: <from Copilot usage if visible>
