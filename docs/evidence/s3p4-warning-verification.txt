@@ -1,10 +1,15 @@
 Sprint 3 Phase 4 warning verification - partial; Human Gate 4 pending
 ====================================================================
 
-The historical blocker is documented in docs/evidence/s3p3-warning-verification.txt.
+The historical blocker is documented in
+docs/evidence/s3p3-warning-verification.txt.
 This run used headed Microsoft Edge 155.0.4283.45 in kiosk mode on Windows,
 with a 1920x1080 display and DPR 1. The browser content viewport was set to the
-exact CSS sizes below; PNG dimensions and window.innerWidth/innerHeight agree.
+exact CSS sizes below using DevTools `Emulation.setDeviceMetricsOverride`;
+PNG dimensions and window.innerWidth/innerHeight agree. The OS outer window was
+not resized independently to each target, so these prove exact headed-browser
+CSS captures, not physical-window geometry at both sizes. H's manual check
+must use actual content viewports.
 The real API health response was status=ok, mock=false,
 contract_version=1.1.0, model_version=cardiotwin-v2.0.0. The frontend showed
 the real profile; no mock fallback was used.

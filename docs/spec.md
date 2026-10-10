@@ -283,9 +283,11 @@ age-related reliability caution. Document overflow measured 0 CSS px. At
 1920x1080 the canvas measured 590.859 px closed and 591.859 px expanded. At
 1280x800 the first closed-state canvas measurement was taken before resizing
 settled and differs from the later expanded measurement; no stable pair is
-claimed. Windows OS `SendKeys` did not activate the focused disclosure, and the
-attempt to select Custom patient did not produce a live empty-warning response.
-The four patient-20 images and raw measurements are under
+claimed. The headed browser's CSS viewport was set through DevTools metrics,
+not independently resized as a physical OS window. Windows OS `SendKeys` did
+not activate the focused disclosure, and the attempt to select Custom patient
+did not produce a live empty-warning response. The four patient-20 images and
+raw measurements are under
 `docs/evidence/s3p4-warning-*`; empty-warning and keyboard evidence remain open
 for H's manual check. S3 is not closed and Gate 4 is not passed.
 
