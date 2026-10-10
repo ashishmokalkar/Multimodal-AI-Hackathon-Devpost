@@ -1,28 +1,24 @@
 # Sprint 3 Plan - Dashboard, UI/UX and gated real integration
 
-**Status:** Gates 0 and 1 are approved; Phase 1 functional delivery is accepted
-with presentation gaps carried into the completed UI/UX Phase 2. Phase 2 evidence
-is submitted for Human Gate 2; real integration and Gate R remain blocked.
-H approved S2 Gate 3
-and continuation in this session (D-031), then approved re-planning for
-independent mock-dashboard work while M's reply is pending (D-032).
-H approved the detailed delivery scope, allocations and dates below.
-H requested one
-Opus 5.5 extra-high read-only UI/UX review and a revised plan for the next phase.
-The review is complete; H approved Phase 2 UI/UX and the budget reallocation
-below. X recorded its actual execution kickoff and fresh baseline at
-**2026-10-10T09:29:01.027Z**. Real integration is
-Phase 3 and remains blocked behind the UI/UX gate and Gate R.
+**Status:** Gates 0, 1, 2 and R are approved. H accepted the delivered desktop
+UI/UX at Gate 2 (D-037), then approved the pinned ML handoff, contract amendments
+and runtime-first Phase 3 at Gate R (D-038). Phase 3 is authorised but X has
+not started; its actual execution kickoff must be recorded separately.
+The real API is available in M's branch, not yet integrated or locally verified.
+The completed Opus review and UI/UX phase do not authorise a broader redesign,
+CSV/document import or additional agents. H retains the current orchestrator
+and manual handover workflow (D-031).
 
 **Calendar:** S3 remains Oct 10-11, S4 Oct 12-13, and Oct 14 submission-only;
 deadline Oct 14 at 20:45 CEST. Independent UI work can proceed after Gate 0.
-Real integration in Oct 10-11 is provisional until M confirms an API date and
-supplies the serving/runtime handoff. H reviews that dependency by Oct 10
-18:00 CEST and again at Gate 1; these are approved follow-up checkpoints, not
-promises from M. If readiness threatens Oct 11 completion, explicitly re-plan
-scope/timing with H; do not silently consume the submission buffer.
-The approved UI/UX phase targets Oct 10 completion and must not displace the
-18:00 backend follow-up or reduce the reserved real-integration allocation.
+M's written handoff declares the real API available now. H approved an Oct 10-11
+integration attempt against the pinned source, with WSL verification first.
+Retain the Oct 10 18:00 CEST checkpoint for an actual integration status or
+blocker, rather than another request for initial API delivery. If runtime setup
+exceeds 45 minutes or 60 X credits, or the same root cause fails twice after
+genuine fixes, stop and report through H. If completion by Oct 11 is threatened,
+explicitly re-plan scope/timing; do not consume the submission buffer silently.
+The UI/UX phase is accepted; the 800 integration allocation remains intact.
 
 ## Budget and boundaries
 
@@ -111,8 +107,8 @@ are excluded.
 |---|---:|---:|---|
 | 0 - Discussion and readiness planning | 200 | 0 | Approved |
 | 1 - Independent explanation/input/metrics dashboard | 400 (was 650) | 160 | Approved with mandatory presentation carryover |
-| 2 - Desktop UI/UX and demo visibility | 250 (new) | 100 | Delivered; Gate 2 pending H |
-| 3 - Real integration, only after readiness approval | 800 | 200 | Blocked on M handoff and preceding gates |
+| 2 - Desktop UI/UX and demo visibility | 250 (new) | 100 | Accepted at Gate 2, D-037 |
+| 3 - Real integration, runtime verification first | 800 | 200 | Authorised at Gate R, D-038; X not started |
 | 4 - Retrospective and cleanup | 100 | 30 | Not started |
 | Contingency, separate H approval required | 50 | Unassigned | Unused |
 | **Total** | **1800** | | |
@@ -134,17 +130,25 @@ reallocation of unused S1/S2 budgets or contingency spending.
 - Deliver a signed top-ten chart, input/contribution table and metrics drawer.
   No decorative gauge, new asset search, public deployment, clinical reference
   classifier, new framework or package is needed.
-- Mock/synthetic/schematic/unconfirmed-scale labels and clinical disclaimers
-  remain visible. Probability is not artery narrowing; signed contributions
-  are not causal effects or confirmed probability-point changes.
+- Mock/synthetic/schematic labels and clinical disclaimers remain visible.
+  Mock explanations retain their unconfirmed-scale wording. Phase 3 may label
+  real contributions as percentage points only under the approved v1.1 profile
+  and successful full-response additivity checks. Probability is not percentage
+  artery narrowing; attribution is not causation.
+- Freeze the broad layout/geometry/camera design during integration. Heart
+  framing and concise explanatory copy are candidates for separately approved
+  post-integration polish. A schema-driven CSV import with preview/confirmation
+  is only a future candidate; XLSX/Word/PDF/OCR/extraction, FHIR, beating-heart
+  animation, nearest-flip scenarios and global heart tint are not authorised.
+  M's UI research is inspiration, not additional implementation scope.
 
 ## External dependencies and submission accountability
 
 | Item | Owner/action | Boundary |
 |---|---|---|
-| Contract response/requested changes and concrete API delivery date | H obtains M's response through the existing question list; O records it. Response remains pending. | Does not block independent UI Gate 0 under D-032. Required at real-integration readiness Gate R. Approved status checkpoints: Oct 10 18:00 CEST and Gate 1 (D-034). |
-| Serving names/types/categories/units/defaults/bounds, thresholds, explanations and metrics source | M provides the serving payload/metadata and final-model details; H approves requested contract changes before X implements them. | Gate R; matching counts or mock compatibility are not sign-off. |
-| Runtime and artifacts | M provides a serving commit, Python/dependency requirements, model artifacts/manifest and exact startup instructions compatible with the intended environment. | Gate R; verified WSL mock hosting does not prove real-backend readiness. |
+| Contract response and API delivery | M's written reply and implemented API are available at the source pin below. H approved v1.1 handling under D-038. | Gate R approved; initial delivery is no longer a blocker. Oct 10 18:00 remains an integration-status checkpoint. |
+| Serving metadata, thresholds, explanations and metrics | `/features`, `api/schemas.py`, API implementation and manifest supply the reviewed boundary. | Implement only the approved profile below; parsing old required keys alone is insufficient. |
+| Runtime and artifacts | Python 3.11.9, pinned requirements, final/demo joblib artifacts and supporting code/data are supplied. M verified Windows; WSL remains unverified. | H explicitly accepts this runtime risk for a bounded runtime-first Phase 3. Passing WSL loading/endpoints remains mandatory for Gate 3. |
 | Demo video | Faizan is accountable (D-033): record/upload a 3-10 minute YouTube demo of inputs, live model flow, 3D selection and technical implementation. | Approved rough cut Oct 12, final recording/link Oct 13 (D-034). |
 | Shared document | Faizan assembles the maximum-six-page document (D-033); request dataset/preprocessing/model/validation sections from Ashish. M's contribution timing remains unconfirmed. | Approved draft Oct 12, final Oct 13 (D-034). |
 
@@ -265,7 +269,7 @@ into mandatory Phase 2, approves the revised allocations and authorises UI/UX
 work only. Real integration remains unauthorised; missing M handoff cannot be
 treated as sign-off or a silent Oct 14 delivery extension.
 
-## Phase 2 - Desktop UI/UX and demo visibility (authorised; X kickoff recorded)
+## Phase 2 - Desktop UI/UX and demo visibility (accepted at Gate 2)
 
 **Goal:** Make the core patient -> probability -> heart -> explanation story
 usable in the actual desktop demo viewport without changing model behavior.
@@ -337,7 +341,7 @@ Atomic tasks
    settles when idle. Lint/typecheck/test/build pass; report committed/pushed
    hashes, clean status and dated Phase 2/S3/project credits.
 
-**Self-check gate 2 (X evidence submitted; Human Gate 2 pending):**
+**Self-check gate 2 (X evidence reviewed and accepted under D-037):**
 
 1. **Passed:** Reproduction captures `s3p2-before-1920x1080.png` and
    `s3p2-before-1280x800.png` show the original document growth/canvas cropping.
@@ -392,57 +396,206 @@ session-store query uses the project's checkout-path filter and distinct
 deduplication fields from `scripts/credits.py`; these are telemetry, not
 billing. Events after the stated snapshot are excluded.
 
-**Human gate 2:** H approves the measured demo layout, truthful states and
-readability after O review, then revisits M's readiness. Real integration
-still requires Gate R; if the handoff is absent or the calendar is threatened,
-bring a scope/timing decision to H rather than starting speculative backend work.
+**Human gate 2 (approved, 2026-10-10):** H selected "Approve Gate 2
+(Recommended)" after O's evidence review and UX discussion (D-037). The bounded
+layout is accepted; small-heart framing and input-entry effort are not silently
+added to the completed phase. Gate R was subsequently approved separately.
 
-## Gate R - Real-integration readiness (blocked on M)
+Transition reconciliation through **2026-10-10T10:30:50.850Z**: final Phase 2
+events before the Phase 3 boundary total **195.743877** (O **129.029930**,
+X **66.713947**), including review/readiness discussion and publication calls.
+This leaves **54.256123** under its 250 allocation and **33.286053** under
+X's 100 ceiling. Pre-Phase-3 project usage is **2349.801967**, S3
+**577.1976495**, leaving **4650.198033** overall and **1222.8023505** under
+S3. These supersede earlier dated current totals, not their historical evidence.
+Usage is deduplicated local telemetry, not account billing.
 
-**Readiness self-check:** Record M's contract acknowledgement/requested changes
-and concrete API date; implemented serving commit and runtime/artifact handoff;
-complete serving feature metadata and mapping of known names, BBB/VHD/Function
-Class/WBC/Exertional CP differences; final target labels/thresholds; explanation
-method/scale/availability; and final-model metrics with validation/version/source.
-If an endpoint or attribution is unavailable, the proposed handling must be
-explicit and approved, not silently substituted with mock output.
+## Gate R - Real-integration readiness (approved, D-038)
 
-**Human readiness gate:** H approves the handoff, any contract amendments and
-the achievable remaining calendar. Under the approved re-plan, required after
-UI/UX Gate 2 and before real-integration Phase 3.
-Neither M's reply alone nor a matching feature count closes this gate.
+**Source pin:** `ML-dev` commit
+`6d3e403ffae65857124929335bbc534e8fd116c4`. The API/model implementation is
+`9ddb96b`; `2f28ab7` adds the written handoff; `6d3e403` relocates it and adds
+UI research without changing the reviewed API/model code. Do not follow a
+moving branch head during execution.
 
-## Phase 3 - Real-backend integration (blocked; not authorised)
+Read first at the pin: `handover_docs/ML_ANSWERS_FOR_FRONTEND.md`,
+`api/README.md`, `api/schemas.py`, `api/main.py`, `api/explain.py`,
+`models/manifest.json` and `reports/BEST_MODELS.md`.
+
+**Readiness self-check (source handoff complete):**
+
+- M declares available now; all five existing endpoints have implementation.
+  Contract v1.1 has 49 frontend-facing inputs, with conversion/feature
+  engineering owned by the backend. BBB/VHD are categorical, Function Class
+  is 0-3, WBC remains x10^3/uL, Chest Pain/Smoking are single choices, and
+  BMI/Obesity/constant Exertional CP are not entered.
+- Final/demo models, manifest, Python 3.11.9 and pinned requirements exist.
+  The API also requires the original primary XLSX and subgroup CSV at runtime;
+  importing only `api/` and `models/` would be incomplete.
+- CAD/LAD/LCX/RCA return per-target decision thresholds and uncertainty.
+  Explanations are baseline Shapley on the served, capped probability.
+  Four-decimal JSON rounding requires a measured tolerance, not exact equality.
+  Metrics come from the manifest's cross-validation report, not a new frontend
+  measurement or clinical validation.
+- Source resolves the sample-edit ambiguity: a valid `sample_id` keeps edited
+  scenarios on demo models; without it, changed samples use final models.
+  This is implemented in `api/main.py` despite less explicit API README wording.
+- O has inspected the handoff/source, not run the models or API. WSL feasibility
+  is not proven. H explicitly approves verifying it first in Phase 3, with
+  bounded stop limits and no downgrade, retraining or mock fallback.
+
+**Human Gate R (approved, 2026-10-10):** H selected "Approve Gate R and
+authorise Phase 3 (Recommended)", approving the source pin, scoped import,
+v1.1 changes, holdout provenance across sample edits, separate WSL environment
+and runtime-first stop limits. This approves an integration attempt, not
+runtime success, deployed metric equivalence or clinical validity.
+
+**Approved ingestion:** Keep Git/frontend on Windows and branch `frontend`.
+Fetch the source ref only if needed, then import the allowlisted files from the
+exact pin after checking for collisions; preserve source bytes and record hashes.
+No branch switch, merge, cherry-pick, new worktree or clone is authorised.
+
+- `api/`; `models/manifest.json`, four final and four demo `.joblib` files;
+  root `requirements.txt`; `tests/test_api.py`.
+- Runtime support: `ml/__init__.py`, `data.py`, `export.py`, `features.py`,
+  `models.py`, `preprocess.py`, `v2.py`, `cv.py`, `evaluate.py`, `risk_scores.py`,
+  `selection.py`, `v2_fe.py`. Do not execute export/training/CV entry points.
+- `data/raw/z_alizadeh_sani_ext/z_alizadeh_sani_ext.xlsx`;
+  `reports/v2/s9/s9_subgroups.csv`; `reports/BEST_MODELS.md`;
+  `handover_docs/ML_ANSWERS_FOR_FRONTEND.md`.
+
+Do not import the UI research DOCX, unrelated datasets, experiment outputs or
+training runners. Do not overwrite conflicting existing files; report collisions
+or a missing support module through H. All individual reviewed artifacts are
+below the workflow's 10 MB binary limit. Preserve dataset citation/licence.
+The imported serving/model/preprocessing implementation is unchanged;
+directly related regression additions to `tests/test_api.py` are permitted.
+
+## Phase 3 - Real-backend integration (authorised; runtime first)
 
 **Goal:** Run the agreed model-serving interface locally and prove the same
 patient-to-prediction-to-vessel-to-explanation story using real model outputs.
 
 **Allocation:** 800 O+X; X ceiling 200.
-Prerequisites: Human Gates 2 and R. Issue a separate bounded handover at readiness.
+Prerequisites: Human Gates 2 and R (both approved).
+Accounting begins **2026-10-10T10:30:42.653Z** after Gate R approval, including
+O's subsequent documentation/handover/review. X records its separate actual
+kickoff timestamp and fresh baseline; do not reset ceilings. At the transition
+snapshot above, Phase 3 has **2.363880** O credits and **0** X credits recorded;
+later documentation/handover calls are excluded.
+
+Handover-preparation snapshot through **2026-10-10T10:33:46.430Z**: Phase 3
+**22.139820** (O **22.139820**, X **0**), leaving **777.860180** combined
+and X's full **200** ceiling. Project total **2371.941787**, S3
+**599.3374695**, leaving **4628.058213** overall and **1200.6625305** under
+S3. This is local deduplicated telemetry, not billing; later editing/publication/
+handover calls are excluded and X must take a fresh actual kickoff snapshot.
+
+X actual execution kickoff and fresh baseline: **2026-10-10T10:35:23.548Z**.
+Through kickoff, Phase 3 was **33.668890** (O **33.668890**, X **0**);
+cumulative S3 was **610.8665395** (O **508.979040**, X **101.8874995**);
+project total was **2383.470857** (O **2110.445665**, X **273.025192**).
+Remaining: **766.331110** under Phase 3, **200** on X's ceiling,
+**1189.1334605** under S3 and **4616.529143** under the project cap. The
+read-only local telemetry was deduplicated by `session_id`, `created_at`,
+`model`, `input_tokens`, `output_tokens`, `cache_read_tokens` and
+`total_nano_aiu`, after filtering to the project checkout path; it is not
+billing. Later events are excluded from this kickoff baseline.
 
 Atomic tasks
 
-- [ ] Apply only H-approved contract/client changes; keep raw preprocessing and
-  unit conversions in M's backend, once. Do not implement or retrain M's models.
-- [ ] Follow M's runtime/artifact instructions in the intended WSL environment;
-  verify health, CORS, metadata, samples, prediction and the approved metrics source.
-- [ ] Reconcile input identifiers/categories/units and per-target thresholds/
-  explanation scales with M's manifest. No base-URL-only compatibility claim.
-- [ ] Validate real responses at runtime and retain request freshness and explicit
-  unavailable/error states. Never fall back to mock predictions on real failures.
-- [ ] Capture fresh real-response/UI evidence for all targets, selection, input
-  changes and error recovery. Label metrics and attribution by their actual source/
-  method/version; no experiment-to-deployed metric relabelling.
-- [ ] Run targeted existing checks, document reproducible startup/artifact steps,
-  commit/push approved work, report credits and stop for Gate 3.
+- [ ] Publish the approved planning changes, record kickoff/credits and import
+  only the pinned serving bundle above. Verify source hashes and dataset
+  attribution. Keep model/preprocessing/API code unchanged.
+- [ ] First prove runtime in a separate Linux-native Python 3.11.9 environment,
+  e.g. `/home/jalfaizy/.venvs/multimodal-ai-hack-real-api`, using M's pinned
+  requirements. Leave the mock environment intact. Verify loading of all eight
+  models, all five endpoints, CORS and Windows localhost access; run only
+  `tests/test_api.py`, with zero skips. Do not retrain/export/run ML experiments.
+  Stop if setup exceeds 45 minutes or 60 X credits, or one root cause fails
+  twice after genuine fixes. No speculative UI implementation before this passes.
+- [ ] Adopt `docs/api-contract.md`'s approved v1.1 real profile while preserving
+  v1.0 mock behavior. Validate health/version/mode and every added field rather
+  than stripping them. Unknown/inconsistent profiles show an explicit error;
+  never reuse stale mock metadata/samples/predictions as real data.
+- [ ] Render the 49-input metadata with its declared types/options/units. Keep
+  raw conversion in M's backend. Label custom-form defaults as reference/demo
+  values, not recorded patient measurements; reset preserves that distinction.
+  Show returned BMI and the dataset-defined Obesity flag read-only, identifying
+  its BMI >25 rule as model/dataset coding, not a clinical obesity diagnosis.
+- [ ] Retain a real sample's origin ID across what-if edits and send `sample_id`
+  so both sides of the comparison use demo models. Show edited-scenario
+  provenance; never present original ground truth as the outcome of edited
+  inputs. Reset/custom start clears origin; another sample replaces it.
+  Synthetic mock requests omit `sample_id`. Snapshot origin together with
+  features at request start; preserve all revision/latest-request guards.
+- [ ] Show truthful real/mock source/version plus response `prediction_source`.
+  Surface warnings and per-target uncertainty in text and a static, non-colour
+  cue in results and viewer legend/callout/accessible details. Uncertainty is a
+  normal model state, not failure and not derivable from probability alone.
+  Preserve response probabilities and per-target label/threshold; no 0.5 rule,
+  unsupported severity categories, lesion coordinates or animated effects.
+- [ ] For confirmed real `scale: probability`, format signed contributions as
+  percentage points, expose the reference risk and method, and distinguish
+  model attribution from causation. Keep the top-ten signed chart, not a
+  waterfall; identify it as a subset of all returned contributions. Mock or
+  unconfirmed scales retain qualified model-unit wording. Check additivity
+  using the complete returned list, including capped vessel outputs.
+- [ ] Extend the existing metrics drawer for returned model names, ROC-AUC CI,
+  balanced accuracy, Brier, ECE and validation threshold. Distinguish the
+  cross-validation-summary threshold from the current prediction threshold,
+  and reported validation from in-sample scores or a separately validated demo
+  refit. Keep version/source warnings and report caveats visible; do not claim
+  exact deployed/demo validation from matching version strings.
+- [ ] Add focused schema/mapping/provenance/formatting/freshness/uncertainty/
+  warning/metrics tests and fresh real live evidence. Preserve the accepted
+  bounded layout and keyboard behavior at both desktop viewports, including
+  long source/warning text and uncertainty; no general redesign.
+- [ ] Run targeted API/frontend checks, document reproducible setup/provenance,
+  commit/push passing approved work, stop verification services, reconcile
+  credits and stop for Human Gate 3. No CI debugging or PR operation.
 
-**Self-check gate 3:** Agreed serving schema/metadata/runtime work on the intended
-machine; a non-sensitive real sample and a modified input produce accepted
-responses reflected consistently in probabilities, vessel colours and explanations;
-actual outputs/labels/methods/metrics/versions are evidenced; unavailable/
-failed responses clear patient detail without mock fallback; local checks pass;
-setup, artifacts, evidence and passing changes are documented/committed/pushed.
-Refine the handover's exact fixtures/thresholds from M's confirmed contract, not guesses.
+**Self-check gate 3 (prove each with `docs/evidence/s3p3-*`):**
+
+1. Source pin/hashes and complete import bundle are documented. Python is
+   3.11.9; pinned dependencies load final/demo artifacts in WSL. Health reports
+   `mock: false`, contract 1.1.0 and `cardiotwin-v2.0.0`; all five endpoints,
+   CORS and Windows localhost work. API tests pass without skipped model tests.
+2. Real metadata has exactly 49 unique inputs and eight non-synthetic samples.
+   BBB/VHD/Chest Pain/Smoking options and Function Class 0-3 are evidenced;
+   WBC has no frontend conversion. Leakage keys, missing inputs and invalid
+   categories/bounds are rejected. Defaults and derived BMI/Obesity are truthful.
+3. A dataset sample and a changed input produce fresh, differing accepted
+   responses using the same demo model set via `sample_id`. Reset/custom input
+   uses final-model provenance. UI predictions, colours, labels, thresholds,
+   selected-target explanations and accepted input snapshots match all four
+   response targets; do not hard-code the change direction or expected values.
+4. All eight sample responses plus an edited sample have finite probability
+   scale explanations; for each CAD/LAD/LCX/RCA target, full-list
+   `abs(base_value + sum(contributions) - probability) < 0.003` (0.3 percentage
+   points, allowing the API's four-decimal rounding). `0.12` renders as
+   `+12 percentage points`, not 12% relative change. Top-ten sorting/subset
+   wording, signed/zero/missing cases and mock/unconfirmed wording pass.
+5. Live examples/fixtures prove uncertain and confident targets, warnings and
+   no-warning responses, derived fields, final/demo source and non-0.5
+   thresholds. Required real fields are not silently ignored/defaulted;
+   invalid/missing schema and unsupported health profiles fail explicitly.
+   Metrics match the served response and preserve validation/source/threshold
+   qualifications; no in-sample AUC replaces reported validation.
+6. Edit/debounce/pending/error/retry/reset/overlap tests and live request failure
+   retain neutral vessels and clear stale risk, attribution, warnings and
+   derived output. No real failure falls back to mock. A deliberate v1.0 mock
+   smoke check still works with qualified mock labels and no real-only request
+   fields; switching service profiles does not retain old form/result data.
+7. Actual 1920 x 1080 and 1280 x 800 captures retain document overflow <=2 CSS
+   px, minimum canvas heights 480/300 CSS px, <=2 CSS px canvas size variation
+   across states and visible essential controls/source/probabilities. Keyboard
+   selection/tabs/focus/reset/drawer work without ordinary selection moving
+   the camera. A measured 1080p active orbit remains >=50 FPS and settles idle.
+8. Existing frontend lint/typecheck/test/build and targeted API tests pass;
+   reproducible startup/shutdown, source/data/model provenance, evidence,
+   commits, clean local/remote hashes and dated P3/S3/project credits are
+   reported. Services are stopped; Human Gate 3 remains pending.
 
 **Human gate 3:** H approves real-integration evidence after O review and
 authorises retrospective/cleanup. If integration is blocked or cannot fit the
@@ -464,6 +617,9 @@ Atomic tasks
   retain every unresolved dependency without promoting mock work to real delivery.
 - [ ] Archive S3 and prepare only unstarted S4 Phase 0, including final integrated
   performance/accessibility/reproducibility and video/document deadlines.
+  Revisit bounded heart-framing/copy polish and optional schema-driven CSV
+  import only as separately approved candidates after real integration; no
+  automatic carry-in of the broader UI research or document extraction.
 - [ ] Commit/push approved cleanup; report evidence/credits/status. No automatic
   PR changes, merge or S4 implementation.
 

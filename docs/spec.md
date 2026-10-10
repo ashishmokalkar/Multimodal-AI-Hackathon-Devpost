@@ -44,7 +44,7 @@ Single-page app, desktop-first (≥1280 px), degrades to stacked layout on table
 First load shows a **modal disclaimer** that must be acknowledged. Banner and footer disclaimers are always visible.
 
 S2's approved sequencing (D-024) delivers readable CAD/vessel summaries and a
-selected-target top-driver/value list before the full gauge/tabs/charts/metrics
+selected-target top-driver/value list before the full tabs/charts/metrics
 experience in S3. Basic camera focus/reset supports the core demo flow; decorative
 controls and elaborate transitions are not priorities. Delivery remains gated.
 
@@ -70,9 +70,14 @@ viewport-bounded desktop workspace, independently scrolling patient/results
 panels, stable canvas, compact prediction/source summaries, distinct state
 guidance and the readable zero-aligned signed chart without changing geometry,
 clinical meaning or the API. Exact 1920 x 1080/1280 x 800 captures and
-measurements are under `docs/evidence/s3p2-*`; the self-check is submitted for
-Human Gate 2, which remains pending. Integration is Phase 3 and still requires
-that gate plus the separate readiness Gate R.
+measurements are under `docs/evidence/s3p2-*`; H approved Human Gate 2 (D-037).
+H then separately approved Gate R and runtime-first integration Phase 3
+(D-038). The real runtime/output integration is not delivered yet.
+Preserve the bounded layout during integration, including long provenance,
+warnings and uncertainty. Small-heart framing and concise explanation copy
+remain separately approved post-integration polish candidates. CSV import
+with preview/confirmation is only a future candidate, not current scope;
+broader UI research, document extraction and animation are not authorised.
 
 ## 4. Architecture
 
@@ -107,13 +112,21 @@ newer input revision or request, including during the debounce interval.
 Windows, while the mock API uses a separate Linux-native environment in WSL 2.
 Keep the existing Windows checkout/Git workflow; do not reuse its Windows
 virtual environment in Linux. API access through Windows localhost is verified;
-no host protections were disabled and no public service is exposed. Using WSL
-for the real backend still requires M's confirmed Python/dependency/model-artifact
-requirements; this is not backend compatibility sign-off.
+no host protections were disabled and no public service is exposed.
+M has now supplied the real API/model/runtime handoff at the D-038 source pin.
+H approved a separate Linux-native Python 3.11.9 real environment using its
+pinned requirements; do not replace the mock environment. Import only the
+approved `api/`, model artifacts, required `ml/` support, primary XLSX and
+subgroup report files, retaining their root-relative paths. The API depends
+on source data/reports as well as joblib files. WSL model loading/endpoints
+must pass before frontend implementation; stop setup after 45 minutes or
+60 X credits, or two genuine failures for one root cause. Do not retrain,
+export, downgrade model dependencies, retry blocked Windows launchers or merge
+branches. Runtime success remains unverified and required at Gate 3.
 
 Extensibility (brief §Technical Considerations): new feature → appears automatically via `GET /features`; new vessel → add entry to `vesselMap.ts` + mesh node name; new model → backend only, metrics drawer is schema-driven.
 
-## 5. API contract (summary — authoritative mock v1.0.0 in `docs/api-contract.md`; real-backend agreement pending)
+## 5. API contract (mock v1.0.0 and approved real v1.1.0 profiles)
 
 | Method & path | Purpose | Response (shape) |
 |---|---|---|
@@ -125,7 +138,27 @@ Extensibility (brief §Technical Considerations): new feature → appears automa
 
 `Target = {probability: 0..1, label, threshold}`; `Explanation = {base_value, contributions: {feature, value, contribution, direction}[]}`. Errors: FastAPI default `{detail}`; 422 on invalid features. CORS open for `localhost:5173`.
 
-The current mock contract is not yet an agreed serving interface for `ML-dev`. Keep raw-input conversion and target-specific feature engineering in the backend, not in the frontend form. Confirm categorical options, units, and explanation output scale before claiming the real backend can be substituted by changing the base URL.
+`docs/api-contract.md` now records the H-approved real v1.1 profile (D-038)
+beside the preserved v1.0 mock examples. Validate health/version/mode and real
+additions explicitly; do not silently strip them or reuse old mock metadata.
+Unsupported/inconsistent profiles fail visibly without a mock fallback.
+Keep raw conversion and feature engineering in M's backend.
+
+The real form has 49 metadata-defined inputs: BBB/VHD categories, Function
+Class 0-3, WBC x10^3/uL, single Chest Pain and Smoking choices; BMI/Obesity
+are derived, and Exertional CP is removed. Reference defaults are clearly
+labelled demo/reference values, not recorded patient measurements.
+Real targets add `uncertain`; predictions add `warnings`, `derived`,
+`prediction_source`, and explanations add `scale`/`method`. Metrics add
+model name, ROC-AUC CI, balanced accuracy, Brier, ECE and validation threshold.
+Display returned target labels/thresholds, not a universal 0.5 rule.
+
+Real-sample what-if requests retain origin `sample_id` across edits to use the
+same holdout demo model set. Snapshot it with the requested features; reset or
+custom start clears it and selecting another sample replaces it. Edited
+scenarios are labelled as such and do not inherit ground truth for their changed
+inputs. Synthetic mock requests omit the real-only field. Preserve all request
+revision/latest-result guards and clear prediction-dependent additions on edits.
 
 Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via `/features`): Demographic (Age, Sex, BMI, DM, HTN, Smoker, FH, Obesity, CRF, CVA, Airway, Thyroid, CHF, DLP…), Symptoms/Exam (BP, PR, Edema, Murmurs, Typical/Atypical CP, Dyspnea, Function Class…), ECG (Q Wave, ST Elevation/Depression, T inversion, LVH, Poor R Progression, BBB), Lab/Echo (FBS, CR, TG, LDL, HDL, BUN, ESR, HB, K, Na, WBC, Lymph, Neut, PLT, EF-TTE, Region RWMA, VHD). **Excluded from inputs:** LAD, LCX, RCA, Cath (target leakage).
 
@@ -139,6 +172,10 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 - Interaction: `OrbitControls` (damped), hover → emissive highlight + tooltip, click → select using the existing emissive highlight and shared results selection. Keyboard-operable result controls provide an alternative to 3D picking. Basic manual LAD/LCX/RCA focus controls and Reset frame the schematic geometry; result selection itself does not change the camera. Focus translates the camera and orbit target together to preserve the current orbit and zoom. No unverified anatomical-view labels or elaborate flyTo animation.
 - Performance target: ≥50 fps during active rendering/interaction at 1080p; heart plus vessels ≤150k triangles total; GLB ≤8 MB. Phase 3 measured results are recorded with the evidence for the Gate 3 handoff.
 - Loading/error states are shown explicitly. The GLB and all its embedded textures are local; no runtime asset or decoder CDN is used.
+- Real uncertainty is conveyed in text and a static non-colour cue in result
+  controls and viewer legend/callout/accessible details. It is neither an error
+  nor an invented quantitative interval. Keep continuous probability colours;
+  no pulsing/glow redesign, severity categories, global tint or lesion locations.
 
 ## 7. Interpretability presentation
 
@@ -167,7 +204,26 @@ Inputs dashboard and metrics drawer, with evidence under `docs/evidence/s3p1-*`;
 Human Gate 1 is approved with presentation gaps carried into mandatory UI/UX
 Phase 2 (D-036). This remains mock-only and does not establish real-backend
 compatibility. Gate R remains separate and blocked on
-M's contract/runtime/model handoff and H's approval.
+M's contract/runtime/model handoff and H's approval at that historical boundary.
+
+**S3 real-profile approval (2026-10-10, D-038):** M's final handoff supersedes
+the experimental logit-scale proposal above: real explanations are baseline
+Shapley on the served probability, including vessel capping, with 32 orderings.
+After validating scale/method and full-list additivity, real signed values are
+shown in percentage points (`0.12` = `+12 percentage points`), with the
+reference model risk and method. For every target, test the complete returned
+list with `abs(base_value + sum(contributions) - probability) < 0.003`,
+allowing four-decimal JSON rounding. The top-ten chart remains a labelled
+subset, not a waterfall or complete additive bridge. Mock/unconfirmed values
+retain model-unit qualifications; attribution is not causation.
+
+Surface response warnings and uncertainty without silently inventing defaults.
+Show derived BMI/Obesity read-only; the latter is the dataset's BMI >25 flag,
+not a clinical obesity diagnosis. Extend the existing metrics drawer with
+returned validation detail, distinguishing CV-summary thresholds from the
+current decision threshold and reported validation from final/demo fitting
+sets. Matching version strings do not validate the demo refit; retain selection/
+validation caveats from `reports/BEST_MODELS.md`. Phase 3 remains undelivered.
 
 ## 8. Clinical safety
 
@@ -187,6 +243,7 @@ M's contract/runtime/model handoff and H's approval.
 | Heart mesh | *Realistic Human Heart*, neshallads, Sketchfab | CC BY 4.0; attribution beside the distributed model and in `assets/heart/LICENSE.md` | `frontend/public/models/heart.glb` |
 | LAD/LCX/RCA overlays | Project-authored schematic `TubeGeometry` paths | Project-generated; not patient-specific lesion maps | `frontend/src/features/viewer/` |
 | Mock dataset samples | Generated synthetic records; not extracted UCI patients | Project-generated fixtures | `mock-api/data/samples.json` |
+| Real dataset and eight demo patients (approved import, not yet integrated) | Extension of Z-Alizadeh Sani dataset, UCI #411; Alizadehsani, Roshanzamir and Sani (2013) | M reports CC BY 4.0; preserve UCI licence/citation when importing | `data/raw/z_alizadeh_sani_ext/z_alizadeh_sani_ext.xlsx`, real `/patients/samples` |
 
 Asset candidates, rejected options, source URLs, and mesh-addressability findings
 are recorded in `assets/heart/CANDIDATES.md`.
@@ -194,12 +251,31 @@ are recorded in `assets/heart/CANDIDATES.md`.
 ## 11. Out of scope
 
 Deployment (D-006), authentication, patient persistence, mobile layout, DICOM/imaging.
+Current Phase 3 also excludes CSV/XLSX/Word/PDF/OCR/document extraction, FHIR,
+beating-heart/depth-layer animation, nearest-flip scenarios, a broader camera/
+layout redesign and unsupported lesion/severity mapping. Post-integration
+polish or CSV work needs a separate H-approved scope/calendar decision.
 
 ## 12. Open questions
 
-- Q1 → M: exact preprocessed feature list, types and ranges; threshold per target; SHAP availability per target (TreeExplainer?).
-- Q2 → M: will the backend expose `/model/metrics`, or do we read a static JSON from the repo?
-- Q3 → H/M: who records the demo video and writes the shared 6-page doc skeleton (S4)?
+- Q1/Q2: M's serving inputs, target thresholds, probability-scale baseline
+  Shapley and `/model/metrics` handoff are supplied and approved under D-038.
+  WSL loading, semantic frontend integration and live Gate 3 evidence remain open.
+- Q3: Faizan remains accountable for the video/document (D-033); M offers ML
+  sections and joint script/architecture input. His contribution timing remains
+  to confirm. Draft Oct 12, final Oct 13; submission-only Oct 14.
+
+### Current ML handoff (reviewed and approved 2026-10-10)
+
+Source: `ML-dev` at `6d3e403ffae65857124929335bbc534e8fd116c4`;
+`handover_docs/ML_ANSWERS_FOR_FRONTEND.md`, `api/README.md`,
+`models/manifest.json`, `reports/BEST_MODELS.md`. API/model code is from
+`9ddb96b`; the latest commit moves handoff documents and adds UI research.
+The API is declared available now, contract v1.1.0, model version
+`cardiotwin-v2.0.0`. O inspected source, not runtime. Windows verification is
+M's report; WSL remains unverified and is the first approved Phase 3 task.
+Gate R is approved with that explicit risk, not as a runtime-success claim.
+The older evidence below remains historical, not current dependency status.
 
 ### ML branch evidence (reviewed 2026-10-08)
 

@@ -1,12 +1,15 @@
 # CAD Risk Visualizer API Contract
 
-**Contract version:** `1.0.0`  
-**Base URL (local mock):** `http://localhost:8000`  
+**Profiles:** mock `1.0.0`; H-approved real serving `1.1.0` (D-038).
+
+**Base URL (one selected local service at a time):** `http://localhost:8000`
+
 **OpenAPI:** `3.1.0`
 
 This document is the frontend/backend boundary. The mock server's Pydantic
-models are the runtime source of truth for JSON shapes; its generated OpenAPI
-document must remain equivalent to the schema below. Feature names identify
+models remain the source for the v1.0 examples below. Real serving schemas
+come from `api/schemas.py` at the approved ML source pin; their generated
+OpenAPI must agree with the real-profile section. Feature names identify
 input values and are case-sensitive. The four dataset targets (`Cath`, `LAD`,
 `LCX`, and `RCA`) are never accepted as model inputs.
 
@@ -41,7 +44,113 @@ the `contract_version` string, which changes when a backwards-incompatible
 contract change is approved. The frontend and backend must not silently
 interpret different contract versions.
 
-## OpenAPI 3.1
+## Approved real serving profile v1.1.0 (D-038)
+
+Source pin: `6d3e403ffae65857124929335bbc534e8fd116c4` on `ML-dev`.
+Read `handover_docs/ML_ANSWERS_FOR_FRONTEND.md`, `api/README.md`,
+`api/schemas.py`, `api/main.py` and `models/manifest.json` at that pin.
+H approved adopting this profile at Gate R; frontend/runtime implementation
+and real-output verification remain Phase 3 work, not completed by this document.
+
+All five endpoint paths and existing required response fields are retained.
+The input feature vocabulary/domains differ from mock v1.0 even though the
+metadata container shape is unchanged: do not interpret this as a base-URL-only
+semantic swap. Health must identify a supported profile/mode; real responses
+require the new fields below rather than silently defaulting or stripping them.
+Legacy mock responses may omit them and retain explicit mock qualifications.
+Do not reuse cached mock form/sample/result data across profiles or fall back
+to mock after real validation/network failures.
+
+### Input metadata
+
+`GET /features` returns 49 unique frontend-facing inputs with names, types,
+options, units, defaults and plausibility bounds. It is the form's authority.
+The backend converts inputs to model encodings exactly once.
+
+| Input | Real profile |
+| --- | --- |
+| BBB | `None`, `LBBB`, `RBBB` |
+| VHD | `None`, `Mild`, `Moderate`, `Severe` |
+| Function Class | Categorical numeric options `0`, `1`, `2`, `3` |
+| Chest Pain | One choice: `None`, `Typical`, `Atypical`, `Non-anginal` |
+| Smoking | One choice: `Never`, `Former`, `Current` |
+| WBC | x10^3/uL; no frontend multiplication/conversion |
+| BMI, Obesity | Not inputs; returned read-only in `derived` |
+| Exertional CP | Removed constant, not an input |
+
+All 49 inputs are required. Unknown/missing keys, leakage targets and invalid
+types/categories/plausibility bounds return 422 with `{detail: [...]}`.
+Plausible values outside training ranges may succeed with warnings.
+Reference defaults are median/No/none demonstration values, not patient
+measurements or permission to fill missing imported data silently.
+
+### Requests and sample provenance
+
+Real `PredictRequest` is `{features, sample_id?: string}`; omit absent IDs
+rather than sending a real-only field to the strict v1.0 mock.
+A valid ID from the eight `synthetic: false` real samples selects demo models
+refitted without those eight patients, including for changed feature values.
+Unchanged feature matches are also detected automatically by the backend.
+Changed samples without `sample_id` use final models; unknown IDs return 422.
+
+For paired what-if comparisons the frontend retains the real sample origin
+through edits and snapshots `sample_id` together with features at request
+start. Reset/custom start clears origin and another sample replaces it.
+Display an edited scenario and its response-provided model provenance; original
+sample ground truth is not ground truth for edited inputs.
+
+### Required real response additions
+
+| Object | Field | Meaning/validation |
+| --- | --- | --- |
+| Target | `uncertain: boolean` | Model prediction-set uncertainty; display text/static non-colour cue, not an error or fabricated interval |
+| Explanation | `scale: "probability"` | Signed probability-scale attribution |
+| Explanation | `method: string` | Baseline Shapley method on served probability, 32 orderings |
+| PredictionResponse | `warnings: string[]` | Explicit training-range/reliability/input-consistency cautions |
+| PredictionResponse | `derived: {BMI: number, Obesity: boolean}` | Returned derived values; Obesity is dataset BMI >25 coding, not a clinical diagnosis |
+| PredictionResponse | `prediction_source: string` | Actual final/demo fitting-set provenance; keep visible alongside model version |
+| TargetMetrics | `roc_auc_ci95: number[2]` | Ordered finite 95% AUC interval in 0-1 |
+| TargetMetrics | `balanced_accuracy`, `brier`, `ece` | Finite returned validation metrics; probability metrics in their valid domains |
+| TargetMetrics | `threshold: number`, `model: string` | Reported validation threshold and estimator name; threshold in 0-1 |
+
+The response retains a UUID `request_id` and `mock: false`.
+`/health` reports `contract_version: "1.1.0"` and the initial model version
+`cardiotwin-v2.0.0`. Model version alone does not identify the final/demo fitting
+set. Unsupported/inconsistent profile or missing/invalid required real fields
+is a visible validation failure, not a success-shaped fallback.
+
+Use returned target probabilities, labels and thresholds. Initial manifest
+thresholds are approximately CAD 0.689, LAD 0.550, LCX 0.324, RCA 0.357;
+do not hard-code these or assume 0.5. Vessel probabilities are capped at CAD.
+The chance of significant stenosis is not its percentage narrowing/severity.
+
+### Attribution display and rounding
+
+The explained quantity is the served calibrated probability, including vessel
+capping. `base_value` is the model risk for the reference inputs, not a measured
+population prevalence. `0.12` means `+12 percentage points`, not a 12% relative
+change or causal treatment effect.
+
+Validate real scale/method and the complete returned list before claiming
+additivity: for each target,
+`abs(base_value + sum(contributions) - probability) < 0.003`.
+This allows four-decimal API rounding; it is not permission to fabricate
+residuals. The top-ten chart is explicitly a subset, not an additive waterfall.
+Mock/unconfirmed scale remains in qualified model units.
+
+### Metrics provenance
+
+Metrics are reported cross-validation results from the manifest, not newly
+measured frontend accuracy, in-sample fit or clinical validation. Display model,
+validation method, cohort size/date, CI and available metrics as returned.
+`TargetMetrics.threshold` is a CV-summary validation threshold and may differ
+from `Target.threshold` for the current prediction. Label them distinctly.
+Shared version strings do not prove that demo refits have separately matching
+validation. Preserve the report's prior-selection/ensemble-optimism caveats;
+do not conflate headline AUC with pooled calibrated AUC or substitute in-sample
+AUC. Existing mismatch/mock/loading/error qualifications still apply.
+
+## OpenAPI 3.1 - preserved mock v1.0.0 profile
 
 The examples below are canonical JSON examples. GET operations have no JSON
 request body. The mock dataset marks all five generated patients as synthetic.
