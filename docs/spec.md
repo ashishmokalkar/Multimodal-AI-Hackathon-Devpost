@@ -129,8 +129,8 @@ Runtime setup used the separate home-directory environment and completed in
 verified without modifying the mock environment. The approved 45-minute/
 60-credit stop limits were not reached. Do not retrain, export, downgrade
 model dependencies, retry blocked Windows launchers or merge branches.
-Human Gate 3 is approved with D-042's warning-evidence carryover; Gate 4 must
-resolve that evidence before Sprint 3 closes.
+Human Gate 3 is approved with D-042's carryover. H subsequently closed S3
+at Gate 4 with remaining viewport evidence explicitly deferred to S4 (D-044).
 
 Extensibility (brief §Technical Considerations): new feature → appears automatically via `GET /features`; new vessel → add entry to `vesselMap.ts` + mesh node name; new model → backend only, metrics drawer is schema-driven.
 
@@ -272,11 +272,11 @@ CDP canvas-sizing failures. H explicitly moved those remaining checks into
 Phase 4 and closed Phase 3 (D-042). Phase 4 bundles a materially different
 headed-browser verification route with retrospective/cleanup; missing saved
 captures, live keyboard activation and closed/open canvas measurements stay
-open until reviewed. Gate 4 requires them before S3 closes, unless H explicitly
-revises the gate. Product/API requirements and all existing budget limits are
+open until reviewed. H explicitly revised Gate 4 under D-044 to carry the
+remaining viewport evidence into S4. Product/API requirements and budget limits are
 unchanged; this is not permission for broader UI implementation.
 
-**Phase 4 evidence status (D-042/D-043; Gate 4 pending):** Headed Edge captured
+**Historical Phase 4 evidence before D-044:** Headed Edge captured
 patient 20 with the real model/version, four probabilities and the visible
 warning count at both exact screenshot sizes; expanded captures show the full
 age-related reliability caution. Document overflow measured 0 CSS px. At
@@ -289,7 +289,38 @@ not activate the focused disclosure, and the attempt to select Custom patient
 did not produce a live empty-warning response. The four patient-20 images and
 raw measurements are under
 `docs/evidence/s3p4-warning-*`; empty-warning and keyboard evidence remain open
-for H's manual check. S3 is not closed and Gate 4 is not passed.
+for H's manual check at that report.
+
+**Human closeout (D-044):** H manually confirmed physical Enter and Space
+opening/closing of the warning disclosure, and that a fresh Custom-patient
+response clears patient 20's warning and displays the qualified "none returned"
+status. These observations have no exact viewport measurements or new
+screenshots. H approved Gate 4 and closed S3 with the settled 1280x800
+closed/open pair, missing saved empty-state captures and remaining viewport
+proof deferred to S4 release-candidate verification before code freeze.
+This changes evidence sequencing, not clinical-safety or layout requirements.
+H subsequently approved S4 Gate 0 and Phase 1 under D-045.
+
+**S4 summary-first presentation (D-045):** Reduce results/explanation density
+using the existing components, formatting helpers and native disclosures.
+Keep real/mock/version, custom/dataset/edited and final/demo source context,
+all four probabilities/labels/thresholds, uncertainty and warning status
+visible; keep complete returned source/method and numeric/input detail
+keyboard-reachable. Move the signed top-ten chart ahead of lengthy method
+copy, without shrinking its existing 11 CSS px text, dropping contributions,
+changing probability-point units or implying causation/clinical benefit.
+At 1280x800, patient 20's CAD Why? view with disclosures collapsed and results
+scroll at zero must show at least three complete labelled chart rows.
+Preserve accepted snapshots, missing/zero/mock distinctions, derived-value
+qualifications, freshness and the bounded viewer/layout. No new backend/
+model/API semantics, assets, imports, geometry, packages or broader redesign.
+Phase 1 requires before/after desktop evidence and existing frontend checks.
+Later hardening completes D-044's open evidence before end Oct 11 code freeze.
+
+S4 completes code under a 700-credit cap; S5 finalises the submission Oct
+12-13 under 500, splitting the existing 1200 allocation (D-045). Draft/final
+document/video dates and Oct 14 submission-only remain protected. S5 does
+not authorise new features; any blocking frozen-code fix needs H approval.
 
 ## 8. Clinical safety
 
@@ -331,8 +362,9 @@ polish or CSV work needs a separate H-approved scope/calendar decision.
   Shapley and `/model/metrics` handoff are supplied and approved under D-038.
   WSL loading, semantic frontend integration and live evidence were verified in
   Phase 3; H approved Human Gate 3 with warning live evidence carried to Phase
-  4 (D-042). That evidence and Gate 4 remain open. Deployment, clinical validity
-  and separately validated demo-refit metrics are not established.
+  4 (D-042). H subsequently closed S3 at Gate 4 with remaining viewport
+  evidence carried to S4 (D-044). Deployment, clinical validity and separately
+  validated demo-refit metrics are not established.
 - Q3: Faizan remains accountable for the video/document (D-033); M offers ML
   sections and joint script/architecture input. His contribution timing remains
   to confirm. Draft Oct 12, final Oct 13; submission-only Oct 14.

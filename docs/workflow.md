@@ -39,7 +39,14 @@ Rule: **if a change to `plan.md` affects scope or architecture, update `spec.md`
 
 ## 4. Sprint lifecycle
 
-Four sprints of ~2 days (D-001). Every sprint has the same shape:
+Five sprints under D-045, superseding D-001's four-sprint structure without
+extending the deadline: S1/S2 are archived; S3 closed Oct 10 with explicit
+evidence carryover; S4 finishes feedback/code work and freezes code by end
+Oct 11; S5 finalises documentation/video/submission readiness Oct 12-13.
+Oct 14 remains submission-only. S4/S5 split the former final sprint's 1200
+credits into 700/500; reserve 700 and project cap 7000 stay unchanged.
+Only separately approved blocking fixes may change code after freeze.
+Every sprint keeps the same shape:
 
 1. **Phase 0 — Discussion & Research** (O + H). Re-read `spec.md`, `decisions.md`, last retro. Confirm or amend the tentative plan for this sprint. Output: `plan.md` for this sprint.
 2. **Phases 1..n — Delivery** (X, reviewed by O). Sizeable chunks of work, each with atomic tasks.

@@ -7,11 +7,13 @@ UI/regressions are published. On Oct 10 H explicitly approved closing Phase 3
 with its remaining warning live evidence carried into Phase 4 (D-042).
 Human Gate 3 is approved with that carryover, not an unconditional self-check
 pass: saved exact-viewport captures, live keyboard disclosure activation and
-closed/open canvas measurements remain unverified. Phase 4 captured partial
-patient-20 evidence, but keyboard activation, a live empty-warning case and a
-stable 1280x800 closed/open canvas pair remain open. Gate 4 is pending; S3 is
-not closed. Verification services are stopped. Original overruns and
-allocations remain recorded; no ceiling is reset.
+closed/open canvas measurements were initially unverified. Phase 4 captured
+partial patient-20 evidence. H subsequently manually confirmed keyboard
+activation and the qualified empty-warning state, then approved Gate 4 with
+the remaining viewport evidence carried to S4 (D-044). S3 is closed with that
+explicit exception, not a complete original self-check pass. X's verification
+services were stopped; H later started the local services for manual checks.
+Original overruns and allocations remain recorded; no ceiling is reset.
 The completed Opus review and UI/UX phase do not authorise a broader redesign,
 CSV/document import or additional agents. H retains the current orchestrator
 and manual handover workflow (D-031).
@@ -863,5 +865,27 @@ live evidence. No third attempt at the failed input route was made. H must
 manually observe the disclosure open/close via keyboard and the real
 Custom-patient empty-warning state, then review settled 1280x800 measurements.
 
-**Human Gate 4:** Pending H review. S3 is not closed; S4 Phase 0 remains
-unstarted and gated on Gate 4 approval.
+**Human Gate 4: approved with carryover (D-044).** The original self-check
+result above remains historical. H selected "Both Enter and Space open and
+close it" for the physical-keyboard warning check and confirmed that Custom
+patient clears the old warning and shows the qualified "none returned"
+status. No exact viewport dimensions or new screenshots accompanied those
+observations. H then selected "Approve Gate 4 with carryover and begin S4
+planning (Recommended)". S3 is closed; S4 planning only is authorised.
+The settled 1280x800 canvas pair, missing saved empty-state captures and
+remaining viewport-specific proof stay open until S4 release-candidate
+verification before code freeze. See `docs/evidence/s3p4-warning-human-check.txt`.
+
+**Closeout accounting correction:** E's 15:15:33.327Z report correctly recorded
+P4 at 42.447956, but its derived S3/project totals included the initial
+11.894060 P4 credits twice. Direct deduplicated totals at that cutoff are
+S3 **1126.7053505** and project **2899.309668**. Preserve the earlier reported
+snapshots with this correction; P4/X actuals and the repair limit are unchanged.
+
+**Final recorded S3 snapshot:** through **2026-10-10T15:42:21.815Z**, P4 is
+**96.9250665** (O **82.866010**, X **14.0590565**), below its 100 combined/
+30 X limits. S3 is **1181.182461** and project **2953.7867785**, leaving
+**618.817539** under S3 and **4046.2132215** overall. D-041/D-043 corrective
+X use is **36.7557225** of 40; no limit is reset. These are deduplicated
+local telemetry, not billing. S4 accounting starts at the recorded transition
+**2026-10-10T15:42:22.433Z**; later planning/publication is S4, not S3.
