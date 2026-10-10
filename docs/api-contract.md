@@ -124,6 +124,13 @@ thresholds are approximately CAD 0.689, LAD 0.550, LCX 0.324, RCA 0.357;
 do not hard-code these or assume 0.5. Vessel probabilities are capped at CAD.
 The chance of significant stenosis is not its percentage narrowing/severity.
 
+**Warning presentation (D-041):** For an accepted real response, show warning
+existence/count beside the probability/source summary without panel scrolling
+at both approved desktop viewports. Keep non-empty response cautions in native,
+keyboard-operable disclosure details. An empty list is explicitly “none
+returned,” not clinical reassurance; mock v1.0 displays that real-model warning
+assessment is unavailable. Clear all warning UI with prediction invalidation.
+
 ### Attribution display and rounding
 
 The explained quantity is the served calibrated probability, including vessel

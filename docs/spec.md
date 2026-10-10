@@ -250,10 +250,30 @@ Z-Alizadeh Sani extension (UCI #411; source-reported CC BY 4.0). This establishe
 neither independent validation of demo refits nor clinical validity or
 deployment; H's Human Gate 3 remains pending.
 
+**Gate 3 review correction (D-041):** The core integration is supported, but
+response warnings were placed after the chart/input table and risk summary,
+so initial desktop captures did not reveal their existence. Before Gate 3,
+show a compact warning count/status beside the probability/source summary at
+1920x1080 and 1280x800, with keyboard-accessible full response text. Preserve
+the bounded layout and clear warning UI on every prediction invalidation;
+only a current accepted real response supplies warning assessment. Empty
+warnings are not clinical reassurance, and mock output must not imply a real
+warning check. H approved this narrow correction, not a broader redesign.
+
+The correction places a compact count beside the probabilities and uses native
+`details`/`summary` for non-empty real warnings. Empty real warnings explicitly
+say “none returned” without reassurance; mock v1.0 explicitly says real-model
+warning assessment is unavailable. Focused UI/store regressions pass. Exact
+1920x1080/1280x800 live acceptance evidence remains incomplete after repeated
+CDP canvas-sizing failures; keep Gate 3 pending until that evidence is reviewed.
+
 ## 8. Clinical safety
 
 - Modal on first load (acknowledge required), persistent header banner, footer. Text: *"For decision-support and educational purposes only. Not a substitute for formal diagnostic imaging or clinical judgement."*
 - Probabilities never shown as "diagnosis"; labels say "predicted".
+- Warning existence/count is visible with the prediction summary without
+  scrolling; full response cautions are keyboard-accessible. Do not bury
+  reliability warnings behind long charts/tables or retain them after edits.
 
 ## 9. Non-functional
 

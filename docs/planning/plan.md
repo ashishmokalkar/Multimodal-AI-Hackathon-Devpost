@@ -5,8 +5,12 @@ UI/UX at Gate 2 (D-037), then approved the pinned ML handoff, contract amendment
 and runtime-first Phase 3 at Gate R (D-038). Implementation and its documented
 closeout are committed and pushed. H authorized the remaining closeout after the
 executor ceiling was exceeded (D-039), without resetting any allocation. All
-verification services are stopped. Human Gate 3 remains pending H; evidence is
-under `docs/evidence/s3p3-*`.
+O's Gate 3 review supports the core real integration but found that warning
+existence was hidden below the chart/table. H approved the bounded correction
+and accounting update (D-041). X delivered the compact warning UI and focused
+regressions; frontend checks pass, but the exact-viewport live evidence remains
+incomplete after repeated browser-automation canvas-sizing failures. Human Gate
+3 remains pending; verification services are stopped. Do not begin Phase 4.
 The completed Opus review and UI/UX phase do not authorise a broader redesign,
 CSV/document import or additional agents. H retains the current orchestrator
 and manual handover workflow (D-031).
@@ -110,7 +114,7 @@ are excluded.
 | 0 - Discussion and readiness planning | 200 | 0 | Approved |
 | 1 - Independent explanation/input/metrics dashboard | 400 (was 650) | 160 | Approved with mandatory presentation carryover |
 | 2 - Desktop UI/UX and demo visibility | 250 (new) | 100 | Accepted at Gate 2, D-037 |
-| 3 - Real integration, runtime verification first | 800 | 200 | Implementation delivered; H review pending |
+| 3 - Real integration, runtime verification first | 800 | 200 original; D-039 closeout exception; D-041 adds a 30-credit corrective limit | Core delivered; warning UI/tests pass; live evidence incomplete; Gate 3 pending |
 | 4 - Retrospective and cleanup | 100 | 30 | Not started |
 | Contingency, separate H approval required | 50 | Unassigned | Unused |
 | **Total** | **1800** | | |
@@ -150,7 +154,7 @@ reallocation of unused S1/S2 budgets or contingency spending.
 |---|---|---|
 | Contract response and API delivery | M's written reply and implemented API are available at the source pin below. H approved v1.1 handling under D-038. | Gate R approved; initial delivery is no longer a blocker. Oct 10 18:00 remains an integration-status checkpoint. |
 | Serving metadata, thresholds, explanations and metrics | `/features`, `api/schemas.py`, API implementation and manifest supply the reviewed boundary. | Implement only the approved profile below; parsing old required keys alone is insufficient. |
-| Runtime and artifacts | Python 3.11.9, pinned requirements, final/demo joblib artifacts and supporting code/data are supplied. M verified Windows; WSL remains unverified. | H explicitly accepts this runtime risk for a bounded runtime-first Phase 3. Passing WSL loading/endpoints remains mandatory for Gate 3. |
+| Runtime and artifacts | Separate Python 3.11.9 WSL environment, all model artifacts/endpoints, CORS and Windows localhost are verified in X's delivered evidence. Setup took 4m39s / 1.902883 X credits, within both limits. | Initial runtime blocker is resolved. Preserve the environment and source pin; local verification does not establish clinical validation or public deployment. |
 | Demo video | Faizan is accountable (D-033): record/upload a 3-10 minute YouTube demo of inputs, live model flow, 3D selection and technical implementation. | Approved rough cut Oct 12, final recording/link Oct 13 (D-034). |
 | Shared document | Faizan assembles the maximum-six-page document (D-033); request dataset/preprocessing/model/validation sections from Ashish. M's contribution timing remains unconfirmed. | Approved draft Oct 12, final Oct 13 (D-034). |
 
@@ -513,9 +517,9 @@ ceiling.
 through **2026-10-10T14:07:55.511Z**, Phase 3 actual was **287.152875**
 (O **33.668890**, X **253.483985**). This is **512.847125** under the
 800 combined allocation; X is **53.483985** over the original 200 ceiling.
-S3 cumulative usage was **864.350525** (O **508.979040**, X **355.371485**)
+S3 cumulative usage was **864.3505245** (O **508.979040**, X **355.3714845**)
 and project usage **2636.954842** (O **2110.445665**, X **526.509177**),
-leaving **935.649475** under the S3 cap and **4363.045158** under the project
+leaving **935.6494755** under the S3 cap and **4363.045158** under the project
 cap. The calculation deduplicates `assistant_usage_events` on session, event
 time, model, token counts and `total_nano_aiu`, scoped to the exact project
 checkout; Phase 3 starts at the approved `2026-10-10T10:30:42.653Z` boundary.
@@ -524,14 +528,98 @@ actuals are reset.
 
 The aggregate increase from the previous recorded snapshot
 (`2026-10-10T13:54:35.093Z`) is **20.724179** credits for Phase 3, S3 and the
-project. A current raw event-time query for this executor session at/after
-that timestamp totals **30.325039** credits, a **9.600860** difference from
-the aggregate delta. The final totals above were recomputed from the current
-deduplicated local event store; this interval mismatch is unresolved, so do not
-present that raw time-slice as an exact marginal delta. The earlier snapshot is
-preserved as historical. The Phase 3 UI/evidence/documentation commits and first
-push are included; the accounting-only update, its push/status checks and
-reporting calls after this timestamp are excluded.
+project. O resolved the previously reported **9.600860** interval mismatch:
+the earlier snapshot already includes the event exactly at its cutoff.
+An inclusive `>=` slice counts that boundary event again, giving **30.325039**.
+The correct incremental interval is strictly after the earlier cutoff and
+through the final cutoff, giving **20.724179**. Do not add 9.600860 to the
+project total. X's chat report also understated S3 as 860.269583; the recomputed
+864.3505245 above is the current total for that historical cutoff. Preserve
+the older snapshots with this correction. The accounting-only update,
+push/status checks and reporting calls after the cutoff remain excluded.
+
+**O Gate 3 review and H-approved correction (D-041):** Core real integration,
+source integrity, response correspondence and runtime evidence are supported.
+Warning visibility is not complete: `RawResult.tsx` renders warnings after the
+selected-target chart/input table and risk summary. Patient 20's age-related
+reliability warning is absent from the initial 1920x1080 and 1280x800 captures.
+It is not sufficient that the warning exists far below the fold.
+
+H selected "Approve bounded correction (Recommended)". Corrective accounting
+begins **2026-10-10T14:12:15.540Z**; X records its actual repair kickoff and
+fresh baseline. Allow at most **30 additional X credits** for the warning UI,
+focused regression/live evidence and related documentation/publication. This
+does not reset the original 200 ceiling, past overrun or the 800 combined
+allocation. Stop for H if the new allowance is exhausted; D-039's closeout-only
+permission does not authorise unlimited corrective implementation.
+
+Snapshot through **2026-10-10T14:12:14.882Z**: project **2697.263846**
+(O **2168.887655**, X **528.376191**); S3 **924.6595285**
+(O **567.421030**, X **357.2384985**); P3 **347.461879**
+(O **92.110880**, X **255.350999**). Remaining: **4302.736154** overall,
+**875.3404715** under S3 and **452.538121** under P3. These are deduplicated
+local telemetry, not billing; later correction planning/handover calls are
+excluded. Take an actual execution snapshot rather than resetting actuals.
+
+**X corrective execution kickoff and fresh baseline:** kickoff
+`2026-10-10T14:13:49.730Z`; deduplicated local telemetry through that cutoff
+(not billing) was project **2713.040056** (O **2184.663865**, X **528.376191**),
+S3 **940.4357385** (O **583.197240**, X **357.2384985**) and P3 **363.238089**
+(O **107.887090**, X **255.350999**). The corrective interval already contained
+O **15.776210** and X **0** credits at kickoff; this is included in the
+baseline, not added again. The script's exact checkout filter and deduplication
+fields match `scripts/credits.py`; the cutoff excludes later execution calls.
+
+**Latest corrective snapshot through `2026-10-10T14:29:06.590Z`:** P3
+**378.2348025** (O **107.887090**, X **270.3477125**); S3 **955.432452**
+(O **583.197240**, X **372.235212**); project **2728.0367695**
+(O **2184.663865**, X **543.3729045**). Corrective X usage since its fresh
+baseline is **14.9967135**, leaving **15.0032865** of D-041's 30-credit X
+allowance. The unchanged 800-credit combined P3 has **421.7651975** remaining;
+S3 and project totals remain below their unchanged caps. These are local
+telemetry, not billing; calls after the last recorded event are excluded.
+
+Corrective tasks and acceptance:
+
+- [ ] Show real-response warning existence/count beside the probability/source
+  summary, visible at the top of the results panel at both approved viewports.
+  Keep full response warning text reachable with keyboard-operable details;
+  no new modal/package, warning suppression or broad copy/layout redesign.
+- [x] Verify warning-bearing accepted results clear on edit, pending/error,
+  sample/reset and profile changes, and reappear only from an accepted fresh
+  response. A real empty list
+  must not masquerade as unavailable output or clinical reassurance; mock
+  responses must not claim real warning assessment.
+- [ ] Add focused warning rendering/clearing tests. Capture a warning-bearing
+  patient (patient 20) and an empty-warning case at actual 1920x1080/1280x800,
+  including keyboard access to the full warning. Preserve visible essential
+  controls/probabilities/source, overflow <=2 CSS px and canvas heights
+  >=480/300 CSS px with <=2 CSS px variation between disclosure states.
+- [x] Publish the related accounting/documentation corrections and passing UI
+  changes, run relevant frontend checks, stop verification services and report
+  source hashes, dated repair/P3/S3/project credits and evidence. Do not repeat
+  accepted model/API/additivity/performance suites or redo the full evidence
+  package without a specific regression. Human Gate 3 remains pending.
+
+**Execution update:** `RawResult.tsx` now places a compact status immediately
+after the probabilities. A non-empty real warning list uses native
+`details`/`summary`; an empty real list says “none returned” and disclaims
+reassurance; mock v1.0 says real-model warning assessment is unavailable.
+Focused rendering and warning-bearing store invalidation regressions pass.
+`pnpm lint`, `pnpm typecheck`, `pnpm test` (57 tests / 15 files) and
+`pnpm build` pass. Verification services were stopped and ports 8000, 5173 and
+9222 have no listeners. The exact-viewport evidence criterion is not accepted: a transient
+1920x1080 capture showed the warning count, source and four probabilities, but
+the run stopped before completing keyboard/layout checks and that temporary
+capture was not retained. Subsequent CDP runs repeatedly timed out waiting for
+the canvas to meet its viewport minimum after resizing/reload; a separate
+diagnostic did measure a 596.01px canvas at 1920x1080, but did not produce
+reproducible closed/open measurements or the required 1280x800 captures.
+CDP-generated keyboard events were not delivered to the focused summary; its
+accessibility tree did expose the native summary as a focusable disclosure
+control. Per the workflow repeated-failure rule, X stopped further live
+capture attempts. No warning PNGs were saved; see
+`docs/evidence/s3p3-warning-verification.txt`. Gate 3 remains pending H.
 
 Atomic tasks
 
