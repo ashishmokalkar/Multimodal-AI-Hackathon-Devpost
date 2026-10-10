@@ -32,7 +32,7 @@ function MockResult({
   const [activeView, setActiveView] = useState<"why" | "inputs">("why");
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-1">
       <div
         aria-label="Prediction source and version"
         className={`prediction-source-badge ${

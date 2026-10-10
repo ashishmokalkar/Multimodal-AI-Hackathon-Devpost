@@ -38,6 +38,7 @@ import {
   isAwaitingPrediction,
   usePatientStore,
 } from "../../store/patientStore";
+import { selectedPredictionTarget } from "./probabilityLegendHelpers";
 import {
   vesselDisplay,
   vesselIds,
@@ -301,10 +302,8 @@ export function ViewerPanel() {
   const isPredicting = usePatientStore((state) => state.isPredicting);
   const awaitingPrediction = usePatientStore(isAwaitingPrediction);
   const predictionError = usePatientStore((state) => state.predictionError);
-  const selectedTarget = selectedVessel
-    ? prediction?.vessels[selectedVessel]
-    : prediction?.cad;
-  const selectedTargetName = selectedVessel ?? "CAD";
+  const { name: selectedTargetName, target: selectedTarget } =
+    selectedPredictionTarget(prediction, selectedVessel);
   const selectedTargetProbability = selectedTarget?.probability ?? null;
   const predictionStatus = prediction
     ? `Current predicted probabilities: CAD ${formatProbability(prediction.cad.probability)}, LAD ${vesselDisplay(prediction, "LAD").percentage}, LCX ${vesselDisplay(prediction, "LCX").percentage}, RCA ${vesselDisplay(prediction, "RCA").percentage}. CAD: ${formatTargetUncertainty(prediction.cad.uncertain)} LAD: ${formatTargetUncertainty(prediction.vessels.LAD.uncertain)} LCX: ${formatTargetUncertainty(prediction.vessels.LCX.uncertain)} RCA: ${formatTargetUncertainty(prediction.vessels.RCA.uncertain)}`

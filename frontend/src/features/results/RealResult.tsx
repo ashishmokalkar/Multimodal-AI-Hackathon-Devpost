@@ -182,14 +182,14 @@ export function RealResult({
               <strong>Real-model prediction</strong>
               <span className="prediction-source-scenario">
                 {isEditedScenario
-                  ? "Edited dataset-sample scenario"
+                  ? "Edited dataset sample"
                   : sampleId
-                    ? "Original dataset-sample scenario"
-                    : "Custom input scenario"}
+                    ? "Original dataset sample"
+                    : "Custom input"}
               </span>
             </span>
             <span className="prediction-source-detail">
-              Model version {prediction.model_version} · Prediction source:{" "}
+              Model version {prediction.model_version} · Source:{" "}
               {prediction.mock ? "mock" : prediction.prediction_source}
             </span>
           </div>

@@ -7,21 +7,36 @@ frontend contract (`docs/api-contract.md` on the `frontend` branch).
 
 ## Run
 
-These are the Windows steps, the setup the API is verified on.
-- **Python:** 3.11.9.
-- **Dependencies:** pinned in `requirements.txt`. The saved models need exactly these versions of scikit-learn, pandas, numpy, xgboost, catboost, lightgbm and interpret.
+The tested serving runtime is Ubuntu 24.04.5 on WSL 2, Python 3.11.9, and uv
+0.12.24. Run from the repository root; the serving environment lives outside
+the checkout, and dependencies are pinned in `requirements.txt`. For a
+first-time setup only (skip when the environment is already prepared):
 
-```powershell
-python -m venv .venv
-.venv\Scripts\python -m pip install -r requirements.txt
-.venv\Scripts\python -m uvicorn api.main:app --host 127.0.0.1 --port 8000
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+uv python install 3.11.9
+VENV="$HOME/.venvs/multimodal-ai-hack-real-api"
+if [ ! -x "$VENV/bin/python" ]; then
+  uv venv --python 3.11.9 "$VENV"
+fi
+uv pip install --python "$VENV/bin/python" -r requirements.txt
 ```
 
-**Ubuntu/WSL:** the same commands should work with `python3.11` and `.venv/bin/python`, run from the repository root, but this is not yet verified.
+Start the API from the repository root:
+
+```bash
+VENV="$HOME/.venvs/multimodal-ai-hack-real-api"
+exec "$VENV/bin/uvicorn" api.main:app --host 127.0.0.1 --port 8000
+```
+
+For Windows/WSL, keep the checkout and Git operations on Windows, open the
+Ubuntu shell, and change to the checkout mounted under `/mnt/<drive>/...`
+before using these same commands. WSL 2 forwards port 8000 to Windows
+localhost.
 
 - **Docs:** <http://localhost:8000/docs>.
 - **CORS:** the API accepts `http://localhost:5173` and `:5174` (and the `127.0.0.1` equivalents). To change this, set `CARDIOTWIN_CORS_ORIGINS` to a comma-separated list.
-- **Tests:** `python -m pytest tests/test_api.py`.
+- **Tests:** `"$HOME/.venvs/multimodal-ai-hack-real-api/bin/python" -m pytest tests/test_api.py -q -ra`, from the repository root.
 
 ## What the API serves
 | Endpoint | Source |
@@ -59,8 +74,13 @@ All the additions are new keys, so the frontend's current zod schemas ignore the
 **Requests (`POST /predict`):**
 - An optional `sample_id`, taken from `/patients/samples`, is accepted.
 - The backend also recognises a sample automatically when its features are sent unchanged.
-- Either way, the patient is scored by **`models/demo/`**: the same pipelines, refitted without the 8 sample patients. So demo predictions are genuinely out-of-sample rather than memorised.
-- If any value is edited, it counts as a new patient, and the final models score it.
+- A valid `sample_id` keeps the request on **`models/demo/`**, including edited
+  inputs, so sample what-if comparisons use the same pipelines refitted without
+  the eight sample patients. The frontend retains and labels this sample
+  origin after edits.
+- Requests without a recognized sample origin use the final models. Exact
+  sample features are recognized automatically; edited values require the
+  retained `sample_id` to preserve the demo-model origin.
 
 **Responses (`POST /predict`):**
 - `Target.uncertain` (bool) is true when the model's 90% prediction set contains both answers. In validation this happened for about 46% of LCX/RCA patients, 24% for LAD and 3% for CAD.

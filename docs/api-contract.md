@@ -171,7 +171,8 @@ or deployment claim is made. H closed Phase 3 at Human Gate 3 with the remaining
 warning live evidence carried into Phase 4 (D-042). This changes the evidence
 schedule, not the contract or warning requirements: saved exact-viewport
 captures, real keyboard disclosure activation and closed/open layout proof
-remain open, and Gate 4 requires them before Sprint 3 closes.
+were carried forward. H's subsequent D-044 closeout below supersedes the
+Gate 4 evidence schedule, not these API/presentation requirements.
 
 Phase 4 published four headed-Edge patient-20 captures at the two requested
 viewport sizes, showing the real source/version, probabilities, warning count
@@ -179,8 +180,11 @@ and expanded reliability text. The 1920x1080 canvas pair is within the 2 px
 variation limit; the 1280x800 closed capture preceded completed resize settling,
 so its canvas pair is inconclusive. OS keyboard activation and a live
 empty-warning capture were not verified; no contract behavior has changed.
-Gate 4 remains pending, and local integration does not establish deployment or
-clinical validation.
+Gate 4 was pending at that report. H subsequently confirmed physical keyboard
+activation and the qualified empty-warning state, then approved Gate 4 with
+remaining exact-viewport evidence deferred to S4 (D-044). No new screenshots
+or settled 1280x800 measurements accompany the manual observations. Local
+integration does not establish deployment or clinical validation.
 
 ## OpenAPI 3.1 - preserved mock v1.0.0 profile
 

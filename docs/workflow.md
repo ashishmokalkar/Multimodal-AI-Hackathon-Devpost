@@ -17,6 +17,18 @@ All handovers O → X and X → O pass **through H in chat**. No agent spawns su
 
 - **Deadline:** 14 Oct 2026, 20:45 CEST (Devpost: 15 Oct 00:15 IST). Oct 14 is submission-only buffer.
 - **Budget:** 7000 Copilot credits for O + X combined. Per-sprint caps live in `plan.md`. Exceeding a sprint cap requires an explicit H decision logged in `decisions.md`.
+- **S4 budget simplification (D-049):** one shared hard ceiling of 700 for O
+  and X. Phase, executor, warning and publication allocations are planning
+  estimates, not separate stop limits. X may use the remaining shared sprint
+  budget for approved scope without micro-allowance requests. Preserve dated
+  actuals and historical overruns; S5 500, reserve 700 and project 7000 stay
+  unchanged. Human gates, scope approvals and repeated-failure rules still
+  apply; this does not authorise later phases automatically.
+- **S5 shared budget (D-053):** the existing 500-credit O+X allocation is one
+  shared hard sprint ceiling. Phase/executor/media/publication figures are
+  estimates, not independent stop guards. Include planning, review and Git
+  publication in actuals; no reset, reserve use or automatic underspend
+  transfer. Human gates and frozen-code scope remain mandatory.
 - **Branches:** `main` ← `dev` ← `frontend` (ours) / `ML-dev` (colleague). We only commit to `frontend`. Merges to `dev` happen at sprint end via PR after H approval.
 
 ## 3. Artefacts
@@ -39,7 +51,20 @@ Rule: **if a change to `plan.md` affects scope or architecture, update `spec.md`
 
 ## 4. Sprint lifecycle
 
-Four sprints of ~2 days (D-001). Every sprint has the same shape:
+Five sprints under D-045, superseding D-001's four-sprint structure without
+extending the deadline: S1/S2 are archived; S3 closed Oct 10 with explicit
+evidence carryover; S4 finishes feedback/code work and freezes code by end
+Oct 11; S5 finalises documentation/video/submission readiness Oct 12-13.
+Oct 14 remains submission-only. S4/S5 split the former final sprint's 1200
+credits into 700/500; reserve 700 and project cap 7000 stay unchanged.
+Only separately approved blocking fixes may change code after freeze.
+S5 uses automation-first document/video preparation to fit H's 2-3 hours of
+review/upload availability: a captioned demo without narration, ML drafting
+from pinned evidence followed by Ashish's sign-off, and a bounded existing-
+tool media preflight with a minimal manual fallback. Required exported
+page/duration limits must still be measured. No new agents or automatic
+submission/PR merge follows from automation; each phase is separately gated.
+Every sprint keeps the same shape:
 
 1. **Phase 0 — Discussion & Research** (O + H). Re-read `spec.md`, `decisions.md`, last retro. Confirm or amend the tentative plan for this sprint. Output: `plan.md` for this sprint.
 2. **Phases 1..n — Delivery** (X, reviewed by O). Sizeable chunks of work, each with atomic tasks.
@@ -58,6 +83,35 @@ Each phase in `plan.md` declares:
 Deferring a particular gate item requires H's explicit approval and a logged decision. Keep the deferred item open; approval of independent work does not certify the missing evidence. D-016 is the Gate 2 exception for backend contract sign-off.
 
 No phase starts until the previous phase's human gate is approved. If a self-check fails twice **for the same root cause after a genuine fix attempt**, X stops and reports; O re-plans rather than X looping. Auto-fixable lint/format errors never count as failures — X runs the fixer (`ruff check --fix && ruff format`, `pnpm format`, `pnpm lint --fix`) and re-checks (D-015). Before stopping for any reason, X commits and pushes all work that passes typecheck/tests, so nothing is left only in the working tree.
+
+### Feedback intake and incorporation
+
+Feedback is evidence to assess, not automatic implementation authority. O keeps
+one compact ledger in the current `plan.md`, archived with the sprint; no
+separate feedback sprint or agent is implied.
+
+1. **Capture:** assign a stable sprint feedback ID; record the source/reviewed
+   commit, claim, expected behavior and relevant rubric or requirement.
+2. **Verify:** compare against current code/evidence and approved decisions.
+   Separate reproduced defects, usability/rubric improvements, intentional
+   behavior, outdated findings and unverified claims. Record evidence or the
+   specific missing check; do not accept the reviewer's severity as fact.
+3. **Triage:** record disposition (`proposed`, `approved`, `implemented`,
+   `verified`, `deferred`, or `no change`), owner, rationale and dependency.
+   Reconcile conflicting advice against the contract/model semantics; changes
+   to either need H approval and M's relevant agreement, not a frontend guess.
+4. **Approve a batch:** H approves the closed scope, exclusions, acceptance,
+   credit ceilings and calendar at a human gate. Incorporate approved changes
+   into plan/spec/decisions before a single manual handover to X. New feedback
+   during execution is queued unless H explicitly changes the active batch.
+5. **Implement and prove:** X reports each approved ID, change/commit and
+   measurable evidence, preserving existing behavior. Reuse accepted checks;
+   an automation failure is not a product defect or a live pass. Stop at the
+   phase gate or applicable credit/repeated-failure limit.
+6. **Close:** O checks the evidence; H approves the human gate. Only then mark
+   the item verified. Retain deferred/no-change items with reasons rather
+   than silently dropping them. After code freeze, only H-approved blocking
+   fixes may enter S5; suggestions do not reopen development.
 
 ## 6. Handover format (O → X)
 
@@ -83,6 +137,7 @@ Commit as you go; do not touch files outside: <paths>.
 ## Report: Sprint N / Phase M
 Commits: <hashes>
 Gate evidence: criterion -> evidence
+Feedback batch (if applicable): ID -> change/commit -> evidence -> unresolved status
 Deviations from handover: ...
 Open questions / blockers: ...
 Estimated credits used: <from Copilot usage if visible>

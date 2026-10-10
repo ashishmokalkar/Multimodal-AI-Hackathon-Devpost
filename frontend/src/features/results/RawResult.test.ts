@@ -60,7 +60,12 @@ const realExplanation = {
   scale: "probability" as const,
   method: "Baseline Shapley on served probability (32 orderings).",
   contributions: [
-    { feature: "Age", value: 67, contribution: 0.12, direction: "positive" as const },
+    {
+      feature: "Age",
+      value: 67,
+      contribution: 0.12,
+      direction: "positive" as const,
+    },
   ],
 };
 const realPrediction: PredictionResponse = {
@@ -77,13 +82,23 @@ const realPrediction: PredictionResponse = {
     LAD: {
       ...realExplanation,
       contributions: [
-        { feature: "EF-TTE", value: 45, contribution: -0.3, direction: "negative" },
+        {
+          feature: "EF-TTE",
+          value: 45,
+          contribution: -0.3,
+          direction: "negative",
+        },
       ],
     },
     LCX: {
       ...realExplanation,
       contributions: [
-        { feature: "Typical Chest Pain", value: "Typical", contribution: 0.45, direction: "positive" },
+        {
+          feature: "Typical Chest Pain",
+          value: "Typical",
+          contribution: 0.45,
+          direction: "positive",
+        },
       ],
     },
     RCA: { ...realExplanation, contributions: [] },
@@ -157,7 +172,9 @@ describe("RawResult explanation rendering", () => {
     expect(markup).toContain("Model contribution");
     expect(markup).toContain('aria-label="Result detail view"');
     expect(markup).not.toContain("Input value: 67 years");
-    expect(markup).toContain("scale is unconfirmed");
+    expect(markup).toContain(
+      "scale and reference-risk interpretation are unconfirmed",
+    );
     expect(markup).not.toContain("verified SHAP");
   });
 
@@ -190,11 +207,12 @@ describe("RawResult explanation rendering", () => {
   });
 
   it("uses confirmed probability-scale units and displays real prediction provenance", () => {
-    const markup = renderResult(null, realPrediction);
+    const markup = renderResult(null, realPrediction, false, "patient-20");
 
     expect(markup).toContain("+12 pts");
     expect(markup).toContain("Typical patient");
     expect(markup).toContain("42%");
+    expect(markup).toContain("Original dataset sample");
     expect(markup).toContain(
       "Baseline Shapley on served probability (32 orderings).",
     );
@@ -234,8 +252,8 @@ describe("RawResult explanation rendering", () => {
       "patient-20",
     );
 
-    expect(markup).toContain("Edited dataset-sample scenario");
-    expect(markup).toContain("Prediction source:");
+    expect(markup).toContain("Edited dataset sample");
+    expect(markup).toContain("Source:");
     expect(markup).toContain("trained without this patient");
   });
 

@@ -129,8 +129,8 @@ Runtime setup used the separate home-directory environment and completed in
 verified without modifying the mock environment. The approved 45-minute/
 60-credit stop limits were not reached. Do not retrain, export, downgrade
 model dependencies, retry blocked Windows launchers or merge branches.
-Human Gate 3 is approved with D-042's warning-evidence carryover; Gate 4 must
-resolve that evidence before Sprint 3 closes.
+Human Gate 3 is approved with D-042's carryover. H subsequently closed S3
+at Gate 4 with remaining viewport evidence explicitly deferred to S4 (D-044).
 
 Extensibility (brief §Technical Considerations): new feature → appears automatically via `GET /features`; new vessel → add entry to `vesselMap.ts` + mesh node name; new model → backend only, metrics drawer is schema-driven.
 
@@ -176,7 +176,7 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
 - Vessel geometry: D-012's approved fallback is active. Project-authored `TubeGeometry` meshes named `LAD`, `LCX`, and `RCA` follow hand-authored `CatmullRomCurve3` paths. They are schematic, not patient-specific lesion maps. The LAD 0.80, LCX 0.30, and RCA 0.55 values used during S1 were illustrative fixtures only; runtime probabilities are never hard-coded.
 - S2's mock-based viewer maps only the current accepted `PredictionResponse` to per-vessel colours, summaries, hover details, and selection details. When a current response is unavailable, all vessels use a distinct neutral colour and no old probability or contribution is shown. These mock-driven updates are not real-model integration.
 - Loading: `useGLTF` (drei); use Draco only if needed and serve its decoder locally. `<Bounds fit>` on load; `frameloop="demand"`; `dpr={[1, 1.5]}`. No runtime asset/decoder CDN calls.
-- Colour mapping: probability → `d3-scale`-style interpolation green (#2e7d32) → amber (#f9a825) → red (#c62828), with vessel labels and numeric values as a secondary encoding. The continuous legend shows 0-100% predicted probability, not clinical severity cutoffs or percentage artery narrowing; unavailable values have a distinct neutral encoding.
+- Colour mapping: probability → `d3-scale`-style interpolation green (#2e7d32) → amber (#f9a825) → red (#c62828), with vessel labels and numeric values as a secondary encoding. The continuous legend shows 0-100% predicted probability, not clinical severity cutoffs or percentage artery narrowing; unavailable values have a distinct neutral encoding. D-047 authorises a separate selected-target decision-threshold marker from the accepted response, without changing probability hues or treating 50% as a classification boundary.
 - Interaction: `OrbitControls` (damped), hover → emissive highlight + tooltip, click → select using the existing emissive highlight and shared results selection. Keyboard-operable result controls provide an alternative to 3D picking. Basic manual LAD/LCX/RCA focus controls and Reset frame the schematic geometry; result selection itself does not change the camera. Focus translates the camera and orbit target together to preserve the current orbit and zoom. No unverified anatomical-view labels or elaborate flyTo animation.
 - Performance target: ≥50 fps during active rendering/interaction at 1080p; heart plus vessels ≤150k triangles total; GLB ≤8 MB. Phase 3 measured results are recorded with the evidence for the Gate 3 handoff.
 - Loading/error states are shown explicitly. The GLB and all its embedded textures are local; no runtime asset or decoder CDN is used.
@@ -184,6 +184,11 @@ Expected feature groups (Z-Alizadeh Sani extension; final list comes from M via 
   controls and viewer legend/callout/accessible details. It is neither an error
   nor an invented quantitative interval. Keep continuous probability colours;
   no pulsing/glow redesign, severity categories, global tint or lesion locations.
+- D-047 authorises a persistent selected-vessel label using the existing Html
+  tooltip pattern, retaining selected emissive/radius cues and probability
+  hues. Hover/selection must not duplicate the same label or intercept picking.
+  CAD clears the selected overlay; unavailable state has no stale risk or
+  threshold marker. Ordinary selection still does not move the camera.
 
 ## 7. Interpretability presentation
 
@@ -272,11 +277,11 @@ CDP canvas-sizing failures. H explicitly moved those remaining checks into
 Phase 4 and closed Phase 3 (D-042). Phase 4 bundles a materially different
 headed-browser verification route with retrospective/cleanup; missing saved
 captures, live keyboard activation and closed/open canvas measurements stay
-open until reviewed. Gate 4 requires them before S3 closes, unless H explicitly
-revises the gate. Product/API requirements and all existing budget limits are
+open until reviewed. H explicitly revised Gate 4 under D-044 to carry the
+remaining viewport evidence into S4. Product/API requirements and budget limits are
 unchanged; this is not permission for broader UI implementation.
 
-**Phase 4 evidence status (D-042/D-043; Gate 4 pending):** Headed Edge captured
+**Historical Phase 4 evidence before D-044:** Headed Edge captured
 patient 20 with the real model/version, four probabilities and the visible
 warning count at both exact screenshot sizes; expanded captures show the full
 age-related reliability caution. Document overflow measured 0 CSS px. At
@@ -289,7 +294,143 @@ not activate the focused disclosure, and the attempt to select Custom patient
 did not produce a live empty-warning response. The four patient-20 images and
 raw measurements are under
 `docs/evidence/s3p4-warning-*`; empty-warning and keyboard evidence remain open
-for H's manual check. S3 is not closed and Gate 4 is not passed.
+for H's manual check at that report.
+
+**Human closeout (D-044):** H manually confirmed physical Enter and Space
+opening/closing of the warning disclosure, and that a fresh Custom-patient
+response clears patient 20's warning and displays the qualified "none returned"
+status. These observations have no exact viewport measurements or new
+screenshots. H approved Gate 4 and closed S3 with the settled 1280x800
+closed/open pair, missing saved empty-state captures and remaining viewport
+proof deferred to S4 release-candidate verification before code freeze.
+This changes evidence sequencing, not clinical-safety or layout requirements.
+H subsequently approved S4 Gate 0 and Phase 1 under D-045.
+
+**S4 summary-first presentation (D-045):** Reduce results/explanation density
+using the existing components, formatting helpers and native disclosures.
+Keep real/mock/version, custom/dataset/edited and final/demo source context,
+all four probabilities/labels/thresholds, uncertainty and warning status
+visible; keep complete returned source/method and numeric/input detail
+keyboard-reachable. Move the signed top-ten chart ahead of lengthy method
+copy, without shrinking its existing 11 CSS px text, dropping contributions,
+changing probability-point units or implying causation/clinical benefit.
+At 1280x800, patient 20's CAD Why? view with disclosures collapsed and results
+scroll at zero must show at least three complete labelled chart rows.
+Preserve accepted snapshots, missing/zero/mock distinctions, derived-value
+qualifications, freshness and the bounded viewer/layout. No new backend/
+model/API semantics, assets, imports, geometry, packages or broader redesign.
+Phase 1 requires before/after desktop evidence and existing frontend checks.
+Later hardening completes D-044's open evidence before end Oct 11 code freeze.
+
+**S4 feedback/hardening (D-047):** H accepted Phase 1 and approved only feedback
+IDs F01/F04/F06/F08/F09 plus existing release-candidate/carryover checks.
+Add the threshold marker and selected label described above; clarify independent
+thresholds and served vessel-probability capping in existing model details,
+without recomputing outputs or inferring capping from equality. Make generic
+repo-relative setup instructions for the tested Linux runtime and optional
+WSL adaptation; distinguish tested Node 24.19.0 from the declared engine range.
+Retain sample origin through edits, the pinned profile guards, schematic
+geometry, asset/dependency/loading paths and disclaimer behavior. Anatomy,
+contract extension and bundle optimisation remain separately scoped/deferred.
+Preserve Phase 1's readability and complete D-044's remaining evidence before
+code freeze. Original Phase 2 was 150 combined/100 X, with a 60 cumulative
+warning limit. D-048 moves 75 unused Phase 1 credits to Phase 2 (now 225
+combined; X still 100) and permits publication only under a 65 cumulative
+corrective ceiling. Retain the recorded corrective and combined overruns;
+S4's 700 total and all other caps remain unchanged.
+H subsequently approved D-049: S4's phase/executor/corrective/publication
+amounts are planning estimates under one shared hard 700-credit O+X budget.
+E may use its remaining budget for approved scope without micro-allowance
+requests. Historical overruns, S5 500, reserve 700 and project 7000 remain.
+Approval is not implementation/verification; use the workflow/plan feedback
+ledger and Human Gate 2 to close the batch.
+
+The Phase 2 source, portable README and live warning/selection evidence were
+published at `39ffab1c8adecd707c0f40ce826c12a568c41267` under D-049. H approved
+Human Gate 2 under D-050 after publication, accepting the release candidate
+and completed D-044 carryover evidence. Phase 3 retrospective/code-freeze
+cleanup is authorised; no new feature implementation, S5 start, PR operation,
+public deployment or clinical-validity claim follows from that approval.
+Record the accepted source hash separately from documentation-only closeout.
+
+S4 completes code under a 700-credit cap; S5 finalises the submission Oct
+12-13 under 500, splitting the existing 1200 allocation (D-045). Draft/final
+document/video dates and Oct 14 submission-only remain protected. S5 does
+not authorise new features; any blocking frozen-code fix needs H approval.
+
+S4 Phase 3 retrospective and archive were published as a documentation-only
+closeout on 2026-10-10. The frozen source baseline remains
+`39ffab1c8adecd707c0f40ce826c12a568c41267`; the closeout commit is separate
+and does not represent a code change. H approved Human Gate 3 under D-051
+after the documentation-only closeout at
+`e5117844e07db7196bed8636992627a551b59cdd`; S4 is formally closed and S5
+Phase 0 planning is active. H confirmed during S5 planning that Ashish's
+document-ready ML sections are due Oct 12; exact time/coverage remain to
+confirm so same-day assembly and draft review are not silently assumed.
+No PR merge, frozen-code change or S5 delivery is implied by planning approval.
+
+**S5 production choices (D-052, Gate 0 approved under D-053):** Faizan has 2-3 hours
+for document/video review, uploads and sign-off across Oct 11-13. Use an
+automation-first plan: E prepares a document/PDF of at most six pages, a
+4-5-minute target captioned real-demo video within the required 3-10 minutes,
+and submission-text drafts. H selected no narration. Reuse frozen source,
+accepted S4 evidence and existing Edge/FFmpeg tooling; recording/PDF export
+still need a bounded media preflight after Gate 0. Failed automation switches
+to a minimal human-recording/export fallback rather than repeated harness
+work. No new features, hosting, retraining, dependencies or agents are
+automatically authorised.
+
+H approved drafting ML sections from the pinned reports after Gate 0, then
+having Ashish verify or replace them on Oct 12 before finalisation. His
+delivery hour/coverage remain open; initial drafting need not wait, but
+missing ML sign-off blocks finalisation. Proposed drafts Oct 12 at 16:00
+CEST and finals Oct 13 at 18:00 protect Oct 14 for submission. The proposed
+S5 phase estimates share the existing 500-credit hard O+X sprint ceiling,
+without independent executor/publication micro-limits or budget resets.
+H approved this budget application, milestones and Phase 1 production only
+under D-053; finalisation and submission retain separate human gates.
+The live Devpost page returned 403 during planning, so H must verify current
+form/rules and judge access before final acceptance. No production or
+submission authority follows from the planning choices alone. Phase 1's
+accounting boundary is `2026-10-10T19:26:20.967Z`; frozen source remains
+unchanged and E must stop for Human Gate 1 after the draft package.
+
+**S5 Gate 1 (D-054):** E published draft source/PDF, captions/storyboard,
+Devpost text and retained a captioned real-demo video. The PDF is five pages;
+the video is 4:21, H.264 1920x1080 without audio. The published draft closeout
+is `8e64e069dc2330463758aea0022aee62e230bbd4`; application source remains
+frozen at `39ffab1c8adecd707c0f40ce826c12a568c41267`.
+O reviewed draft text, PDF text/page count, video metadata, the first-page
+preview and five retained frames, not full playback or all-page visual review.
+H approved Gate 1 with explicit carryover into Phase 2: H's full PDF/video
+review and current Devpost-form check remain mandatory before Gate 2.
+Ashish's ML sign-off remains open. Approved document corrections clarify
+exact-match sample routing without an ID, headline versus calibrated/
+threshold-metric aggregation, and baseline Shapley on served probability
+with 32 orderings. Correct review candidates may be prepared now, but do
+not remove draft/pending-review status or claim final acceptance before the
+outstanding confirmations. No footage re-recording or frozen-code change
+is implied. Phase 2 begins `2026-10-10T20:23:07.549Z`; S5's shared 500
+ceiling, manual handovers and separately gated submission remain unchanged.
+
+**S5 Phase 2 corrected candidates (2026-10-10):** E published corrected
+review candidates in `48384c56f357b690d9c8dd5eaacd86dddf2e8731`. The
+document source, five-page PDF, Devpost draft and storyboard incorporate
+S5-F01/F02/F03; the original 4:21 captioned rough cut was not re-recorded.
+The package remains in draft status. H's full document/video review and
+current-form/access check, plus Ashish's ML verification, remain pending and
+block finalisation and Human Gate 2. No upload, submission, source change or
+Gate 2 approval is implied.
+
+**Review sharing (D-055):** H requested GitHub access to the video and
+documentation for colleague review and gave O one-time scoped commit/push
+authority. The review index at `docs/submission/README.md` links corrected
+drafts and a byte-identical 7,097,500-byte captioned MP4 at
+`docs/submission/demo-review.mp4`. Raw footage stays outside Git. The
+repository is private; a reviewer needs repository access, and this copy is
+not a substitute for the required YouTube upload or verified judge access.
+All H/M reviews and Gate 2 remain pending; no application-source change or
+finalisation/PR/submission authority follows from review publication.
 
 ## 8. Clinical safety
 
@@ -331,11 +472,16 @@ polish or CSV work needs a separate H-approved scope/calendar decision.
   Shapley and `/model/metrics` handoff are supplied and approved under D-038.
   WSL loading, semantic frontend integration and live evidence were verified in
   Phase 3; H approved Human Gate 3 with warning live evidence carried to Phase
-  4 (D-042). That evidence and Gate 4 remain open. Deployment, clinical validity
-  and separately validated demo-refit metrics are not established.
-- Q3: Faizan remains accountable for the video/document (D-033); M offers ML
-  sections and joint script/architecture input. His contribution timing remains
-  to confirm. Draft Oct 12, final Oct 13; submission-only Oct 14.
+  4 (D-042). H subsequently closed S3 at Gate 4 with remaining viewport
+  evidence carried to S4 (D-044). Deployment, clinical validity and separately
+  validated demo-refit metrics are not established.
+- Q3: Faizan remains accountable for the video/document (D-033), with 2-3 hours
+  for review/uploads/sign-off and automation-first E preparation proposed
+  under D-052. H confirmed Ashish's ML sections for Oct 12; hour/coverage
+  remain open. Draft from existing pinned evidence after Gate 0, with Ashish's
+  sign-off before finalisation. Captioned video without narration; drafts
+  Oct 12, finals Oct 13, submission-only Oct 14. Gate 0/D-053 authorises
+  Phase 1 only; ML verification and current-form/access checks remain open.
 
 ### Current ML handoff (reviewed and approved 2026-10-10)
 

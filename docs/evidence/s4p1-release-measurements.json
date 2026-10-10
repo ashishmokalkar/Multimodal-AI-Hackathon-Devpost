@@ -1,0 +1,559 @@
+{
+  "api": {
+    "status": "ok",
+    "model_version": "cardiotwin-v2.0.0",
+    "contract_version": "1.1.0",
+    "mock": false
+  },
+  "captures": [
+    {
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "dpr": 1
+      },
+      "document": {
+        "width": 1920,
+        "height": 1080,
+        "overflowX": 0,
+        "overflowY": 0
+      },
+      "canvas": {
+        "width": 620.765625,
+        "height": 591.859375
+      },
+      "sampleId": "patient-20",
+      "profile": "API profile: Real v1.1.0 · cardiotwin-v2.0.0",
+      "sourceBadge": "Real-model prediction Model cardiotwin-v2.0.0",
+      "sourceVisible": true,
+      "scenario": "Original dataset sample · Source: Dataset patient 20: scored by models trained without this patient",
+      "probabilities": [
+        "CAD 98.6% elevated · threshold 68.9%",
+        "LAD 76.4% elevated · threshold 55.0%",
+        "LCX 70.5% elevated · threshold 32.4%",
+        "RCA 59.7% elevated · threshold 35.7%"
+      ],
+      "selectedTarget": "Select CAD. Predicted probability 98.6%. Model label elevated. Threshold 68.9%. Single-answer 90% prediction set.",
+      "warning": "Model warnings (1) - Show details",
+      "warningVisible": true,
+      "warningOpen": false,
+      "methodOpen": false,
+      "methodDisclosure": {
+        "summary": "Method and reference details",
+        "closed": true,
+        "summaryTabIndex": 0,
+        "fullText": "Method and reference detailsReference model risk: 18.2%.Method: Baseline Shapley values on the served probability: each input's average change in probability when it is switched from the reference patient's value to this patient's value (32 orderings). Contributions add up exactly to probability minus base_value.The chart shows the ten largest absolute contributions, a subset of the full response, not a complete waterfall. Attribution is not causation and does not indicate clinical benefit or harm."
+      },
+      "numericAlternative": {
+        "label": "CAD contribution values and input values",
+        "tabIndex": 0,
+        "rows": [
+          "Chest pain type Input value: Typical Model contribution: +44.48 percentage points",
+          "High blood pressure Input value: Yes Model contribution: +9.59 percentage points",
+          "Diabetes Input value: Yes Model contribution: +9.47 percentage points",
+          "Regional wall-motion abnormality Input value: 1 Model contribution: +6.10 percentage points",
+          "Triglycerides Input value: 230 mg/dL Model contribution: +6.05 percentage points",
+          "Sex Input value: Female Model contribution: -5.56 percentage points",
+          "Fasting blood sugar Input value: 227 mg/dL Model contribution: +4.81 percentage points",
+          "ST depression Input value: Yes Model contribution: +4.71 percentage points",
+          "Height Input value: 150 cm Model contribution: -3.20 percentage points",
+          "Age Input value: 65 years Model contribution: +3.03 percentage points"
+        ]
+      },
+      "view": "Why?",
+      "resultScrollTop": 0,
+      "visibleChartRows": 9,
+      "chartRows": [
+        {
+          "label": "Chest pain type",
+          "labelBounds": {
+            "x": 1343.9375,
+            "y": 615.43310546875,
+            "width": 75.67919921875,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1543.875,
+            "y": 614.4681396484375,
+            "width": 116.5,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "High bloodpressure",
+          "labelBounds": {
+            "x": 1364.671875,
+            "y": 653.8331298828125,
+            "width": 54.943359375,
+            "height": 26
+          },
+          "barBounds": {
+            "x": 1543.875,
+            "y": 658.3681030273438,
+            "width": 25.11767578125,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "Diabetes",
+          "labelBounds": {
+            "x": 1377.03125,
+            "y": 703.233154296875,
+            "width": 42.6728515625,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1543.875,
+            "y": 702.2681274414062,
+            "width": 24.803466796875,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "Regionalwall-moti…",
+          "labelBounds": {
+            "x": 1364.71875,
+            "y": 741.6331176757812,
+            "width": 54.65625,
+            "height": 26
+          },
+          "barBounds": {
+            "x": 1543.875,
+            "y": 746.1680908203125,
+            "width": 15.976806640625,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "Triglycerides",
+          "labelBounds": {
+            "x": 1358.390625,
+            "y": 791.0331420898438,
+            "width": 61.3115234375,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1543.875,
+            "y": 790.068115234375,
+            "width": 15.845947265625,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "Sex",
+          "labelBounds": {
+            "x": 1402.71875,
+            "y": 834.93310546875,
+            "width": 17.59619140625,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1529.3125,
+            "y": 833.9681396484375,
+            "width": 14.5625,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "Fasting bloodsugar",
+          "labelBounds": {
+            "x": 1353.5,
+            "y": 873.3331298828125,
+            "width": 67.044921875,
+            "height": 26
+          },
+          "barBounds": {
+            "x": 1543.875,
+            "y": 877.8681640625,
+            "width": 12.59814453125,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "ST depression",
+          "labelBounds": {
+            "x": 1351.796875,
+            "y": 922.733154296875,
+            "width": 67.578125,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1543.875,
+            "y": 921.7681274414062,
+            "width": 12.336181640625,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "Height",
+          "labelBounds": {
+            "x": 1386.71875,
+            "y": 966.6331176757812,
+            "width": 32.9287109375,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1535.49365234375,
+            "y": 965.6680908203125,
+            "width": 8.38134765625,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "Age",
+          "labelBounds": {
+            "x": 1399.046875,
+            "y": 1010.5330810546875,
+            "width": 20.57275390625,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1543.875,
+            "y": 1009.568115234375,
+            "width": 7.93603515625,
+            "height": 18
+          },
+          "fullyVisible": false
+        }
+      ],
+      "minChartTickFontPx": 11,
+      "resultsText": "PREDICTION SUMMARY\n\nResults panel\nReal-model prediction\nModel cardiotwin-v2.0.0\n\nOriginal dataset sample · Source: Dataset patient 20: scored by models trained without this patient\n\nCAD\n98.6%\nelevated · threshold 68.9%\nLAD\n76.4%\nelevated · threshold 55.0%\nLCX\n70.5%\nelevated · threshold 32.4%\nRCA\n59.7%\nelevated · threshold 35.7%\nModel warnings (1) - Show details\n\n90% sets (not an error): CAD single answer · LAD single answer · LCX uncertain · RCA uncertain\n\nPredicted probabilities are model outputs, not diagnoses or percentage artery narrowing.\n\nWhy?\nInputs\nWhy CAD?\nProbability scale · percentage points\n\nSigned baseline Shapley values in percentage points from reference risk 18.2%. Top ten from the full response are a subset, not a waterfall, causal effect, or clinical benefit/harm claim.\n\n-44.48\n-22.24\n0.00\n22.24\n44.48\nChest pain type\nHigh bloodpressure\nDiabetes\nRegionalwall-moti…\nTriglycerides\nSex\nFasting bloodsugar\nST depression\nHeight\nAge\n\nModel contribution (percentage points)\n\nChest pain type\nInput value: Typical\nModel contribution:\n+44.48 percentage points\nHigh blood pressure\nInput value: Yes\nModel contribution:\n+9.59 percentage points\nDiabetes\nInput value: Yes\nModel contribution:\n+9.47 percentage points\nRegional wall-motion abnormality\nInput value: 1\nModel contribution:\n+6.10 percentage points\nTriglycerides\nInput value: 230 mg/dL\nModel contribution:\n+6.05 percentage points\nSex\nInput value: Female\nModel contribution:\n-5.56 percentage points\nFasting blood sugar\nInput value: 227 mg/dL\nModel contribution:\n+4.81 percentage points\nST depression\nInput value: Yes\nModel contribution:\n+4.71 percentage points\nHeight\nInput value: 150 cm\nModel contribution:\n-3.20 percentage points\nAge\nInput value: 65 years\nModel contribution:\n+3.03 percentage points\nMethod and reference details\n\nEstimated chance of significant coronary artery disease (at least 50% narrowing): 99%, above the 69% decision threshold. Arteries flagged: LAD 76%, LCX 71%, RCA 60%. The model cannot call these confidently: LCX, RCA. Decision support only, not a diagnosis; confirm with clinical assessment and diagnostic imaging.",
+      "screenshot": {
+        "path": "docs/evidence/s4p1-release-1920x1080.png",
+        "width": 1920,
+        "height": 1080,
+        "bytes": 351444,
+        "sha256": "f85ba7ffc5745e6945704e7a26aafec8dbfd99487abd8caee5b10cf41088acb4"
+      }
+    },
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "document": {
+        "width": 1280,
+        "height": 800,
+        "overflowX": 0,
+        "overflowY": 0
+      },
+      "canvas": {
+        "width": 509.734375,
+        "height": 362.546875
+      },
+      "sampleId": "patient-20",
+      "profile": "API profile: Real v1.1.0 · cardiotwin-v2.0.0",
+      "sourceBadge": "Real-model prediction Model cardiotwin-v2.0.0",
+      "sourceVisible": true,
+      "scenario": "Original dataset sample · Source: Dataset patient 20: scored by models trained without this patient",
+      "probabilities": [
+        "CAD 98.6% elevated · threshold 68.9%",
+        "LAD 76.4% elevated · threshold 55.0%",
+        "LCX 70.5% elevated · threshold 32.4%",
+        "RCA 59.7% elevated · threshold 35.7%"
+      ],
+      "selectedTarget": "Select CAD. Predicted probability 98.6%. Model label elevated. Threshold 68.9%. Single-answer 90% prediction set.",
+      "warning": "Model warnings (1) - Show details",
+      "warningVisible": true,
+      "warningOpen": false,
+      "methodOpen": false,
+      "methodDisclosure": {
+        "summary": "Method and reference details",
+        "closed": true,
+        "summaryTabIndex": 0,
+        "fullText": "Method and reference detailsReference model risk: 18.2%.Method: Baseline Shapley values on the served probability: each input's average change in probability when it is switched from the reference patient's value to this patient's value (32 orderings). Contributions add up exactly to probability minus base_value.The chart shows the ten largest absolute contributions, a subset of the full response, not a complete waterfall. Attribution is not causation and does not indicate clinical benefit or harm."
+      },
+      "numericAlternative": {
+        "label": "CAD contribution values and input values",
+        "tabIndex": 0,
+        "rows": [
+          "Chest pain type Input value: Typical Model contribution: +44.48 percentage points",
+          "High blood pressure Input value: Yes Model contribution: +9.59 percentage points",
+          "Diabetes Input value: Yes Model contribution: +9.47 percentage points",
+          "Regional wall-motion abnormality Input value: 1 Model contribution: +6.10 percentage points",
+          "Triglycerides Input value: 230 mg/dL Model contribution: +6.05 percentage points",
+          "Sex Input value: Female Model contribution: -5.56 percentage points",
+          "Fasting blood sugar Input value: 227 mg/dL Model contribution: +4.81 percentage points",
+          "ST depression Input value: Yes Model contribution: +4.71 percentage points",
+          "Height Input value: 150 cm Model contribution: -3.20 percentage points",
+          "Age Input value: 65 years Model contribution: +3.03 percentage points"
+        ]
+      },
+      "view": "Why?",
+      "resultScrollTop": 0,
+      "visibleChartRows": 3,
+      "chartRows": [
+        {
+          "label": "Chest pain type",
+          "labelBounds": {
+            "x": 966.421875,
+            "y": 633.74560546875,
+            "width": 75.67919921875,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1130.859375,
+            "y": 632.7806396484375,
+            "width": 81,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "High bloodpressure",
+          "labelBounds": {
+            "x": 987.15625,
+            "y": 672.1456298828125,
+            "width": 54.943359375,
+            "height": 26
+          },
+          "barBounds": {
+            "x": 1130.859375,
+            "y": 676.6806030273438,
+            "width": 17.4638671875,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "Diabetes",
+          "labelBounds": {
+            "x": 999.515625,
+            "y": 721.545654296875,
+            "width": 42.6728515625,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1130.859375,
+            "y": 720.5806274414062,
+            "width": 17.245361328125,
+            "height": 18
+          },
+          "fullyVisible": true
+        },
+        {
+          "label": "Regionalwall-moti…",
+          "labelBounds": {
+            "x": 987.203125,
+            "y": 759.9456176757812,
+            "width": 54.65625,
+            "height": 26
+          },
+          "barBounds": {
+            "x": 1130.859375,
+            "y": 764.4805908203125,
+            "width": 11.1083984375,
+            "height": 18
+          },
+          "fullyVisible": false
+        },
+        {
+          "label": "Triglycerides",
+          "labelBounds": {
+            "x": 980.875,
+            "y": 809.3456420898438,
+            "width": 61.3115234375,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1130.859375,
+            "y": 808.380615234375,
+            "width": 11.017333984375,
+            "height": 18
+          },
+          "fullyVisible": false
+        },
+        {
+          "label": "Sex",
+          "labelBounds": {
+            "x": 1025.203125,
+            "y": 853.24560546875,
+            "width": 17.59619140625,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1120.734375,
+            "y": 852.2806396484375,
+            "width": 10.125,
+            "height": 18
+          },
+          "fullyVisible": false
+        },
+        {
+          "label": "Fasting bloodsugar",
+          "labelBounds": {
+            "x": 975.984375,
+            "y": 891.6456298828125,
+            "width": 67.044921875,
+            "height": 26
+          },
+          "barBounds": {
+            "x": 1130.859375,
+            "y": 896.1806640625,
+            "width": 8.7591552734375,
+            "height": 18
+          },
+          "fullyVisible": false
+        },
+        {
+          "label": "ST depression",
+          "labelBounds": {
+            "x": 974.28125,
+            "y": 941.045654296875,
+            "width": 67.578125,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1130.859375,
+            "y": 940.0806274414062,
+            "width": 8.5771484375,
+            "height": 18
+          },
+          "fullyVisible": false
+        },
+        {
+          "label": "Height",
+          "labelBounds": {
+            "x": 1009.203125,
+            "y": 984.9456176757812,
+            "width": 32.9287109375,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1125.0321044921875,
+            "y": 983.9805908203125,
+            "width": 5.8272705078125,
+            "height": 18
+          },
+          "fullyVisible": false
+        },
+        {
+          "label": "Age",
+          "labelBounds": {
+            "x": 1021.53125,
+            "y": 1028.8455810546875,
+            "width": 20.57275390625,
+            "height": 15
+          },
+          "barBounds": {
+            "x": 1130.859375,
+            "y": 1027.880615234375,
+            "width": 5.517822265625,
+            "height": 18
+          },
+          "fullyVisible": false
+        }
+      ],
+      "minChartTickFontPx": 11,
+      "resultsText": "PREDICTION SUMMARY\n\nResults panel\nReal-model prediction\nModel cardiotwin-v2.0.0\n\nOriginal dataset sample · Source: Dataset patient 20: scored by models trained without this patient\n\nCAD\n98.6%\nelevated · threshold 68.9%\nLAD\n76.4%\nelevated · threshold 55.0%\nLCX\n70.5%\nelevated · threshold 32.4%\nRCA\n59.7%\nelevated · threshold 35.7%\nModel warnings (1) - Show details\n\n90% sets (not an error): CAD single answer · LAD single answer · LCX uncertain · RCA uncertain\n\nPredicted probabilities are model outputs, not diagnoses or percentage artery narrowing.\n\nWhy?\nInputs\nWhy CAD?\nProbability scale · percentage points\n\nSigned baseline Shapley values in percentage points from reference risk 18.2%. Top ten from the full response are a subset, not a waterfall, causal effect, or clinical benefit/harm claim.\n\n-44.48\n-22.24\n0.00\n22.24\n44.48\nChest pain type\nHigh bloodpressure\nDiabetes\nRegionalwall-moti…\nTriglycerides\nSex\nFasting bloodsugar\nST depression\nHeight\nAge\n\nModel contribution (percentage points)\n\nChest pain type\nInput value: Typical\nModel contribution:\n+44.48 percentage points\nHigh blood pressure\nInput value: Yes\nModel contribution:\n+9.59 percentage points\nDiabetes\nInput value: Yes\nModel contribution:\n+9.47 percentage points\nRegional wall-motion abnormality\nInput value: 1\nModel contribution:\n+6.10 percentage points\nTriglycerides\nInput value: 230 mg/dL\nModel contribution:\n+6.05 percentage points\nSex\nInput value: Female\nModel contribution:\n-5.56 percentage points\nFasting blood sugar\nInput value: 227 mg/dL\nModel contribution:\n+4.81 percentage points\nST depression\nInput value: Yes\nModel contribution:\n+4.71 percentage points\nHeight\nInput value: 150 cm\nModel contribution:\n-3.20 percentage points\nAge\nInput value: 65 years\nModel contribution:\n+3.03 percentage points\nMethod and reference details\n\nEstimated chance of significant coronary artery disease (at least 50% narrowing): 99%, above the 69% decision threshold. Arteries flagged: LAD 76%, LCX 71%, RCA 60%. The model cannot call these confidently: LCX, RCA. Decision support only, not a diagnosis; confirm with clinical assessment and diagnostic imaging.",
+      "screenshot": {
+        "path": "docs/evidence/s4p1-release-1280x800.png",
+        "width": 1280,
+        "height": 800,
+        "bytes": 216138,
+        "sha256": "8844837d41656260777a748056f2594cd7ea54fcb95485eb5cae1114dc06b090"
+      }
+    }
+  ],
+  "inputView": {
+    "view": "Inputs",
+    "methodDisclosure": {
+      "summary": "Method and reference details",
+      "closed": true,
+      "summaryTabIndex": 0,
+      "fullText": "Method and reference detailsReference model risk: 18.2%.Method: Baseline Shapley values on the served probability: each input's average change in probability when it is switched from the reference patient's value to this patient's value (32 orderings). Contributions add up exactly to probability minus base_value.Returned contributions are in percentage points. Attribution is not causation."
+    },
+    "inputRegions": [
+      {
+        "label": "Demographics patient inputs and contributions",
+        "tabIndex": 0,
+        "rows": [
+          "Age | 65 years | +3.03 percentage points",
+          "Weight | 72 kg | 0.00 percentage points",
+          "Height | 150 cm | -3.20 percentage points",
+          "Sex | Female | -5.56 percentage points",
+          "Diabetes | Yes | +9.47 percentage points",
+          "High blood pressure | Yes | +9.59 percentage points",
+          "Smoking | Never | Not returned",
+          "Family history of heart disease | No | Not returned",
+          "Chronic kidney failure | Yes | +1.59 percentage points",
+          "Previous stroke | No | Not returned",
+          "Lung airway disease | No | Not returned",
+          "Thyroid disease | No | Not returned",
+          "Heart failure | No | Not returned",
+          "High cholesterol (dyslipidaemia) | Yes | -2.16 percentage points"
+        ]
+      },
+      {
+        "label": "Symptoms/Exam patient inputs and contributions",
+        "tabIndex": 0,
+        "rows": [
+          "Blood pressure (systolic) | 150 mmHg | +1.27 percentage points",
+          "Pulse rate | 70 beats/min | Not returned",
+          "Chest pain type | Typical | +44.48 percentage points",
+          "Shortness of breath | No | Not returned",
+          "Functional class | 0 | Not returned",
+          "Low-threshold angina | No | Not returned",
+          "Leg swelling (oedema) | No | Not returned",
+          "Weak pulses in the limbs | No | Not returned",
+          "Crackles in the lungs | No | Not returned",
+          "Systolic heart murmur | No | Not returned",
+          "Diastolic heart murmur | No | Not returned"
+        ]
+      },
+      {
+        "label": "ECG patient inputs and contributions",
+        "tabIndex": 0,
+        "rows": [
+          "Q waves | No | Not returned",
+          "ST elevation | No | Not returned",
+          "ST depression | Yes | +4.71 percentage points",
+          "T-wave inversion | No | Not returned",
+          "Thickened heart muscle (LVH) | No | Not returned",
+          "Poor R-wave progression | No | Not returned",
+          "Bundle branch block | None | Not returned"
+        ]
+      },
+      {
+        "label": "Lab patient inputs and contributions",
+        "tabIndex": 0,
+        "rows": [
+          "Fasting blood sugar | 227 mg/dL | +4.81 percentage points",
+          "Creatinine | 1 mg/dL | Not returned",
+          "Triglycerides | 230 mg/dL | +6.05 percentage points",
+          "LDL cholesterol | 82 mg/dL | +0.68 percentage points",
+          "HDL cholesterol | 34 mg/dL | -0.02 percentage points",
+          "Blood urea nitrogen | 18 mg/dL | +0.16 percentage points",
+          "ESR | 26 mm/h | +2.46 percentage points",
+          "Haemoglobin | 12.4 g/dL | +0.40 percentage points",
+          "Potassium | 3.8 mmol/L | -0.93 percentage points",
+          "Sodium | 145 mmol/L | +0.12 percentage points",
+          "White blood cells | 5.3 x10^3/uL | +0.67 percentage points",
+          "Lymphocytes | 45% | -2.43 percentage points",
+          "Neutrophils | 50% | -0.66 percentage points",
+          "Platelets | 227 x10^3/uL | -0.29 percentage points"
+        ]
+      },
+      {
+        "label": "Echo patient inputs and contributions",
+        "tabIndex": 0,
+        "rows": [
+          "Ejection fraction | 50% | Not returned",
+          "Regional wall-motion abnormality | 1 | +6.10 percentage points",
+          "Heart valve disease | None | Not returned"
+        ]
+      }
+    ],
+    "derivedValues": "API-derived values · read-only  BMI: 32  Obesity dataset flag: Yes. The dataset codes this as BMI >25; it is not a clinical obesity diagnosis."
+  }
+}

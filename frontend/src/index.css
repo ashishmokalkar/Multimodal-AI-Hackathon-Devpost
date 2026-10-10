@@ -531,7 +531,7 @@ button:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 4px 10px;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border: 1px solid #b8d5c5;
   border-radius: 10px;
   background: #f1f8f3;
@@ -760,6 +760,10 @@ button:focus-visible {
   .viewer-attribution {
     padding-inline: 10px;
     padding-bottom: 4px;
+  }
+
+  .response-warning-disclosure {
+    padding-block: 2px;
   }
 }
 
@@ -1953,8 +1957,36 @@ button:focus-visible {
 }
 
 .artery-scale-bar {
+  position: relative;
   height: 8px;
   border-radius: 999px;
+}
+
+.artery-scale-threshold {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 3px;
+  border-radius: 2px;
+  background: #0f172a;
+  box-shadow: 0 0 0 1.5px #ffffff;
+}
+
+.artery-scale-threshold-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 10.5px;
+  color: #475569;
+}
+
+.artery-scale-threshold-note i {
+  display: inline-block;
+  width: 3px;
+  height: 11px;
+  border-radius: 2px;
+  background: #0f172a;
 }
 
 .artery-scale-ticks {

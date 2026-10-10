@@ -1,7 +1,9 @@
 # Sprint 3 Retrospective - Real integration and warning evidence
 
-**Status:** Human Gate 4 is pending. The Phase 4 package is published with
-explicit warning-evidence carryover; Sprint 3 is not closed.
+**Status:** S3 is closed at Human Gate 4 with explicit carryover (D-044).
+H manually confirmed keyboard disclosure activation and the qualified empty
+warning state. Missing exact-viewport captures/settled measurements remain
+open for S4 release-candidate verification, not marked passed.
 
 ## What worked
 
@@ -13,8 +15,8 @@ explicit warning-evidence carryover; Sprint 3 is not closed.
   distinct. Warning copy states only what the API returned; an empty real list
   is not clinical reassurance.
 - Keyboard-operable viewer, dashboard and drawer controls were delivered and
-  focused regressions cover warning rendering and clearing. The warning
-  disclosure itself still lacks live keyboard activation evidence.
+  focused regressions cover warning rendering and clearing. H subsequently
+  confirmed physical Enter/Space opening and closing of the warning disclosure.
 - Rendering was measured during active orbit rather than inferred from
   demand-mode idle. Earlier S3 evidence records the 1920x1080/1280x800 layout
   and active-orbit result; Phase 4 did not repeat that accepted performance
@@ -41,7 +43,8 @@ explicit warning-evidence carryover; Sprint 3 is not closed.
   the 1280x800 closed canvas measurement was taken before resize settling.
   Consequently, no live empty-warning capture or stable 1280x800
   closed/open canvas pair exists. This is an evidence blocker, not proof of a
-  UI defect. H must manually observe the remaining checks before Gate 4.
+  UI defect. H later confirmed keyboard and Custom-patient behavior, then
+  explicitly deferred the remaining viewport evidence at Gate 4 (D-044).
 - The original Phase 3 executor ceiling was exceeded by 78.047665 credits.
   D-039/D-041 closeout allowances and D-043's bounded additional warning
   allowance are recorded separately; none reset the S3 or project caps.
@@ -53,8 +56,9 @@ explicit warning-evidence carryover; Sprint 3 is not closed.
 
 ## Still risky
 
-- Live keyboard disclosure activation, empty real-warning presentation at both
-  viewports, and a settled 1280x800 closed/open canvas pair remain unverified.
+- Keyboard and empty-warning behavior are human-confirmed on the observed
+  page, but both exact viewports are not proven by that report. Missing saved
+  empty-state captures and a settled 1280x800 pair remain carried to S4.
 - The pinned real API/profile and its contract-compatible frontend path were
   verified locally. This does not establish public deployment, independently
   validated demo-refit metrics or clinical validity.
@@ -70,7 +74,7 @@ explicit warning-evidence carryover; Sprint 3 is not closed.
 
 | Action | Owner | When |
 |---|---|---|
-| Manually verify the warning disclosure with keyboard input; capture its open/closed state and the real Custom-patient empty-warning response at both settled viewports. | H | Before Gate 4 |
+| Finish missing exact-viewport warning captures and settled closed/open measurements; retain H's completed keyboard/empty-state observations without promoting them to both-viewport proof. | H/X | S4 release-candidate check, before code freeze |
 | Retain the verified Windows-frontend/WSL real-API startup and shutdown instructions; keep local integration distinct from deployment status. | H/X | S4 |
 | Keep reviews concise and evidence-driven; do not rerun accepted suites without a concrete regression. | O/H | Ongoing |
 | Remeasure the final integrated dashboard's accessibility, reproducibility and active-orbit performance on the intended demo setup. | X | S4, after its human gates |
@@ -106,3 +110,16 @@ verification cutoff. This corrective limit overlaps Phase 4's 30-X ceiling;
 it is not additive to it. Later retrospective, documentation and publication
 calls are excluded from this dated snapshot. Preserve all prior actuals and
 overruns; no ceiling was reset.
+
+**Gate 4 update (D-044):** The historical pending status and snapshots above
+are superseded by H's explicit closeout with carryover. Manual observations
+are recorded in `docs/evidence/s3p4-warning-human-check.txt`. Remaining
+viewport evidence is deferred to S4; the code/API requirements are unchanged.
+
+E's final report at 15:15:33.327Z double-counted 11.894060 initial P4 credits
+in derived S3/project totals. Direct totals are S3 **1126.7053505**, project
+**2899.309668** and unchanged P4 **42.447956** at that cutoff.
+The final recorded pre-S4 snapshot through **2026-10-10T15:42:21.815Z** is
+P4 **96.9250665** (O **82.866010**, X **14.0590565**), S3 **1181.182461**
+and project **2953.7867785**. S4 starts at **2026-10-10T15:42:22.433Z**.
+No allocation is reset; usage is local telemetry, not billing.

@@ -208,6 +208,22 @@ export function ModelMetricsDrawer({
           >
             These are model-level validation metrics, not patient predictions.
           </p>
+          <section
+            aria-label="How target thresholds and vessel probabilities relate"
+            className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-700"
+          >
+            <h3 className="font-semibold text-slate-800">
+              Thresholds and served probabilities
+            </h3>
+            <p>
+              Each target has its own decision threshold, so target labels can
+              differ even when probabilities are equal. In the real API
+              profile, each served vessel probability is capped at the served
+              CAD probability; equal values alone do not show that the cap
+              changed an output. This app displays the returned outputs without
+              recomputing them.
+            </p>
+          </section>
 
           {metricsQuery.isPending && !data && (
             <p className="metrics-state" role="status">

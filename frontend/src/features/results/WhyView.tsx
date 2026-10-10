@@ -56,9 +56,7 @@ export function WhyView({
   const chartValues = contributions.map(({ contribution }) =>
     probabilityScale ? contribution * 100 : contribution,
   );
-  const axis = contributionAxis(
-    chartValues,
-  );
+  const axis = contributionAxis(chartValues);
   const chartContributions = contributions.map((item) => ({
     ...item,
     contribution: probabilityScale
@@ -82,10 +80,12 @@ export function WhyView({
               : "Model scale unconfirmed"}
         </span>
       </div>
-      <p className="mt-2 text-[11px] leading-5 text-slate-600">
+      <p className="mt-1 text-[10px] leading-4 text-slate-600">
         {probabilityScale
-          ? `Baseline Shapley values on the served probability; the chart shows the 10 largest absolute contributions, a subset of the full response. Reference model risk: ${formatProbability(explanation.base_value)}. Method: ${explanation.method} Attribution is not causation.`
-          : "Mock contributions are illustrative signed model units; their scale is unconfirmed. The chart shows up to 10 returned contributions, not an additive waterfall. Signs do not indicate clinical benefit, harm, or causation."}
+          ? `Signed baseline Shapley values in percentage points from reference risk ${formatProbability(explanation.base_value)}. Top ten from the full response are a subset, not a waterfall, causal effect, or clinical benefit/harm claim.`
+          : prediction.mock
+            ? "Illustrative signed model units; scale and reference-risk interpretation are unconfirmed. Top ten returned values are a subset, not an additive waterfall, cause, or clinical benefit/harm claim."
+            : "Signed real-model contributions; scale and reference-risk interpretation are unconfirmed. Top ten returned values are a subset, not an additive waterfall, cause, or clinical benefit/harm claim."}
       </p>
 
       {contributions.length === 0 ? (
@@ -144,10 +144,10 @@ export function WhyView({
             Model contribution
             {probabilityScale ? " (percentage points)" : ""}
           </p>
-
           <ol
             aria-label={`${target} contribution values and input values`}
-            className="mt-2 divide-y divide-slate-100 rounded-lg border border-slate-200"
+            className="mt-2 divide-y divide-slate-100 rounded-lg border border-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            tabIndex={0}
           >
             {contributions.map((item, index) => (
               <li
@@ -165,16 +165,57 @@ export function WhyView({
                 </span>
                 <span className="shrink-0 text-right font-semibold tabular-nums text-slate-800">
                   <span className="sr-only">Model contribution: </span>
-                {formatExplanationContribution(
-                  item.contribution,
-                  probabilityScale ? "probability" : undefined,
-                )}
+                  {formatExplanationContribution(
+                    item.contribution,
+                    probabilityScale ? "probability" : undefined,
+                  )}
                 </span>
               </li>
             ))}
           </ol>
         </>
       )}
+      <details className="contribution-method-details mt-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[11px] leading-4 text-slate-700">
+        <summary className="cursor-pointer font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
+          Method and reference details
+        </summary>
+        <div className="mt-2 space-y-1">
+          {probabilityScale ? (
+            <>
+              <p>
+                Reference model risk:{" "}
+                {formatProbability(explanation.base_value)}.
+              </p>
+              <p>Method: {explanation.method ?? "Not returned."}</p>
+              <p>
+                The chart shows the ten largest absolute contributions, a subset
+                of the full response, not a complete waterfall. Attribution is
+                not causation and does not indicate clinical benefit or harm.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>
+                {prediction.mock
+                  ? "Mock contributions are illustrative signed model units; their scale and reference-risk interpretation are unconfirmed."
+                  : "Real-model contributions are signed, but their scale and reference-risk interpretation are unconfirmed."}
+              </p>
+              <p>
+                Method:{" "}
+                {explanation.method ??
+                  (prediction.mock
+                    ? "Not returned by mock v1.0."
+                    : "Not returned.")}
+              </p>
+              <p>
+                The chart shows up to ten returned contributions, a subset
+                rather than an additive waterfall. Signs do not indicate
+                causation, clinical benefit, or harm.
+              </p>
+            </>
+          )}
+        </div>
+      </details>
     </section>
   );
 }

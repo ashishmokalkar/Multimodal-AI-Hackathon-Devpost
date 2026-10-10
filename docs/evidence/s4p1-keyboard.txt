@@ -1,0 +1,29 @@
+Sprint 4 Phase 1 keyboard reachability
+
+The live keyboard sequence ran in headed Edge against the real API profile
+(mock=false, cardiotwin-v2.0.0). Key input used the browser's CDP
+Input.dispatchKeyEvent, not DOM-dispatched key events.
+
+Why view, starting with focus on its toggle:
+- Tab reached the Inputs button.
+- Tab reached the CAD numeric alternative (ordered list, tabindex=0) with all
+  ten full feature names, input values and signed contribution values.
+- Tab reached the native "Method and reference details" summary (tabindex=0).
+- Enter opened the disclosure; Enter closed it.
+
+Inputs view:
+- Tab reached the native method disclosure summary (tabindex=0); Enter opened
+  it.
+- Tab reached the Demographics table region (role=region, tabindex=0), followed
+  by the other metadata-grouped table regions.
+- The live patient-20 tables retained snapshot values, response-attributed
+  values, units, zero contributions and "Not returned" distinctions. The
+  derived BMI/Obesity dataset qualification remained visible.
+
+The combined keyboard run also emitted layout screenshots while the local heart
+model was still loading at 1920x1080 and before the 1280x800 resize had settled.
+Those images and canvas measurements are not used as layout evidence. Use
+`s4p1-before-*` and `s4p1-release-*` for the settled before/after captures and
+measurements; the keyboard focus sequence above is independent of those
+screenshots. A single readiness-aware capture retry timed out waiting for the
+heart scene and wrote no images; no further capture retries were made.

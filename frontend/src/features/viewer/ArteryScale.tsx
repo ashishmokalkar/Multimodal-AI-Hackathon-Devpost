@@ -4,6 +4,10 @@ import { formatProbability, formatTargetUncertainty } from "../../lib/format";
 import { useUiStore } from "../../store/uiStore";
 import { UNAVAILABLE_VESSEL_COLOR, vesselMap } from "./vesselMap";
 import { EDGE, placePins } from "./arteryPins";
+import {
+  selectedPredictionTarget,
+  thresholdMarkerStyle,
+} from "./probabilityLegendHelpers";
 
 interface ArteryScaleProps {
   prediction: PredictionResponse | null;
@@ -31,6 +35,9 @@ export function ArteryScale({ prediction }: ArteryScaleProps) {
   const setSelectedVessel = useUiStore((state) => state.setSelectedVessel);
   const pins = prediction ? placePins(prediction) : [];
   const lanes = Math.max(1, ...pins.map((pin) => pin.lane + 1));
+  // The selected target's own decision threshold; the 50% colour midpoint is not one.
+  const { name: thresholdName, target: thresholdTarget } =
+    selectedPredictionTarget(prediction, selectedVessel);
 
   return (
     <div
@@ -115,7 +122,15 @@ export function ArteryScale({ prediction }: ArteryScaleProps) {
         aria-hidden="true"
         className="artery-scale-bar"
         style={{ background: COLOR_SCALE_GRADIENT }}
-      />
+      >
+        {thresholdTarget && (
+          <span
+            className="artery-scale-threshold"
+            data-threshold-marker="true"
+            style={thresholdMarkerStyle(thresholdTarget.threshold)}
+          />
+        )}
+      </div>
       <div aria-hidden="true" className="artery-scale-ticks">
         <span>0%</span>
         <span>25%</span>
@@ -123,6 +138,14 @@ export function ArteryScale({ prediction }: ArteryScaleProps) {
         <span>75%</span>
         <span>100%</span>
       </div>
+      {thresholdTarget && (
+        <p className="artery-scale-threshold-note">
+          <i aria-hidden="true" />
+          {thresholdName} decision threshold:{" "}
+          {formatProbability(thresholdTarget.threshold)}. The 50% colour
+          midpoint is not a threshold.
+        </p>
+      )}
     </div>
   );
 }

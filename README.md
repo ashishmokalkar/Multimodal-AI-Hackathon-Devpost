@@ -6,135 +6,126 @@ results in an interactive 3D heart.
 
 ## Repository layout
 
-- `frontend/` — clinician-facing application and 3D visualization (frontend
-  team).
-- `mock-api/` — contract-compatible mock service (frontend team).
-- `backend/` — production ML API and model implementation (ML colleague).
-- `docs/` — shared product specification, workflow, planning, and API contract.
-- `assets/` — 3D meshes and their licence records.
+- `frontend/` — React application, patient inputs, results, and 3D viewer.
+- `api/` — real FastAPI serving application.
+- `models/` — pinned model manifest and exported final/demo estimators served by
+  `api/`.
+- `mock-api/` — separate contract-compatible synthetic stub for local UI work.
+- `docs/` — product specification, workflow, planning, evidence, and API
+  contract.
+- `assets/` — heart asset and licence records.
+- `data/` — source data used by the pinned real serving bundle.
+- `ml/`, `reports/`, `tests/` — model research/training material, validation
+  reports, and real API tests.
 
-## Run frontend
+## Run the frontend
 
-Requires Node.js **24.19.0** (LTS, pinned in `frontend/.nvmrc`) and pnpm
-**12.9.1** through Corepack.
+The tested and recommended Node.js version is **24.19.0** (`frontend/.nvmrc`);
+the package declares a compatibility lower bound of **20.19.0**, which does
+not mean every compatible version has been tested. The pinned package manager
+is pnpm **12.9.1** through Corepack.
 
-```powershell
-cd frontend
+From a repository checkout with Node.js installed:
+
+```bash
+cd /path/to/Multimodal-AI-Hackathon-Devpost/frontend
 corepack enable
 corepack prepare pnpm@12.9.1 --activate
-pnpm install
-pnpm dev
+corepack pnpm install --frozen-lockfile
+corepack pnpm dev
 ```
 
-The frontend is available at `http://localhost:5173`. From `frontend/`, run
-`pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` for quality checks.
+Open `http://localhost:5173`. Run `corepack pnpm lint`,
+`corepack pnpm typecheck`, `corepack pnpm test`, and `corepack pnpm build`
+from `frontend/`. Tested frontend toolchain: Node.js 24.19.0, pnpm 12.9.1,
+Vite 8.3.2, React 18.3.1, TypeScript 6.0.3, and Tailwind CSS 3.4.19.
 
-Installed toolchain: Node.js 24.19.0, pnpm 12.9.1, Vite 8.3.2, React 18.3.1,
-TypeScript 6.0.3, and Tailwind CSS 3.4.19.
+## Run the real model API
 
-## Run the real model API in WSL
+The pinned real serving bundle reports contract `1.1.0` and model version
+`cardiotwin-v2.0.0`. Its tested Linux runtime is Ubuntu 24.04.5 on WSL 2 with
+Python **3.11.9** and uv **0.12.24**. Run these commands in an Ubuntu/Linux
+shell from the repository root. The virtual environment and uv-managed Python
+live outside the checkout; the pinned dependencies come from
+`requirements.txt`.
 
-The approved real serving bundle is pinned to ML commit
-`6d3e403ffae65857124929335bbc534e8fd116c4` and is included in this checkout.
-It reports contract `1.1.0` and model version `cardiotwin-v2.0.0`. The eight
-sample patients are non-synthetic holdout demonstrations scored by models
-refitted without those patients; edited sample scenarios must retain their
-sample origin to use the same demo-model set.
+For a first-time setup only (skip it when this environment is already
+prepared):
 
-The verified runtime is Ubuntu 24.04.5 on WSL 2, Python **3.11.9**, and uv
-**0.12.24**. Keep this environment separate from the mock API's Python 3.12
-environment. The real environment lives in Ubuntu's home directory:
-
-```powershell
-wsl -d Ubuntu-24.04 --exec bash -lc '
+```bash
 export PATH="$HOME/.local/bin:$PATH"
 uv python install 3.11.9
 VENV="$HOME/.venvs/multimodal-ai-hack-real-api"
 if [ ! -x "$VENV/bin/python" ]; then
   uv venv --python 3.11.9 "$VENV"
 fi
-"$VENV/bin/python" --version
-uv pip install --python "$VENV/bin/python" -r /mnt/c/Users/faiza/workspace/MultimodalAIHack/requirements.txt
-'
+uv pip install --python "$VENV/bin/python" -r requirements.txt
 ```
 
-LightGBM requires the Ubuntu OpenMP runtime. If
-`ldconfig -p | grep libgomp.so.1` returns no result, install this single system
-package once from Ubuntu with
-`sudo apt-get install -y --no-install-recommends --no-upgrade libgomp1`; no
-Python dependency pins need to change.
-
-Start the real API in its own PowerShell window. It binds to WSL loopback and
-WSL 2 forwards it to Windows localhost:
-
-```powershell
-wsl -d Ubuntu-24.04 --exec bash -lc 'export PATH="$HOME/.local/bin:$PATH"; cd /mnt/c/Users/faiza/workspace/MultimodalAIHack; exec "$HOME/.venvs/multimodal-ai-hack-real-api/bin/uvicorn" api.main:app --host 127.0.0.1 --port 8000'
-```
-
-In another PowerShell window, start the frontend using the Windows instructions
-above. Verify from Ubuntu with
-`curl -fsS http://127.0.0.1:8000/health` and from Windows with
-`Invoke-RestMethod http://localhost:8000/health`. The real API permits the
-frontend origins on ports 5173 and 5174. Stop both foreground processes with
-`Ctrl+C` in their respective windows.
-
-Run the pinned API checks from Windows against the same Linux environment:
-
-```powershell
-wsl -d Ubuntu-24.04 --exec bash -lc 'exec "$HOME/.venvs/multimodal-ai-hack-real-api/bin/python" -m pytest /mnt/c/Users/faiza/workspace/MultimodalAIHack/tests/test_api.py -q -ra'
-```
-
-The service requires the pinned `requirements.txt`, model manifest, final and
-demo model files, the original dataset workbook, and the subgroup report at
-their repository-relative paths. Do not run training/export commands to start
-the service. The dataset is the Z-Alizadeh Sani extension (UCI #411), credited
-by M under CC BY 4.0. Citation: Alizadehsani, Roshanzamir and Sani (2013).
-The app footer and `docs/spec.md` retain its attribution.
-Imported source blob IDs and SHA-256 hashes are recorded in
-`docs/evidence/s3p3-source-hashes.txt`. Validation metrics are cross-validation
-report results, not clinical validation or independently validated demo-refit
-metrics; see `reports/BEST_MODELS.md`.
-
-## Run the mock API in WSL
-
-The verified local setup runs the Windows frontend and the mock API in Ubuntu
-24.04 on WSL 2. Keep this repository checkout and all Git operations on Windows;
-WSL runs the API from the same checkout mounted at `/mnt/c`.
-Verified with Ubuntu's Python 3.12.3 and uv 0.12.24; the project environment
-lives at `~/.venvs/multimodal-ai-hack-mock-api` and dependencies come from
-`mock-api/uv.lock`.
-
-Check that `wsl --list --verbose` reports Ubuntu 24.04 with version `2`. In
-Ubuntu, install `uv` once if needed:
+Start the API from the repository root:
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+VENV="$HOME/.venvs/multimodal-ai-hack-real-api"
+exec "$VENV/bin/uvicorn" api.main:app --host 127.0.0.1 --port 8000
 ```
 
-Sync the existing lockfile into a Linux-only environment in Ubuntu's home
-directory. This uses the system Python 3.12 and does not update the lockfile:
+Check readiness with `curl -fsS http://127.0.0.1:8000/health`; the real
+profile reports `mock: false`. API tests use the same pinned environment:
 
-```powershell
-wsl -d Ubuntu-24.04 --exec bash -lc 'export PATH="$HOME/.local/bin:$PATH"; export UV_PROJECT_ENVIRONMENT="$HOME/.venvs/multimodal-ai-hack-mock-api"; uv sync --project /mnt/c/Users/faiza/workspace/MultimodalAIHack/mock-api --frozen --extra dev --python /usr/bin/python3'
+```bash
+"$HOME/.venvs/multimodal-ai-hack-real-api/bin/python" -m pytest tests/test_api.py -q -ra
 ```
 
-Start the API in its own PowerShell window. It listens on WSL loopback; WSL 2
-forwards it to Windows at `http://localhost:8000`.
+On Windows, the verified adaptation keeps Git and the Node frontend on
+Windows and runs the API in Ubuntu on WSL 2. Open Ubuntu, change to the checkout
+mounted under `/mnt/<drive>/...`, then use the same Linux setup/start commands
+above. WSL 2 forwards the API on port 8000 to Windows localhost; check it there
+with `Invoke-RestMethod http://localhost:8000/health`. Start the frontend in a
+separate Windows terminal using the frontend commands above. The real API
+accepts localhost frontend origins on ports 5173 and 5174.
 
-```powershell
-wsl -d Ubuntu-24.04 --exec bash -lc 'export PATH="$HOME/.local/bin:$PATH"; export UV_PROJECT_ENVIRONMENT="$HOME/.venvs/multimodal-ai-hack-mock-api"; cd /mnt/c/Users/faiza/workspace/MultimodalAIHack/mock-api; exec uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8000'
+The service requires the pinned `requirements.txt`, model manifest, final and
+demo model files, original dataset workbook, and subgroup report at their
+repository-relative paths. Do not run training/export commands to start it.
+LightGBM requires Ubuntu's `libgomp1` runtime if it is not already installed.
+The dataset is the Z-Alizadeh Sani extension (UCI #411), credited by M under
+CC BY 4.0; citation: Alizadehsani, Roshanzamir and Sani (2013). Attribution is
+also retained in the app footer and `docs/spec.md`.
+
+The eight sample patients are non-synthetic holdout demonstrations scored by
+models refitted without those patients. Keep a selected sample's `sample_id`
+when editing its inputs to keep the same demo-model origin for a paired
+what-if comparison; the UI identifies the edited scenario. Requests without
+that sample origin use the final models. The pinned real API profile currently
+requires exactly 49 unique inputs and eight unique non-synthetic samples, with
+specific feature metadata and units. These guards validate this approved
+contract; they are not a promise that arbitrary schema additions work. Schema
+evolution requires coordinated API, contract, and frontend-profile work.
+
+The model uses independent target thresholds, so CAD and vessel labels can
+differ even when probabilities are equal. In the real API profile, each
+**served** vessel probability is capped at the served CAD probability. Equal
+probabilities alone do not establish that the cap changed a value; the
+frontend presents returned outputs without recomputing them. Validation
+metrics are cross-validation results, not clinical validation or independently
+validated demo-refit metrics; see `reports/BEST_MODELS.md`.
+
+## Run the mock API
+
+The mock service is a deterministic synthetic stub, not a clinical model. Its
+five bundled patients are synthetic. It requires Python 3.11 or later and uses
+the committed `mock-api/uv.lock`.
+
+From an Ubuntu/Linux shell:
+
+```bash
+cd /path/to/Multimodal-AI-Hackathon-Devpost/mock-api
+uv sync --frozen --extra dev
+uv run --frozen uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-In a second PowerShell window, start the frontend:
-
-```powershell
-$env:Path = "C:\Program Files\nodejs;$env:LOCALAPPDATA\node\corepack;$env:Path"
-Set-Location C:\Users\faiza\workspace\MultimodalAIHack\frontend
-corepack pnpm dev -- --host 127.0.0.1
-```
-
-Check API readiness from Ubuntu with
-`curl -fsS http://127.0.0.1:8000/health` and from Windows with
-`Invoke-RestMethod http://localhost:8000/health`. The frontend origin
-`http://localhost:5173` is allowed by the mock API. Stop each foreground
-process with `Ctrl+C` in its respective PowerShell window.
+The API and interactive docs are available at `http://localhost:8000` and
+`http://localhost:8000/docs`. Its health response reports `mock: true`.
+`uv run --frozen pytest` and `uv run --frozen ruff check .` run the mock API
+checks from `mock-api/`. To use this API in WSL, run these same commands in the
+Ubuntu shell and run the frontend on Windows as described above.
