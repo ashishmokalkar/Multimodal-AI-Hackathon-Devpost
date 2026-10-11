@@ -1,4 +1,6 @@
 import {
+  CohortResponseSchema,
+  type CohortResponse,
   FeatureSchema,
   ImportanceResponseSchema,
   type ImportanceResponse,
@@ -111,4 +113,26 @@ export function fetchImportance(
     return Promise.resolve(null);
   }
   return requestJson("/model/importance", ImportanceResponseSchema);
+}
+
+/**
+ * The comparison cohort (real profile only): every dataset patient's age, sex and served probabilities. An API
+ * without the endpoint gives no comparison rather than an error.
+ */
+export async function fetchCohort(
+  profile: ApiProfile,
+): Promise<CohortResponse | null> {
+  if (profile.mode !== "real") {
+    return null;
+  }
+  const response = await fetch(`${API_BASE_URL}/cohort`, {
+    headers: { Accept: "application/json" },
+  });
+  if (response.status === 404) {
+    return null;
+  }
+  if (!response.ok) {
+    throw new Error(`API GET /cohort failed (${response.status}).`);
+  }
+  return CohortResponseSchema.parse(await response.json());
 }

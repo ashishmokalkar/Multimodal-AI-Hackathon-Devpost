@@ -1,0 +1,390 @@
+/* Components shared by Classic, Studio and the report: lab-unit toggle, "Listen" button, similar-patients
+   comparison. Tokens default to the light Classic look; Studio maps them onto its theme variables. */
+:root {
+  --sh-ink: #18312c;
+  --sh-muted: #63746f;
+  --sh-line: #dce6e1;
+  --sh-soft: #f1f5f3;
+  --sh-accent: #236b56;
+  --sh-on-accent: #ffffff;
+  --sh-dot: #9aa8b4;
+  --sh-dot-group: #4b5d6b;
+  --sh-band: rgb(35 107 86 / 14%);
+  --sh-median: #236b56;
+  --cc-cad: #c2255c;
+  --sh-halo: #ffffff;
+}
+.studio {
+  --sh-halo: rgb(var(--s-panel-rgb));
+  --sh-ink: var(--s-text);
+  --sh-muted: var(--s-muted);
+  --sh-line: var(--s-line-strong);
+  --sh-soft: var(--s-hover);
+  --sh-accent: var(--s-accent);
+  --sh-on-accent: var(--s-accent-ink);
+  --sh-dot: var(--s-faint);
+  --sh-dot-group: var(--s-muted);
+  --sh-band: color-mix(in srgb, var(--s-accent) 18%, transparent);
+  --sh-median: var(--s-accent);
+  --cc-cad: var(--s-flag);
+}
+.report-root {
+  --sh-ink: #10242e;
+  --sh-muted: #5a6b74;
+  --sh-line: #e2e8ed;
+  --sh-soft: #f5f8fa;
+  --sh-accent: #0f766e;
+  --sh-dot: #b7c2cb;
+  --sh-dot-group: #5f7380;
+  --sh-band: rgb(15 118 110 / 13%);
+  --sh-median: #0f766e;
+  --cc-cad: #c2255c;
+  --sh-halo: #ffffff;
+}
+
+/* ------------------------------------------------------------------------------------------- unit toggle */
+.unit-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 2px;
+  border: 1px solid var(--sh-line);
+  border-radius: 999px;
+  min-inline-size: auto;
+}
+.unit-toggle-legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.unit-toggle-option {
+  position: relative;
+  cursor: pointer;
+}
+.unit-toggle-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+.unit-toggle-option span {
+  display: block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--sh-muted);
+  white-space: nowrap;
+}
+.unit-toggle-option input:checked + span {
+  background: var(--sh-accent);
+  color: var(--sh-on-accent);
+}
+.unit-toggle-option input:focus-visible + span {
+  outline: 3px solid #7bbda3;
+  outline-offset: 1px;
+}
+.studio .unit-toggle-option input:focus-visible + span {
+  outline-color: var(--s-accent);
+}
+.studio-units {
+  margin: 4px 0 8px;
+}
+
+/* ------------------------------------------------------------------------------------------- listen */
+.speak {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.speak-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border: 1px solid var(--sh-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sh-ink);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.speak-btn:hover {
+  background: var(--sh-soft);
+}
+.speak-btn[aria-pressed="true"] {
+  border-color: var(--sh-accent);
+  color: var(--sh-accent);
+}
+.speak-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.speak-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.speak-bars i {
+  width: 2.5px;
+  height: 40%;
+  border-radius: 2px;
+  background: currentColor;
+}
+.speak-bars i:nth-child(2) {
+  height: 75%;
+}
+.speak-bars i:nth-child(3) {
+  height: 100%;
+}
+.speak-bars i:nth-child(4) {
+  height: 55%;
+}
+.speak-bars.is-on i {
+  animation: speak-eq 0.9s ease-in-out infinite;
+}
+.speak-bars.is-on i:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.speak-bars.is-on i:nth-child(3) {
+  animation-delay: -0.6s;
+}
+.speak-bars.is-on i:nth-child(4) {
+  animation-delay: -0.15s;
+}
+@keyframes speak-eq {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.speak-bars i {
+  transform-origin: bottom;
+}
+.speak-caption {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 8000;
+  max-width: min(680px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  border-radius: 14px;
+  /* solid, not blurred: a backdrop blur over the WebGL heart can drop the caption from the composited frame */
+  background: rgb(10 16 24 / 94%);
+  border: 1px solid rgb(255 255 255 / 12%);
+  color: #f1f5f9;
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: center;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 35%);
+  pointer-events: none;
+  /* its own compositing layer, so it stays above the WebGL heart */
+  will-change: transform, opacity;
+  animation: speak-in 0.25s ease-out;
+}
+/* Studio: under the 3D toolbar, clear of the what-if window and the dock */
+.studio-body .speak-caption {
+  top: 112px;
+  bottom: auto;
+}
+@keyframes speak-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+}
+
+/* ------------------------------------------------------------------------------------------- comparison */
+.cc {
+  display: grid;
+  gap: 8px;
+  color: var(--sh-ink);
+}
+.cc-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cc-figure {
+  display: grid;
+  justify-items: center;
+  min-width: 68px;
+}
+.cc-figure b {
+  font-size: 30px;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.cc-figure span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sh-muted);
+}
+.cc-copy p {
+  margin: 0;
+}
+.cc-word {
+  font-weight: 700;
+  font-size: 13px;
+}
+.cc-sentence {
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.cc-sub {
+  font-size: 11px;
+  color: var(--sh-muted);
+}
+.cc-track-rail {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--sh-soft);
+  border: 1px solid var(--sh-line);
+}
+.cc-track-tick {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--sh-dot-group);
+}
+.cc-track-marker {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 6px;
+  margin-left: -3px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--sh-on-accent, #fff);
+}
+.report-root .cc-track-marker {
+  box-shadow: 0 0 0 2px #fff;
+}
+.cc-track-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  font-size: 10px;
+  color: var(--sh-muted);
+}
+.cc-nomogram {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.cc-grid {
+  stroke: var(--sh-line);
+  stroke-width: 1;
+}
+.cc-axis {
+  font-size: 9px;
+  fill: var(--sh-muted);
+}
+.cc-axis-title {
+  font-size: 9.5px;
+}
+.cc-window {
+  fill: var(--sh-soft);
+}
+.cc-band {
+  fill: var(--sh-band);
+}
+.cc-median {
+  fill: none;
+  stroke: var(--sh-median);
+  stroke-width: 1.6;
+  stroke-dasharray: 4 3;
+}
+.cc-dot {
+  fill: var(--sh-dot);
+  opacity: 0.55;
+}
+.cc-dot-group {
+  fill: var(--sh-dot-group);
+  opacity: 0.85;
+}
+.cc-you-halo {
+  fill: none;
+  stroke-width: 2;
+  opacity: 0.45;
+}
+.cc-you {
+  stroke: #fff;
+  stroke-width: 2;
+}
+.cc-you-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  fill: var(--sh-ink);
+  paint-order: stroke;
+  stroke: var(--sh-halo, transparent);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
+.cc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 10.5px;
+  color: var(--sh-muted);
+}
+.cc-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.cc-key-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sh-dot);
+}
+.cc-key-group {
+  background: var(--sh-dot-group);
+}
+.cc-key-band {
+  width: 14px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--sh-band);
+  border: 1px solid var(--sh-line);
+}
+.cc-key-line {
+  width: 14px;
+  border-top: 2px dashed var(--sh-median);
+}
+.cc-caution {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b45309;
+}
+.cc-note {
+  margin: 0;
+  font-size: 10.5px;
+  color: var(--sh-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .speak-bars.is-on i,
+  .speak-caption {
+    animation: none;
+  }
+}

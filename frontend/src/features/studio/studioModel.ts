@@ -6,6 +6,7 @@ import type {
 import { buildDrivers, type Driver } from "../../lib/summary";
 import type { InsightTarget } from "../../lib/insights";
 import type { VesselId } from "../viewer/vesselMap";
+import { isFlagged } from "../../lib/flags";
 
 // ------------------------------------------------------------------------------------------- risk words
 export type RiskBand = "low" | "moderate" | "high";
@@ -14,8 +15,12 @@ export type RiskBand = "low" | "moderate" | "high";
  * Plain risk word relative to the target's own decision threshold: at or above it is "high" (the model flags it),
  * within 40% below it is "moderate", anything lower is "low".
  */
-export function riskBand(probability: number, threshold: number): RiskBand {
-  if (probability >= threshold) {
+export function riskBand(
+  probability: number,
+  threshold: number,
+  flagged = probability >= threshold,
+): RiskBand {
+  if (flagged) {
     return "high";
   }
   return probability >= threshold * 0.6 ? "moderate" : "low";
@@ -47,6 +52,7 @@ export const WINDOW_IDS = [
   "vessel",
   "factors",
   "people",
+  "compare",
   "measures",
   "model",
 ] as const;
@@ -70,6 +76,7 @@ export const MIN_WINDOW_SIZE: Record<WindowId, { w: number; h: number }> = {
   vessel: { w: 240, h: 200 },
   factors: { w: 300, h: 220 },
   people: { w: 240, h: 240 },
+  compare: { w: 300, h: 300 },
   measures: { w: 300, h: 220 },
   model: { w: 300, h: 200 },
 };
@@ -79,10 +86,11 @@ export const DEFAULT_OPEN: Record<WindowId, boolean> = {
   patient: true,
   risk: true,
   drivers: true,
-  whatif: true,
+  whatif: false,
   vessel: false,
   factors: false,
   people: false,
+  compare: false,
   measures: false,
   model: false,
 };
@@ -102,9 +110,13 @@ export function defaultLayout(
   const whatIfW = Math.min(680, vw - 2 * (sideW + GAP) - 40);
   const whatIfH = 196;
   const centreX = sideW + GAP + 20;
+  const patientH = Math.min(vh - top - 80, 400);
+  const patientY = Math.max(top, Math.round(top + (vh - 80 - top - patientH) / 2));
+  const vesselW = 360;
+  const vesselH = 260;
   return {
-    // leave room under the patient window for the dock
-    patient: { x: GAP, y: top, w: 310, h: Math.min(vh - top - 80, 400) },
+    // patient on the left, centred in the height between the top bar and the dock
+    patient: { x: GAP, y: patientY, w: 310, h: patientH },
     risk: { x: rightX, y: top, w: sideW, h: riskH },
     drivers: {
       x: rightX,
@@ -118,10 +130,16 @@ export function defaultLayout(
       w: whatIfW,
       h: whatIfH,
     },
-    // the artery inspector opens under the patient window, keeping the heart clear
-    vessel: { x: GAP, y: top + 412, w: 310, h: 270 },
+    // the artery inspector opens at the bottom centre; the heart is framed above it
+    vessel: {
+      x: Math.round((vw - vesselW) / 2),
+      y: vh - GAP - vesselH,
+      w: vesselW,
+      h: vesselH,
+    },
     factors: { x: centreX, y: top + 50, w: 400, h: 360 },
-    people: { x: rightX - 12 - 300, y: top + 40, w: 300, h: 330 },
+    people: { x: rightX - 12 - 300, y: top + 40, w: 300, h: 470 },
+    compare: { x: rightX - 12 - 380, y: top + 20, w: 380, h: 560 },
     measures: { x: centreX, y: top + 30, w: 540, h: 440 },
     model: { x: Math.round(vw / 2 - 200), y: top + 70, w: 400, h: 330 },
   };
@@ -187,7 +205,7 @@ export function buildTour(
       ...TOUR_TEXT[target],
       probability: value.probability,
       threshold: value.threshold,
-      band: riskBand(value.probability, value.threshold),
+      band: riskBand(value.probability, value.threshold, isFlagged(value)),
       uncertain: value.uncertain === true,
       raising: drivers.filter((driver) => driver.points > 0).slice(0, 3),
       lowering: drivers.filter((driver) => driver.points < 0).slice(0, 2),

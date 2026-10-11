@@ -16,7 +16,8 @@ export function ModelWindow() {
   const data = metrics.data;
 
   return (
-    <FloatingWindow icon={<IconChart />} id="model" title="Model accuracy">
+    <FloatingWindow
+      focusableBody icon={<IconChart />} id="model" title="Model performance">
       {!data ? (
         <EmptyState>
           {metrics.isError ? "Metrics unavailable." : "Loading metrics…"}

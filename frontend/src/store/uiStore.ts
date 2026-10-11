@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { VesselId } from "../features/viewer/vesselMap";
+import type { UnitSystem } from "../lib/units";
 
 export type ExplainView = "why" | "arteries" | "body";
 export type ArteryMode = "flow" | "table";
@@ -7,6 +8,17 @@ export type ArteryMode = "flow" | "table";
 export type UiVersion = "studio" | "classic";
 
 const UI_VERSION_STORAGE_KEY = "cad-risk-ui-version";
+const UNIT_SYSTEM_STORAGE_KEY = "cad-risk-lab-units";
+
+function storedUnitSystem(): UnitSystem {
+  try {
+    return window.localStorage.getItem(UNIT_SYSTEM_STORAGE_KEY) === "si"
+      ? "si"
+      : "conventional";
+  } catch {
+    return "conventional";
+  }
+}
 
 function storedUiVersion(): UiVersion {
   try {
@@ -21,6 +33,15 @@ function storedUiVersion(): UiVersion {
 interface UiState {
   uiVersion: UiVersion;
   setUiVersion: (version: UiVersion) => void;
+  /** Lab units shown on screen; the API always receives its own (conventional) units. */
+  unitSystem: UnitSystem;
+  setUnitSystem: (system: UnitSystem) => void;
+  /** The clinician has picked a patient on the start screen (each visit starts there). */
+  patientChosen: boolean;
+  setPatientChosen: (chosen: boolean) => void;
+  /** The printable patient report is open (both layouts). */
+  reportOpen: boolean;
+  setReportOpen: (open: boolean) => void;
   hoveredVessel: VesselId | null;
   selectedVessel: VesselId | null;
   /** Input feature currently highlighted in an explanation view; the 3D vessels react to it. */
@@ -45,6 +66,20 @@ export const useUiStore = create<UiState>((set) => ({
     }
     set({ uiVersion, hoveredFactor: null, hoveredVessel: null });
   },
+  unitSystem: storedUnitSystem(),
+  setUnitSystem: (unitSystem) => {
+    try {
+      window.localStorage.setItem(UNIT_SYSTEM_STORAGE_KEY, unitSystem);
+    } catch {
+      // the choice still applies for this visit
+    }
+    set({ unitSystem });
+  },
+  patientChosen: false,
+  setPatientChosen: (patientChosen) =>
+    set({ patientChosen, reportOpen: false, selectedVessel: null, hoveredFactor: null }),
+  reportOpen: false,
+  setReportOpen: (reportOpen) => set({ reportOpen }),
   hoveredVessel: null,
   selectedVessel: null,
   hoveredFactor: null,

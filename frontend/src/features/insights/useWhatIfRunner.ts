@@ -13,7 +13,6 @@ const DEBOUNCE_MS = 300;
 export function useWhatIfRunner(
   baseInputs: Readonly<Record<string, FeatureValue>>,
   basePrediction: PredictionResponse,
-  sampleId: string | null,
 ) {
   const profileQuery = useApiProfile();
   const profile = profileQuery.isSuccess ? profileQuery.data : null;
@@ -35,12 +34,8 @@ export function useWhatIfRunner(
     const sent = revision;
     const timer = setTimeout(() => {
       postPredict(
-        {
-          features: { ...values },
-          ...(profile.mode === "real" && sampleId
-            ? { sample_id: sampleId }
-            : {}),
-        },
+        // a scenario is an edit of the patient, so no sample id: the API works out which models apply
+        { features: { ...values } },
         profile,
       )
         .then((prediction) =>
@@ -58,7 +53,7 @@ export function useWhatIfRunner(
         );
     }, DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [changed, pending, profile, revision, sampleId, values]);
+  }, [changed, pending, profile, revision, values]);
 
   return { changed };
 }

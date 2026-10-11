@@ -24,6 +24,7 @@ import {
   VESSEL_TUBE_RADIAL_SEGMENTS,
   VESSEL_TUBE_TUBULAR_SEGMENTS,
 } from "./vesselMap";
+import { isFlagged } from "../../lib/flags";
 
 interface VesselMeshProps {
   vessel: VesselId;
@@ -96,9 +97,7 @@ export function VesselMesh({ vessel }: VesselMeshProps) {
     impact === null && anySelected && !isSelected && !isHovered;
   const uncertain = display.target?.uncertain === true;
   // colour shows which artery; risk is shown by the tag, thickness and glow
-  const flagged =
-    display.target !== null &&
-    display.target.probability >= display.target.threshold;
+  const flagged = display.target !== null && isFlagged(display.target);
   const pulse =
     uncertain &&
     impact === null &&

@@ -3,6 +3,8 @@ import { useFeatures, useSamples } from "../../api/hooks";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 import { vesselIds, type VesselId } from "../viewer/vesselMap";
+import { useSpeechStore } from "../speech/speechStore";
+import { useSpokenResult } from "../speech/useSpokenResult";
 import { IconSearch } from "./icons";
 import { WINDOW_TITLES } from "./windowTitles";
 import { WINDOW_IDS } from "./studioModel";
@@ -30,6 +32,12 @@ function focusVessel(vessel: VesselId | null) {
 function useCommands(): Command[] {
   const features = useFeatures().data;
   const samples = useSamples().data;
+  const spoken = useSpokenResult();
+  // commands are built once per data change; reading aloud always uses the latest result
+  const spokenRef = useRef(spoken);
+  useEffect(() => {
+    spokenRef.current = spoken;
+  });
   return useMemo(() => {
     const studio = useStudioStore.getState;
     const list: Command[] = [
@@ -68,25 +76,11 @@ function useCommands(): Command[] {
         run: () => studio().setDepth(1),
       },
       {
-        id: "beat",
+        id: "motion",
         group: "View",
-        label: "Toggle heartbeat",
-        keywords: "pulse animation",
-        run: () => studio().toggle("beat"),
-      },
-      {
-        id: "flow",
-        group: "View",
-        label: "Toggle blood flow",
-        keywords: "particles animation",
-        run: () => studio().toggle("flow"),
-      },
-      {
-        id: "rotate",
-        group: "View",
-        label: "Toggle auto-rotate",
-        keywords: "spin turntable",
-        run: () => studio().toggle("autoRotate"),
+        label: "Toggle motion (heartbeat, blood flow and rotation)",
+        keywords: "animation beat pulse flow blood particles spin rotate turntable base pedestal still pause",
+        run: () => studio().toggle("motion"),
       },
       {
         id: "tour",
@@ -102,6 +96,41 @@ function useCommands(): Command[] {
         keywords: "open panel window",
         run: () => studio().openWindow(id),
       })),
+      {
+        id: "patients",
+        group: "Patients",
+        label: "All patients (start screen)",
+        keywords: "choose select list switch",
+        run: () => useUiStore.getState().setPatientChosen(false),
+      },
+      {
+        id: "report",
+        group: "Share",
+        label: "Open patient report",
+        keywords: "pdf print download take-home summary",
+        run: () => useUiStore.getState().setReportOpen(true),
+      },
+      {
+        id: "speak",
+        group: "Share",
+        label: "Read the result aloud",
+        keywords: "speech voice listen audio tts",
+        run: () => useSpeechStore.getState().speak(spokenRef.current.sentences()),
+      },
+      {
+        id: "units-conventional",
+        group: "Lab units",
+        label: "Show labs in mg/dL",
+        keywords: "units conventional us",
+        run: () => useUiStore.getState().setUnitSystem("conventional"),
+      },
+      {
+        id: "units-si",
+        group: "Lab units",
+        label: "Show labs in mmol/L",
+        keywords: "units si international",
+        run: () => useUiStore.getState().setUnitSystem("si"),
+      },
       {
         id: "layout",
         group: "Windows",

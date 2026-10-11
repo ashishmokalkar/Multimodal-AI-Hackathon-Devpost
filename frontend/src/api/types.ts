@@ -198,6 +198,23 @@ export const FeatureImportanceSchema = z.object({
   share_raising: z.number().min(0).max(1),
 }).strict();
 
+export const CohortPatientSchema = z.object({
+  patient: z.number().int().min(1),
+  age: z.number().int(),
+  sex: z.enum(["Female", "Male"]),
+  cad: z.number().min(0).max(1),
+  LAD: z.number().min(0).max(1),
+  LCX: z.number().min(0).max(1),
+  RCA: z.number().min(0).max(1),
+}).strict();
+
+export const CohortResponseSchema = z.object({
+  model_version: z.string().min(1),
+  n_patients: z.number().int().min(1),
+  population: z.string(),
+  patients: z.array(CohortPatientSchema).min(1),
+}).strict();
+
 export const ImportanceResponseSchema = z.object({
   model_version: z.string().min(1),
   n_patients: z.number().int().min(1),
@@ -226,7 +243,16 @@ export const ValidationErrorSchema = z.object({
 });
 
 export type FeatureValue = z.infer<typeof FeatureValueSchema>;
-export type FeatureDefinition = z.infer<typeof FeatureSchema>;
+/** How a lab value is shown when the user picks other units (see lib/units.ts); never sent by the API. */
+export interface DisplayConversion {
+  unit: string;
+  /** Shown value = API value × factor. */
+  factor: number;
+  digits: number;
+}
+export type FeatureDefinition = z.infer<typeof FeatureSchema> & {
+  display?: DisplayConversion;
+};
 export type HealthResponse = z.infer<typeof HealthResponseSchema>;
 export type VesselGroundTruth = z.infer<typeof VesselGroundTruthSchema>;
 export type GroundTruth = z.infer<typeof GroundTruthSchema>;
@@ -244,4 +270,6 @@ export type ValidationErrorItem = z.infer<typeof ValidationErrorItemSchema>;
 export type ValidationError = z.infer<typeof ValidationErrorSchema>;
 export type FeatureImportance = z.infer<typeof FeatureImportanceSchema>;
 export type ImportanceResponse = z.infer<typeof ImportanceResponseSchema>;
+export type CohortPatient = z.infer<typeof CohortPatientSchema>;
+export type CohortResponse = z.infer<typeof CohortResponseSchema>;
 export type ReferenceRange = NonNullable<FeatureDefinition["reference_range"]>;

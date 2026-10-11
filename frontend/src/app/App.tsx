@@ -19,6 +19,7 @@ import { DisclaimerBanner } from "../features/safety/DisclaimerBanner";
 import { DisclaimerModal } from "../features/safety/DisclaimerModal";
 import { DISCLAIMER_TEXT } from "../features/safety/disclaimer";
 import { HeartbeatLoader } from "../features/loading/HeartbeatLoader";
+import { PatientPicker } from "../features/start/PatientPicker";
 import {
   useApiProfile,
   useFeatures,
@@ -33,6 +34,9 @@ const ViewerPanel = lazy(() =>
     default: module.ViewerPanel,
   })),
 );
+
+// The printable patient report (with its own 3D snapshots) loads when it is opened.
+const PatientReport = lazy(() => import("../features/report/PatientReport"));
 
 // Studio is a separate full-screen interface; load it (and its effects library) only when it is chosen.
 const StudioApp = lazy(() => import("../features/studio/StudioApp"));
@@ -51,6 +55,8 @@ function AppContent() {
   );
   const prediction = usePatientStore((state) => state.prediction);
   const uiVersion = useUiStore((state) => state.uiVersion);
+  const reportOpen = useUiStore((state) => state.reportOpen);
+  const patientChosen = useUiStore((state) => state.patientChosen);
   const setUiVersion = useUiStore((state) => state.setUiVersion);
   const previousProfileId = useRef<string | null>(null);
   const metricsButtonRef = useRef<HTMLButtonElement>(null);
@@ -82,6 +88,18 @@ function AppContent() {
     setIsDisclaimerAcknowledged(true);
   };
 
+  // every visit starts by choosing a patient; the workspace opens on that patient
+  if (!patientChosen) {
+    return (
+      <>
+        <PatientPicker />
+        {!isDisclaimerAcknowledged && (
+          <DisclaimerModal onAcknowledge={acknowledgeDisclaimer} />
+        )}
+      </>
+    );
+  }
+
   if (uiVersion === "studio") {
     return (
       <>
@@ -98,6 +116,11 @@ function AppContent() {
         >
           <StudioApp />
         </Suspense>
+        {reportOpen && (
+          <Suspense fallback={null}>
+            <PatientReport />
+          </Suspense>
+        )}
         {!isDisclaimerAcknowledged && (
           <DisclaimerModal onAcknowledge={acknowledgeDisclaimer} />
         )}
@@ -107,6 +130,9 @@ function AppContent() {
 
   return (
     <div className="app-shell mx-auto w-full max-w-screen-2xl">
+      <a className="skip-link" href="#results-panel-heading">
+        Skip to results
+      </a>
       <header className="app-header">
         <div className="masthead">
           <div className="brand-lockup">
@@ -119,6 +145,14 @@ function AppContent() {
             </div>
           </div>
           <div className="header-actions">
+            <button
+              className="metrics-button"
+              title="Back to the patient list"
+              type="button"
+              onClick={() => useUiStore.getState().setPatientChosen(false)}
+            >
+              All patients
+            </button>
             <button
               className="studio-switch"
               title="Open the immersive Studio interface"
@@ -241,6 +275,12 @@ function AppContent() {
         }
         returnFocusRef={metricsButtonRef}
       />
+
+      {reportOpen && (
+        <Suspense fallback={null}>
+          <PatientReport />
+        </Suspense>
+      )}
 
       {!isDisclaimerAcknowledged && (
         <DisclaimerModal onAcknowledge={acknowledgeDisclaimer} />

@@ -29,10 +29,12 @@ import {
   DoubleSide,
   FrontSide,
   Mesh as MeshClass,
+  NormalBlending,
   Object3D,
   ShaderMaterial,
   Vector3,
   type Group,
+  type PerspectiveCamera,
   type InstancedMesh,
   type Material,
   type Mesh,
@@ -55,6 +57,7 @@ import {
 import { SCENE_THEMES, type SceneTheme } from "./sceneTheme";
 import { beatPulse, pulseRate } from "./studioModel";
 import { useStudioStore } from "./studioStore";
+import { isFlagged } from "../../lib/flags";
 
 type OrbitControlsImpl = ComponentRef<typeof OrbitControls>;
 
@@ -236,10 +239,15 @@ function StudioHeart({ depth, theme, onBounds }: HeartProps) {
         const material = mesh.material as ShaderMaterial;
         (material.uniforms.uColor.value as Color).set(theme.xray);
         material.uniforms.uOpacity.value = Math.max(0, xrayOpacity);
+        const blending = theme.light ? NormalBlending : AdditiveBlending;
+        if (material.blending !== blending) {
+          material.blending = blending;
+          material.needsUpdate = true;
+        }
       }
     });
     root.visible = xrayOpacity > 0.01;
-  }, [theme.xray, xray, xrayOpacity]);
+  }, [theme.light, theme.xray, xray, xrayOpacity]);
 
   useEffect(() => () => xrayMaterial.dispose(), [xrayMaterial]);
 
@@ -342,6 +350,7 @@ interface StudioVesselProps {
 
 function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
   const definition = vesselMap[vessel];
+  const lightStage = useStudioStore((state) => SCENE_THEMES[state.theme].light);
   const curve = useMemo(
     () =>
       new CatmullRomCurve3(
@@ -360,10 +369,10 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
   const isSelected = useUiStore((state) => state.selectedVessel === vessel);
   const anySelected = useUiStore((state) => state.selectedVessel !== null);
   const hoveredFactor = useUiStore((state) => state.hoveredFactor);
-  const flow = useStudioStore((state) => state.flow);
+  const flow = useStudioStore((state) => state.motion);
   const labels = useStudioStore((state) => state.labels);
   const target = display.target;
-  const flagged = target !== null && target.probability >= target.threshold;
+  const flagged = target !== null && isFlagged(target);
   const impact =
     hoveredFactor && prediction && !prediction.mock
       ? factorImpact(prediction.explanations, hoveredFactor)[vessel]
@@ -397,14 +406,15 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
   const glows = affected || isHovered || isSelected || flagged;
   const materialRef = useRef<MeshStandardMaterial>(null);
   const haloRef = useRef<Mesh>(null);
-  const animate = !reducedMotion();
+  const motion = useStudioStore((state) => state.motion);
+  const animate = motion && !reducedMotion();
 
   useFrame((state) => {
     const material = materialRef.current;
     if (!material) {
       return;
     }
-    // high-risk vessels breathe softly; low-risk vessels stay matte
+    // high-risk vessels breathe softly while motion is on; low-risk vessels stay matte
     const breathe =
       animate && flagged && !affected
         ? 0.75 + 0.25 * Math.sin(state.clock.elapsedTime * 2.2)
@@ -458,10 +468,10 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
         <mesh raycast={() => null} ref={haloRef}>
           <tubeGeometry args={[curve, 64, radius * 1.6, 10, false]} />
           <meshBasicMaterial
-            blending={AdditiveBlending}
+            blending={lightStage ? NormalBlending : AdditiveBlending}
             color={glowColor}
             depthWrite={false}
-            opacity={0.18}
+            opacity={lightStage ? 0.3 : 0.18}
             side={DoubleSide}
             toneMapped={false}
             transparent
@@ -505,7 +515,8 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
 // ------------------------------------------------------------------------------------------- pedestal
 function Pedestal({ y, theme }: { y: number; theme: SceneTheme }) {
   const spin = useRef<Group>(null);
-  const animate = !reducedMotion();
+  const motion = useStudioStore((state) => state.motion);
+  const animate = motion && !reducedMotion();
   useFrame((_, delta) => {
     if (spin.current && animate) {
       spin.current.rotation.z += delta * 0.12;
@@ -621,30 +632,113 @@ function CameraRig({
   return null;
 }
 
+/** Breathing room between the heart and the toolbar above it or the window below it, in pixels. */
+const FRAME_MARGIN = 14;
+
+/**
+ * Keeps the heart in the clear band of the screen: below the 3D toolbar and above the bottom window (or the dock
+ * when that window is closed or moved aside). The camera's view is shifted up and, when the band is short,
+ * zoomed out a little, so windows cover as little of the heart as possible. Orbiting and flying to an artery work
+ * as before, inside the same band.
+ */
+function Framing({ heartBox }: { heartBox: Box3 | null }) {
+  const get = useThree((state) => state.get);
+  const size = useThree((state) => state.size);
+  const invalidate = useThree((state) => state.invalidate);
+  const whatifOpen = useStudioStore((state) => state.open.whatif);
+  const whatif = useStudioStore((state) => state.rects.whatif);
+  const vesselOpen = useStudioStore((state) => state.open.vessel);
+  const vessel = useStudioStore((state) => state.rects.vessel);
+
+  useEffect(() => {
+    const view = get().camera as PerspectiveCamera;
+    // compact (phone) layout stacks the windows below the stage, so the heart keeps the plain centred view
+    if (!heartBox || heartBox.isEmpty() || size.width < 760) {
+      view.clearViewOffset();
+      view.zoom = 1;
+      view.updateProjectionMatrix();
+      invalidate();
+      return;
+    }
+    // where the heart lands on screen from the overview position, without any framing
+    const probe = view.clone();
+    probe.clearViewOffset();
+    probe.zoom = 1;
+    probe.aspect = size.width / size.height;
+    probe.position.set(...STUDIO_OVERVIEW_POSITION);
+    probe.lookAt(...STUDIO_OVERVIEW_TARGET);
+    probe.updateProjectionMatrix();
+    probe.updateMatrixWorld();
+    let top = Infinity;
+    let bottom = -Infinity;
+    const { min, max } = heartBox;
+    for (const x of [min.x, max.x]) {
+      for (const y of [min.y, max.y]) {
+        for (const z of [min.z, max.z]) {
+          const point = new Vector3(x, y, z).project(probe);
+          const screenY = ((1 - point.y) / 2) * size.height;
+          top = Math.min(top, screenY);
+          bottom = Math.max(bottom, screenY);
+        }
+      }
+    }
+    const toolbarBottom =
+      document.querySelector(".studio .toolbar")?.getBoundingClientRect().bottom ?? 104;
+    const bandTop = toolbarBottom + FRAME_MARGIN;
+    // a window only limits the band when it sits under the heart (the what-if sliders or the artery inspector)
+    const under = (open: boolean, rect: { x: number; y: number; w: number }) =>
+      open &&
+      rect.x < size.width * 0.6 &&
+      rect.x + rect.w > size.width * 0.4 &&
+      rect.y > bandTop + 240;
+    const bandBottom = Math.min(
+      size.height - 96,
+      under(whatifOpen, whatif) ? whatif.y - FRAME_MARGIN : Infinity,
+      under(vesselOpen, vessel) ? vessel.y - FRAME_MARGIN : Infinity,
+    );
+    const zoom = Math.min(1, Math.max(0.6, (bandBottom - bandTop) / (bottom - top)));
+    const centre = size.height / 2 + ((top + bottom) / 2 - size.height / 2) * zoom;
+    const shift = centre - (bandTop + bandBottom) / 2;
+    view.zoom = zoom;
+    view.setViewOffset(size.width, size.height, 0, shift, size.width, size.height);
+    view.updateProjectionMatrix();
+    invalidate();
+  }, [get, heartBox, invalidate, size.height, size.width, vessel, vesselOpen, whatif, whatifOpen]);
+
+  return null;
+}
+
 // ------------------------------------------------------------------------------------------- scene
 function SceneContent() {
   const themeName = useStudioStore((state) => state.theme);
   const theme = SCENE_THEMES[themeName];
   const depth = useStudioStore((state) => state.depth);
-  const beat = useStudioStore((state) => state.beat);
+  const motion = useStudioStore((state) => state.motion);
   const quality = useStudioStore((state) => state.quality);
-  const autoRotate = useStudioStore((state) => state.autoRotate);
+  // the heart turns only in the overview: not while an artery is in focus, the camera flies, or the tour runs
+  const overview = useStudioStore(
+    (state) => state.camera.vessel === null && !state.tour.active,
+  );
+  const nothingSelected = useUiStore((state) => state.selectedVessel === null);
+  const autoRotate = motion && overview && nothingSelected;
   const pulse = usePatientStore((state) => pulseRate(state.features.PR));
   const controls = useRef<OrbitControlsImpl | null>(null);
   const beating = useRef<Group>(null);
   const beatRef = useRef(0);
   const [floorY, setFloorY] = useState(-0.95);
+  const [heartBox, setHeartBox] = useState<Box3 | null>(null);
   const onBounds = useMemo(
     () => (box: Box3) => {
       if (Number.isFinite(box.min.y)) {
         setFloorY(box.min.y - 0.06);
+        setHeartBox(box);
       }
     },
     [],
   );
 
   useFrame((state) => {
-    const pulseValue = beat
+    const pulseValue = motion
       ? beatPulse((state.clock.elapsedTime * pulse) / 60)
       : 0;
     beatRef.current = pulseValue;
@@ -722,6 +816,7 @@ function SceneContent() {
         target={[...STUDIO_OVERVIEW_TARGET]}
       />
       <CameraRig controls={controls} />
+      <Framing heartBox={heartBox} />
       {quality === "high" && (
         <EffectComposer multisampling={4}>
           <Bloom
@@ -766,12 +861,10 @@ class SceneErrorBoundary extends Component<
 
 /** Full-screen 3D stage behind the floating windows. */
 export function StudioScene() {
-  const beat = useStudioStore((state) => state.beat);
-  const flow = useStudioStore((state) => state.flow);
-  const autoRotate = useStudioStore((state) => state.autoRotate);
+  const motion = useStudioStore((state) => state.motion);
   const quality = useStudioStore((state) => state.quality);
   const setQuality = useStudioStore((state) => state.setQuality);
-  const animated = beat || flow || autoRotate;
+  const animated = motion;
   const prediction = useShownPrediction();
   const features = useFeatures();
   const summary = prediction

@@ -78,7 +78,7 @@ export function ArteryScale({ prediction }: ArteryScaleProps) {
               >
                 <span aria-hidden="true" className="artery-pin-stem" />
                 <button
-                  aria-label={`${pin.vessel} (${vesselMap[pin.vessel].label}) ${formatProbability(pin.probability)}. ${formatTargetUncertainty(pin.uncertain)} Select on the heart.`}
+                  aria-label={`${pin.vessel} ${Math.round(pin.probability * 100)}%: ${vesselMap[pin.vessel].label}, ${formatProbability(pin.probability)}. ${formatTargetUncertainty(pin.uncertain)} Select on the heart.`}
                   aria-pressed={selectedVessel === pin.vessel}
                   className="artery-pin-label"
                   type="button"

@@ -6,6 +6,7 @@ import {
   type DriverSummary,
 } from "../../lib/summary";
 import { FactorPills } from "./FactorPills";
+import { isFlagged } from "../../lib/flags";
 
 interface RiskHeroProps {
   target: Target;
@@ -92,7 +93,8 @@ export function RiskHero({
   selected,
   onSelect,
 }: RiskHeroProps) {
-  const flagged = target.probability >= target.threshold;
+  const flagged = isFlagged(target);
+  const above = target.probability >= target.threshold;
   const threshold = Math.round(target.threshold * 100);
   return (
     <section
@@ -100,15 +102,16 @@ export function RiskHero({
       className={`risk-hero ${selected ? "risk-hero-selected" : ""}`}
     >
       <button
-        aria-label={`Coronary artery disease: ${Math.round(target.probability * 100)}% chance, ${
-          flagged ? "above" : "below"
-        } the ${threshold}% threshold. Show CAD details.`}
         aria-pressed={selected}
         className="risk-hero-main"
         type="button"
         onClick={onSelect}
       >
         <Gauge baseline={baseline} target={target} />
+        {/* the gauge is drawn, so its number is given to screen readers here; the visible text names the button */}
+        <span className="sr-only">
+          {Math.round(target.probability * 100)}% chance.{" "}
+        </span>
         <span className="risk-hero-text">
           <span className="risk-hero-eyebrow">Overall result</span>
           <span className="risk-hero-title" id="risk-hero-heading">
@@ -121,7 +124,7 @@ export function RiskHero({
             {flagged ? "Flagged" : "Not flagged"}
           </span>
           <span className="risk-hero-threshold">
-            {flagged ? "Above" : "Below"} the {threshold}% decision threshold
+            {above ? "Above" : "Below"} the {threshold}% decision threshold
           </span>
           {baseline && (
             <span className="risk-hero-was">

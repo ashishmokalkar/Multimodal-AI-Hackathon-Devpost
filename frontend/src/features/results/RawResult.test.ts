@@ -1,5 +1,6 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { FeatureDefinition, PredictionResponse } from "../../api/types";
 import { loadWhyView } from "./lazyWhyView";
@@ -148,16 +149,21 @@ function renderResult(
   isEditedScenario = false,
   sampleId: string | null = null,
 ) {
+  // the real result reads API data (cohort, features) through React Query; nothing is fetched here
   return renderToStaticMarkup(
-    createElement(RawResult, {
-      prediction: response,
-      features,
-      predictionInputs: { Age: 60, "EF-TTE": 50 },
-      isEditedScenario,
-      sampleId,
-      selectedVessel,
-      onSelectVessel: () => undefined,
-    }),
+    createElement(
+      QueryClientProvider,
+      { client: new QueryClient() },
+      createElement(RawResult, {
+        prediction: response,
+        features,
+        predictionInputs: { Age: 60, "EF-TTE": 50 },
+        isEditedScenario,
+        sampleId,
+        selectedVessel,
+        onSelectVessel: () => undefined,
+      }),
+    ),
   );
 }
 
@@ -253,7 +259,7 @@ describe("RawResult explanation rendering", () => {
       {
         ...realPrediction,
         prediction_source:
-          "Dataset patient 20: scored by models trained without this patient",
+          "Edited dataset patient 20: scored by the cross-validation model that never saw that patient",
       },
       true,
       "patient-20",
@@ -262,9 +268,8 @@ describe("RawResult explanation rendering", () => {
     expect(markup).toContain("Edited dataset-sample scenario");
     expect(markup).toContain("Prediction source:");
     expect(markup).toContain(
-      "What-if edit of Dataset patient 20; scored by the models trained without that patient.",
+      "Edited dataset patient 20: scored by the cross-validation model that never saw that patient",
     );
-    expect(markup).not.toContain("trained without this patient");
   });
 
   it("shows an explicit unavailable message when the selected explanation is empty", () => {

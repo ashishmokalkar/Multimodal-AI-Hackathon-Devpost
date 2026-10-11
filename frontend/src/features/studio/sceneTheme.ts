@@ -14,6 +14,8 @@ export interface SceneTheme {
   bloom: number;
   vignette: number;
   ambient: number;
+  /** A light stage: glows are drawn normally, not added, because adding light to near-white shows nothing. */
+  light: boolean;
 }
 
 export const SCENE_THEMES: Record<StudioTheme, SceneTheme> = {
@@ -27,27 +29,20 @@ export const SCENE_THEMES: Record<StudioTheme, SceneTheme> = {
     bloom: 1.1,
     vignette: 0.55,
     ambient: 0.55,
-  },
-  aurora: {
-    inner: "#2a1a5e",
-    outer: "#06030f",
-    accent: "#c4b5fd",
-    xray: "#f0abfc",
-    rimA: "#f472b6",
-    rimB: "#22d3ee",
-    bloom: 1.2,
-    vignette: 0.6,
-    ambient: 0.55,
+    light: false,
   },
   clinical: {
-    inner: "#ffffff",
-    outer: "#cdd8e3",
+    // a soft cool-grey stage, darker towards the edges, so the red heart and the coloured arteries stand out
+    // instead of fading into white; rim lights are slate rather than white so the outline stays defined
+    inner: "#e3eaf2",
+    outer: "#8fa2b8",
     accent: "#0f766e",
-    xray: "#0369a1",
-    rimA: "#bae6fd",
-    rimB: "#ffffff",
-    bloom: 0.45,
-    vignette: 0.18,
-    ambient: 1.05,
+    xray: "#1e3a5f",
+    rimA: "#6b8bb0",
+    rimB: "#9fb3c8",
+    bloom: 0.3,
+    vignette: 0.32,
+    ambient: 0.7,
+    light: true,
   },
 };

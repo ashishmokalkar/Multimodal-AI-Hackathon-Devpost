@@ -34,6 +34,7 @@ export function MeasuresWindow() {
 
   return (
     <FloatingWindow
+      focusableBody
       actions={
         <div className="sl-segmented sl-segmented-sm" role="group" aria-label="Filter">
           <button

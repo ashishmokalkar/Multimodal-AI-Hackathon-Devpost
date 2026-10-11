@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { displayUnit } from "../../../lib/units";
 import type {
   FeatureDefinition,
   FeatureValue,
@@ -35,12 +36,10 @@ function Scenario({
   features,
   baseInputs,
   basePrediction,
-  sampleId,
 }: {
   features: readonly FeatureDefinition[];
   baseInputs: Readonly<Record<string, FeatureValue>>;
   basePrediction: PredictionResponse;
-  sampleId: string | null;
 }) {
   const values = useWhatIfStore((s) => s.values);
   const baseValues = useWhatIfStore((s) => s.baseValues);
@@ -53,7 +52,7 @@ function Scenario({
     () => features.filter((feature) => feature.modifiable),
     [features],
   );
-  const { changed } = useWhatIfRunner(baseInputs, basePrediction, sampleId);
+  const { changed } = useWhatIfRunner(baseInputs, basePrediction);
   const shown = changed && scenario ? scenario : basePrediction;
 
   if (modifiable.length === 0) {
@@ -132,7 +131,8 @@ function Scenario({
                     <i className="sl-slider-was" style={{ left: `${basePos}%` }} />
                   )}
                   <input
-                    aria-label={`${feature.label} (${prettyUnit(feature.unit)})`}
+                    aria-label={`${feature.label} (${prettyUnit(displayUnit(feature))})`}
+                  aria-valuetext={formatFeatureValue(value, feature)}
                     max={max}
                     min={min}
                     onChange={(event) =>
@@ -176,7 +176,7 @@ function Scenario({
 
 /** Try changes a patient could make (weight, smoking, blood pressure, lipids) and watch the arteries respond. */
 export function WhatIfWindow() {
-  const { accepted, features, predictionInputs, sampleId } = useStudioData();
+  const { accepted, features, predictionInputs } = useStudioData();
   return (
     <FloatingWindow icon={<IconSliders />} id="whatif" title="What if">
       {accepted && predictionInputs ? (
@@ -184,7 +184,6 @@ export function WhatIfWindow() {
           basePrediction={accepted}
           baseInputs={predictionInputs}
           features={features}
-          sampleId={sampleId}
         />
       ) : (
         <EmptyState>Available once the patient is scored.</EmptyState>

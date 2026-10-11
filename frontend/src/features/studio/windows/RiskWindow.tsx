@@ -9,6 +9,7 @@ import { BandChip, Delta, EmptyState, Ring, UnsureChip } from "../parts";
 import { bandOf, useStudioData } from "../studioData";
 import { percent, riskBand } from "../studioModel";
 import { useStudioStore } from "../studioStore";
+import { isFlagged } from "../../../lib/flags";
 
 const FLAG_COLOR = "var(--s-flag)";
 
@@ -50,7 +51,7 @@ export function RiskWindow() {
           <div className="sl-risk-hero">
             <Ring
               color={
-                shown.cad.probability >= shown.cad.threshold
+                isFlagged(shown.cad)
                   ? FLAG_COLOR
                   : "var(--s-accent)"
               }
@@ -85,7 +86,11 @@ export function RiskWindow() {
           <div className="risk-arteries">
             {vesselIds.map((vessel) => {
               const target = shown.vessels[vessel];
-              const band = riskBand(target.probability, target.threshold);
+              const band = riskBand(
+                target.probability,
+                target.threshold,
+                isFlagged(target),
+              );
               return (
                 <button
                   aria-pressed={selectedVessel === vessel}

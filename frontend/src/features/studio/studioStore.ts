@@ -10,15 +10,13 @@ import {
   type WindowId,
 } from "./studioModel";
 
-export type StudioTheme = "midnight" | "aurora" | "clinical";
+export type StudioTheme = "midnight" | "clinical";
 export const STUDIO_THEMES: readonly StudioTheme[] = [
   "midnight",
-  "aurora",
   "clinical",
 ];
 export const THEME_LABEL: Record<StudioTheme, string> = {
   midnight: "Midnight",
-  aurora: "Aurora",
   clinical: "Clinical light",
 };
 
@@ -30,10 +28,12 @@ interface Persisted {
   glass: number;
   /** 0 solid heart, 0.5 x-ray, 1 arteries only. */
   depth: number;
-  beat: boolean;
-  flow: boolean;
+  /**
+   * One switch for every looping animation: the heartbeat, blood flow along the arteries, the slow turn of the
+   * heart and the rotating base.
+   */
+  motion: boolean;
   labels: boolean;
-  autoRotate: boolean;
   quality: Quality;
   rects: Record<WindowId, Rect>;
   open: Record<WindowId, boolean>;
@@ -50,7 +50,7 @@ interface StudioState extends Persisted {
   setTheme: (theme: StudioTheme) => void;
   setGlass: (glass: number) => void;
   setDepth: (depth: number) => void;
-  toggle: (key: "beat" | "flow" | "labels" | "autoRotate") => void;
+  toggle: (key: "motion" | "labels") => void;
   setQuality: (quality: Quality) => void;
   focus: (vessel: VesselId | null) => void;
   setPaletteOpen: (open: boolean) => void;
@@ -68,7 +68,8 @@ interface StudioState extends Persisted {
   resetLayout: () => void;
 }
 
-const STORAGE_KEY = "cardiolens-studio-v1";
+// v2: new default layout (patient left-centre, what-if closed) and no Aurora theme; v1 layouts are not reused
+const STORAGE_KEY = "cardiolens-studio-v2";
 
 function viewport() {
   return typeof window === "undefined"
@@ -93,10 +94,8 @@ function defaults(): Persisted {
     theme: "midnight",
     glass: 0.55,
     depth: 0,
-    beat: !reducedMotion,
-    flow: !reducedMotion,
+    motion: !reducedMotion,
     labels: true,
-    autoRotate: false,
     quality: "high",
     ...freshLayout(),
   };
@@ -139,10 +138,9 @@ function load(): Persisted {
         typeof saved.depth === "number"
           ? Math.min(1, Math.max(0, saved.depth))
           : base.depth,
-      beat: saved.beat ?? base.beat,
-      flow: saved.flow ?? base.flow,
+      // earlier versions saved the heartbeat on its own; it stands in for the combined switch
+      motion: saved.motion ?? (saved as { beat?: boolean }).beat ?? base.motion,
       labels: saved.labels ?? base.labels,
-      autoRotate: saved.autoRotate ?? base.autoRotate,
       quality: saved.quality === "lite" ? "lite" : "high",
       rects,
       // the vessel inspector follows the selection, so it never reopens by itself
@@ -159,10 +157,8 @@ function save(state: StudioState) {
     theme: state.theme,
     glass: state.glass,
     depth: state.depth,
-    beat: state.beat,
-    flow: state.flow,
+    motion: state.motion,
     labels: state.labels,
-    autoRotate: state.autoRotate,
     quality: state.quality,
     rects: state.rects,
     open: state.open,

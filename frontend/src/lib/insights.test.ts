@@ -158,8 +158,18 @@ describe("measurements", () => {
     expect(rangeStatus(35, { low: 40 })).toBe("low");
     expect(rangeStatus(50, { low: 40 })).toBe("normal");
     expect(rangeStatus(true, { low: 40 })).toBeNull();
-    expect(formatRange({ high: 100 }, "mg/dL")).toBe("< 100 mg/dL");
-    expect(formatRange({ low: 4, high: 11 }, "x10^3/uL")).toBe("4–11 ×10³/µL");
+    const lab = (name: string, unit: string) => ({
+      name,
+      label: name,
+      group: "Lab",
+      type: "number" as const,
+      unit,
+      default: 0,
+    });
+    expect(formatRange({ high: 100 }, lab("LDL", "mg/dL"))).toBe("< 100 mg/dL");
+    expect(formatRange({ low: 4, high: 11 }, lab("WBC", "x10^3/uL"))).toBe(
+      "4–11 ×10³/µL",
+    );
   });
 
   it("groups cards by body system, marks attention and inputs equal to the reference", () => {

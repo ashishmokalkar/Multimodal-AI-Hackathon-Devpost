@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { displayUnit } from "../../lib/units";
 import type {
   FeatureDefinition,
   FeatureValue,
@@ -46,7 +47,6 @@ export function WhatIfPanel({
   features,
   baseInputs,
   basePrediction,
-  sampleId,
 }: WhatIfPanelProps) {
   const values = useWhatIfStore((s) => s.values);
   const baseValues = useWhatIfStore((s) => s.baseValues);
@@ -59,7 +59,7 @@ export function WhatIfPanel({
     () => features.filter((f) => f.modifiable),
     [features],
   );
-  const { changed } = useWhatIfRunner(baseInputs, basePrediction, sampleId);
+  const { changed } = useWhatIfRunner(baseInputs, basePrediction);
 
   if (modifiable.length === 0) {
     return (
@@ -160,7 +160,8 @@ export function WhatIfPanel({
                   </span>
                 </span>
                 <input
-                  aria-label={`${feature.label} (${prettyUnit(feature.unit)})`}
+                  aria-label={`${feature.label} (${prettyUnit(displayUnit(feature))})`}
+                  aria-valuetext={formatFeatureValue(value, feature)}
                   className="insight-slider w-full"
                   max={max}
                   min={min}

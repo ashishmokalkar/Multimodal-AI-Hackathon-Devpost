@@ -87,14 +87,25 @@ export function buildDrivers(
 export function driverPhrase(
   driver: Pick<Driver, "label" | "valueText">,
 ): string {
-  const label = driver.label.charAt(0).toLowerCase() + driver.label.slice(1);
+  const label = lowerFirst(driver.label);
   if (driver.valueText === "Yes") {
     return label;
   }
   if (driver.valueText === "No") {
     return `no ${label}`;
   }
-  return `${label} (${driver.valueText.toLowerCase()})`;
+  // measurements keep their units' case ("160 mg/dL"); option names read as words ("typical")
+  const value = /^[\d.−-]/.test(driver.valueText)
+    ? driver.valueText
+    : driver.valueText.toLowerCase();
+  return `${label} (${value})`;
+}
+
+/** Lower-cases the first letter for use mid-sentence, but leaves acronyms ("LDL", "ST elevation") alone. */
+function lowerFirst(text: string): string {
+  return /^[A-Z][A-Z]/.test(text)
+    ? text
+    : text.charAt(0).toLowerCase() + text.slice(1);
 }
 
 function joinPhrases(parts: string[]): string {
@@ -127,7 +138,7 @@ export function driverPillText(
     return driver.label;
   }
   if (driver.valueText === "No") {
-    return `No ${driver.label.charAt(0).toLowerCase()}${driver.label.slice(1)}`;
+    return `No ${lowerFirst(driver.label)}`;
   }
   return `${driver.label} · ${driver.valueText}`;
 }

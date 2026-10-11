@@ -143,7 +143,8 @@ describe("fresh prediction requests", () => {
       },
     );
 
-    expect(sentSampleId).toBe("patient-1");
+    // edited inputs are no longer the dataset sample, so its id is not sent
+    expect(sentSampleId).toBeNull();
     expect(sentFeatures).toEqual({ Age: 61 });
     expect(usePatientStore.getState()).toMatchObject({
       selectedSampleId: "patient-1",

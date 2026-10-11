@@ -6,6 +6,7 @@ import type {
   Target,
   TargetExplanations,
 } from "../api/types";
+import { displayNumber, displayRange, displayUnit } from "./units";
 
 /** Colour-blind-safe pair used for every attribution: magenta raises the estimate, blue lowers it. */
 export const RAISE_COLOR = "#c2255c";
@@ -68,8 +69,8 @@ export function formatFeatureValue(
     return value ? "Yes" : "No";
   }
   if (typeof value === "number") {
-    const unit = prettyUnit(definition?.unit);
-    const text = Number.isInteger(value) ? String(value) : value.toFixed(1);
+    const unit = prettyUnit(displayUnit(definition));
+    const text = displayNumber(value, definition);
     if (!unit || definition?.type !== "number") {
       return text;
     }
@@ -293,8 +294,13 @@ export function rangeStatus(
   return "normal";
 }
 
-export function formatRange(range: ReferenceRange, unit?: string): string {
-  const suffix = prettyUnit(unit);
+/** A reference range as text, in the shown unit of the feature it belongs to. */
+export function formatRange(
+  apiRange: ReferenceRange,
+  definition?: FeatureDefinition,
+): string {
+  const range = displayRange(apiRange, definition);
+  const suffix = prettyUnit(displayUnit(definition));
   const join = (text: string) => (suffix ? `${text} ${suffix}` : text);
   if (range.low !== undefined && range.high !== undefined) {
     return join(`${range.low}–${range.high}`);
@@ -374,7 +380,7 @@ export function buildMeasurementGroups(
       sameAsReference: !item,
       status,
       rangeText: feature.reference_range
-        ? formatRange(feature.reference_range, feature.unit)
+        ? formatRange(feature.reference_range, feature)
         : null,
       bar:
         typeof value === "number" && feature.reference_range

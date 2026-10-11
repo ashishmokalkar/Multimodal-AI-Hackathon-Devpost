@@ -11,6 +11,10 @@ import {
   schedulePrediction,
 } from "../../lib/predictionRequests";
 import { createFeatureValidationSchema } from "../../lib/featureValidation";
+import { prettyUnit } from "../../lib/insights";
+import { displayUnit } from "../../lib/units";
+import { UnitNumberInput } from "../units/UnitNumberInput";
+import { UnitToggle } from "../units/UnitToggle";
 import { usePatientStore } from "../../store/patientStore";
 
 function errorMessage(error: unknown): string {
@@ -42,7 +46,6 @@ export function PatientPanel() {
   const [autoPredict, setAutoPredict] = useState(true);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const cancelAutoPredict = useRef<(() => void) | null>(null);
-  const initializedFromSamples = useRef(false);
 
   const defaultFeatures = useMemo(() => {
     if (!featuresQuery.data) {
@@ -90,18 +93,6 @@ export function PatientPanel() {
       setFeatures(defaultFeatures);
     }
   }, [defaultFeatures, patientFeatures, setFeatures]);
-
-  useEffect(() => {
-    if (
-      !initializedFromSamples.current &&
-      samplesQuery.data &&
-      samplesQuery.data.length > 0 &&
-      Object.keys(patientFeatures).length > 0
-    ) {
-      initializedFromSamples.current = true;
-      setFromSample(samplesQuery.data[0]);
-    }
-  }, [patientFeatures, samplesQuery.data, setFromSample]);
 
   const requestPrediction = useCallback(
     async (
@@ -219,6 +210,7 @@ export function PatientPanel() {
           <p className="eyebrow">Input workspace</p>
           <h2 id="patient-panel-heading">Patient panel</h2>
         </div>
+        <UnitToggle className="classic-units" />
       </header>
       <div className="panel-body !justify-start gap-4 overflow-y-auto">
         <div className="shrink-0 space-y-2">
@@ -316,9 +308,9 @@ export function PatientPanel() {
                           htmlFor={controlId}
                         >
                           {feature.label}
-                          {feature.unit && (
+                          {displayUnit(feature) && (
                             <span className="ml-1 font-normal text-slate-500">
-                              ({feature.unit})
+                              ({prettyUnit(displayUnit(feature))})
                             </span>
                           )}
                         </label>
@@ -359,29 +351,15 @@ export function PatientPanel() {
                             ))}
                           </select>
                         ) : (
-                          <input
-                            className="min-w-0 rounded-md border border-slate-300 px-2 py-1.5 text-xs text-slate-800"
-                            id={controlId}
-                            type="number"
-                            inputMode="decimal"
-                            min={feature.min}
-                            max={feature.max}
-                            step="any"
-                            value={
-                              typeof value === "number" &&
-                              Number.isFinite(value)
-                                ? value
-                                : ""
-                            }
+                          <UnitNumberInput
                             aria-invalid={Boolean(error)}
-                            onChange={(event) =>
-                              handleFeatureChange(
-                                feature,
-                                event.target.value === ""
-                                  ? ""
-                                  : event.target.valueAsNumber,
-                              )
+                            className="min-w-0 rounded-md border border-slate-300 px-2 py-1.5 text-xs text-slate-800"
+                            definition={feature}
+                            id={controlId}
+                            onValueChange={(next) =>
+                              handleFeatureChange(feature, next)
                             }
+                            value={value}
                           />
                         )}
                         {error && (

@@ -8,6 +8,7 @@ import { BandChip, Delta, Ring, UnsureChip } from "../parts";
 import { useStudioData } from "../studioData";
 import { percent, riskBand } from "../studioModel";
 import { useStudioStore } from "../studioStore";
+import { isFlagged } from "../../../lib/flags";
 
 /** Opens when an artery is clicked: its chance, what it supplies, and the three biggest reasons. */
 export function VesselWindow() {
@@ -58,7 +59,13 @@ export function VesselWindow() {
             </span>
           </Ring>
           <div className="vessel-side">
-            <BandChip band={riskBand(target.probability, target.threshold)} />
+            <BandChip
+              band={riskBand(
+                target.probability,
+                target.threshold,
+                isFlagged(target),
+              )}
+            />
             {target.uncertain && <UnsureChip />}
             {scenario && accepted && (
               <Delta

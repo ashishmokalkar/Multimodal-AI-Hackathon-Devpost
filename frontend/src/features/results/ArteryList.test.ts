@@ -5,15 +5,22 @@ import type { PredictionResponse } from "../../api/types";
 import { ArteryList } from "./ArteryList";
 
 const explanation = { base_value: 0.4, contributions: [] };
+// labels as the API sets them: an artery is "elevated" only when it is above its threshold and CAD is elevated
 function prediction(cad: number, lad: number): PredictionResponse {
+  const label = (flag: boolean) => (flag ? "elevated" : "not elevated");
+  const cadFlag = cad >= 0.69;
   return {
     request_id: "095e7b1f-22f0-4ef0-9d30-310f769c2847",
     model_version: "fixture",
-    cad: { probability: cad, label: "x", threshold: 0.69 },
+    cad: { probability: cad, label: label(cadFlag), threshold: 0.69 },
     vessels: {
-      LAD: { probability: lad, label: "x", threshold: 0.55 },
-      LCX: { probability: 0.2, label: "x", threshold: 0.32 },
-      RCA: { probability: 0.2, label: "x", threshold: 0.36 },
+      LAD: {
+        probability: lad,
+        label: label(lad >= 0.55 && cadFlag),
+        threshold: 0.55,
+      },
+      LCX: { probability: 0.2, label: label(false), threshold: 0.32 },
+      RCA: { probability: 0.2, label: label(false), threshold: 0.36 },
     },
     explanations: {
       cad: explanation,
@@ -44,9 +51,8 @@ describe("ArteryList", () => {
     expect(markup).toContain("artery-disagreement");
     expect(markup).toContain("LAD");
     expect(markup).toContain("is");
-    expect(markup).toContain(
-      "above its own threshold while overall CAD is below its threshold",
-    );
+    expect(markup).toContain("above its own threshold but not flagged");
+    expect(markup).not.toContain("risk-status-flagged");
   });
 
   it("shows no note when CAD is flagged too, or when no artery is", () => {

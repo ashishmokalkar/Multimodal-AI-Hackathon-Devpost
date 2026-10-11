@@ -4,20 +4,23 @@ import { targetColor } from "../../lib/colorScale";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 import { DISCLAIMER_TEXT } from "../safety/disclaimer";
+import { SpeakButton } from "../speech/SpeakButton";
+import { useSpokenResult } from "../speech/useSpokenResult";
+import { UnitToggle } from "../units/UnitToggle";
 import { vesselIds, type VesselId } from "../viewer/vesselMap";
 import {
   IconBars,
   IconChart,
+  IconCompare,
   IconFlask,
-  IconFlow,
   IconGauge,
   IconGrid,
   IconHeart,
   IconLayout,
-  IconOrbit,
   IconPalette,
   IconPeople,
   IconPlay,
+  IconReport,
   IconSearch,
   IconShield,
   IconSliders,
@@ -39,8 +42,7 @@ const isMac =
 
 const THEME_SWATCH: Record<StudioTheme, string> = {
   midnight: "linear-gradient(135deg, #14223f, #03050b 70%, #5eead4)",
-  aurora: "linear-gradient(135deg, #2a1a5e, #06030f 70%, #f472b6)",
-  clinical: "linear-gradient(135deg, #ffffff, #cdd8e3 70%, #0f766e)",
+  clinical: "linear-gradient(135deg, #e3eaf2, #8fa2b8 70%, #0f766e)",
 };
 
 function focusVessel(vessel: VesselId | null) {
@@ -145,6 +147,8 @@ function SettingsMenu() {
             type="range"
             value={glass}
           />
+          <p className="menu-label">Lab units</p>
+          <UnitToggle className="menu-units" />
           <p className="menu-label">3D quality</p>
           <div className="sl-segmented sl-segmented-sm" role="group" aria-label="3D quality">
             <button
@@ -178,17 +182,25 @@ export function TopBar() {
   const startTour = useStudioStore((state) => state.startTour);
   const setUiVersion = useUiStore((state) => state.setUiVersion);
   const hasPrediction = usePatientStore((state) => state.prediction !== null);
+  const spoken = useSpokenResult();
+  const setReportOpen = useUiStore((state) => state.setReportOpen);
 
   return (
     <header className="topbar">
-      <div className="brand">
+      <button
+        className="brand"
+        onClick={() => useUiStore.getState().setPatientChosen(false)}
+        title="Back to the patient list"
+        type="button"
+      >
         <span className="brand-glyph" aria-hidden="true">
           <IconHeart size={18} />
         </span>
         <span className="brand-name">
           CardioLens <em>Studio</em>
         </span>
-      </div>
+        <span className="sr-only">: back to the patient list</span>
+      </button>
       <div className="disclaimer-chip" title={DISCLAIMER_TEXT}>
         <IconShield size={14} />
         <span>Decision support · not a diagnosis</span>
@@ -224,6 +236,21 @@ export function TopBar() {
           <IconPlay size={13} />
           <span>Tour</span>
         </button>
+        <SpeakButton
+          className="topbar-speak"
+          resultKey={spoken.resultKey}
+          sentences={spoken.sentences}
+        />
+        <button
+          className="topbar-btn topbar-report"
+          disabled={!hasPrediction}
+          onClick={() => setReportOpen(true)}
+          title="Printable patient report (save as PDF)"
+          type="button"
+        >
+          <IconReport size={14} />
+          <span>Report</span>
+        </button>
         <SettingsMenu />
         <button
           className="topbar-btn topbar-classic"
@@ -243,10 +270,8 @@ export function Toolbar() {
   const selected = useUiStore((state) => state.selectedVessel);
   const depth = useStudioStore((state) => state.depth);
   const setDepth = useStudioStore((state) => state.setDepth);
-  const beat = useStudioStore((state) => state.beat);
-  const flow = useStudioStore((state) => state.flow);
+  const motion = useStudioStore((state) => state.motion);
   const labels = useStudioStore((state) => state.labels);
-  const autoRotate = useStudioStore((state) => state.autoRotate);
   const toggle = useStudioStore((state) => state.toggle);
   const pulse = usePatientStore((state) => Math.round(pulseRate(state.features.PR)));
 
@@ -287,18 +312,16 @@ export function Toolbar() {
         </span>
       </div>
       <span className="toolbar-sep" />
-      <ToolButton label={`Heartbeat · ${pulse} bpm`} onClick={() => toggle("beat")} pressed={beat}>
+      <ToolButton
+        label={`Motion: heartbeat at ${pulse} bpm, blood flow and slow rotation`}
+        onClick={() => toggle("motion")}
+        pressed={motion}
+      >
         <IconHeart size={15} />
         <small>{pulse}</small>
       </ToolButton>
-      <ToolButton label="Blood flow" onClick={() => toggle("flow")} pressed={flow}>
-        <IconFlow size={16} />
-      </ToolButton>
       <ToolButton label="Labels" onClick={() => toggle("labels")} pressed={labels}>
         <IconTag size={15} />
-      </ToolButton>
-      <ToolButton label="Auto-rotate" onClick={() => toggle("autoRotate")} pressed={autoRotate}>
-        <IconOrbit size={16} />
       </ToolButton>
     </div>
   );
@@ -320,6 +343,7 @@ const DOCK: { id: WindowId; icon: ReactNode }[] = [
   { id: "whatif", icon: <IconSliders size={18} /> },
   { id: "factors", icon: <IconGrid size={18} /> },
   { id: "people", icon: <IconPeople size={18} /> },
+  { id: "compare", icon: <IconCompare size={18} /> },
   { id: "measures", icon: <IconFlask size={18} /> },
   { id: "model", icon: <IconChart size={18} /> },
 ];
@@ -349,12 +373,12 @@ export function Dock() {
 
 export function Watermark() {
   return (
-    <div className="watermark">
+    <footer className="watermark">
       <span>Decision support only · not a diagnosis</span>
       <a href="/models/ATTRIBUTION.md" rel="noreferrer" target="_blank">
         Heart model: neshallads, CC BY 4.0 · schematic arteries
       </a>
-    </div>
+    </footer>
   );
 }
 

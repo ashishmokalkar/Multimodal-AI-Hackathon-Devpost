@@ -39,18 +39,6 @@
   color-scheme: dark;
 }
 
-.studio[data-theme="aurora"] {
-  --s-panel-rgb: 22 14 46;
-  --s-text: #f4f0ff;
-  --s-muted: #b9addc;
-  --s-faint: #74689a;
-  --s-line: rgb(196 181 253 / 17%);
-  --s-line-strong: rgb(196 181 253 / 34%);
-  --s-accent: #c4b5fd;
-  --s-accent-ink: #1e1240;
-  --s-track: rgb(196 181 253 / 18%);
-  background: #06030f;
-}
 
 .studio[data-theme="clinical"] {
   --s-panel-rgb: 255 255 255;
@@ -207,6 +195,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 4px 8px 4px 4px;
+  margin-left: -4px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.studio .brand:hover {
+  background: var(--s-hover);
 }
 
 .studio .brand-glyph {
@@ -333,9 +333,6 @@
   color: var(--s-accent-ink);
 }
 
-.studio[data-theme="aurora"] .topbar-tour {
-  background: linear-gradient(135deg, #c4b5fd, #f472b6);
-}
 
 .studio .topbar-tour:hover {
   border-color: transparent;
@@ -343,9 +340,6 @@
   filter: brightness(1.1);
 }
 
-.studio[data-theme="aurora"] .topbar-tour:hover {
-  background: linear-gradient(135deg, #c4b5fd, #f472b6);
-}
 
 .studio .topbar-classic {
   color: var(--s-muted);
@@ -1183,16 +1177,11 @@
 }
 
 .studio .avatar {
-  display: grid;
-  width: 42px;
-  height: 42px;
   flex-shrink: 0;
-  place-items: center;
   border-radius: 14px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--s-accent) 35%, transparent), color-mix(in srgb, var(--s-flag) 30%, transparent));
-  font-size: 16px;
-  font-weight: 750;
-  box-shadow: var(--s-highlight);
+  box-shadow:
+    0 6px 16px rgb(0 0 0 / 22%),
+    var(--s-highlight);
 }
 
 .studio .patient-name {
@@ -1765,7 +1754,64 @@
 }
 
 .studio .people-grid .off {
-  fill: var(--s-track);
+  fill: none;
+  stroke: var(--s-faint);
+  stroke-width: 1.1;
+}
+
+.studio .people-head {
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.studio .people-head b {
+  white-space: nowrap;
+}
+
+.studio .people-head span {
+  max-width: 240px;
+}
+
+.studio .people .people-grid {
+  max-width: 200px;
+}
+
+.studio .people-head b small {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--s-muted);
+}
+
+.studio .people-legend {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--s-muted);
+}
+
+.studio .people-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.studio .people-legend b {
+  color: var(--s-text);
+}
+
+.studio .people-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.studio .people-legend i.is-off {
+  border: 1.5px solid var(--s-faint);
 }
 
 /* ------------------------------------------------------------------ measurements */
@@ -2421,4 +2467,53 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* factor map: the row's label is the pin toggle */
+.studio .fmap-pin {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.studio .fmap-pin small {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--s-muted);
+  font-size: 10.5px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio .fmap-pin[aria-pressed="true"] {
+  color: var(--s-accent);
+}
+
+/* landmark wrapper that adds no box of its own */
+.studio-landmark {
+  display: contents;
+}
+.studio .sw-body:focus-visible {
+  outline-offset: -3px;
+}
+
+/* a filter in a window's title bar keeps each label at its natural width (no squeezing or overlap) */
+.studio .sw-actions .sl-segmented {
+  flex: none;
+}
+.studio .sw-actions .sl-segmented button {
+  flex: none;
+  min-width: max-content;
+}
+
+/* the clinical stage darkens towards its edges, so the corner watermark uses dark ink there */
+.studio[data-theme="clinical"] .watermark {
+  color: #1e293b;
 }

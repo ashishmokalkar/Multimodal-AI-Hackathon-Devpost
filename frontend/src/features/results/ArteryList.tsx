@@ -9,6 +9,7 @@ import {
 } from "../../lib/insights";
 import { ARTERY_INFO, topArteryDrivers } from "../../lib/summary";
 import { useUiStore } from "../../store/uiStore";
+import { isFlagged, isHeldBack } from "../../lib/flags";
 
 interface ArteryListProps {
   prediction: PredictionResponse;
@@ -32,15 +33,10 @@ export function ArteryList({
 }: ArteryListProps) {
   const setHoveredVessel = useUiStore((state) => state.setHoveredVessel);
   const setHoveredFactor = useUiStore((state) => state.setHoveredFactor);
-  // compare probabilities with thresholds (not label text, which differs between API profiles)
-  const cadFlagged = prediction.cad.probability >= prediction.cad.threshold;
-  const disagreement = cadFlagged
-    ? []
-    : FLOW_ARTERIES.filter(
-        (artery) =>
-          prediction.vessels[artery].probability >=
-          prediction.vessels[artery].threshold,
-      );
+  // arteries above their own threshold that the API does not flag, because overall CAD is below its threshold
+  const disagreement = FLOW_ARTERIES.filter((artery) =>
+    isHeldBack(prediction.vessels[artery]),
+  );
 
   return (
     <section aria-labelledby="artery-list-heading" className="result-section">
@@ -59,8 +55,8 @@ export function ArteryList({
             {disagreement.length > 1
               ? "their own thresholds"
               : "its own threshold"}{" "}
-            while overall CAD is below its threshold. Each target uses a
-            separately tuned threshold.
+            but not flagged: an artery is only flagged when overall CAD is above
+            its threshold too.
           </span>
         </p>
       )}
@@ -68,7 +64,8 @@ export function ArteryList({
         {FLOW_ARTERIES.map((artery) => {
           const target = prediction.vessels[artery];
           const before = baseline?.vessels[artery] ?? null;
-          const flagged = target.probability >= target.threshold;
+          const flagged = isFlagged(target);
+          const above = target.probability >= target.threshold;
           const threshold = Math.round(target.threshold * 100);
           const drivers = prediction.mock
             ? []
@@ -77,9 +74,6 @@ export function ArteryList({
           return (
             <li key={artery}>
               <button
-                aria-label={`${artery}, ${ARTERY_INFO[artery].name}: ${Math.round(target.probability * 100)}% chance, ${
-                  flagged ? "above" : "below"
-                } the ${threshold}% threshold.${target.uncertain ? " The model is unsure." : ""} Show ${artery} details.`}
                 aria-pressed={isSelected}
                 className={`artery-item ${isSelected ? "artery-item-selected" : ""}`}
                 type="button"
@@ -145,6 +139,12 @@ export function ArteryList({
                   <span className="artery-threshold-text">
                     threshold {threshold}%
                   </span>
+                  {above && !flagged && (
+                    <span className="sr-only">
+                      Above its own threshold, but not flagged because overall
+                      CAD is below its threshold.
+                    </span>
+                  )}
                   {target.uncertain && (
                     <span className="risk-unsure-chip">
                       <span aria-hidden="true">?</span> Unsure

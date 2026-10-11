@@ -7,7 +7,8 @@ export const WINDOW_TITLES: Record<WindowId, string> = {
   whatif: "What if",
   vessel: "Artery",
   factors: "Factor map",
-  people: "100 people like this",
+  people: "Out of 100 patients",
+  compare: "Similar patients",
   measures: "Measurements",
-  model: "Model accuracy",
+  model: "Model performance",
 };

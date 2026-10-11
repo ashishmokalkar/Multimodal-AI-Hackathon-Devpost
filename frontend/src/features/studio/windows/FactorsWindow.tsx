@@ -55,7 +55,9 @@ export function FactorsWindow() {
       ) : (
         <div className="fmap" role="table" aria-label="Factor by artery">
           <div className="fmap-row fmap-headrow" role="row">
-            <span role="columnheader" />
+            <span role="columnheader">
+              <span className="sr-only">Input</span>
+            </span>
             {INSIGHT_TARGETS.map((target) => (
               <span
                 className="fmap-col"
@@ -69,24 +71,28 @@ export function FactorsWindow() {
           </div>
           {rows.map((row) => (
             <div
-              aria-pressed={pinned === row.feature}
               className={`fmap-row${hoveredFactor === row.feature ? " is-hot" : ""}${pinned === row.feature ? " is-pinned" : ""}`}
               key={row.feature}
               onClick={() => togglePin(row.feature)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  togglePin(row.feature);
-                }
-              }}
               onPointerEnter={() => setHoveredFactor(row.feature)}
               onPointerLeave={() => setHoveredFactor(pinned)}
               role="row"
-              tabIndex={0}
             >
               <span className="fmap-label" role="rowheader">
-                {row.label}
-                <small>{row.valueText}</small>
+                <button
+                  aria-pressed={pinned === row.feature}
+                  className="fmap-pin"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    togglePin(row.feature);
+                  }}
+                  onBlur={() => setHoveredFactor(pinned)}
+                  onFocus={() => setHoveredFactor(row.feature)}
+                  type="button"
+                >
+                  {row.label}
+                  <small>{row.valueText}</small>
+                </button>
               </span>
               {INSIGHT_TARGETS.map((target) => {
                 const points = row.cells[target];

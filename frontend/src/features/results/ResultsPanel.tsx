@@ -51,7 +51,7 @@ export function ResultsPanel() {
       <header className="panel-header">
         <div>
           <p className="eyebrow">Prediction summary</p>
-          <h2 id="results-panel-heading">Results panel</h2>
+          <h2 id="results-panel-heading" tabIndex={-1}>Results panel</h2>
         </div>
       </header>
       <div className="panel-body !justify-start overflow-y-auto">

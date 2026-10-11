@@ -216,3 +216,38 @@ export const IconShield = (p: IconProps) => (
     <path d="M12 8v5M12 16v.5" />
   </Icon>
 );
+export const IconCompare = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 20V4M4 20h16" />
+    <circle cx="9" cy="14" r="1.4" />
+    <circle cx="13" cy="11" r="1.4" />
+    <circle cx="17" cy="8" r="2.4" />
+  </Icon>
+);
+export const IconSpeaker = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />
+    <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />
+  </Icon>
+);
+export const IconStop = (p: IconProps) => (
+  <Icon {...p}>
+    <rect height="12" rx="2" width="12" x="6" y="6" />
+  </Icon>
+);
+export const IconReport = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M7 3h7l5 5v13H7z" />
+    <path d="M14 3v5h5M10 13h6M10 17h4" />
+  </Icon>
+);
+export const IconExpand = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" />
+  </Icon>
+);
+export const IconShrink = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7" />
+  </Icon>
+);

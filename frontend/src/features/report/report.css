@@ -1,0 +1,693 @@
+/* Patient report: A4 pages previewed over the app and printed (Save as PDF) on their own. Light, print-safe
+   colours whatever theme the app is in. */
+.report-root {
+  --rp-ink: #10242e;
+  --rp-muted: #5a6b74;
+  --rp-line: #e2e8ed;
+  --rp-soft: #f5f8fa;
+  --rp-brand: #0f766e;
+  --rp-deep: #0b2f3d;
+  --rp-flag: #c2255c;
+  --rp-held: #a15c07;
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  overflow: auto;
+  background: radial-gradient(circle at 50% 0%, #2c3a46, #12181f 70%);
+  color: var(--rp-ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  outline: none;
+}
+
+.rp-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgb(14 20 27 / 88%);
+  backdrop-filter: blur(12px);
+  color: #e8eef3;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+.rp-toolbar h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+}
+.rp-toolbar-hint {
+  margin-right: auto;
+  font-size: 12px;
+  color: #a9b6c1;
+}
+.rp-btn {
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rp-btn:hover {
+  background: rgb(255 255 255 / 8%);
+}
+.rp-btn-primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  color: #fff;
+}
+.rp-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rp-btn:focus-visible,
+.report-root .speak-btn:focus-visible {
+  outline: 3px solid #5eead4;
+  outline-offset: 2px;
+}
+.rp-speak .speak-btn {
+  border-color: rgb(255 255 255 / 22%);
+  color: #e8eef3;
+}
+.rp-empty {
+  color: #e8eef3;
+  text-align: center;
+  padding: 80px 16px;
+}
+
+.rp-pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 16px 48px;
+}
+
+/* ------------------------------------------------------------------------------------------- page */
+.rp-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4.2mm;
+  width: 210mm;
+  height: 297mm;
+  padding: 12mm 12mm 16mm;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 45%);
+  font-size: 10.5pt;
+  line-height: 1.45;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.rp-page::before {
+  /* thin accent rule down the page edge, in the page's colour */
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2.2mm;
+  background: var(--rp-accent);
+}
+.rp-foot {
+  position: absolute;
+  left: 12mm;
+  right: 12mm;
+  bottom: 7mm;
+  display: flex;
+  justify-content: space-between;
+  gap: 8mm;
+  padding-top: 2.5mm;
+  border-top: 1px solid var(--rp-line);
+  font-size: 7.5pt;
+  color: var(--rp-muted);
+}
+
+.rp-hero {
+  position: relative;
+  margin: -12mm -12mm 0;
+  padding: 10mm 12mm 9mm 14mm;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 85% 20%, rgb(20 184 166 / 45%), transparent 45%),
+    radial-gradient(circle at 10% 120%, rgb(194 37 92 / 35%), transparent 50%),
+    linear-gradient(135deg, #0b2f3d, #0d4a52 60%, #0f766e);
+  color: #fff;
+}
+.rp-hero-ecg {
+  position: absolute;
+  inset: auto 0 6mm;
+  width: 100%;
+  height: 16mm;
+  fill: none;
+  stroke: rgb(255 255 255 / 18%);
+  stroke-width: 2;
+}
+.rp-brand {
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+  font-size: 9pt;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b8f2ea;
+}
+.rp-logo {
+  display: grid;
+  place-items: center;
+  width: 6mm;
+  height: 6mm;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 16%);
+  color: #ff8fb8;
+  font-size: 9pt;
+}
+.rp-hero h1 {
+  margin: 3mm 0 1mm;
+  font-size: 26pt;
+  line-height: 1.05;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+.rp-hero-sub {
+  margin: 0;
+  color: #d5efeb;
+  font-size: 10.5pt;
+}
+.rp-hero-meta {
+  position: relative;
+  display: flex;
+  gap: 8mm;
+  margin: 5mm 0 0;
+}
+.rp-hero-meta dt {
+  font-size: 7pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9fd9d0;
+}
+.rp-hero-meta dd {
+  margin: 0;
+  font-weight: 600;
+  font-size: 9.5pt;
+}
+.rp-banner {
+  margin: 0;
+  padding: 2mm 3mm;
+  border-radius: 2mm;
+  background: #fff4e5;
+  color: #7a4100;
+  font-weight: 600;
+  font-size: 9pt;
+}
+
+.rp-card {
+  padding: 4mm 4.5mm;
+  border: 1px solid var(--rp-line);
+  border-radius: 3.5mm;
+  background: #fff;
+}
+.rp-card-main {
+  background: linear-gradient(180deg, #fff, var(--rp-soft));
+}
+.rp-h {
+  margin: 0 0 2mm;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--rp-muted);
+}
+.rp-lead {
+  margin: 2mm 0 1.5mm;
+  font-size: 11.5pt;
+  line-height: 1.4;
+}
+.rp-muted {
+  margin: 0;
+  color: var(--rp-muted);
+}
+.rp-small {
+  font-size: 8pt;
+  margin-top: 2mm;
+}
+.rp-center {
+  text-align: center;
+}
+.rp-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.rp-grid-hero {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 4mm;
+}
+.rp-grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+  flex: 1;
+  min-height: 0;
+}
+.rp-grid-artery {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 4mm;
+}
+.rp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4mm;
+}
+
+.rp-headline {
+  display: flex;
+  align-items: center;
+  gap: 4mm;
+}
+.rp-gauge {
+  flex: none;
+}
+.rp-gauge-track {
+  fill: none;
+  stroke: #e9eef2;
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+.rp-gauge-tick {
+  stroke: var(--rp-ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.rp-gauge-ticklabel {
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--rp-ink);
+}
+.rp-gauge-value {
+  font-size: 46px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  fill: var(--rp-ink);
+}
+.rp-gauge-unit {
+  font-size: 22px;
+  font-weight: 650;
+}
+.rp-gauge-caption {
+  font-size: 11px;
+  fill: var(--rp-muted);
+}
+
+.rp-pill {
+  display: inline-block;
+  padding: 1mm 2.6mm;
+  border-radius: 999px;
+  font-size: 8.5pt;
+  font-weight: 700;
+}
+.rp-pill-flag {
+  background: #fde7ef;
+  color: var(--rp-flag);
+}
+.rp-pill-held {
+  background: #fff1dc;
+  color: var(--rp-held);
+}
+.rp-pill-clear {
+  background: #e7f3f1;
+  color: var(--rp-brand);
+}
+
+.rp-people-block {
+  display: flex;
+  align-items: center;
+  gap: 4mm;
+  margin-top: 3mm;
+  padding-top: 3mm;
+  border-top: 1px dashed var(--rp-line);
+}
+.rp-people {
+  width: 52%;
+  flex: none;
+}
+.rp-people-block p {
+  margin: 0;
+  font-size: 9.5pt;
+}
+
+.rp-card-heart {
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 50% 42%, #f3f8fb, #e4edf2 75%);
+}
+.rp-snapshot {
+  display: block;
+  width: 100%;
+  height: 72mm;
+  object-fit: contain;
+}
+.rp-snapshot-live canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.rp-artery-keys {
+  display: grid;
+  gap: 1.2mm;
+  margin: 2mm 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 9pt;
+}
+.rp-artery-keys li {
+  display: grid;
+  grid-template-columns: 3mm 1fr auto auto;
+  align-items: center;
+  gap: 2mm;
+}
+.rp-artery-keys i {
+  width: 3mm;
+  height: 3mm;
+  border-radius: 50%;
+  background: #9aa5b1;
+}
+.rp-artery-keys b {
+  margin-right: 1mm;
+}
+.rp-artery-keys em {
+  color: var(--rp-flag);
+  font-style: normal;
+  font-size: 8pt;
+}
+.rp-artery-lm {
+  color: var(--rp-muted);
+  font-size: 8pt;
+}
+
+.rp-drivers {
+  display: grid;
+  gap: 1.8mm;
+  margin: 2mm 0 0;
+  padding: 0;
+  list-style: none;
+}
+.rp-drivers li {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 12mm;
+  align-items: center;
+  gap: 2mm;
+  font-size: 8.8pt;
+}
+.rp-driver-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rp-driver-track {
+  position: relative;
+  height: 3mm;
+  border-radius: 2mm;
+  background: linear-gradient(90deg, transparent calc(50% - 0.5px), #c4ced6 calc(50% - 0.5px), #c4ced6 calc(50% + 0.5px), transparent calc(50% + 0.5px)), var(--rp-soft);
+}
+.rp-driver-track i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 2mm;
+}
+.rp-driver-points {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rp-compare-head {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+}
+.rp-compare-head b {
+  font-size: 22pt;
+  font-weight: 750;
+  line-height: 1;
+  color: var(--rp-accent);
+  letter-spacing: -0.02em;
+}
+.rp-compare-head span {
+  font-size: 9pt;
+}
+
+.rp-artery-head {
+  display: flex;
+  align-items: center;
+  gap: 4mm;
+  margin: -12mm -12mm 0;
+  padding: 9mm 12mm 7mm 14mm;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--rp-accent) 22%, #fff), #fff 70%);
+  border-bottom: 1px solid var(--rp-line);
+}
+.rp-artery-tag {
+  display: grid;
+  place-items: center;
+  width: 16mm;
+  height: 16mm;
+  flex: none;
+  border-radius: 4mm;
+  background: var(--rp-accent);
+  color: #fff;
+  font-size: 13pt;
+  font-weight: 800;
+  box-shadow: 0 4mm 8mm color-mix(in srgb, var(--rp-accent) 35%, transparent);
+}
+.rp-artery-head h1 {
+  margin: 0;
+  font-size: 20pt;
+  letter-spacing: -0.015em;
+}
+.rp-artery-head p {
+  margin: 0.5mm 0 0;
+  color: var(--rp-muted);
+}
+
+.rp-facts {
+  display: grid;
+  gap: 2mm;
+  margin: 3mm 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 9pt;
+}
+.rp-facts li {
+  padding: 2mm 3mm;
+  border-radius: 2mm;
+  background: var(--rp-soft);
+}
+.rp-facts b {
+  display: block;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--rp-muted);
+}
+.rp-note {
+  margin-top: 3mm;
+  padding: 2.5mm 3mm;
+  border-left: 1mm solid var(--rp-accent);
+  border-radius: 1mm;
+  background: var(--rp-soft);
+  font-size: 8.5pt;
+}
+
+.rp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+.rp-table th,
+.rp-table td {
+  padding: 1.6mm 1.5mm;
+  border-bottom: 1px solid var(--rp-line);
+  text-align: left;
+}
+.rp-table thead th {
+  font-size: 7.5pt;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rp-muted);
+}
+.rp-table tbody th {
+  font-weight: 600;
+}
+.rp-table td {
+  white-space: nowrap;
+}
+.rp-flag {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0.4mm 2mm;
+  border-radius: 999px;
+  font-size: 7.5pt;
+  font-weight: 700;
+}
+.rp-flag-high {
+  background: #fde7ef;
+  color: var(--rp-flag);
+}
+.rp-flag-low {
+  background: #e6f0fb;
+  color: #1864ab;
+}
+.rp-flag-ok {
+  background: #e7f3f1;
+  color: var(--rp-brand);
+}
+.rp-questions {
+  margin: 0;
+  padding-left: 5mm;
+  display: grid;
+  gap: 1.5mm;
+  font-size: 9.2pt;
+}
+.rp-urgent {
+  border-color: #f4c3d3;
+  background: #fff5f8;
+}
+.rp-urgent p {
+  margin: 0;
+  font-size: 9pt;
+}
+.rp-glossary {
+  display: grid;
+  gap: 1.6mm;
+  margin: 0;
+  font-size: 8.6pt;
+}
+.rp-glossary dt {
+  font-weight: 700;
+}
+.rp-glossary dd {
+  margin: 0;
+  color: var(--rp-muted);
+}
+.rp-about p {
+  margin: 0;
+  font-size: 8.8pt;
+}
+.rp-warnings {
+  margin: 2mm 0 0;
+  padding-left: 5mm;
+  font-size: 8.4pt;
+  color: var(--rp-held);
+}
+.rp-grid-take {
+  flex: none;
+}
+
+/* the shared comparison visuals, in print colours */
+.report-root .cc-track {
+  margin: 2.5mm 0 1mm;
+}
+.report-root .cc-nomogram {
+  width: 100%;
+  height: auto;
+  margin-top: 1mm;
+}
+
+/* ------------------------------------------------------------------------------------------- print */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html,
+  body,
+  #root {
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  body.report-open > *:not(.report-root) {
+    display: none !important;
+  }
+  .report-root {
+    position: static;
+    overflow: visible;
+    background: none;
+  }
+  .rp-toolbar {
+    display: none;
+  }
+  .rp-pages {
+    display: block;
+    padding: 0;
+    zoom: 1 !important;
+  }
+  .rp-page {
+    box-shadow: none;
+    break-after: page;
+    page-break-after: always;
+  }
+  .rp-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+}
+
+/* what pushes the chance up or down, in words */
+.rp-factor-cols {
+  display: grid;
+  gap: 3mm;
+}
+.rp-factors-title {
+  margin: 0 0 1.2mm;
+  font-size: 8.5pt;
+  font-weight: 700;
+}
+.rp-factors ul {
+  display: grid;
+  gap: 1.4mm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rp-factors li {
+  display: grid;
+  grid-template-columns: 1fr 26mm;
+  align-items: center;
+  gap: 3mm;
+  font-size: 9pt;
+  line-height: 1.3;
+}
+.rp-effect {
+  display: grid;
+  gap: 0.6mm;
+}
+.rp-effect i {
+  display: block;
+  height: 2mm;
+  border-radius: 2mm;
+}
+.rp-effect em {
+  color: var(--rp-muted);
+  font-size: 7.5pt;
+  font-style: normal;
+}
+.rp-gauge-ticklabel {
+  font-size: 10px;
+  font-weight: 600;
+}
+.rp-table tbody th {
+  width: 40%;
+}

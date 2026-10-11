@@ -17,6 +17,26 @@ function errorMessage(error: unknown): string {
     : "The prediction request failed.";
 }
 
+function unchangedSample(
+  store: {
+    selectedSampleId: string | null;
+    sampleOriginFeatures: Record<string, FeatureValue> | null;
+  },
+  features: Record<string, FeatureValue>,
+): string | null {
+  const origin = store.sampleOriginFeatures;
+  if (!store.selectedSampleId || !origin) {
+    return null;
+  }
+  const names = new Set([...Object.keys(origin), ...Object.keys(features)]);
+  for (const name of names) {
+    if (!Object.is(origin[name], features[name])) {
+      return null;
+    }
+  }
+  return store.selectedSampleId;
+}
+
 export async function requestPredictionForRevision(
   expectedRevision: number,
   features: Record<string, FeatureValue>,
@@ -35,7 +55,8 @@ export async function requestPredictionForRevision(
     return;
   }
   const inputSnapshot = { ...features };
-  const sampleIdSnapshot = store.selectedSampleId;
+  // the sample id only describes the request while its inputs are the sample's own; edits make it a new scenario
+  const sampleIdSnapshot = unchangedSample(store, inputSnapshot);
 
   try {
     const prediction = await request({ ...inputSnapshot }, sampleIdSnapshot);

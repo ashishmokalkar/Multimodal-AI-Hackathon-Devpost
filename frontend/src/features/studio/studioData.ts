@@ -4,6 +4,7 @@ import type { InsightTarget } from "../../lib/insights";
 import { usePatientStore } from "../../store/patientStore";
 import { useActiveScenario } from "../../store/whatIfStore";
 import { riskBand, type RiskBand } from "./studioModel";
+import { isFlagged } from "../../lib/flags";
 
 /** The prediction on screen (a what-if scenario when one is active) and what it was built from. */
 export function useStudioData() {
@@ -36,5 +37,5 @@ export function bandOf(
   target: InsightTarget,
 ): RiskBand {
   const value = target === "cad" ? prediction.cad : prediction.vessels[target];
-  return riskBand(value.probability, value.threshold);
+  return riskBand(value.probability, value.threshold, isFlagged(value));
 }

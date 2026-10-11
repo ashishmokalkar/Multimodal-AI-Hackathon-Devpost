@@ -1,5 +1,9 @@
+import { useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { localiseFeatures } from "../lib/units";
+import { useUiStore } from "../store/uiStore";
 import {
+  fetchCohort,
   fetchFeatures,
   fetchHealth,
   fetchImportance,
@@ -8,7 +12,7 @@ import {
   postPredict,
 } from "./client";
 import type { ApiProfile } from "./profile";
-import type { PredictRequest } from "./types";
+import type { FeatureDefinition, PredictRequest } from "./types";
 
 function useActiveProfile() {
   const profileQuery = useApiProfile();
@@ -26,13 +30,24 @@ export function useApiProfile() {
   });
 }
 
+/**
+ * The API's input definitions, marked for the lab units the user chose (values stay in API units; see
+ * lib/units.ts). Switching units gives new definition objects, so everything that formats values re-renders.
+ */
 export function useFeatures() {
   const profile = useActiveProfile();
+  const unitSystem = useUiStore((state) => state.unitSystem);
+  const select = useCallback(
+    (definitions: FeatureDefinition[]) =>
+      localiseFeatures(definitions, unitSystem),
+    [unitSystem],
+  );
   return useQuery({
     queryKey: ["api-profile-data", profile?.id, "features"],
     queryFn: () => requireProfile(profile, fetchFeatures),
     enabled: profile !== null,
     staleTime: Infinity,
+    select,
   });
 }
 
@@ -78,6 +93,16 @@ export function useImportance() {
   return useQuery({
     queryKey: ["api-profile-data", profile?.id, "importance"],
     queryFn: () => requireProfile(profile, fetchImportance),
+    enabled: profile !== null,
+    staleTime: Infinity,
+  });
+}
+
+export function useCohort() {
+  const profile = useActiveProfile();
+  return useQuery({
+    queryKey: ["api-profile-data", profile?.id, "cohort"],
+    queryFn: () => requireProfile(profile, fetchCohort),
     enabled: profile !== null,
     staleTime: Infinity,
   });

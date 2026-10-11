@@ -6,7 +6,11 @@ import { StudioScene } from "./StudioScene";
 import { TourOverlay } from "./TourOverlay";
 import { usePredictionDriver } from "./usePredictionDriver";
 import { useStudioStore } from "./studioStore";
+import { useStudioData } from "./studioData";
+import { isFlagged } from "../../lib/flags";
+import { vesselIds } from "../viewer/vesselMap";
 import { useCompact } from "./useCompact";
+import { CompareWindow } from "./windows/CompareWindow";
 import { DriversWindow } from "./windows/DriversWindow";
 import { FactorsWindow } from "./windows/FactorsWindow";
 import { MeasuresWindow } from "./windows/MeasuresWindow";
@@ -22,6 +26,23 @@ import "./studio.css";
  * Studio: the heart fills the screen and every result floats over it in a glass window that can be moved, resized,
  * hidden to the dock or found with the command bar.
  */
+/** Tells screen-reader users when a new result is on screen (the windows update silently). */
+function ResultAnnouncer() {
+  const { shown, scenario } = useStudioData();
+  if (!shown) {
+    return <p aria-live="polite" className="sr-only" />;
+  }
+  const flagged = vesselIds.filter((artery) => isFlagged(shown.vessels[artery]));
+  return (
+    <p aria-atomic="true" aria-live="polite" className="sr-only">
+      {scenario ? "What-if result: " : "Result: "}
+      chance of coronary artery disease {Math.round(shown.cad.probability * 100)}%,{" "}
+      {isFlagged(shown.cad) ? "flagged" : "not flagged"}.{" "}
+      {flagged.length ? `Arteries flagged: ${flagged.join(", ")}.` : "No artery flagged."}
+    </p>
+  );
+}
+
 export function StudioApp() {
   usePredictionDriver();
   const theme = useStudioStore((state) => state.theme);
@@ -70,11 +91,13 @@ export function StudioApp() {
       data-theme={theme}
       style={{ ["--glass" as string]: glass }}
     >
-      <div className="studio-stage">
+      <section aria-label="3D heart" className="studio-stage">
         <StudioScene />
-      </div>
+      </section>
       <TopBar />
-      <Toolbar />
+      <aside aria-label="3D view controls" className="studio-landmark">
+        <Toolbar />
+      </aside>
       <main className="studio-windows" aria-label="Results">
         <PatientWindow />
         <RiskWindow />
@@ -83,8 +106,13 @@ export function StudioApp() {
         <WhatIfWindow />
         <FactorsWindow />
         <PeopleWindow />
+        <CompareWindow />
         <MeasuresWindow />
         <ModelWindow />
+        <ResultAnnouncer />
+        <p className="sr-only" id="sw-arrange-hint">
+          Arrow keys move the window; Shift and arrow keys resize it.
+        </p>
       </main>
       <Dock />
       <Watermark />

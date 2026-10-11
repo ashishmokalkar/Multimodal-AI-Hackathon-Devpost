@@ -13,8 +13,8 @@ import {
 import { usePatientStore } from "../../store/patientStore";
 
 /**
- * Studio keeps the model in step with the inputs at all times: it starts from the first dataset sample and asks
- * for a new prediction 500 ms after every valid change (the same contract and debounce as the Classic panel).
+ * Studio keeps the model in step with the inputs at all times: it starts from the patient chosen on the start
+ * screen and asks for a new prediction 500 ms after every valid change (the same contract and debounce as the Classic panel).
  */
 export function usePredictionDriver() {
   const profileQuery = useApiProfile();
@@ -53,20 +53,6 @@ export function usePredictionDriver() {
         ),
       );
   }, [featuresQuery.data, features]);
-
-  const firstSample = samplesQuery.data?.[0];
-  useEffect(() => {
-    const state = usePatientStore.getState();
-    if (
-      firstSample &&
-      state.selectedSampleId === null &&
-      state.prediction === null &&
-      state.latestPredictionRequestId === 0 &&
-      Object.keys(state.features).length > 0
-    ) {
-      state.setFromSample(firstSample);
-    }
-  }, [firstSample, features]);
 
   useEffect(() => {
     // wait until the samples request settles, so the first sample (not the defaults) is scored first

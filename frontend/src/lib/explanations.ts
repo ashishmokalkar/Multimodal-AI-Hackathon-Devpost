@@ -5,6 +5,7 @@ import type {
   FeatureValue,
   TargetExplanations,
 } from "../api/types";
+import { displayUnit, displayValue } from "./units";
 import type { VesselId } from "../features/viewer/vesselMap";
 
 export type ExplanationTarget = keyof TargetExplanations;
@@ -49,7 +50,7 @@ export function leadingContributions(
   const featureDefinitions = new Map(
     features.map((feature) => [
       feature.name,
-      { label: feature.label, unit: feature.unit },
+      { label: feature.label, unit: displayUnit(feature), definition: feature },
     ]),
   );
 
@@ -68,6 +69,7 @@ export function leadingContributions(
     .slice(0, Math.max(0, Math.floor(limit)))
     .map(({ contribution, metadata }) => ({
       ...contribution,
+      value: displayValue(contribution.value, metadata?.definition),
       label: metadata?.label ?? contribution.feature,
       ...(metadata?.unit ? { unit: metadata.unit } : {}),
     }));
@@ -103,13 +105,16 @@ export function groupPredictionInputs(
       feature: feature.name,
       label: feature.label,
       group: feature.group,
-      value: attributed
-        ? attributed.value
-        : hasSnapshotValue
-          ? predictionInputs[feature.name]
-          : null,
+      value: displayValue(
+        attributed
+          ? attributed.value
+          : hasSnapshotValue
+            ? predictionInputs[feature.name]
+            : null,
+        feature,
+      ),
       contribution: attributed?.contribution ?? null,
-      ...(feature.unit ? { unit: feature.unit } : {}),
+      ...(displayUnit(feature) ? { unit: displayUnit(feature) } : {}),
     });
   }
 

@@ -367,7 +367,7 @@ button:focus-visible {
 
 .eyebrow {
   margin: 0;
-  color: #71817b;
+  color: #5a6a64;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -627,7 +627,7 @@ button:focus-visible {
   margin-top: 0;
   padding: 8px 2px 0;
   border-top: 1px solid #dce6e1;
-  color: #73817c;
+  color: #56645f;
   font-size: 10px;
   line-height: 1.55;
 }
@@ -1967,7 +1967,7 @@ button:focus-visible {
   margin-top: 2px;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .artery-scale-empty {
@@ -2971,4 +2971,42 @@ button:focus-visible {
   display: grid;
   place-items: center;
   background: radial-gradient(circle at 50% 45%, #14223f, #03050b 70%);
+}
+
+/* Listen and Patient report, above the headline result */
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.result-report {
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+.panel-header .classic-units {
+  flex: none;
+  align-self: center;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 100;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--green-dark);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  transition: top 0.15s;
+}
+
+.skip-link:focus {
+  top: 12px;
 }

@@ -1,7 +1,15 @@
 import { useMemo, useState } from "react";
 import { useSamples } from "../../../api/hooks";
 import type { FeatureDefinition, FeatureValue } from "../../../api/types";
-import { formatFeatureValue, rangeStatus } from "../../../lib/insights";
+import {
+  formatFeatureValue,
+  prettyUnit,
+  rangeStatus,
+} from "../../../lib/insights";
+import { displayNumber, displayUnit } from "../../../lib/units";
+import { UnitNumberInput } from "../../units/UnitNumberInput";
+import { UnitToggle } from "../../units/UnitToggle";
+import { PatientAvatar } from "../../patient/PatientAvatar";
 import { usePatientStore } from "../../../store/patientStore";
 import { FloatingWindow } from "../FloatingWindow";
 import {
@@ -55,7 +63,7 @@ function FeatureControl({
     <label className="field" htmlFor={id}>
       <span className="field-label">
         {feature.label}
-        {feature.unit && <small> {feature.unit}</small>}
+        {displayUnit(feature) && <small> {prettyUnit(displayUnit(feature))}</small>}
       </span>
       {feature.type === "boolean" ? (
         <span className="sl-switch">
@@ -87,20 +95,11 @@ function FeatureControl({
           ))}
         </select>
       ) : (
-        <input
+        <UnitNumberInput
+          definition={feature}
           id={id}
-          inputMode="decimal"
-          max={feature.max}
-          min={feature.min}
-          onChange={(event) =>
-            update(
-              feature.name,
-              event.target.value === "" ? "" : event.target.valueAsNumber,
-            )
-          }
-          step="any"
-          type="number"
-          value={typeof value === "number" && Number.isFinite(value) ? value : ""}
+          onValueChange={(next) => update(feature.name, next)}
+          value={value}
         />
       )}
     </label>
@@ -170,9 +169,11 @@ export function PatientWindow() {
     >
       <div className="patient">
         <div className="patient-id">
-          <div className="avatar" aria-hidden="true">
-            {values.Sex === "Female" ? "F" : values.Sex === "Male" ? "M" : "?"}
-          </div>
+          <PatientAvatar
+            className="avatar"
+            sex={values.Sex === "Female" || values.Sex === "Male" ? values.Sex : null}
+            size={46}
+          />
           <div className="patient-name">
             <select
               aria-label="Choose a patient"
@@ -237,7 +238,9 @@ export function PatientWindow() {
                         {feature === "EF-TTE" ? "EF" : feature}
                       </span>
                       <span className="metric-value">
-                        {typeof value === "number" ? value : "–"}
+                        {typeof value === "number"
+                          ? displayNumber(value, definition)
+                          : "–"}
                         {state === "high" ? " ↑" : state === "low" ? " ↓" : ""}
                       </span>
                     </div>
@@ -276,6 +279,7 @@ export function PatientWindow() {
                 </button>
               ))}
             </div>
+            {activeGroup === "Lab" && <UnitToggle className="studio-units" />}
             <div className="editor-fields">
               {features
                 .filter((feature) => feature.group === activeGroup)

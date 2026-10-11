@@ -1,10 +1,11 @@
 import {
   useRef,
   useState,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
-import { IconMinus } from "./icons";
+import { IconExpand, IconMinus, IconShrink } from "./icons";
 import { useCompact } from "./useCompact";
 import { clampRect, MIN_WINDOW_SIZE, type Rect, type WindowId } from "./studioModel";
 import { useStudioStore } from "./studioStore";
@@ -20,6 +21,8 @@ interface FloatingWindowProps {
   accent?: string;
   actions?: ReactNode;
   children: ReactNode;
+  /** Lets keyboard users scroll a window whose content has nothing focusable (WCAG 2.1.1). */
+  focusableBody?: boolean;
 }
 
 /**
@@ -33,6 +36,7 @@ export function FloatingWindow({
   accent,
   actions,
   children,
+  focusableBody = false,
 }: FloatingWindowProps) {
   const rect = useStudioStore((state) => state.rects[id]);
   const open = useStudioStore((state) => state.open[id]);
@@ -52,6 +56,7 @@ export function FloatingWindow({
   } | null>(null);
   const restore = useRef<Rect | null>(null);
   const [active, setActive] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   if (!open) {
     return null;
@@ -123,9 +128,11 @@ export function FloatingWindow({
     if (restore.current) {
       moveWindow(id, restore.current);
       restore.current = null;
+      setExpanded(false);
       return;
     }
     restore.current = rect;
+    setExpanded(true);
     const w = Math.min(window.innerWidth - 80, Math.max(rect.w, 860));
     const h = Math.min(window.innerHeight - 120, Math.max(rect.h, 600));
     moveWindow(id, {
@@ -135,6 +142,30 @@ export function FloatingWindow({
       h,
     });
     raiseWindow(id);
+  };
+
+  /** Keyboard alternative to dragging: arrows move the window, Shift+arrows resize it. */
+  const onArrange = (event: ReactKeyboardEvent<HTMLButtonElement>) => {
+    const step = event.altKey ? 4 : 24;
+    const delta: Record<string, [number, number]> = {
+      ArrowLeft: [-step, 0],
+      ArrowRight: [step, 0],
+      ArrowUp: [0, -step],
+      ArrowDown: [0, step],
+    };
+    const move = delta[event.key];
+    if (!move || compact) {
+      return;
+    }
+    event.preventDefault();
+    const min = MIN_WINDOW_SIZE[id];
+    const next = event.shiftKey
+      ? { ...rect, w: Math.max(min.w, rect.w + move[0]), h: Math.max(min.h, rect.h + move[1]) }
+      : { ...rect, x: rect.x + move[0], y: rect.y + move[1] };
+    restore.current = null;
+    setExpanded(false);
+    raiseWindow(id);
+    moveWindow(id, clampRect(next, window.innerWidth, window.innerHeight, min));
   };
 
   const style = compact
@@ -169,6 +200,19 @@ export function FloatingWindow({
         <h2>{title}</h2>
         <div className="sw-actions">
           {actions}
+          {!compact && (
+            <button
+              aria-describedby="sw-arrange-hint"
+              aria-label={`${expanded ? "Restore" : "Expand"} ${title}`}
+              className="sw-btn"
+              onClick={toggleExpand}
+              onKeyDown={onArrange}
+              title={`${expanded ? "Restore" : "Expand"} · arrow keys move, Shift+arrows resize`}
+              type="button"
+            >
+              {expanded ? <IconShrink size={13} /> : <IconExpand size={13} />}
+            </button>
+          )}
           <button
             aria-label={`Hide ${title}`}
             className="sw-btn"
@@ -180,7 +224,9 @@ export function FloatingWindow({
         </div>
       </header>
       {accent && <div className="sw-accent" style={{ background: accent }} />}
-      <div className="sw-body">{children}</div>
+      <div className="sw-body" tabIndex={focusableBody ? 0 : undefined}>
+        {children}
+      </div>
       {!compact &&
         EDGES.map((edge) => (
           <div

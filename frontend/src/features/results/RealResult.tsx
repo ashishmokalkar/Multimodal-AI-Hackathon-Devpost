@@ -8,6 +8,10 @@ import { WhatIfPanel } from "../insights/WhatIfPanel";
 import { ArteryList } from "./ArteryList";
 import { DriversChart } from "./DriversChart";
 import { RiskHero } from "./RiskHero";
+import { CohortCompare } from "../cohort/CohortCompare";
+import { useCohortComparison } from "../cohort/useCohortComparison";
+import { SpeakButton } from "../speech/SpeakButton";
+import { useSpokenResult } from "../speech/useSpokenResult";
 
 /**
  * Real-model result, laid out to answer three questions upfront in plain language: how high is the risk, which
@@ -30,14 +34,10 @@ export function RealResult({
   const shown = scenario ?? prediction;
   const baseline = scenario ? prediction : null;
   const warnings = shown.mock ? [] : shown.warnings;
-  const backendSource = prediction.mock ? "mock" : prediction.prediction_source;
-  // The backend describes the original sample; for edited inputs say what was actually scored.
-  const sampleName = backendSource.startsWith("Dataset patient")
-    ? backendSource.split(":")[0]
-    : (sampleId ?? "the dataset sample");
-  const predictionSourceText = isEditedScenario
-    ? `What-if edit of ${sampleName}; scored by the models trained without that patient.`
-    : backendSource;
+  // the backend works out from the values whether this is a dataset patient, an edit of one, or a new patient
+  const predictionSourceText = prediction.mock
+    ? "mock"
+    : prediction.prediction_source;
 
   const cadDrivers = useMemo(
     () => buildDrivers(shown.explanations.cad, features, shown.cad.probability),
@@ -54,6 +54,13 @@ export function RealResult({
           )
         : cadDrivers,
     [selectedVessel, shown, features, target, cadDrivers],
+  );
+  const spoken = useSpokenResult();
+  const setReportOpen = useUiStore((state) => state.setReportOpen);
+  const { comparison, cohort } = useCohortComparison(
+    shown,
+    predictionInputs,
+    selectedVessel ?? "cad",
   );
   const subject = selectedVessel
     ? `${selectedVessel} (${ARTERY_INFO[selectedVessel].name})`
@@ -73,6 +80,16 @@ export function RealResult({
         </div>
       )}
 
+      <div className="result-actions" role="group" aria-label="Share this result">
+        <SpeakButton resultKey={spoken.resultKey} sentences={spoken.sentences} />
+        <button
+          className="result-button result-report"
+          type="button"
+          onClick={() => setReportOpen(true)}
+        >
+          Patient report
+        </button>
+      </div>
       <RiskHero
         baseline={baseline?.cad ?? null}
         selected={selectedVessel === null}
@@ -111,6 +128,21 @@ export function RealResult({
         onHoverFactor={setHoveredFactor}
       />
 
+      {comparison && cohort && (
+        <section aria-labelledby="compare-heading" className="result-section">
+          <h3 className="result-section-title" id="compare-heading">
+            Compared with similar patients
+            {selectedVessel ? ` · ${selectedVessel}` : ""}
+          </h3>
+          <p className="result-section-lead">
+            Where this estimate sits among patients of the same sex and similar
+            age in the study.
+          </p>
+          <div className="mt-3">
+            <CohortCompare comparison={comparison} population={cohort.population} />
+          </div>
+        </section>
+      )}
       <section aria-labelledby="whatif-heading" className="result-section">
         <div className="flex items-start justify-between gap-3">
           <div>

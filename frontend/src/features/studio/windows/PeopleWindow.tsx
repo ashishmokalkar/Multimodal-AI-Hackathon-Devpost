@@ -6,13 +6,21 @@ import { FloatingWindow } from "../FloatingWindow";
 import { IconPeople } from "../icons";
 import { EmptyState, TargetChips } from "../parts";
 import { probabilityOf, useStudioData } from "../studioData";
+import { WINDOW_TITLES } from "../windowTitles";
 
 const PERSON =
   "M12 4.2a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2Zm-4.2 16v-5.4c0-2.5 1.8-4.2 4.2-4.2s4.2 1.7 4.2 4.2v5.4Z";
 
+const OUTCOME: Record<InsightTarget, string> = {
+  cad: "significant narrowing in at least one heart artery",
+  LAD: "significant narrowing of the LAD",
+  LCX: "significant narrowing of the LCX",
+  RCA: "significant narrowing of the RCA",
+};
+
 /**
- * "Out of 100 people like this": the model's chance as an icon array, which patients read more accurately than a
- * bare percentage.
+ * The estimate as an icon array: out of 100 patients with exactly these results, how many would have significant
+ * narrowing on an angiogram. Patients read a chance more accurately as "67 of 100" than as "67%".
  */
 export function PeopleWindow() {
   const { shown } = useStudioData();
@@ -23,22 +31,23 @@ export function PeopleWindow() {
   const color = target === "cad" ? "var(--s-flag)" : targetColor(target);
 
   return (
-    <FloatingWindow icon={<IconPeople />} id="people" title="100 people like this">
+    <FloatingWindow icon={<IconPeople />} id="people" title={WINDOW_TITLES.people}>
       <TargetChips onChange={setOwn} value={target} />
       {!shown ? (
         <EmptyState>Waiting for a prediction.</EmptyState>
       ) : (
         <div className="people">
           <p className="people-head">
-            <b style={{ color }}>{count}</b>
+            <b style={{ color }}>
+              {count}
+              <small> of 100</small>
+            </b>
             <span>
-              in 100 would have
-              <br />
-              {target === "cad" ? "significant CAD" : `a narrowed ${target}`}
+              patients with these exact results would have {OUTCOME[target]}
             </span>
           </p>
           <svg
-            aria-label={`${count} of 100 people highlighted`}
+            aria-label={`${count} of 100 patient icons filled: with narrowing; ${100 - count} empty: without`}
             className="people-grid"
             role="img"
             viewBox="0 0 240 240"
@@ -61,7 +70,19 @@ export function PeopleWindow() {
               );
             })}
           </svg>
-          <p className="muted-xs">Model estimate for people with the same readings.</p>
+          <ul className="people-legend">
+            <li>
+              <i style={{ background: color }} />
+              <b>{count}</b> with narrowing
+            </li>
+            <li>
+              <i className="is-off" />
+              <b>{100 - count}</b> without
+            </li>
+          </ul>
+          <p className="muted-xs">
+            A picture of the model&apos;s {count}% estimate: a chance for this patient, not a count of real people.
+          </p>
         </div>
       )}
     </FloatingWindow>
