@@ -74,7 +74,10 @@ describe("window layout", () => {
     expect(overlaps(layout.patient, layout.risk)).toBe(false);
     expect(overlaps(layout.patient, layout.drivers)).toBe(false);
     expect(overlaps(layout.risk, layout.drivers)).toBe(false);
-    // the patient window stays clear of the dock in the bottom-left corner
+    // the right column stays clear of the watermark, the patient window of the dock
+    if (vh >= 720) {
+      expect(layout.drivers.y + layout.drivers.h).toBeLessThanOrEqual(vh - 44);
+    }
     expect(layout.patient.y + layout.patient.h).toBeLessThanOrEqual(vh - 80);
     // and leaves the middle third for the heart
     expect(layout.patient.x + layout.patient.w).toBeLessThan(vw / 3);

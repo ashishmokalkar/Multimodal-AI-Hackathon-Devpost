@@ -6,6 +6,9 @@ A clinical decision-support and educational prototype for exploring coronary
 artery disease risk, interpreting model outputs, and visualizing per-vessel
 results in an interactive 3D heart.
 
+**Live demo: [cardioclarity-962866578386.us-central1.run.app](https://cardioclarity-962866578386.us-central1.run.app)**
+(the dashboard and the real models; the API's documentation is at [`/docs`](https://cardioclarity-962866578386.us-central1.run.app/docs)).
+
 ## Track A deliverables
 
 | Deliverable | Where |
@@ -127,6 +130,21 @@ probabilities alone do not establish that the cap changed a value; the
 frontend presents returned outputs without recomputing them. Validation
 metrics are cross-validation results, not clinical validation or independently
 validated demo-refit metrics; see `reports/BEST_MODELS.md`.
+
+## Deploy the live demo
+
+The root [`Dockerfile`](Dockerfile) builds the dashboard and serves it from the real-model API, so one container
+(and one URL) runs the whole app. The live demo runs it on Google Cloud Run: 2 vCPU, 2 GiB (the API peaks at about
+0.4 GB per worker), one copy always running so nobody waits for a cold start, up to three under load. Cloud Build
+builds the image, so no local Docker is needed:
+
+```bash
+gcloud auth login
+PROJECT=<your-project-id> scripts/deploy_cloudrun.sh
+```
+
+[`.github/workflows/keep-demo-awake.yml`](.github/workflows/keep-demo-awake.yml) also requests the demo's
+health check every 15 minutes as a backup.
 
 ## Run the mock API
 

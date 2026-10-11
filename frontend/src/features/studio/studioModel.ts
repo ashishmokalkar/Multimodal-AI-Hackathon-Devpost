@@ -103,6 +103,8 @@ export const ANCHORED_WINDOWS: readonly WindowId[] = ["patient", "risk", "driver
 
 /** Height kept free at the bottom left for the dock. */
 const DOCK_SPACE = 80;
+/** Height kept free at the bottom right for the "decision support only" watermark. */
+const WATERMARK_SPACE = 48;
 
 function clamp(value: number, low: number, high: number): number {
   return Math.round(Math.min(high, Math.max(low, value)));
@@ -123,7 +125,7 @@ export function defaultLayout(
   const sideW = clamp(vw * 0.23, 290, 460);
   const patientW = clamp(vw * 0.21, 270, 400);
   const rightX = vw - GAP - sideW;
-  const column = vh - top - GAP;
+  const column = vh - top - WATERMARK_SPACE;
   const riskH = clamp(column * 0.5, 260, 360);
   const driversY = top + riskH + 12;
   const driversH = clamp(column - riskH - 12, MIN_WINDOW_SIZE.drivers.h, 520);

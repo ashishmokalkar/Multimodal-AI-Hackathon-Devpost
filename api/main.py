@@ -2,6 +2,7 @@
 
 Run from the repository root:  uvicorn api.main:app --port 8000
 CORS origins: env CARDIOCLARITY_CORS_ORIGINS (comma-separated); defaults to the Vite dev server on ports 5173 and 5174.
+Web app: env CARDIOCLARITY_WEB_DIR (a built frontend/dist) serves the dashboard from the same origin (used in Docker).
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ from functools import lru_cache
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from api.explain import explain
@@ -44,6 +46,7 @@ app.add_middleware(
                                  "http://localhost:5174,http://127.0.0.1:5174").split(","),
     allow_credentials=True, allow_methods=["GET", "POST"], allow_headers=["*"],
 )
+app.add_middleware(GZipMiddleware, minimum_size=1024)   # the dashboard's scripts and the larger JSON responses
 
 
 # ------------------------------------------------------------------------------------------- state (loaded once)
@@ -239,3 +242,13 @@ def _warnings(patient: dict, s: dict) -> list[str]:
 def _derived(patient: dict) -> dict:
     bmi = patient["Weight"] / (patient["Length"] / 100) ** 2
     return {"BMI": round(bmi, 1), "Obesity": bool(bmi > 25)}
+
+
+# ------------------------------------------------------------------------------------------- web app (deployment)
+# In the deployed container the built dashboard is served from the same origin as the API, so the browser needs no
+# CORS and there is one URL. Mounted last so every API route above takes precedence.
+_WEB_DIR = os.environ.get("CARDIOCLARITY_WEB_DIR")
+if _WEB_DIR:
+    from fastapi.staticfiles import StaticFiles
+
+    app.mount("/", StaticFiles(directory=_WEB_DIR, html=True), name="web")

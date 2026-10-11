@@ -1,0 +1,26 @@
+# Only what the Dockerfile copies is needed; keep the build context (and the Cloud Run source upload) small.
+.git
+.github
+**/node_modules
+**/dist
+**/.vite
+**/*.tsbuildinfo
+**/__pycache__
+**/*.py[cod]
+.venv
+**/.env*
+docs
+mock-api
+handover_docs
+assets
+tests
+scripts
+data/interim
+data/processed
+data/raw/angiocad
+data/raw/uci_heart_disease
+reports/eda
+reports/figures
+reports/phase*
+reports/tabpfn
+reports/autogluon

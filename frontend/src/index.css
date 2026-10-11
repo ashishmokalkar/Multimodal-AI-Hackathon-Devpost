@@ -644,7 +644,8 @@ button:focus-visible {
 
 .modal-backdrop {
   position: fixed;
-  z-index: 10;
+  /* above every screen it can open over: the patient picker, the Studio, captions and the report */
+  z-index: 9500;
   inset: 0;
   display: grid;
   place-items: center;

@@ -1,0 +1,3 @@
+# Files `gcloud run deploy --source .` leaves out of the upload: the same as the Docker build context.
+.gcloudignore
+#!include:.dockerignore
