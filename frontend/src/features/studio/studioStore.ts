@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { VesselId } from "../viewer/vesselMap";
 import {
+  ANCHORED_WINDOWS,
   clampRect,
   DEFAULT_OPEN,
   defaultLayout,
@@ -41,6 +42,11 @@ interface Persisted {
 }
 
 interface StudioState extends Persisted {
+  /**
+   * Windows that follow the default layout for the current viewport (re-laid out on resize). A window leaves it
+   * when the user moves or resizes it, for the rest of the session.
+   */
+  anchored: Record<WindowId, boolean>;
   /** Each request bumps the sequence so the same vessel can be revisited. */
   camera: { vessel: VesselId | null; sequence: number };
   paletteOpen: boolean;
@@ -64,6 +70,8 @@ interface StudioState extends Persisted {
   toggleWindow: (id: WindowId) => void;
   raiseWindow: (id: WindowId) => void;
   moveWindow: (id: WindowId, rect: Rect) => void;
+  /** Puts a window back on the default layout for the current viewport. */
+  anchorWindow: (id: WindowId) => void;
   fitToViewport: () => void;
   resetLayout: () => void;
 }
@@ -77,16 +85,21 @@ function viewport() {
     : { w: window.innerWidth, h: window.innerHeight };
 }
 
-function freshLayout(): Pick<Persisted, "rects" | "open" | "order"> {
+function allAnchored(): Record<WindowId, boolean> {
+  return Object.fromEntries(WINDOW_IDS.map((id) => [id, true])) as Record<WindowId, boolean>;
+}
+
+function freshLayout(): Pick<StudioState, "rects" | "open" | "order" | "anchored"> {
   const { w, h } = viewport();
   return {
     rects: defaultLayout(w, h),
     open: { ...DEFAULT_OPEN },
     order: [...WINDOW_IDS],
+    anchored: allAnchored(),
   };
 }
 
-function defaults(): Persisted {
+function defaults(): Persisted & Pick<StudioState, "anchored"> {
   const reducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -101,7 +114,7 @@ function defaults(): Persisted {
   };
 }
 
-function load(): Persisted {
+function load(): Persisted & Pick<StudioState, "anchored"> {
   const base = defaults();
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -111,13 +124,19 @@ function load(): Persisted {
     const saved = JSON.parse(raw) as Partial<Persisted>;
     const rects = { ...base.rects };
     const open = { ...base.open };
+    const anchored = { ...base.anchored };
     for (const id of WINDOW_IDS) {
+      // the patient, risk and why windows always start on the layout for this screen, open
+      if (ANCHORED_WINDOWS.includes(id)) {
+        continue;
+      }
       const rect = saved.rects?.[id];
       if (
         rect &&
         [rect.x, rect.y, rect.w, rect.h].every((n) => Number.isFinite(n))
       ) {
         rects[id] = rect;
+        anchored[id] = false;
       }
       if (typeof saved.open?.[id] === "boolean") {
         open[id] = saved.open[id];
@@ -143,6 +162,7 @@ function load(): Persisted {
       labels: saved.labels ?? base.labels,
       quality: saved.quality === "lite" ? "lite" : "high",
       rects,
+      anchored,
       // the vessel inspector follows the selection, so it never reopens by itself
       open: { ...open, vessel: false },
       order: [...order, ...WINDOW_IDS.filter((id) => !order.includes(id))],
@@ -221,13 +241,27 @@ export const useStudioStore = create<StudioState>((set) => ({
         : { order: raised(state.order, id) },
     ),
   moveWindow: (id, rect) =>
-    set((state) => ({ rects: { ...state.rects, [id]: rect } })),
+    set((state) => ({
+      rects: { ...state.rects, [id]: rect },
+      anchored: { ...state.anchored, [id]: false },
+    })),
+  anchorWindow: (id) =>
+    set((state) => {
+      const { w, h } = viewport();
+      return {
+        rects: { ...state.rects, [id]: defaultLayout(w, h)[id] },
+        anchored: { ...state.anchored, [id]: true },
+      };
+    }),
   fitToViewport: () =>
     set((state) => {
       const { w, h } = viewport();
+      const layout = defaultLayout(w, h);
       const rects = { ...state.rects };
       for (const id of WINDOW_IDS) {
-        rects[id] = clampRect(rects[id], w, h, MIN_WINDOW_SIZE[id]);
+        rects[id] = state.anchored[id]
+          ? layout[id]
+          : clampRect(rects[id], w, h, MIN_WINDOW_SIZE[id]);
       }
       return { rects };
     }),

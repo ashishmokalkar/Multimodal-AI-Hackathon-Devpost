@@ -95,35 +95,51 @@ export const DEFAULT_OPEN: Record<WindowId, boolean> = {
   model: false,
 };
 
-/** Starting layout for a viewport: inputs on the left, results on the right, the heart in the middle. */
+/**
+ * The windows every session starts with, laid out from the viewport rather than restored from a saved layout, so
+ * they fit whatever screen the app opens on and re-flow when the window is resized (until the user moves them).
+ */
+export const ANCHORED_WINDOWS: readonly WindowId[] = ["patient", "risk", "drivers"];
+
+/** Height kept free at the bottom left for the dock. */
+const DOCK_SPACE = 80;
+
+function clamp(value: number, low: number, high: number): number {
+  return Math.round(Math.min(high, Math.max(low, value)));
+}
+
+/**
+ * Starting layout for a viewport: inputs on the left, results on the right, the heart in the middle. Column widths
+ * grow with the screen width; the right column (Risk above Why) fills the height, and the patient window is centred
+ * between the top bar and the dock.
+ */
 export function defaultLayout(
   viewportWidth: number,
   viewportHeight: number,
 ): Record<WindowId, Rect> {
-  const vw = Math.max(viewportWidth, 960);
-  const vh = Math.max(viewportHeight, 600);
+  const vw = Math.max(viewportWidth, 900);
+  const vh = Math.max(viewportHeight, 560);
   const top = TOP_BAR_HEIGHT + GAP;
-  const sideW = 340;
+  const sideW = clamp(vw * 0.23, 290, 460);
+  const patientW = clamp(vw * 0.21, 270, 400);
   const rightX = vw - GAP - sideW;
-  const riskH = 336;
+  const column = vh - top - GAP;
+  const riskH = clamp(column * 0.5, 260, 360);
   const driversY = top + riskH + 12;
+  const driversH = clamp(column - riskH - 12, MIN_WINDOW_SIZE.drivers.h, 520);
   const whatIfW = Math.min(680, vw - 2 * (sideW + GAP) - 40);
   const whatIfH = 196;
-  const centreX = sideW + GAP + 20;
-  const patientH = Math.min(vh - top - 80, 400);
-  const patientY = Math.max(top, Math.round(top + (vh - 80 - top - patientH) / 2));
+  const centreX = patientW + GAP + 20;
+  const dockTop = vh - DOCK_SPACE;
+  const patientH = clamp(dockTop - top - GAP, MIN_WINDOW_SIZE.patient.h, 440);
+  const patientY = Math.max(top, Math.round(top + (dockTop - top - patientH) / 2));
   const vesselW = 360;
   const vesselH = 260;
   return {
     // patient on the left, centred in the height between the top bar and the dock
-    patient: { x: GAP, y: patientY, w: 310, h: patientH },
+    patient: { x: GAP, y: patientY, w: patientW, h: patientH },
     risk: { x: rightX, y: top, w: sideW, h: riskH },
-    drivers: {
-      x: rightX,
-      y: driversY,
-      w: sideW,
-      h: Math.min(vh - driversY - GAP, 380),
-    },
+    drivers: { x: rightX, y: driversY, w: sideW, h: driversH },
     whatif: {
       x: Math.round((vw - whatIfW) / 2),
       y: vh - GAP - whatIfH,

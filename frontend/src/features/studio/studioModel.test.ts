@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { FeatureDefinition, PredictionResponse } from "../../api/types";
 import {
+  ANCHORED_WINDOWS,
   beatPulse,
   buildTour,
   clampRect,
@@ -10,6 +11,7 @@ import {
   riskBand,
   TOP_BAR_HEIGHT,
   WINDOW_IDS,
+  type Rect,
 } from "./studioModel";
 
 describe("riskBand", () => {
@@ -42,6 +44,46 @@ describe("window layout", () => {
     expect(layout.patient.x).toBeLessThan(720);
     expect(layout.risk.x).toBeGreaterThan(720);
     expect(layout.drivers.y).toBeGreaterThan(layout.risk.y + layout.risk.h);
+  });
+
+  const SCREENS: [number, number][] = [
+    [900, 600],
+    [1280, 720],
+    [1366, 768],
+    [1440, 900],
+    [1536, 864],
+    [1920, 1080],
+    [2560, 1440],
+    [3840, 2160],
+  ];
+
+  it.each(SCREENS)("fits patient, risk and why on a %ix%i screen without overlap", (vw, vh) => {
+    const layout = defaultLayout(vw, vh);
+    const core = ANCHORED_WINDOWS.map((id) => layout[id]);
+    for (const [index, rect] of core.entries()) {
+      const id = ANCHORED_WINDOWS[index];
+      expect(rect.x).toBeGreaterThanOrEqual(0);
+      expect(rect.y).toBeGreaterThanOrEqual(TOP_BAR_HEIGHT);
+      expect(rect.x + rect.w).toBeLessThanOrEqual(vw);
+      expect(rect.y + rect.h).toBeLessThanOrEqual(vh);
+      expect(rect.w).toBeGreaterThanOrEqual(MIN_WINDOW_SIZE[id].w);
+      expect(rect.h).toBeGreaterThanOrEqual(MIN_WINDOW_SIZE[id].h);
+    }
+    const overlaps = (a: Rect, b: Rect) =>
+      a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+    expect(overlaps(layout.patient, layout.risk)).toBe(false);
+    expect(overlaps(layout.patient, layout.drivers)).toBe(false);
+    expect(overlaps(layout.risk, layout.drivers)).toBe(false);
+    // the patient window stays clear of the dock in the bottom-left corner
+    expect(layout.patient.y + layout.patient.h).toBeLessThanOrEqual(vh - 80);
+    // and leaves the middle third for the heart
+    expect(layout.patient.x + layout.patient.w).toBeLessThan(vw / 3);
+    expect(layout.risk.x).toBeGreaterThan((2 * vw) / 3 - 40);
+  });
+
+  it("gives larger screens wider windows", () => {
+    expect(defaultLayout(1920, 1080).risk.w).toBeGreaterThan(defaultLayout(1280, 720).risk.w);
+    expect(defaultLayout(1920, 1080).drivers.h).toBeGreaterThan(defaultLayout(1280, 720).drivers.h);
   });
 
   it("pulls a window back so its title bar stays reachable", () => {

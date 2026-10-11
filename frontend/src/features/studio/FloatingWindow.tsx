@@ -45,6 +45,7 @@ export function FloatingWindow({
     (state) => state.order[state.order.length - 1] === id,
   );
   const moveWindow = useStudioStore((state) => state.moveWindow);
+  const anchorWindow = useStudioStore((state) => state.anchorWindow);
   const raiseWindow = useStudioStore((state) => state.raiseWindow);
   const closeWindow = useStudioStore((state) => state.closeWindow);
   const compact = useCompact();
@@ -54,7 +55,8 @@ export function FloatingWindow({
     startY: number;
     rect: Rect;
   } | null>(null);
-  const restore = useRef<Rect | null>(null);
+  // where Restore returns to: a fixed rect, or "layout" for a window that was on the default layout
+  const restore = useRef<Rect | "layout" | null>(null);
   const [active, setActive] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
@@ -126,12 +128,16 @@ export function FloatingWindow({
       return;
     }
     if (restore.current) {
-      moveWindow(id, restore.current);
+      if (restore.current === "layout") {
+        anchorWindow(id);
+      } else {
+        moveWindow(id, restore.current);
+      }
       restore.current = null;
       setExpanded(false);
       return;
     }
-    restore.current = rect;
+    restore.current = useStudioStore.getState().anchored[id] ? "layout" : rect;
     setExpanded(true);
     const w = Math.min(window.innerWidth - 80, Math.max(rect.w, 860));
     const h = Math.min(window.innerHeight - 120, Math.max(rect.h, 600));
