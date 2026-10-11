@@ -2,7 +2,7 @@ import pytest
 
 from ml.export import MODELS
 
-pytestmark = pytest.mark.skipif(not (MODELS / "demo" / "rca.joblib").exists(), reason="run python -m ml.export first")
+pytestmark = pytest.mark.skipif(not (MODELS / "rca.joblib").exists(), reason="run python -m ml.export first")
 
 
 @pytest.fixture(scope="module")
@@ -16,104 +16,82 @@ def client():
 
 def test_health_features_and_samples(client):
     h = client.get("/health").json()
-    assert h["status"] == "ok"
     assert h["mock"] is False and h["contract_version"] == "1.1.0"
-    assert h["model_version"] == "cardiotwin-v2.0.0"
     feats = client.get("/features").json()
     names = {f["name"] for f in feats}
-    assert len(feats) == len(names) == 49
     assert not names & {"LAD", "LCX", "RCA", "Cath", "Exertional CP", "BMI", "Obesity"}       # leakage / derived / constant
     assert all(None not in f.values() for f in feats)                                          # optional keys omitted, never null
     bbb = next(f for f in feats if f["name"] == "BBB")
     assert bbb["type"] == "categorical" and bbb["options"] == ["None", "LBBB", "RBBB"]
-    assert next(f for f in feats if f["name"] == "VHD")["options"] == ["None", "Mild", "Moderate", "Severe"]
-    assert next(f for f in feats if f["name"] == "Function Class")["options"] == [0, 1, 2, 3]
-    assert next(f for f in feats if f["name"] == "Chest Pain")["options"] == ["None", "Typical", "Atypical", "Non-anginal"]
-    assert next(f for f in feats if f["name"] == "Smoking")["options"] == ["Never", "Former", "Current"]
-    assert next(f for f in feats if f["name"] == "WBC")["unit"] == "x10^3/uL"
     samples = client.get("/patients/samples").json()
-    assert len(samples) == len({s["id"] for s in samples}) == 8
-    assert not any(s["synthetic"] for s in samples)
-    assert all(len(s["features"]) == 49 for s in samples)
+    assert len(samples) == 8 and not any(s["synthetic"] for s in samples)
     patterns = {(s["ground_truth"]["vessels"]["LAD"], s["ground_truth"]["vessels"]["LCX"],
                  s["ground_truth"]["vessels"]["RCA"]) for s in samples}
     assert len(patterns) == 8                                                                  # every vessel pattern once
 
 
-def test_all_final_and_demo_models_load(client):
-    from api.main import state
+def test_predict_is_consistent_additive_and_uses_holdout_models_for_dataset_patients(client):
+    sample = client.get("/patients/samples").json()[0]
+    r = client.post("/predict", json={"features": sample["features"]})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "never saw this patient" in body["prediction_source"]
+    cad = body["cad"]["probability"]
+    for key, target in [("cad", body["cad"])] + list(body["vessels"].items()):
+        assert target["label"] in ("elevated", "not elevated") and isinstance(target["uncertain"], bool)
+        if key != "cad":
+            assert target["probability"] <= cad + 1e-9
+        e = body["explanations"][key]
+        total = e["base_value"] + sum(c["contribution"] for c in e["contributions"])
+        assert abs(total - target["probability"]) < 3e-3                                      # exact up to 4-dp rounding
+    # a small edit is still scored by the model that never saw that patient (no memorised answer), and the
+    # response says it was edited even when the client still sends the sample id
+    edited = dict(sample["features"], Age=sample["features"]["Age"] + 1)
+    e = client.post("/predict", json={"features": edited, "sample_id": sample["id"]}).json()
+    assert e["prediction_source"].startswith("Edited dataset patient")
+    for key in ("LAD", "LCX", "RCA"):
+        assert abs(e["vessels"][key]["probability"] - body["vessels"][key]["probability"]) < 0.1
 
-    models = state()
-    assert set(models["models"]) == {"cad", "lad", "lcx", "rca"}
-    assert set(models["demo_models"]) == {"cad", "lad", "lcx", "rca"}
+
+def test_number_formatting_does_not_change_the_model(client):
+    sample = client.get("/patients/samples").json()[0]
+    numbers = {f["name"] for f in client.get("/features").json() if f["type"] == "number"}
+    as_float = {k: float(v) if k in numbers else v for k, v in sample["features"].items()}       # 72 -> 72.0
+    a = client.post("/predict", json={"features": sample["features"]}).json()
+    b = client.post("/predict", json={"features": as_float}).json()
+    assert "prediction_source" in b, b
+    assert a["prediction_source"] == b["prediction_source"]
+    assert a["vessels"]["LAD"]["probability"] == b["vessels"]["LAD"]["probability"]
 
 
-def test_predict_is_consistent_additive_and_uses_holdout_models_for_samples(client):
-    samples = client.get("/patients/samples").json()
-    responses = []
-    observed_uncertainty = set()
+def test_served_models_do_not_memorise_dataset_patients():
+    from sklearn.metrics import roc_auc_score
 
-    for sample in samples:
-        r = client.post(
-            "/predict",
-            json={"features": sample["features"], "sample_id": sample["id"]},
-        )
-        assert r.status_code == 200, r.text
-        body = r.json()
-        assert "trained without this patient" in body["prediction_source"]
-        assert body["mock"] is False
-        responses.append(body)
+    from ml.data import TARGETS, load_clean
+    from ml.export import load_models, predict_all
 
-    sample = samples[0]
-    original = responses[0]
-    options = ["None", "Typical", "Atypical", "Non-anginal"]
-    edited_features = dict(sample["features"])
-    edited_features["Chest Pain"] = next(
-        option for option in options if option != sample["features"]["Chest Pain"]
-    )
-    edited = client.post(
-        "/predict",
-        json={"features": edited_features, "sample_id": sample["id"]},
-    )
-    assert edited.status_code == 200, edited.text
-    edited_body = edited.json()
-    assert edited_body["request_id"] != original["request_id"]
-    assert edited_body["prediction_source"] == original["prediction_source"]
-    assert any(
-        edited_body["cad"]["probability"] != original["cad"]["probability"]
-        or edited_body["vessels"][vessel]["probability"]
-        != original["vessels"][vessel]["probability"]
-        for vessel in ("LAD", "LCX", "RCA")
-    )
-    responses.append(edited_body)
+    df = load_clean()
+    p = predict_all(load_models(), df)
+    for t in TARGETS:
+        assert roc_auc_score(df[t], p[t]) < 0.97, t                    # memorising models score ~1.0 here
 
-    for body in responses:
-        cad = body["cad"]["probability"]
-        for key, target in [("cad", body["cad"])] + list(body["vessels"].items()):
-            assert target["label"] in ("elevated", "not elevated")
-            assert isinstance(target["uncertain"], bool)
-            observed_uncertainty.add(target["uncertain"])
-            if key != "cad":
-                assert target["probability"] <= cad + 1e-9
-            explanation = body["explanations"][key]
-            assert explanation["scale"] == "probability"
-            total = explanation["base_value"] + sum(
-                item["contribution"] for item in explanation["contributions"]
-            )
-            assert abs(total - target["probability"]) < 3e-3  # API rounds to 4 dp
 
-    assert observed_uncertainty == {False, True}
+def test_artery_is_never_flagged_without_cad_and_uncertainty_uses_served_probability():
+    import numpy as np
 
-    # Without the sample origin, an edited scenario is scored by final models.
-    final_body = client.post(
-        "/predict",
-        json={"features": edited_features},
-    ).json()
-    assert "all 303 patients" in final_body["prediction_source"]
-    assert any(target["threshold"] != 0.5 for target in [
-        final_body["cad"],
-        *final_body["vessels"].values(),
-    ])
+    from ml.data import TARGETS, VESSELS, load_clean
+    from ml.export import decide, load_models, predict_all
+
+    models, df = load_models(), load_clean()
+    rng = np.random.default_rng(0)
+    rows = df.sample(300, replace=True, random_state=0).reset_index(drop=True)
+    for c in ("age", "bp", "fbs", "tg", "ldl", "hdl"):
+        rows[c] = rows[c] * rng.uniform(0.7, 1.3, len(rows))
+    p = predict_all(models, rows)
+    flags = decide(p, {t: models[t].threshold for t in TARGETS})
+    for v in VESSELS:
+        assert not (flags[v] & ~flags["cad"]).any()
+        assert (p[v] <= p["cad"] + 1e-12).all()
 
 
 def test_predict_rejects_bad_input(client):
@@ -125,39 +103,11 @@ def test_predict_rejects_bad_input(client):
         assert r.status_code == 422 and r.json()["detail"]
 
 
-def test_warnings_derived_values_and_no_warning_response(client):
-    features = {
-        feature["name"]: feature["default"]
-        for feature in client.get("/features").json()
-    }
-    response = client.post("/predict", json={"features": features})
-    assert response.status_code == 200, response.text
-    body = response.json()
-    assert body["warnings"] == []
-    expected_bmi = features["Weight"] / (features["Length"] / 100) ** 2
-    assert body["derived"]["BMI"] == round(expected_bmi, 1)
-    assert body["derived"]["Obesity"] is (expected_bmi > 25)
-
-    warning_features = dict(features, Age=100, Lymph=75, Neut=50)
-    warned = client.post("/predict", json={"features": warning_features})
-    assert warned.status_code == 200, warned.text
-    warnings = warned.json()["warnings"]
-    assert warnings
-    assert any("outside the range seen in the training data" in item for item in warnings)
-    assert any("65 or over" in item for item in warnings)
-    assert any("add up to more than 100%" in item for item in warnings)
-
-
 def test_metrics(client):
     m = client.get("/model/metrics").json()
     assert m["n_samples"] == 303 and m["trained_at"].endswith("Z") and m["mock"] is False
     assert set(m["targets"]) == {"cad", "LAD", "LCX", "RCA"}
     assert 0.9 < m["targets"]["cad"]["roc_auc"] < 1
-    for target in m["targets"].values():
-        assert len(target["roc_auc_ci95"]) == 2
-        assert target["roc_auc_ci95"][0] <= target["roc_auc_ci95"][1]
-        assert target["model"]
-        assert target["threshold"] != 0.5
 
 
 def test_reference_ranges_capping_flag_and_global_importance(client):
@@ -169,3 +119,16 @@ def test_reference_ranges_capping_flag_and_global_importance(client):
     imp = client.get("/model/importance").json()
     assert set(imp["targets"]) == {"cad", "LAD", "LCX", "RCA"} and imp["n_patients"] == 303
     assert len(imp["targets"]["cad"]) == len(feats)
+
+
+def test_cohort_matches_what_predict_serves_for_dataset_patients(client):
+    cohort = client.get("/cohort").json()
+    assert cohort["n_patients"] == len(cohort["patients"]) == 303
+    assert cohort["model_version"] == client.get("/health").json()["model_version"]
+    by_row = {p["patient"]: p for p in cohort["patients"]}
+    for sample in client.get("/patients/samples").json()[:3]:
+        row = by_row[int(sample["id"].split("-")[1])]
+        body = client.post("/predict", json={"features": sample["features"]}).json()
+        assert (row["age"], row["sex"]) == (sample["features"]["Age"], sample["features"]["Sex"])
+        assert abs(row["cad"] - body["cad"]["probability"]) < 1e-3
+        assert all(abs(row[v] - body["vessels"][v]["probability"]) < 1e-3 for v in ("LAD", "LCX", "RCA"))

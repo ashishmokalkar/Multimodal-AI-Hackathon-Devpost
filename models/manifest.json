@@ -1,11 +1,12 @@
 {
-  "model_version": "cardiotwin-v2.0.0",
-  "created": "2026-10-10T10:22:44+01:00",
+  "model_version": "cardiotwin-v2.1.0",
+  "created": "2026-10-11T12:31:44+01:00",
   "n_patients": 303,
   "conformal_level": 0.9,
   "python": "3.11.9",
-  "consistency": "P(vessel) capped at P(CAD)",
-  "validation": "10 x 5-fold repeated stratified CV on fixed folds; choices made on repeats r0-r4, metrics on repeats r5-r9 only; calibration and thresholds fitted per outer fold on training patients",
+  "serving": "cross-fitted: 5 fold models per label (folds of repeat r0); a request is scored by the fold models that never saw a dataset patient within Gower distance 0.03 (faded out by 0.05); far from every dataset patient, by all five",
+  "consistency": "P(vessel) capped at P(CAD); a vessel is flagged only when CAD is flagged",
+  "validation": "10 x 5-fold repeated stratified CV on fixed folds; model choices made on repeats r0-r4, metrics on repeats r5-r9 only; calibration, cap, thresholds and conformal sets fitted per outer fold on training patients",
   "demo_patients": {
     "rows": [
       19,
@@ -17,7 +18,7 @@
       158,
       286
     ],
-    "note": "models/demo/* are refitted without these patients"
+    "note": "dataset samples listed by the API; scored like every dataset patient"
   },
   "targets": {
     "cad": {
@@ -27,53 +28,6 @@
       ],
       "stack": null,
       "n_features": 45,
-      "features": [
-        "age",
-        "sex_male",
-        "bmi",
-        "dm",
-        "htn",
-        "fh",
-        "dlp",
-        "bp",
-        "pr",
-        "systolic_murmur",
-        "diastolic_murmur",
-        "dyspnea",
-        "low_th_ang",
-        "q_wave",
-        "st_elevation",
-        "st_depression",
-        "t_inversion",
-        "lvh",
-        "poor_r_progression",
-        "bbb_lbbb",
-        "bbb_rbbb",
-        "fbs",
-        "cr",
-        "tg",
-        "ldl",
-        "hdl",
-        "bun",
-        "esr",
-        "hb",
-        "k",
-        "na",
-        "wbc",
-        "lymph",
-        "neut",
-        "plt",
-        "ef_tte",
-        "region_rwma",
-        "vhd",
-        "chest_pain_type",
-        "smoking",
-        "fc_ge2",
-        "pretest_prob",
-        "age_x_male",
-        "female_ge50",
-        "comorbidity_count"
-      ],
       "platt": [
         0.9995249203701967,
         -0.09865701455442581
@@ -81,36 +35,38 @@
       "threshold": 0.6890126255428674,
       "conformal_q": 0.5459762553786456,
       "validation": {
-        "auc_r0r4": 0.9453,
-        "auc_r5r9": 0.9389,
+        "auc_r5r9": 0.9389142680797947,
         "auc_r5r9_ci95": [
-          0.9077,
-          0.9621
+          0.9031357067133986,
+          0.9603164907048632
         ],
         "calibrated_r5r9": {
-          "auc": 0.9318,
-          "brier": 0.0881,
-          "ece": 0.0403,
-          "cal_slope": 0.9705
+          "auc": 0.9389142680797947,
+          "brier": 0.08808542605040728,
+          "ece": 0.040311352759628334,
+          "cal_slope": 0.9704461596538729
         },
         "threshold_rule_r5r9": {
-          "threshold": 0.6857,
-          "accuracy": 0.8673,
-          "balanced_acc": 0.8676,
-          "f1": 0.9026,
-          "precision": 0.9436,
-          "recall": 0.8665
+          "threshold": 0.6856407069642627,
+          "accuracy": 0.8673224043715847,
+          "balanced_acc": 0.867581620385998,
+          "f1": 0.9025840900299299,
+          "precision": 0.9435945354132058,
+          "recall": 0.8665357897916038
         },
         "conformal_r5r9": {
-          "coverage": 0.8951,
-          "avg_set_size": 1.0325,
-          "singleton_rate": 0.9649
+          "coverage": 0.8951475409836065,
+          "avg_set_size": 1.0324699453551913,
+          "singleton_rate": 0.9648852459016394
         }
       },
-      "fit_seconds": 1.8,
-      "latency_ms_single_patient": 7.1,
-      "in_sample_auc": 0.9919114516815667,
-      "file_mb": 0.1
+      "memorisation_check": {
+        "auc_exact": 0.9413048105576841,
+        "auc_two_inputs_nudged_5pct": 0.9408258833546189
+      },
+      "fit_seconds_5_folds": 14.2,
+      "latency_ms_single_patient_all_labels": 127.2,
+      "file_mb": 0.29
     },
     "lad": {
       "option": "classical:catboost",
@@ -119,98 +75,45 @@
       ],
       "stack": null,
       "n_features": 53,
-      "features": [
-        "age",
-        "sex_male",
-        "bmi",
-        "dm",
-        "htn",
-        "fh",
-        "crf",
-        "cva",
-        "airway_disease",
-        "thyroid_disease",
-        "chf",
-        "dlp",
-        "bp",
-        "pr",
-        "edema",
-        "weak_peripheral_pulse",
-        "lung_rales",
-        "systolic_murmur",
-        "diastolic_murmur",
-        "dyspnea",
-        "low_th_ang",
-        "q_wave",
-        "st_elevation",
-        "st_depression",
-        "t_inversion",
-        "lvh",
-        "poor_r_progression",
-        "bbb_lbbb",
-        "bbb_rbbb",
-        "fbs",
-        "cr",
-        "tg",
-        "ldl",
-        "hdl",
-        "bun",
-        "esr",
-        "hb",
-        "k",
-        "na",
-        "wbc",
-        "lymph",
-        "neut",
-        "plt",
-        "ef_tte",
-        "region_rwma",
-        "vhd",
-        "chest_pain_type",
-        "smoking",
-        "fc_ge2",
-        "pretest_prob",
-        "rwma_any",
-        "rwma_severe",
-        "duke_significant"
-      ],
       "platt": [
         0.7300301367599273,
         -0.04366683322802079
       ],
-      "threshold": 0.5504765001025987,
-      "conformal_q": 0.684348823019699,
+      "threshold": 0.4301837628467365,
+      "conformal_q": 0.6948969405589306,
       "validation": {
-        "auc_r0r4": 0.8761,
-        "auc_r5r9": 0.8663,
+        "auc_r5r9": 0.8686222969187675,
         "auc_r5r9_ci95": [
-          0.8235,
-          0.9053
+          0.8224557311995836,
+          0.9062483260789603
         ],
         "calibrated_r5r9": {
-          "auc": 0.8641,
-          "brier": 0.1455,
-          "ece": 0.0465,
-          "cal_slope": 0.9434
+          "auc": 0.8686222969187675,
+          "brier": 0.1443264987192696,
+          "ece": 0.05354322485062034,
+          "cal_slope": 0.9094384229548451
         },
         "threshold_rule_r5r9": {
-          "threshold": 0.5371,
-          "accuracy": 0.781,
-          "balanced_acc": 0.7734,
-          "f1": 0.8125,
-          "precision": 0.8112,
-          "recall": 0.82
+          "threshold": 0.3318720016613243,
+          "accuracy": 0.7921530054644808,
+          "balanced_acc": 0.7800617252029015,
+          "f1": 0.8262792577082751,
+          "precision": 0.8069457994759515,
+          "recall": 0.8496003734827263
         },
         "conformal_r5r9": {
-          "coverage": 0.8885,
-          "avg_set_size": 1.2402,
-          "singleton_rate": 0.7598
+          "coverage": 0.8931256830601093,
+          "avg_set_size": 1.252153005464481,
+          "singleton_rate": 0.7478469945355191
         }
       },
-      "fit_seconds": 2.5,
-      "latency_ms_single_patient": 14.2,
-      "in_sample_auc": 1.0,
-      "file_mb": 0.56
+      "memorisation_check": {
+        "auc_exact": 0.879472693032015,
+        "auc_two_inputs_nudged_5pct": 0.8796072101156848
+      },
+      "fit_seconds_5_folds": 37.6,
+      "latency_ms_single_patient_all_labels": 127.2,
+      "file_mb": 0.87
     },
     "lcx": {
       "option": "classical:xgboost",
@@ -219,111 +122,45 @@
       ],
       "stack": null,
       "n_features": 66,
-      "features": [
-        "age",
-        "weight",
-        "height",
-        "sex_male",
-        "bmi",
-        "dm",
-        "htn",
-        "current_smoker",
-        "ex_smoker",
-        "fh",
-        "obesity",
-        "crf",
-        "airway_disease",
-        "thyroid_disease",
-        "dlp",
-        "bp",
-        "pr",
-        "edema",
-        "lung_rales",
-        "systolic_murmur",
-        "diastolic_murmur",
-        "typical_chest_pain",
-        "dyspnea",
-        "function_class",
-        "atypical",
-        "nonanginal",
-        "q_wave",
-        "st_elevation",
-        "st_depression",
-        "t_inversion",
-        "lvh",
-        "poor_r_progression",
-        "bbb_lbbb",
-        "bbb_rbbb",
-        "fbs",
-        "cr",
-        "tg",
-        "ldl",
-        "hdl",
-        "bun",
-        "esr",
-        "hb",
-        "k",
-        "na",
-        "wbc",
-        "lymph",
-        "neut",
-        "plt",
-        "ef_tte",
-        "region_rwma",
-        "vhd",
-        "pretest_prob",
-        "age_x_male",
-        "female_ge50",
-        "ef_category",
-        "esc2019_ptp",
-        "esc2024_rfcl",
-        "winther_basic_ptp",
-        "updated_df_ptp",
-        "cadc_basic",
-        "cadc_clinical",
-        "duke_significant",
-        "duke_severe",
-        "duke_left_main",
-        "jang_score",
-        "rare_cv_history"
-      ],
       "platt": [
         1.2427506325255822,
         0.06762989010953438
       ],
-      "threshold": 0.3243769231330903,
-      "conformal_q": 0.7109420955969061,
+      "threshold": 0.3204420211968987,
+      "conformal_q": 0.7138512880972399,
       "validation": {
-        "auc_r0r4": 0.7872,
-        "auc_r5r9": 0.7844,
+        "auc_r5r9": 0.7818502586110138,
         "auc_r5r9_ci95": [
-          0.7274,
-          0.824
+          0.7221714658132662,
+          0.8201548537345358
         ],
         "calibrated_r5r9": {
-          "auc": 0.767,
-          "brier": 0.1906,
-          "ece": 0.0529,
-          "cal_slope": 0.9232
+          "auc": 0.7818502586110138,
+          "brier": 0.19051554423578598,
+          "ece": 0.05227870780658572,
+          "cal_slope": 0.8469641586198936
         },
         "threshold_rule_r5r9": {
-          "threshold": 0.347,
-          "accuracy": 0.6832,
-          "balanced_acc": 0.6946,
-          "f1": 0.6459,
-          "precision": 0.5773,
-          "recall": 0.7455
+          "threshold": 0.21696185328255002,
+          "accuracy": 0.6734426229508196,
+          "balanced_acc": 0.6981986840387298,
+          "f1": 0.659582401966806,
+          "precision": 0.5609788804654879,
+          "recall": 0.8122405797101448
         },
         "conformal_r5r9": {
-          "coverage": 0.9003,
-          "avg_set_size": 1.4588,
-          "singleton_rate": 0.5412
+          "coverage": 0.9003606557377049,
+          "avg_set_size": 1.461377049180328,
+          "singleton_rate": 0.5386229508196722
         }
       },
-      "fit_seconds": 0.9,
-      "latency_ms_single_patient": 22.5,
-      "in_sample_auc": 0.8846364632809646,
-      "file_mb": 0.16
+      "memorisation_check": {
+        "auc_exact": 0.7811929119473876,
+        "auc_two_inputs_nudged_5pct": 0.7827913774205335
+      },
+      "fit_seconds_5_folds": 13.1,
+      "latency_ms_single_patient_all_labels": 127.2,
+      "file_mb": 0.13
     },
     "rca": {
       "option": "ensemble:lr_stack",
@@ -351,89 +188,45 @@
         }
       },
       "n_features": 44,
-      "features": [
-        "age",
-        "sex_male",
-        "bmi",
-        "dm",
-        "htn",
-        "fh",
-        "dlp",
-        "bp",
-        "pr",
-        "systolic_murmur",
-        "diastolic_murmur",
-        "dyspnea",
-        "q_wave",
-        "st_elevation",
-        "st_depression",
-        "t_inversion",
-        "lvh",
-        "poor_r_progression",
-        "bbb_lbbb",
-        "bbb_rbbb",
-        "fbs",
-        "cr",
-        "tg",
-        "ldl",
-        "hdl",
-        "bun",
-        "esr",
-        "hb",
-        "k",
-        "na",
-        "wbc",
-        "lymph",
-        "neut",
-        "plt",
-        "ef_tte",
-        "region_rwma",
-        "vhd",
-        "chest_pain_type",
-        "smoking",
-        "fc_ge2",
-        "rwma_any",
-        "rwma_severe",
-        "comorbidity_count",
-        "jang_score"
-      ],
       "platt": [
         0.45570723710150224,
         0.01354356507326131
       ],
-      "threshold": 0.3569583511753041,
-      "conformal_q": 0.6819367880196592,
+      "threshold": 0.3941664065257147,
+      "conformal_q": 0.6876636838821554,
       "validation": {
-        "auc_r0r4": 0.7754,
-        "auc_r5r9": 0.7674,
+        "auc_r5r9": 0.7695997481809839,
         "auc_r5r9_ci95": [
-          0.715,
-          0.8105
+          0.7137991207569502,
+          0.8130085493708777
         ],
         "calibrated_r5r9": {
-          "auc": 0.7615,
-          "brier": 0.1909,
-          "ece": 0.0471,
-          "cal_slope": 0.9167
+          "auc": 0.7695997481809839,
+          "brier": 0.19157959599891128,
+          "ece": 0.05579539276252523,
+          "cal_slope": 0.80166391365685
         },
         "threshold_rule_r5r9": {
-          "threshold": 0.3565,
-          "accuracy": 0.6686,
-          "balanced_acc": 0.682,
-          "f1": 0.6252,
-          "precision": 0.5464,
-          "recall": 0.7363
+          "threshold": 0.3579762414592497,
+          "accuracy": 0.6792349726775956,
+          "balanced_acc": 0.678046535226169,
+          "f1": 0.6121976554429558,
+          "precision": 0.5727067126087599,
+          "recall": 0.6734961415396199
         },
         "conformal_r5r9": {
-          "coverage": 0.8885,
-          "avg_set_size": 1.4561,
-          "singleton_rate": 0.5439
+          "coverage": 0.8878360655737704,
+          "avg_set_size": 1.4501530054644811,
+          "singleton_rate": 0.5498469945355191
         }
       },
-      "fit_seconds": 7.2,
-      "latency_ms_single_patient": 87.1,
-      "in_sample_auc": 1.0,
-      "file_mb": 6.26
+      "memorisation_check": {
+        "auc_exact": 0.7762925833101271,
+        "auc_two_inputs_nudged_5pct": 0.773925554627309
+      },
+      "fit_seconds_5_folds": 91.3,
+      "latency_ms_single_patient_all_labels": 127.2,
+      "file_mb": 9.01
     }
   }
 }

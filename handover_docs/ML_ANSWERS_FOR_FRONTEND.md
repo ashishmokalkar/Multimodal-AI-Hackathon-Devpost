@@ -43,7 +43,7 @@ Metrics are served by `/model/metrics`, so you don't need a static file. The v1.
 | `Explanation` | `scale: "probability"`, `method: string` | How to read the contributions (see item 4) |
 | `PredictionResponse` | `warnings: string[]` | Plain-language cautions, for example a value outside the training range, or age 65+ where accuracy is lower |
 | `PredictionResponse` | `derived: {BMI, Obesity}` | BMI calculated from weight and height. Show it read-only |
-| `PredictionResponse` | `prediction_source: string` | Whether the final models or the hold-out demo models answered |
+| `PredictionResponse` | `prediction_source: string` | Which cross-validation models answered (dataset patient, edited dataset patient, or new patient) |
 | `PredictRequest` | optional `sample_id` | Ties what-if edits of a sample patient to the hold-out models. Without it, an edited sample counts as a new patient. Your `PredictRequestSchema` would strip it today, so add it there if you want it |
 | `TargetMetrics` | `roc_auc_ci95`, `balanced_accuracy`, `brier`, `ece`, `threshold`, `model` | Validation detail for the metrics page |
 
@@ -119,7 +119,7 @@ The patient's true result is LAD-only disease. They were scored by the hold-out 
       { "feature": "T inversion", "value": true,      "contribution": 0.0653, "direction": "positive" } ] } },
   "risk_summary": "Estimated chance of significant coronary artery disease (at least 50% narrowing): 98%, above the 69% decision threshold. Arteries flagged: LAD 94%, LCX 75%. Decision support only, not a diagnosis; confirm with clinical assessment and diagnostic imaging.",
   "mock": false, "warnings": [], "derived": { "BMI": 18.4, "Obesity": false },
-  "prediction_source": "Dataset patient 117: scored by models trained without this patient" }
+  "prediction_source": "Dataset patient 117: scored by the cross-validation model that never saw this patient" }
 ```
 
 A prediction including explanations takes about 0.4 s.
@@ -146,8 +146,7 @@ The brief scores "risk estimation quality". A model that says when it isn't sure
   - interpret-core 0.7.8;
   - fastapi 0.143.0, uvicorn 0.54.0, pydantic 2.13.5.
 - **Model files:**
-  - `models/{cad,lad,lcx,rca}.joblib` for the final models;
-  - `models/demo/*.joblib` for the hold-out copies used by the sample patients;
+  - `models/{cad,lad,lcx,rca}.joblib`: cross-fitted models (five fold models each; see `api/README.md`);
   - `models/manifest.json` for the version, thresholds and validated metrics.
 - **Start, from the repository root:**
   ```bash

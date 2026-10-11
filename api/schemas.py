@@ -158,3 +158,20 @@ class ImportanceResponse(ContractModel):
     n_patients: int
     description: str
     targets: dict[str, list[FeatureImportance]]
+
+
+class CohortPatient(ContractModel):
+    patient: int = Field(ge=1, description="Row number in the dataset (1-based), as in prediction_source.")
+    age: int
+    sex: Literal["Female", "Male"]
+    cad: Probability
+    LAD: Probability
+    LCX: Probability
+    RCA: Probability
+
+
+class CohortResponse(ContractModel):
+    model_version: str
+    n_patients: int = Field(ge=1)
+    population: str = Field(description="Who the comparison group is (a referral cohort, not the general population).")
+    patients: list[CohortPatient]

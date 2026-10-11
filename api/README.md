@@ -8,7 +8,9 @@ frontend contract (`docs/api-contract.md` on the `frontend` branch).
 ## Run
 
 The tested serving runtime is Ubuntu 24.04.5 on WSL 2, Python 3.11.9, and uv
-0.12.24. Run from the repository root; the serving environment lives outside
+0.12.24. **Use Python 3.11**: the models are pickled with 3.11.9 and the pinned
+library versions; on another version the API starts with a warning and may fail
+to load or predict. Run from the repository root; the serving environment lives outside
 the checkout, and dependencies are pinned in `requirements.txt`. For a
 first-time setup only (skip when the environment is already prepared):
 
@@ -41,10 +43,10 @@ localhost.
 ## What the API serves
 | Endpoint | Source |
 |---|---|
-| `GET /health` | `models/manifest.json` → `model_version` (`cardiotwin-v2.0.0`), `mock: false` |
+| `GET /health` | `models/manifest.json` → `model_version` (`cardiotwin-v2.1.0`), `mock: false` |
 | `GET /features` | `api/features.py` (49 inputs: the 55 dataset columns, minus Exertional CP, BMI and Obesity, with chest pain and smoking merged) |
 | `GET /patients/samples` | 8 real dataset patients, one per vessel pattern, with their angiography ground truth |
-| `POST /predict` | `models/*.joblib`, or `models/demo/*.joblib` for the sample patients (see below) |
+| `POST /predict` | `models/*.joblib`: cross-fitted models, so no dataset patient is scored by a model that trained on them (see below) |
 | `GET /model/metrics` | Validated metrics from `models/manifest.json` (repeats r5–r9, see `reports/BEST_MODELS.md`) |
 
 ## Changes from contract v1.0.0
@@ -72,21 +74,18 @@ All the additions are new keys, so the frontend's current zod schemas ignore the
   - choices default to their "none" option.
 
 **Requests (`POST /predict`):**
-- An optional `sample_id`, taken from `/patients/samples`, is accepted.
-- The backend also recognises a sample automatically when its features are sent unchanged.
-- A valid `sample_id` keeps the request on **`models/demo/`**, including edited
-  inputs, so sample what-if comparisons use the same pipelines refitted without
-  the eight sample patients. The frontend retains and labels this sample
-  origin after edits.
-- Requests without a recognized sample origin use the final models. Exact
-  sample features are recognized automatically; edited values require the
-  retained `sample_id` to preserve the demo-model origin.
+- An optional `sample_id`, taken from `/patients/samples`, is accepted and checked, but it does not decide how the request is scored; the values do. The frontend sends it only while the inputs are the sample's own.
+- **Cross-fitted serving.** Each label has five fold models (folds of the fixed repeat r0; each trained on 4/5 of the 303 patients). A request is scored by the fold models that never trained on a dataset patient close to it (Gower distance on the inputs: excluded within 0.03, faded out by 0.05; the two closest distinct dataset patients are 0.025 apart):
+  - any of the 303 dataset patients, typed in exactly, with `72.0` instead of `72`, or with small edits (what-if), is scored by the fold model that never saw them;
+  - a new patient far from every dataset patient is scored by the average of the five fold models.
+- No model trained on all 303 patients is served: it memorises them (in-sample AUC ~1.0), so near-matches would have returned their recorded labels.
 
 **Responses (`POST /predict`):**
-- `Target.uncertain` (bool) is true when the model's 90% prediction set contains both answers. In validation this happened for about 46% of LCX/RCA patients, 24% for LAD and 3% for CAD.
-- `label` is `elevated` when probability ≥ `threshold`.
-- The thresholds are per target and were validated out of fold to maximise balanced accuracy: CAD 0.689, LAD 0.550, LCX 0.324, RCA 0.357.
+- `Target.uncertain` (bool) is true when the model's 90% prediction set contains both answers. It is computed on the returned (capped) probability, with the conformal quantile fitted on capped scores. In validation this happened for about 46% of LCX, 45% of RCA, 25% of LAD and 4% of CAD patients.
 - Each vessel's probability is capped at the CAD probability.
+- `label` is `elevated` for CAD when probability ≥ `threshold`. A vessel is `elevated` only when its probability ≥ its `threshold` **and** CAD is elevated (a narrowed artery is CAD, so a vessel flag without a CAD flag would contradict itself). A vessel can therefore be above its own threshold yet `not elevated`; `risk_summary` says so.
+- The thresholds maximise balanced accuracy on the capped, calibrated out-of-fold scores (vessel thresholds under the rule above): CAD 0.689, LAD 0.430, LCX 0.320, RCA 0.394.
+- On repeats r5–r9 this rule never flags a vessel without CAD, keeps CAD unchanged, and gives slightly higher mean balanced accuracy than independent per-target flags (`reports/v2/s9/s9_served.csv`).
 - `Explanation` gains two fields:
   - `scale: "probability"`;
   - `method` (text describing the method).
@@ -99,7 +98,7 @@ All the additions are new keys, so the frontend's current zod schemas ignore the
   - lower validated accuracy at age 65 or over;
   - lymphocyte plus neutrophil percentages above 100%.
 - `derived`: `{"BMI": 27.2, "Obesity": true}`.
-- `prediction_source`: whether the final models or the hold-out demo models answered.
+- `prediction_source`: which models answered: `Dataset patient N: …never saw this patient`, `Edited dataset patient N: …`, `Close to dataset patient N: …` or `New patient: average of 5 cross-validation models…`.
 - `risk_summary` is a plain-language sentence, including the disclaimer.
 
 **Metrics (`GET /model/metrics`):**
@@ -121,3 +120,4 @@ All the additions are new keys, so the frontend's current zod schemas ignore the
 | `FeatureSchema` | `modifiable: true` | A risk factor a patient can change (weight, smoking, BP, fasting glucose, TG, LDL, HDL). Drives the what-if sliders |
 | `Target` (vessels only) | `capped: bool` | `true` when the vessel model's estimate was above P(CAD) and was lowered to it |
 | new `GET /model/importance` | `{model_version, n_patients, description, targets: {cad, LAD, LCX, RCA: [{feature, mean_abs_contribution, share_raising}]}}` | What each model generally relies on: the average size of every input's contribution over the 303 dataset patients, using the same explanations as `/predict`. Precomputed by `python -m api.importance` into `models/importance.json` |
+| new `GET /cohort` | `{model_version, n_patients, population, patients: [{patient, age, sex, cad, LAD, LCX, RCA}]}` | The comparison cohort for "higher than X% of same-sex, similar-age patients": every dataset patient's age, sex and served probabilities, each scored by the cross-validation model that never saw them (the same numbers `/predict` returns for them). The 303 were referred for angiography, so it is a comparison with that referral group, not the general population. Precomputed by `python -m api.cohort` into `models/cohort.json` |

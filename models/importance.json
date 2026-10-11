@@ -1,632 +1,637 @@
 {
- "model_version": "cardiotwin-v2.0.0",
+ "model_version": "cardiotwin-v2.1.0",
  "n_patients": 303,
- "description": "Average size of each input's contribution (probability units) over the dataset patients, using the same explanations /predict returns (final models); share_raising is the share of patients for whom the input raised the probability.",
+ "description": "Average size of each input's contribution (probability units) over the dataset patients, using the same explanations /predict returns (each patient scored by the cross-validation model that never saw them); share_raising is the share of patients for whom the input raised the probability.",
  "targets": {
   "cad": [
    {
     "feature": "Chest Pain",
-    "mean_abs_contribution": 0.32378,
-    "share_raising": 0.901
+    "mean_abs_contribution": 0.3062,
+    "share_raising": 0.8845
    },
    {
     "feature": "Age",
-    "mean_abs_contribution": 0.06323,
-    "share_raising": 0.4884
+    "mean_abs_contribution": 0.0636,
+    "share_raising": 0.4851
    },
    {
     "feature": "HTN",
-    "mean_abs_contribution": 0.05334,
+    "mean_abs_contribution": 0.05602,
     "share_raising": 0.5908
    },
    {
     "feature": "Region RWMA",
-    "mean_abs_contribution": 0.05126,
+    "mean_abs_contribution": 0.05558,
     "share_raising": 0.2838
    },
    {
     "feature": "TG",
-    "mean_abs_contribution": 0.0435,
+    "mean_abs_contribution": 0.04527,
     "share_raising": 0.4983
    },
    {
     "feature": "EF-TTE",
-    "mean_abs_contribution": 0.04089,
+    "mean_abs_contribution": 0.04248,
     "share_raising": 0.4191
    },
    {
     "feature": "Sex",
-    "mean_abs_contribution": 0.03352,
+    "mean_abs_contribution": 0.04124,
     "share_raising": 0.0
    },
    {
-    "feature": "FBS",
-    "mean_abs_contribution": 0.03163,
-    "share_raising": 0.4884
-   },
-   {
     "feature": "ESR",
-    "mean_abs_contribution": 0.03078,
+    "mean_abs_contribution": 0.03906,
     "share_raising": 0.4686
    },
    {
     "feature": "DM",
-    "mean_abs_contribution": 0.03019,
+    "mean_abs_contribution": 0.03373,
     "share_raising": 0.297
+   },
+   {
+    "feature": "FBS",
+    "mean_abs_contribution": 0.03369,
+    "share_raising": 0.4917
    },
    {
     "feature": "T inversion",
-    "mean_abs_contribution": 0.02809,
+    "mean_abs_contribution": 0.03025,
     "share_raising": 0.297
    },
    {
-    "feature": "CR",
-    "mean_abs_contribution": 0.02376,
-    "share_raising": 0.5413
-   },
-   {
-    "feature": "Dyspnea",
-    "mean_abs_contribution": 0.0211,
-    "share_raising": 0.0
-   },
-   {
-    "feature": "K",
-    "mean_abs_contribution": 0.02026,
-    "share_raising": 0.6535
-   },
-   {
     "feature": "BP",
-    "mean_abs_contribution": 0.01689,
+    "mean_abs_contribution": 0.02593,
     "share_raising": 0.3498
    },
    {
+    "feature": "CR",
+    "mean_abs_contribution": 0.0248,
+    "share_raising": 0.6073
+   },
+   {
     "feature": "PR",
-    "mean_abs_contribution": 0.01675,
+    "mean_abs_contribution": 0.02288,
     "share_raising": 0.4719
    },
    {
+    "feature": "K",
+    "mean_abs_contribution": 0.02009,
+    "share_raising": 0.6601
+   },
+   {
+    "feature": "Dyspnea",
+    "mean_abs_contribution": 0.02,
+    "share_raising": 0.0
+   },
+   {
     "feature": "FH",
-    "mean_abs_contribution": 0.01645,
+    "mean_abs_contribution": 0.01823,
     "share_raising": 0.1584
    },
    {
     "feature": "Weight",
-    "mean_abs_contribution": 0.01195,
-    "share_raising": 0.495
-   },
-   {
-    "feature": "HB",
-    "mean_abs_contribution": 0.0115,
-    "share_raising": 0.5215
-   },
-   {
-    "feature": "Function Class",
-    "mean_abs_contribution": 0.01145,
-    "share_raising": 0.3036
-   },
-   {
-    "feature": "Lymph",
-    "mean_abs_contribution": 0.01106,
-    "share_raising": 0.5842
-   },
-   {
-    "feature": "Smoking",
-    "mean_abs_contribution": 0.01082,
-    "share_raising": 0.2409
+    "mean_abs_contribution": 0.01619,
+    "share_raising": 0.4752
    },
    {
     "feature": "ST Depression",
-    "mean_abs_contribution": 0.01055,
+    "mean_abs_contribution": 0.01439,
     "share_raising": 0.2343
    },
    {
-    "feature": "Length",
-    "mean_abs_contribution": 0.00968,
-    "share_raising": 0.5446
+    "feature": "VHD",
+    "mean_abs_contribution": 0.01173,
+    "share_raising": 0.0132
    },
    {
-    "feature": "Q Wave",
-    "mean_abs_contribution": 0.0091,
-    "share_raising": 0.0528
+    "feature": "Length",
+    "mean_abs_contribution": 0.01172,
+    "share_raising": 0.5347
+   },
+   {
+    "feature": "Lymph",
+    "mean_abs_contribution": 0.0117,
+    "share_raising": 0.5776
+   },
+   {
+    "feature": "Function Class",
+    "mean_abs_contribution": 0.0112,
+    "share_raising": 0.3036
    },
    {
     "feature": "Neut",
-    "mean_abs_contribution": 0.00898,
+    "mean_abs_contribution": 0.01107,
     "share_raising": 0.4455
    },
    {
-    "feature": "ST Elevation",
-    "mean_abs_contribution": 0.00761,
-    "share_raising": 0.0462
+    "feature": "HB",
+    "mean_abs_contribution": 0.01088,
+    "share_raising": 0.5941
    },
    {
-    "feature": "DLP",
-    "mean_abs_contribution": 0.00758,
-    "share_raising": 0.0
+    "feature": "Smoking",
+    "mean_abs_contribution": 0.00999,
+    "share_raising": 0.2409
+   },
+   {
+    "feature": "Q Wave",
+    "mean_abs_contribution": 0.00887,
+    "share_raising": 0.0528
    },
    {
     "feature": "LDL",
-    "mean_abs_contribution": 0.00757,
-    "share_raising": 0.7096
+    "mean_abs_contribution": 0.00854,
+    "share_raising": 0.8416
    },
    {
     "feature": "WBC",
-    "mean_abs_contribution": 0.00678,
-    "share_raising": 0.4719
+    "mean_abs_contribution": 0.00756,
+    "share_raising": 0.5743
    },
    {
-    "feature": "Poor R Progression",
-    "mean_abs_contribution": 0.00559,
-    "share_raising": 0.0297
-   },
-   {
-    "feature": "HDL",
-    "mean_abs_contribution": 0.00526,
-    "share_raising": 0.0
-   },
-   {
-    "feature": "LVH",
-    "mean_abs_contribution": 0.00449,
-    "share_raising": 0.066
-   },
-   {
-    "feature": "VHD",
-    "mean_abs_contribution": 0.0042,
-    "share_raising": 0.0
-   },
-   {
-    "feature": "PLT",
-    "mean_abs_contribution": 0.0038,
-    "share_raising": 0.495
+    "feature": "ST Elevation",
+    "mean_abs_contribution": 0.00707,
+    "share_raising": 0.0462
    },
    {
     "feature": "Na",
-    "mean_abs_contribution": 0.00336,
-    "share_raising": 0.495
+    "mean_abs_contribution": 0.0069,
+    "share_raising": 0.4125
    },
    {
-    "feature": "BBB",
-    "mean_abs_contribution": 0.00284,
-    "share_raising": 0.0
+    "feature": "DLP",
+    "mean_abs_contribution": 0.00662,
+    "share_raising": 0.0297
+   },
+   {
+    "feature": "Poor R Progression",
+    "mean_abs_contribution": 0.00532,
+    "share_raising": 0.0297
+   },
+   {
+    "feature": "PLT",
+    "mean_abs_contribution": 0.00529,
+    "share_raising": 0.3432
    },
    {
     "feature": "BUN",
-    "mean_abs_contribution": 0.00271,
-    "share_raising": 0.5116
+    "mean_abs_contribution": 0.00519,
+    "share_raising": 0.736
    },
    {
-    "feature": "Diastolic Murmur",
-    "mean_abs_contribution": 0.00237,
-    "share_raising": 0.0
+    "feature": "HDL",
+    "mean_abs_contribution": 0.00442,
+    "share_raising": 0.3828
+   },
+   {
+    "feature": "LVH",
+    "mean_abs_contribution": 0.00427,
+    "share_raising": 0.066
+   },
+   {
+    "feature": "BBB",
+    "mean_abs_contribution": 0.00294,
+    "share_raising": 0.0099
    },
    {
     "feature": "Systolic Murmur",
-    "mean_abs_contribution": 0.00189,
-    "share_raising": 0.1353
+    "mean_abs_contribution": 0.00253,
+    "share_raising": 0.132
+   },
+   {
+    "feature": "Diastolic Murmur",
+    "mean_abs_contribution": 0.00247,
+    "share_raising": 0.0
+   },
+   {
+    "feature": "Edema",
+    "mean_abs_contribution": 0.00123,
+    "share_raising": 0.0396
    },
    {
     "feature": "LowTH Ang",
-    "mean_abs_contribution": 0.00134,
+    "mean_abs_contribution": 0.00112,
     "share_raising": 0.0066
    },
    {
     "feature": "Lung rales",
-    "mean_abs_contribution": 0.00114,
-    "share_raising": 0.0363
-   },
-   {
-    "feature": "Edema",
     "mean_abs_contribution": 0.00112,
-    "share_raising": 0.0396
-   },
-   {
-    "feature": "Airway",
-    "mean_abs_contribution": 0.00062,
     "share_raising": 0.0363
    },
    {
     "feature": "CVA",
-    "mean_abs_contribution": 0.00056,
+    "mean_abs_contribution": 0.00067,
     "share_raising": 0.0165
    },
    {
+    "feature": "Airway",
+    "mean_abs_contribution": 0.00055,
+    "share_raising": 0.033
+   },
+   {
     "feature": "Thyroid Disease",
-    "mean_abs_contribution": 0.00037,
+    "mean_abs_contribution": 0.00034,
     "share_raising": 0.0231
    },
    {
     "feature": "Weak Peripheral Pulse",
-    "mean_abs_contribution": 0.00033,
+    "mean_abs_contribution": 0.00027,
     "share_raising": 0.0165
    },
    {
     "feature": "CRF",
-    "mean_abs_contribution": 0.00031,
+    "mean_abs_contribution": 0.00025,
     "share_raising": 0.0198
    },
    {
     "feature": "CHF",
-    "mean_abs_contribution": 4e-05,
+    "mean_abs_contribution": 3e-05,
     "share_raising": 0.0033
    }
   ],
   "lad": [
    {
     "feature": "Chest Pain",
-    "mean_abs_contribution": 0.31748,
+    "mean_abs_contribution": 0.32461,
     "share_raising": 0.868
    },
    {
     "feature": "Age",
-    "mean_abs_contribution": 0.07343,
+    "mean_abs_contribution": 0.08062,
     "share_raising": 0.4884
    },
    {
     "feature": "Region RWMA",
-    "mean_abs_contribution": 0.065,
+    "mean_abs_contribution": 0.07603,
     "share_raising": 0.2838
    },
    {
-    "feature": "EF-TTE",
-    "mean_abs_contribution": 0.04387,
-    "share_raising": 0.4191
-   },
-   {
     "feature": "Sex",
-    "mean_abs_contribution": 0.04374,
+    "mean_abs_contribution": 0.0466,
     "share_raising": 0.0
    },
    {
-    "feature": "TG",
-    "mean_abs_contribution": 0.02888,
-    "share_raising": 0.505
+    "feature": "EF-TTE",
+    "mean_abs_contribution": 0.04115,
+    "share_raising": 0.4191
    },
    {
     "feature": "ESR",
-    "mean_abs_contribution": 0.02627,
-    "share_raising": 0.462
+    "mean_abs_contribution": 0.02725,
+    "share_raising": 0.4719
    },
    {
-    "feature": "FBS",
-    "mean_abs_contribution": 0.02523,
-    "share_raising": 0.4686
+    "feature": "TG",
+    "mean_abs_contribution": 0.02454,
+    "share_raising": 0.4983
    },
    {
     "feature": "DM",
-    "mean_abs_contribution": 0.02179,
+    "mean_abs_contribution": 0.02195,
     "share_raising": 0.297
    },
    {
+    "feature": "FBS",
+    "mean_abs_contribution": 0.02135,
+    "share_raising": 0.4818
+   },
+   {
     "feature": "T inversion",
-    "mean_abs_contribution": 0.01838,
+    "mean_abs_contribution": 0.01752,
     "share_raising": 0.297
    },
    {
     "feature": "HB",
-    "mean_abs_contribution": 0.0168,
-    "share_raising": 0.5809
-   },
-   {
-    "feature": "PLT",
-    "mean_abs_contribution": 0.01611,
-    "share_raising": 0.3531
-   },
-   {
-    "feature": "HTN",
-    "mean_abs_contribution": 0.01317,
-    "share_raising": 0.5875
-   },
-   {
-    "feature": "Lymph",
-    "mean_abs_contribution": 0.01284,
-    "share_raising": 0.5479
-   },
-   {
-    "feature": "K",
-    "mean_abs_contribution": 0.01278,
-    "share_raising": 0.5875
+    "mean_abs_contribution": 0.01533,
+    "share_raising": 0.5314
    },
    {
     "feature": "LDL",
-    "mean_abs_contribution": 0.01244,
-    "share_raising": 0.6766
-   },
-   {
-    "feature": "WBC",
-    "mean_abs_contribution": 0.01127,
-    "share_raising": 0.4488
+    "mean_abs_contribution": 0.01476,
+    "share_raising": 0.6997
    },
    {
     "feature": "ST Depression",
-    "mean_abs_contribution": 0.00945,
-    "share_raising": 0.2343
+    "mean_abs_contribution": 0.01214,
+    "share_raising": 0.231
+   },
+   {
+    "feature": "PLT",
+    "mean_abs_contribution": 0.01203,
+    "share_raising": 0.2838
+   },
+   {
+    "feature": "Lymph",
+    "mean_abs_contribution": 0.01198,
+    "share_raising": 0.4158
    },
    {
     "feature": "Weight",
-    "mean_abs_contribution": 0.00924,
-    "share_raising": 0.462
-   },
-   {
-    "feature": "Dyspnea",
-    "mean_abs_contribution": 0.00904,
-    "share_raising": 0.0
-   },
-   {
-    "feature": "Smoking",
-    "mean_abs_contribution": 0.00835,
-    "share_raising": 0.2409
-   },
-   {
-    "feature": "Neut",
-    "mean_abs_contribution": 0.00816,
-    "share_raising": 0.5116
-   },
-   {
-    "feature": "HDL",
-    "mean_abs_contribution": 0.00778,
-    "share_raising": 0.1518
-   },
-   {
-    "feature": "Na",
-    "mean_abs_contribution": 0.00778,
-    "share_raising": 0.3894
-   },
-   {
-    "feature": "BP",
-    "mean_abs_contribution": 0.00703,
-    "share_raising": 0.3465
-   },
-   {
-    "feature": "Q Wave",
-    "mean_abs_contribution": 0.0068,
-    "share_raising": 0.0528
-   },
-   {
-    "feature": "Length",
-    "mean_abs_contribution": 0.00663,
-    "share_raising": 0.3696
-   },
-   {
-    "feature": "PR",
-    "mean_abs_contribution": 0.00583,
-    "share_raising": 0.4653
-   },
-   {
-    "feature": "CR",
-    "mean_abs_contribution": 0.0056,
-    "share_raising": 0.5413
+    "mean_abs_contribution": 0.01073,
+    "share_raising": 0.5182
    },
    {
     "feature": "DLP",
-    "mean_abs_contribution": 0.00513,
-    "share_raising": 0.2574
+    "mean_abs_contribution": 0.01049,
+    "share_raising": 0.3399
    },
    {
-    "feature": "FH",
-    "mean_abs_contribution": 0.00409,
-    "share_raising": 0.1551
+    "feature": "HTN",
+    "mean_abs_contribution": 0.00984,
+    "share_raising": 0.4587
    },
    {
-    "feature": "Function Class",
-    "mean_abs_contribution": 0.00366,
-    "share_raising": 0.3003
+    "feature": "WBC",
+    "mean_abs_contribution": 0.00965,
+    "share_raising": 0.5908
    },
    {
-    "feature": "ST Elevation",
-    "mean_abs_contribution": 0.00286,
-    "share_raising": 0.0462
+    "feature": "Neut",
+    "mean_abs_contribution": 0.00937,
+    "share_raising": 0.6634
+   },
+   {
+    "feature": "PR",
+    "mean_abs_contribution": 0.00935,
+    "share_raising": 0.4752
+   },
+   {
+    "feature": "Length",
+    "mean_abs_contribution": 0.00795,
+    "share_raising": 0.5017
+   },
+   {
+    "feature": "Dyspnea",
+    "mean_abs_contribution": 0.0079,
+    "share_raising": 0.0825
+   },
+   {
+    "feature": "BP",
+    "mean_abs_contribution": 0.00773,
+    "share_raising": 0.2772
+   },
+   {
+    "feature": "Na",
+    "mean_abs_contribution": 0.00765,
+    "share_raising": 0.4356
+   },
+   {
+    "feature": "Smoking",
+    "mean_abs_contribution": 0.00763,
+    "share_raising": 0.2376
+   },
+   {
+    "feature": "K",
+    "mean_abs_contribution": 0.00761,
+    "share_raising": 0.5941
+   },
+   {
+    "feature": "Q Wave",
+    "mean_abs_contribution": 0.00623,
+    "share_raising": 0.0528
+   },
+   {
+    "feature": "HDL",
+    "mean_abs_contribution": 0.00555,
+    "share_raising": 0.1947
+   },
+   {
+    "feature": "CR",
+    "mean_abs_contribution": 0.00539,
+    "share_raising": 0.6304
    },
    {
     "feature": "VHD",
-    "mean_abs_contribution": 0.00173,
-    "share_raising": 0.0
+    "mean_abs_contribution": 0.00439,
+    "share_raising": 0.1386
    },
    {
-    "feature": "BBB",
-    "mean_abs_contribution": 0.00153,
-    "share_raising": 0.0
+    "feature": "FH",
+    "mean_abs_contribution": 0.00337,
+    "share_raising": 0.1221
    },
    {
-    "feature": "Diastolic Murmur",
-    "mean_abs_contribution": 0.00125,
-    "share_raising": 0.0
-   },
-   {
-    "feature": "LVH",
-    "mean_abs_contribution": 0.001,
-    "share_raising": 0.066
+    "feature": "Function Class",
+    "mean_abs_contribution": 0.00321,
+    "share_raising": 0.2376
    },
    {
     "feature": "BUN",
-    "mean_abs_contribution": 0.00094,
-    "share_raising": 0.505
+    "mean_abs_contribution": 0.00283,
+    "share_raising": 0.4983
+   },
+   {
+    "feature": "ST Elevation",
+    "mean_abs_contribution": 0.0022,
+    "share_raising": 0.0462
+   },
+   {
+    "feature": "BBB",
+    "mean_abs_contribution": 0.00133,
+    "share_raising": 0.0132
    },
    {
     "feature": "Systolic Murmur",
-    "mean_abs_contribution": 0.00066,
-    "share_raising": 0.1353
+    "mean_abs_contribution": 0.00122,
+    "share_raising": 0.0792
    },
    {
-    "feature": "Lung rales",
-    "mean_abs_contribution": 0.00064,
-    "share_raising": 0.0363
+    "feature": "LVH",
+    "mean_abs_contribution": 0.00099,
+    "share_raising": 0.0462
    },
    {
-    "feature": "Edema",
-    "mean_abs_contribution": 0.0005,
-    "share_raising": 0.0396
-   },
-   {
-    "feature": "LowTH Ang",
-    "mean_abs_contribution": 0.0003,
-    "share_raising": 0.0066
+    "feature": "Diastolic Murmur",
+    "mean_abs_contribution": 0.00082,
+    "share_raising": 0.0
    },
    {
     "feature": "Airway",
-    "mean_abs_contribution": 0.00026,
-    "share_raising": 0.0363
-   },
-   {
-    "feature": "Poor R Progression",
-    "mean_abs_contribution": 0.00022,
-    "share_raising": 0.0264
-   },
-   {
-    "feature": "CVA",
-    "mean_abs_contribution": 0.00016,
-    "share_raising": 0.0165
-   },
-   {
-    "feature": "Thyroid Disease",
-    "mean_abs_contribution": 0.0001,
+    "mean_abs_contribution": 0.00057,
     "share_raising": 0.0231
    },
    {
-    "feature": "Weak Peripheral Pulse",
-    "mean_abs_contribution": 9e-05,
+    "feature": "Edema",
+    "mean_abs_contribution": 0.00054,
+    "share_raising": 0.0231
+   },
+   {
+    "feature": "Poor R Progression",
+    "mean_abs_contribution": 0.00046,
+    "share_raising": 0.0132
+   },
+   {
+    "feature": "CVA",
+    "mean_abs_contribution": 0.00038,
+    "share_raising": 0.0132
+   },
+   {
+    "feature": "Thyroid Disease",
+    "mean_abs_contribution": 0.00035,
     "share_raising": 0.0165
    },
    {
+    "feature": "Lung rales",
+    "mean_abs_contribution": 0.00029,
+    "share_raising": 0.0231
+   },
+   {
     "feature": "CRF",
+    "mean_abs_contribution": 0.00026,
+    "share_raising": 0.0066
+   },
+   {
+    "feature": "Weak Peripheral Pulse",
+    "mean_abs_contribution": 0.00024,
+    "share_raising": 0.0099
+   },
+   {
+    "feature": "LowTH Ang",
     "mean_abs_contribution": 6e-05,
-    "share_raising": 0.0198
+    "share_raising": 0.0066
    },
    {
     "feature": "CHF",
-    "mean_abs_contribution": 1e-05,
+    "mean_abs_contribution": 0.0,
     "share_raising": 0.0033
    }
   ],
   "lcx": [
    {
     "feature": "Chest Pain",
-    "mean_abs_contribution": 0.22237,
-    "share_raising": 0.901
+    "mean_abs_contribution": 0.23276,
+    "share_raising": 0.8845
    },
    {
     "feature": "Age",
-    "mean_abs_contribution": 0.09237,
+    "mean_abs_contribution": 0.07997,
     "share_raising": 0.4851
    },
    {
     "feature": "Sex",
-    "mean_abs_contribution": 0.06198,
+    "mean_abs_contribution": 0.05262,
     "share_raising": 0.0
    },
    {
     "feature": "TG",
-    "mean_abs_contribution": 0.02572,
-    "share_raising": 0.6106
+    "mean_abs_contribution": 0.02206,
+    "share_raising": 0.4983
    },
    {
     "feature": "DM",
-    "mean_abs_contribution": 0.02211,
-    "share_raising": 0.2937
-   },
-   {
-    "feature": "ESR",
-    "mean_abs_contribution": 0.01769,
-    "share_raising": 0.4686
-   },
-   {
-    "feature": "K",
-    "mean_abs_contribution": 0.01681,
-    "share_raising": 0.5479
-   },
-   {
-    "feature": "CR",
-    "mean_abs_contribution": 0.01463,
-    "share_raising": 0.5545
+    "mean_abs_contribution": 0.01936,
+    "share_raising": 0.297
    },
    {
     "feature": "BP",
-    "mean_abs_contribution": 0.01438,
-    "share_raising": 0.3498
-   },
-   {
-    "feature": "FBS",
-    "mean_abs_contribution": 0.01269,
-    "share_raising": 0.4884
-   },
-   {
-    "feature": "Smoking",
-    "mean_abs_contribution": 0.01264,
-    "share_raising": 0.2376
-   },
-   {
-    "feature": "EF-TTE",
-    "mean_abs_contribution": 0.01098,
-    "share_raising": 0.4125
-   },
-   {
-    "feature": "LDL",
-    "mean_abs_contribution": 0.01074,
-    "share_raising": 0.571
+    "mean_abs_contribution": 0.01311,
+    "share_raising": 0.3432
    },
    {
     "feature": "PLT",
-    "mean_abs_contribution": 0.01039,
-    "share_raising": 0.495
+    "mean_abs_contribution": 0.01098,
+    "share_raising": 0.4917
+   },
+   {
+    "feature": "CR",
+    "mean_abs_contribution": 0.01083,
+    "share_raising": 0.5281
+   },
+   {
+    "feature": "Smoking",
+    "mean_abs_contribution": 0.0106,
+    "share_raising": 0.231
+   },
+   {
+    "feature": "K",
+    "mean_abs_contribution": 0.00953,
+    "share_raising": 0.6535
+   },
+   {
+    "feature": "FBS",
+    "mean_abs_contribution": 0.00922,
+    "share_raising": 0.4917
    },
    {
     "feature": "Na",
-    "mean_abs_contribution": 0.00997,
-    "share_raising": 0.3267
+    "mean_abs_contribution": 0.0092,
+    "share_raising": 0.3465
    },
    {
     "feature": "HTN",
-    "mean_abs_contribution": 0.00981,
-    "share_raising": 0.5908
+    "mean_abs_contribution": 0.00815,
+    "share_raising": 0.5413
+   },
+   {
+    "feature": "EF-TTE",
+    "mean_abs_contribution": 0.00766,
+    "share_raising": 0.3432
+   },
+   {
+    "feature": "LDL",
+    "mean_abs_contribution": 0.00734,
+    "share_raising": 0.5809
+   },
+   {
+    "feature": "ESR",
+    "mean_abs_contribution": 0.00715,
+    "share_raising": 0.4389
    },
    {
     "feature": "FH",
-    "mean_abs_contribution": 0.00786,
+    "mean_abs_contribution": 0.00671,
     "share_raising": 0.1584
    },
    {
     "feature": "Weight",
-    "mean_abs_contribution": 0.00712,
-    "share_raising": 0.4884
-   },
-   {
-    "feature": "Dyspnea",
-    "mean_abs_contribution": 0.00517,
-    "share_raising": 0.0066
-   },
-   {
-    "feature": "T inversion",
-    "mean_abs_contribution": 0.00472,
-    "share_raising": 0.2871
+    "mean_abs_contribution": 0.00595,
+    "share_raising": 0.4125
    },
    {
     "feature": "DLP",
-    "mean_abs_contribution": 0.00364,
-    "share_raising": 0.2178
+    "mean_abs_contribution": 0.00422,
+    "share_raising": 0.2871
    },
    {
     "feature": "Length",
-    "mean_abs_contribution": 0.0032,
-    "share_raising": 0.5314
+    "mean_abs_contribution": 0.00373,
+    "share_raising": 0.3927
+   },
+   {
+    "feature": "T inversion",
+    "mean_abs_contribution": 0.00344,
+    "share_raising": 0.2376
+   },
+   {
+    "feature": "Dyspnea",
+    "mean_abs_contribution": 0.00331,
+    "share_raising": 0.1155
    },
    {
     "feature": "PR",
-    "mean_abs_contribution": 0.00282,
-    "share_raising": 0.4653
+    "mean_abs_contribution": 0.00288,
+    "share_raising": 0.3894
+   },
+   {
+    "feature": "HB",
+    "mean_abs_contribution": 0.00272,
+    "share_raising": 0.6931
    },
    {
     "feature": "ST Depression",
-    "mean_abs_contribution": 0.00266,
-    "share_raising": 0.2277
+    "mean_abs_contribution": 0.00258,
+    "share_raising": 0.2013
    },
    {
-    "feature": "Region RWMA",
-    "mean_abs_contribution": 0.00233,
-    "share_raising": 0.2805
+    "feature": "HDL",
+    "mean_abs_contribution": 0.00224,
+    "share_raising": 0.1254
    },
    {
-    "feature": "Lymph",
-    "mean_abs_contribution": 0.00228,
-    "share_raising": 0.5677
+    "feature": "VHD",
+    "mean_abs_contribution": 0.00209,
+    "share_raising": 0.2178
    },
    {
     "feature": "Q Wave",
@@ -634,108 +639,103 @@
     "share_raising": 0.0528
    },
    {
-    "feature": "Function Class",
-    "mean_abs_contribution": 0.00179,
-    "share_raising": 0.3036
+    "feature": "Region RWMA",
+    "mean_abs_contribution": 0.00183,
+    "share_raising": 0.2244
    },
    {
-    "feature": "HB",
-    "mean_abs_contribution": 0.00168,
-    "share_raising": 0.5149
+    "feature": "Lymph",
+    "mean_abs_contribution": 0.00173,
+    "share_raising": 0.5116
+   },
+   {
+    "feature": "Function Class",
+    "mean_abs_contribution": 0.00163,
+    "share_raising": 0.2112
    },
    {
     "feature": "Neut",
-    "mean_abs_contribution": 0.00164,
-    "share_raising": 0.4257
-   },
-   {
-    "feature": "VHD",
     "mean_abs_contribution": 0.00143,
-    "share_raising": 0.0
-   },
-   {
-    "feature": "Diastolic Murmur",
-    "mean_abs_contribution": 0.00132,
-    "share_raising": 0.0
-   },
-   {
-    "feature": "HDL",
-    "mean_abs_contribution": 0.00132,
-    "share_raising": 0.0
+    "share_raising": 0.4455
    },
    {
     "feature": "WBC",
-    "mean_abs_contribution": 0.00129,
-    "share_raising": 0.4686
+    "mean_abs_contribution": 0.0014,
+    "share_raising": 0.7327
    },
    {
-    "feature": "BBB",
-    "mean_abs_contribution": 0.00082,
+    "feature": "Diastolic Murmur",
+    "mean_abs_contribution": 0.00098,
     "share_raising": 0.0
    },
    {
     "feature": "BUN",
-    "mean_abs_contribution": 0.00073,
-    "share_raising": 0.5116
+    "mean_abs_contribution": 0.00092,
+    "share_raising": 0.6799
+   },
+   {
+    "feature": "Systolic Murmur",
+    "mean_abs_contribution": 0.00066,
+    "share_raising": 0.1023
+   },
+   {
+    "feature": "BBB",
+    "mean_abs_contribution": 0.00059,
+    "share_raising": 0.033
    },
    {
     "feature": "CVA",
-    "mean_abs_contribution": 0.0005,
+    "mean_abs_contribution": 0.00044,
     "share_raising": 0.0165
    },
    {
     "feature": "ST Elevation",
-    "mean_abs_contribution": 0.00045,
-    "share_raising": 0.0462
-   },
-   {
-    "feature": "Systolic Murmur",
-    "mean_abs_contribution": 0.00037,
-    "share_raising": 0.1353
-   },
-   {
-    "feature": "Weak Peripheral Pulse",
-    "mean_abs_contribution": 0.00036,
-    "share_raising": 0.0165
+    "mean_abs_contribution": 0.00039,
+    "share_raising": 0.0429
    },
    {
     "feature": "LVH",
-    "mean_abs_contribution": 0.00036,
-    "share_raising": 0.066
+    "mean_abs_contribution": 0.0003,
+    "share_raising": 0.0462
+   },
+   {
+    "feature": "Weak Peripheral Pulse",
+    "mean_abs_contribution": 0.00023,
+    "share_raising": 0.0165
    },
    {
     "feature": "Edema",
-    "mean_abs_contribution": 0.00019,
-    "share_raising": 0.0396
-   },
-   {
-    "feature": "Lung rales",
-    "mean_abs_contribution": 0.00018,
-    "share_raising": 0.0363
-   },
-   {
-    "feature": "Airway",
-    "mean_abs_contribution": 9e-05,
-    "share_raising": 0.0363
-   },
-   {
-    "feature": "Poor R Progression",
-    "mean_abs_contribution": 8e-05,
+    "mean_abs_contribution": 0.00021,
     "share_raising": 0.0297
    },
    {
+    "feature": "Lung rales",
+    "mean_abs_contribution": 0.00019,
+    "share_raising": 0.0297
+   },
+   {
+    "feature": "Poor R Progression",
+    "mean_abs_contribution": 0.00016,
+    "share_raising": 0.0198
+   },
+   {
     "feature": "Thyroid Disease",
-    "mean_abs_contribution": 5e-05,
-    "share_raising": 0.0231
+    "mean_abs_contribution": 0.0001,
+    "share_raising": 0.0198
    },
    {
     "feature": "CRF",
-    "mean_abs_contribution": 4e-05,
+    "mean_abs_contribution": 9e-05,
+    "share_raising": 0.0099
+   },
+   {
+    "feature": "Airway",
+    "mean_abs_contribution": 8e-05,
     "share_raising": 0.0198
    },
    {
     "feature": "LowTH Ang",
-    "mean_abs_contribution": 4e-05,
+    "mean_abs_contribution": 2e-05,
     "share_raising": 0.0066
    },
    {
@@ -747,248 +747,248 @@
   "rca": [
    {
     "feature": "Chest Pain",
-    "mean_abs_contribution": 0.11505,
-    "share_raising": 0.7954
+    "mean_abs_contribution": 0.10957,
+    "share_raising": 0.8482
    },
    {
     "feature": "Age",
-    "mean_abs_contribution": 0.06424,
-    "share_raising": 0.4587
-   },
-   {
-    "feature": "ESR",
-    "mean_abs_contribution": 0.05909,
-    "share_raising": 0.5644
+    "mean_abs_contribution": 0.06224,
+    "share_raising": 0.4818
    },
    {
     "feature": "DM",
-    "mean_abs_contribution": 0.05192,
+    "mean_abs_contribution": 0.05445,
     "share_raising": 0.297
-   },
-   {
-    "feature": "TG",
-    "mean_abs_contribution": 0.0493,
-    "share_raising": 0.5644
    },
    {
     "feature": "Sex",
-    "mean_abs_contribution": 0.04802,
-    "share_raising": 0.0066
+    "mean_abs_contribution": 0.05041,
+    "share_raising": 0.0
+   },
+   {
+    "feature": "ESR",
+    "mean_abs_contribution": 0.04644,
+    "share_raising": 0.4983
+   },
+   {
+    "feature": "TG",
+    "mean_abs_contribution": 0.03211,
+    "share_raising": 0.769
    },
    {
     "feature": "Neut",
-    "mean_abs_contribution": 0.04313,
-    "share_raising": 0.4323
-   },
-   {
-    "feature": "CR",
-    "mean_abs_contribution": 0.02634,
-    "share_raising": 0.396
-   },
-   {
-    "feature": "Dyspnea",
-    "mean_abs_contribution": 0.02459,
-    "share_raising": 0.0132
+    "mean_abs_contribution": 0.03055,
+    "share_raising": 0.4422
    },
    {
     "feature": "BP",
-    "mean_abs_contribution": 0.0242,
-    "share_raising": 0.2739
+    "mean_abs_contribution": 0.01807,
+    "share_raising": 0.3399
    },
    {
-    "feature": "Function Class",
-    "mean_abs_contribution": 0.0156,
-    "share_raising": 0.2772
+    "feature": "Dyspnea",
+    "mean_abs_contribution": 0.01482,
+    "share_raising": 0.0033
    },
    {
     "feature": "EF-TTE",
+    "mean_abs_contribution": 0.01204,
+    "share_raising": 0.3399
+   },
+   {
+    "feature": "CR",
     "mean_abs_contribution": 0.01185,
-    "share_raising": 0.4158
+    "share_raising": 0.4785
    },
    {
     "feature": "Smoking",
-    "mean_abs_contribution": 0.01122,
-    "share_raising": 0.198
-   },
-   {
-    "feature": "Poor R Progression",
-    "mean_abs_contribution": 0.00867,
-    "share_raising": 0.0297
-   },
-   {
-    "feature": "FH",
-    "mean_abs_contribution": 0.00862,
-    "share_raising": 0.1485
-   },
-   {
-    "feature": "HTN",
-    "mean_abs_contribution": 0.0075,
-    "share_raising": 0.5908
-   },
-   {
-    "feature": "FBS",
-    "mean_abs_contribution": 0.0067,
-    "share_raising": 0.4884
-   },
-   {
-    "feature": "Q Wave",
-    "mean_abs_contribution": 0.00446,
-    "share_raising": 0.0528
-   },
-   {
-    "feature": "Region RWMA",
-    "mean_abs_contribution": 0.00367,
-    "share_raising": 0.2838
-   },
-   {
-    "feature": "PR",
-    "mean_abs_contribution": 0.00342,
-    "share_raising": 0.4686
-   },
-   {
-    "feature": "Weight",
-    "mean_abs_contribution": 0.00324,
-    "share_raising": 0.5215
-   },
-   {
-    "feature": "T inversion",
-    "mean_abs_contribution": 0.00304,
-    "share_raising": 0.297
-   },
-   {
-    "feature": "K",
-    "mean_abs_contribution": 0.00303,
-    "share_raising": 0.6502
+    "mean_abs_contribution": 0.01003,
+    "share_raising": 0.2211
    },
    {
     "feature": "Lymph",
-    "mean_abs_contribution": 0.00268,
-    "share_raising": 0.5776
+    "mean_abs_contribution": 0.00905,
+    "share_raising": 0.4356
    },
    {
-    "feature": "Length",
-    "mean_abs_contribution": 0.00245,
-    "share_raising": 0.5776
+    "feature": "FH",
+    "mean_abs_contribution": 0.00876,
+    "share_raising": 0.1584
    },
    {
-    "feature": "HB",
-    "mean_abs_contribution": 0.00233,
-    "share_raising": 0.5215
+    "feature": "K",
+    "mean_abs_contribution": 0.00823,
+    "share_raising": 0.5149
    },
    {
-    "feature": "LDL",
-    "mean_abs_contribution": 0.00206,
-    "share_raising": 0.6667
+    "feature": "Poor R Progression",
+    "mean_abs_contribution": 0.00768,
+    "share_raising": 0.0297
    },
    {
-    "feature": "DLP",
-    "mean_abs_contribution": 0.00198,
-    "share_raising": 0.0
+    "feature": "Weight",
+    "mean_abs_contribution": 0.00761,
+    "share_raising": 0.4224
    },
    {
-    "feature": "ST Depression",
-    "mean_abs_contribution": 0.00177,
-    "share_raising": 0.2343
+    "feature": "HTN",
+    "mean_abs_contribution": 0.00664,
+    "share_raising": 0.4224
    },
    {
     "feature": "WBC",
-    "mean_abs_contribution": 0.0016,
-    "share_raising": 0.4686
+    "mean_abs_contribution": 0.00557,
+    "share_raising": 0.5611
    },
    {
-    "feature": "HDL",
-    "mean_abs_contribution": 0.00146,
-    "share_raising": 0.0
+    "feature": "Length",
+    "mean_abs_contribution": 0.00554,
+    "share_raising": 0.4587
+   },
+   {
+    "feature": "FBS",
+    "mean_abs_contribution": 0.0055,
+    "share_raising": 0.462
+   },
+   {
+    "feature": "Na",
+    "mean_abs_contribution": 0.00473,
+    "share_raising": 0.3729
+   },
+   {
+    "feature": "Function Class",
+    "mean_abs_contribution": 0.00443,
+    "share_raising": 0.2904
+   },
+   {
+    "feature": "PR",
+    "mean_abs_contribution": 0.00426,
+    "share_raising": 0.3861
    },
    {
     "feature": "VHD",
-    "mean_abs_contribution": 0.00146,
-    "share_raising": 0.0
+    "mean_abs_contribution": 0.00422,
+    "share_raising": 0.1221
+   },
+   {
+    "feature": "Q Wave",
+    "mean_abs_contribution": 0.0039,
+    "share_raising": 0.0528
+   },
+   {
+    "feature": "BUN",
+    "mean_abs_contribution": 0.00372,
+    "share_raising": 0.4587
+   },
+   {
+    "feature": "DLP",
+    "mean_abs_contribution": 0.00332,
+    "share_raising": 0.1155
+   },
+   {
+    "feature": "T inversion",
+    "mean_abs_contribution": 0.00314,
+    "share_raising": 0.2145
+   },
+   {
+    "feature": "Region RWMA",
+    "mean_abs_contribution": 0.00269,
+    "share_raising": 0.2112
+   },
+   {
+    "feature": "ST Depression",
+    "mean_abs_contribution": 0.00255,
+    "share_raising": 0.1485
+   },
+   {
+    "feature": "LDL",
+    "mean_abs_contribution": 0.00208,
+    "share_raising": 0.6667
+   },
+   {
+    "feature": "HB",
+    "mean_abs_contribution": 0.00204,
+    "share_raising": 0.5644
    },
    {
     "feature": "Diastolic Murmur",
-    "mean_abs_contribution": 0.00116,
+    "mean_abs_contribution": 0.00189,
     "share_raising": 0.0
    },
    {
     "feature": "PLT",
-    "mean_abs_contribution": 0.00095,
-    "share_raising": 0.495
-   },
-   {
-    "feature": "Na",
-    "mean_abs_contribution": 0.00089,
-    "share_raising": 0.495
-   },
-   {
-    "feature": "BBB",
-    "mean_abs_contribution": 0.00087,
-    "share_raising": 0.0
-   },
-   {
-    "feature": "BUN",
-    "mean_abs_contribution": 0.00075,
-    "share_raising": 0.5116
-   },
-   {
-    "feature": "LVH",
-    "mean_abs_contribution": 0.00061,
-    "share_raising": 0.066
+    "mean_abs_contribution": 0.00132,
+    "share_raising": 0.3564
    },
    {
     "feature": "Systolic Murmur",
-    "mean_abs_contribution": 0.00048,
-    "share_raising": 0.1353
+    "mean_abs_contribution": 0.0013,
+    "share_raising": 0.0858
    },
    {
-    "feature": "ST Elevation",
-    "mean_abs_contribution": 0.00033,
-    "share_raising": 0.0462
-   },
-   {
-    "feature": "Lung rales",
-    "mean_abs_contribution": 0.0002,
-    "share_raising": 0.0363
-   },
-   {
-    "feature": "Edema",
-    "mean_abs_contribution": 0.00016,
-    "share_raising": 0.0396
-   },
-   {
-    "feature": "Airway",
-    "mean_abs_contribution": 0.00012,
-    "share_raising": 0.0363
-   },
-   {
-    "feature": "Thyroid Disease",
-    "mean_abs_contribution": 8e-05,
+    "feature": "BBB",
+    "mean_abs_contribution": 0.00125,
     "share_raising": 0.0231
    },
    {
-    "feature": "Weak Peripheral Pulse",
-    "mean_abs_contribution": 7e-05,
-    "share_raising": 0.0165
+    "feature": "HDL",
+    "mean_abs_contribution": 0.00121,
+    "share_raising": 0.3432
    },
    {
-    "feature": "CVA",
-    "mean_abs_contribution": 5e-05,
+    "feature": "LVH",
+    "mean_abs_contribution": 0.00064,
+    "share_raising": 0.0495
+   },
+   {
+    "feature": "ST Elevation",
+    "mean_abs_contribution": 0.0004,
+    "share_raising": 0.0264
+   },
+   {
+    "feature": "Edema",
+    "mean_abs_contribution": 0.00035,
+    "share_raising": 0.0264
+   },
+   {
+    "feature": "Lung rales",
+    "mean_abs_contribution": 0.00032,
+    "share_raising": 0.0231
+   },
+   {
+    "feature": "Airway",
+    "mean_abs_contribution": 0.00031,
     "share_raising": 0.0165
    },
    {
     "feature": "CRF",
-    "mean_abs_contribution": 4e-05,
-    "share_raising": 0.0165
+    "mean_abs_contribution": 0.00025,
+    "share_raising": 0.0132
    },
    {
-    "feature": "CHF",
-    "mean_abs_contribution": 2e-05,
-    "share_raising": 0.0033
+    "feature": "CVA",
+    "mean_abs_contribution": 0.00016,
+    "share_raising": 0.0099
+   },
+   {
+    "feature": "Thyroid Disease",
+    "mean_abs_contribution": 0.00016,
+    "share_raising": 0.0198
+   },
+   {
+    "feature": "Weak Peripheral Pulse",
+    "mean_abs_contribution": 0.0001,
+    "share_raising": 0.0066
    },
    {
     "feature": "LowTH Ang",
-    "mean_abs_contribution": 1e-05,
+    "mean_abs_contribution": 4e-05,
     "share_raising": 0.0066
+   },
+   {
+    "feature": "CHF",
+    "mean_abs_contribution": 3e-05,
+    "share_raising": 0.0
    }
   ]
  }

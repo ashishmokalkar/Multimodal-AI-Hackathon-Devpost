@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import json
 import os
+import platform
 import uuid
+import warnings
 from datetime import datetime, timezone
 from functools import lru_cache
 
@@ -17,10 +19,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from api.explain import explain, predict
-from api.features import NAMES, SPECS, from_model_row, public_schema, training_ranges, validate
-from api.schemas import (FeatureSchema, HealthResponse, ImportanceResponse, MetricsResponse, PredictionResponse,
-                         PredictRequest, SamplePatient)
+from api.explain import explain
+from api.features import NAMES, SPECS, from_model_row, public_schema, to_model_frame, training_ranges, validate
+from api.schemas import (CohortResponse, FeatureSchema, HealthResponse, ImportanceResponse, MetricsResponse,
+                         PredictionResponse, PredictRequest, SamplePatient)
 from ml.data import ROOT, TARGETS, VESSELS
 
 CONTRACT_VERSION = "1.1.0"
@@ -51,6 +53,10 @@ def state() -> dict:
     from ml.export import MODELS, load_models
 
     manifest = json.loads((MODELS / "manifest.json").read_text())
+    saved, running = manifest["python"].rsplit(".", 1)[0], platform.python_version().rsplit(".", 1)[0]
+    if saved != running:
+        warnings.warn(f"The models were saved with Python {manifest['python']}; this is Python "
+                      f"{platform.python_version()}. Use Python {saved} (see README) if loading or predictions fail.")
     df = load_clean()
     samples = []
     for row in manifest["demo_patients"]["rows"]:
@@ -62,11 +68,16 @@ def state() -> dict:
                                                                          "RCA": bool(r.rca)}},
                         "synthetic": False})
     sub = pd.read_csv(ROOT / "reports" / "v2" / "s9" / "s9_subgroups.csv")
-    return {"models": load_models(), "demo_models": load_models(demo=True), "manifest": manifest,
-            "samples": samples, "sample_ids": {s["id"] for s in samples},
-            "sample_keys": {json.dumps(s["features"], sort_keys=True): s["id"] for s in samples},
+    return {"models": load_models(), "manifest": manifest, "samples": samples, "sample_ids": {s["id"] for s in samples},
             "ranges": training_ranges(),
             "auc_65": sub[sub.group == "age>=65"].set_index("target").auc.to_dict()}
+
+
+@app.on_event("startup")
+def _warm_up() -> None:
+    """Load the models and run one explanation at startup, so the first request from the dashboard is not slow."""
+    s = state()
+    explain(s["models"], s["samples"][0]["features"])
 
 
 # ------------------------------------------------------------------------------------------- endpoints
@@ -94,13 +105,17 @@ def predict_endpoint(request: PredictRequest):
         errors.append({"loc": ["body", "sample_id"], "msg": "Unknown sample id", "type": "value_error"})
     if errors:
         return JSONResponse(status_code=422, content={"detail": errors})
+    from ml.export import decide
+
     patient = {n: request.features[n] for n in NAMES}
-    sample = request.sample_id or s["sample_keys"].get(json.dumps(patient, sort_keys=True))
-    models = s["demo_models"] if sample else s["models"]
-    probs = {t: float(v[0]) for t, v in predict(models, [patient]).items()}
-    uncapped = _uncapped(models, patient)
+    models = s["models"]
+    # sample_id is only checked for existence: what the request is scored by follows from its values (nearest
+    # dataset patient), so an edited sample is never described as the untouched dataset patient
     expl = explain(models, patient)
-    targets = {t: _target(models[t], probs[t], capped=uncapped[t] > uncapped["cad"] if t != "cad" else None)
+    probs = {t: expl[t]["probability"] for t in TARGETS}
+    flags = decide(probs, {t: models[t].threshold for t in TARGETS})
+    targets = {t: _target(models[t], probs[t], bool(flags[t]),
+                          capped=expl[t]["uncapped"] > expl["cad"]["uncapped"] if t != "cad" else None)
                for t in TARGETS}
     return {
         "request_id": str(uuid.uuid4()),
@@ -112,8 +127,7 @@ def predict_endpoint(request: PredictRequest):
         "mock": False,
         "warnings": _warnings(patient, s),
         "derived": _derived(patient),
-        "prediction_source": (f"Dataset patient {sample.split('-')[1]}: scored by models trained without this patient"
-                              if sample else "Final models trained on all 303 patients"),
+        "prediction_source": _source(models, patient),
     }
 
 
@@ -146,18 +160,36 @@ def importance():
     return {**data, "targets": {API_KEYS[t]: rows for t, rows in data["targets"].items()}}
 
 
+@app.get("/cohort", response_model=CohortResponse)
+def cohort():
+    """The comparison cohort: age, sex and served probabilities of every dataset patient, each scored by the
+    cross-validation model that never saw them (precomputed by `python -m api.cohort`)."""
+    from ml.export import MODELS
+
+    return json.loads((MODELS / "cohort.json").read_text())
+
+
 # ------------------------------------------------------------------------------------------- helpers
-def _target(model, p: float, capped: bool | None = None) -> dict:
-    return {"probability": round(p, 4), "label": "elevated" if p >= model.threshold else "not elevated",
+def _target(model, p: float, flagged: bool, capped: bool | None = None) -> dict:
+    return {"probability": round(p, 4), "label": "elevated" if flagged else "not elevated",
             "threshold": round(model.threshold, 4), "uncertain": len(model.conformal_set([p])[0]) != 1,
             "capped": capped}
 
 
-def _uncapped(models: dict, patient: dict) -> dict:
-    from api.features import to_model_frame
+def _source(models: dict, patient: dict) -> str:
+    """Which models scored this request, from its distance to the nearest dataset patient (see ml/export.py)."""
+    from ml.export import GATE_FAR, GATE_NEAR
 
-    X = to_model_frame([patient])
-    return {t: float(models[t].predict_proba(X)[0]) for t in TARGETS}
+    rows, dists = models["cad"].index.nearest(to_model_frame([patient]))
+    n, dist = int(rows[0]) + 1, float(dists[0])
+    if dist < 1e-9:
+        return f"Dataset patient {n}: scored by the cross-validation model that never saw this patient"
+    if dist <= GATE_NEAR:
+        return f"Edited dataset patient {n}: scored by the cross-validation model that never saw that patient"
+    if dist < GATE_FAR:
+        return (f"Close to dataset patient {n}: scored mostly by the cross-validation models that never saw that "
+                "patient")
+    return "New patient: average of 5 cross-validation models, each trained on 4/5 of the 303 dataset patients"
 
 
 def _explanation(e: dict, patient: dict) -> dict:
@@ -173,8 +205,13 @@ def _summary(targets: dict) -> str:
     text = (f"Estimated chance of significant coronary artery disease (at least 50% narrowing): "
             f"{cad['probability']:.0%}, {side} the {cad['threshold']:.0%} decision threshold.")
     high = sorted((v for v in VESSELS if targets[v]["label"] == "elevated"), key=lambda v: -targets[v]["probability"])
+    held = [v for v in VESSELS if targets[v]["label"] != "elevated" and targets[v]["probability"] >= targets[v]["threshold"]]
     if high:
         text += " Arteries flagged: " + ", ".join(f"{API_KEYS[v]} {targets[v]['probability']:.0%}" for v in high) + "."
+    elif held:
+        one = len(held) == 1
+        text += (" " + ", ".join(API_KEYS[v] for v in held) + (" is above its own threshold" if one else
+                 " are above their own thresholds") + ", but arteries are only flagged when overall CAD is.")
     else:
         text += " No individual artery is above its threshold."
     unsure = [API_KEYS[t] for t in TARGETS if targets[t]["uncertain"]]

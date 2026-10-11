@@ -23,14 +23,16 @@ from ml.data import TARGETS
 N_ORDERINGS = 32          # antithetic pairs: each random ordering is also used reversed
 
 
-def predict(models: dict, rows: list[dict]) -> dict[str, np.ndarray]:
+def predict(models: dict, rows: list[dict], uncapped: bool = False):
     from ml.export import predict_all
 
-    return predict_all(models, to_model_frame(rows))
+    return predict_all(models, to_model_frame(rows), uncapped=uncapped)
 
 
 def explain(models: dict, patient: dict, n_orderings: int = N_ORDERINGS, seed: int = 0) -> dict:
-    """{target: {"base_value", "probability", "contributions": {input: value}}} for one patient."""
+    """{target: {"base_value", "probability", "uncapped", "contributions": {input: value}}} for one patient. The
+    patient is the last row of every path, so the served probability (and its value before the P(CAD) cap) come
+    from the same model pass as the explanation."""
     diff = [n for n in NAMES if patient[n] != REFERENCE[n]]
     rng = np.random.default_rng(seed)
     orders = []
@@ -44,7 +46,7 @@ def explain(models: dict, patient: dict, n_orderings: int = N_ORDERINGS, seed: i
         for j in o:
             cur[diff[j]] = patient[diff[j]]
             rows.append(dict(cur))
-    p = predict(models, rows)
+    p, raw = predict(models, rows, uncapped=True)
     out = {}
     for t in TARGETS:
         contrib = np.zeros(len(diff))
@@ -53,5 +55,6 @@ def explain(models: dict, patient: dict, n_orderings: int = N_ORDERINGS, seed: i
             contrib[o] += np.diff(pt[k])
         contrib /= len(orders)
         out[t] = {"base_value": float(pt[0, 0]), "probability": float(pt[0, -1]),
+                  "uncapped": float(raw[t].reshape(len(orders), len(diff) + 1)[0, -1]),
                   "contributions": {n: float(c) for n, c in zip(diff, contrib)}}
     return out

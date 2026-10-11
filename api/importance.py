@@ -1,5 +1,5 @@
 """Precompute global importance for GET /model/importance: for every dataset patient, the same per-input explanation
-the API serves (final models), summarised per target as the mean absolute contribution and the share of patients for
+the API serves (cross-fitted models: each dataset patient is explained by the fold model that never saw them), summarised per target as the mean absolute contribution and the share of patients for
 whom the input raised the probability.
 
 Run from the repository root:  python -m api.importance      -> models/importance.json
@@ -36,7 +36,8 @@ def main() -> None:
     manifest = json.loads((MODELS / "manifest.json").read_text())
     out = {"model_version": manifest["model_version"], "n_patients": len(df),
            "description": ("Average size of each input's contribution (probability units) over the dataset "
-                           "patients, using the same explanations /predict returns (final models); share_raising "
+                           "patients, using the same explanations /predict returns (each patient scored by the cross-validation "
+                           "model that never saw them); share_raising "
                            "is the share of patients for whom the input raised the probability."),
            "targets": targets}
     (MODELS / "importance.json").write_text(json.dumps(out, indent=1))

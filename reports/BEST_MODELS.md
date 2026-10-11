@@ -130,18 +130,25 @@ The models are weakest in patients aged 65 and over, and for LAD in diabetics. T
 
 ## Export (S9, `python -m ml.export`)
 
-Each champion is refitted on all 303 patients and saved to `models/<label>.joblib`, with `models/manifest.json` recording features, weights, calibration, threshold, conformal quantile and validation metrics.
+Each champion is exported as a **cross-fitted** model (`models/<label>.joblib`): five fold models (the folds of repeat r0, each trained on 4/5 of the patients). A request is scored by the fold models that never trained on a dataset patient close to it, so every dataset patient (also when edited slightly) gets a genuine out-of-sample prediction and a new patient gets the five-model average. A model refitted on all 303 patients is not served: it memorised them (in-sample AUC 0.99–1.00), so near-matches returned their labels.
 
-| Label | Exported threshold | Conformal q | Latency / patient (CPU) | File size |
-|---|:---:|:---:|:---:|:---:|
-| CAD | 0.689 | 0.546 | 6 ms | 0.1 MB |
-| LAD | 0.550 | 0.684 | 13 ms | 0.6 MB |
-| LCX | 0.324 | 0.711 | 22 ms | 0.2 MB |
-| RCA | 0.357 | 0.682 | 86 ms | 6.3 MB |
+Post-processing is fitted on the champion's r0–r4 out-of-fold scores, i.e. on models of the same kind as those served: Platt calibration, the P(vessel) ≤ P(CAD) cap, thresholds on the capped scores (a vessel is flagged only when CAD is), and conformal quantiles on the capped scores. `reports/v2/s9/s9_served.csv` validates exactly this pipeline on r5–r9 (post-processing fitted per outer fold on training patients).
+
+| Label | Threshold | Conformal q | Served AUC on the 303 dataset patients | r5–r9 AUC (served pipeline) | File size |
+|---|:---:|:---:|:---:|:---:|:---:|
+| CAD | 0.689 | 0.546 | 0.941 | 0.939 | 0.3 MB |
+| LAD | 0.430 | 0.695 | 0.879 | 0.869 | 0.9 MB |
+| LCX | 0.320 | 0.714 | 0.781 | 0.782 | 0.1 MB |
+| RCA | 0.394 | 0.688 | 0.776 | 0.770 | 9.0 MB |
+
+- **Memorisation check:** the served AUC on the dataset patients stays at cross-validated levels (it was ~1.0 with the all-data models), also after nudging two inputs by ±5%.
+- **Reproducibility:** `python -m ml.export` reruns on a fresh clone (CPU only). The champion out-of-fold scores and the RCA stack weights it needs are snapshotted in `models/export_inputs.npz/.json`; `--rebuild-inputs` regenerates them from `data/processed/oof` after a full pipeline run. The model choices themselves (`reports/v2/decisions.json`) came from the full plan-v2 search, including GPU TabPFN runs that are not needed to export.
+- **Leakage note:** the fold models' weights never saw the patients they score, but design choices (features, hyperparameters, stack weights, calibration, thresholds) were made by cross-validation over all 303 patients, as usual for a dataset this size.
 
 - **Interface:** `ml.export.load_models()` + `predict_all(models, df)` give calibrated probabilities with the consistency cap. `ChampionModel.conformal_set(p)` gives the prediction set.
   - Input is raw patient rows in the `ml.data.load_clean()` format. All feature engineering is row-wise.
-  - A one-row prediction equals the batch prediction; the export asserts this.
+  - A one-row prediction equals the batch prediction, and a reloaded model equals the exported one; the export asserts both.
+  - Python 3.11 with the pinned `requirements.txt` versions is required to load the pickles.
 - **Runtime:** CPU only, in the main environment. **No TabPFN or AutoGluon at runtime**, so there is no GPU, licence token or second environment.
 - **Licences:** EBM (MIT), CatBoost and XGBoost (Apache-2.0), LightGBM (MIT), scikit-learn (BSD).
 - **Explanations:**

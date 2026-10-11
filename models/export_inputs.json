@@ -1,0 +1,21 @@
+{
+  "note": "Champion out-of-fold scores (raw, before calibration) on the fixed folds: r0-r4 (post-processing) and r5-r9 (validation); RCA stack weights.",
+  "stack": {
+    "cad": null,
+    "lad": null,
+    "lcx": null,
+    "rca": {
+      "intercept": 0.21278645867235593,
+      "weights": {
+        "classical:logreg": 0.5143420502995975,
+        "classical:svm_rbf": 0.048572843058033784,
+        "classical:knn": 0.3646117604216994,
+        "classical:gnb": 0.13849479280189086,
+        "classical:random_forest": 0.05759119992707612,
+        "classical:extra_trees": 0.0036424678529553794,
+        "classical:lightgbm": 0.797120639147028,
+        "classical:ebm": 0.4558630712299284
+      }
+    }
+  }
+}
