@@ -83,6 +83,25 @@
   font-size: 11px;
 }
 
+.studio .sl-method-badge {
+  border: 1px solid color-mix(in srgb, var(--s-accent) 45%, transparent);
+  border-radius: 999px;
+  padding: 1px 7px;
+  color: var(--s-accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: help;
+}
+
+/* method footnote under an explanation chart */
+.studio .sl-method {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--s-line);
+  line-height: 1.45;
+}
+
 .studio .text-flag {
   color: var(--s-flag);
 }

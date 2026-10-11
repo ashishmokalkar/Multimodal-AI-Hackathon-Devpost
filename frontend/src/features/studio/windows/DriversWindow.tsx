@@ -5,7 +5,7 @@ import { buildDrivers, driverPillText } from "../../../lib/summary";
 import { useUiStore } from "../../../store/uiStore";
 import { FloatingWindow } from "../FloatingWindow";
 import { IconBars } from "../icons";
-import { EmptyState, TargetChips } from "../parts";
+import { EmptyState, ShapBadge, TargetChips } from "../parts";
 import { probabilityOf, useStudioData } from "../studioData";
 import { useStudioStore } from "../studioStore";
 
@@ -45,6 +45,7 @@ export function DriversWindow() {
   return (
     <FloatingWindow
       accent={targetColor(target)}
+      actions={<ShapBadge detail="Bars are Shapley values (SHAP) of the calibrated probability" />}
       icon={<IconBars />}
       id="drivers"
       title="Why"
@@ -118,6 +119,10 @@ export function DriversWindow() {
               {Math.abs(Math.round(summary.rest.points))} pts)
             </p>
           )}
+          <p className="muted-xs sl-method">
+            Method: Shapley values (SHAP) of the calibrated probability, in percentage points from a typical
+            patient. They add up exactly to this patient&apos;s estimate.
+          </p>
         </>
       )}
     </FloatingWindow>

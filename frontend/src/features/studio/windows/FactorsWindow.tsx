@@ -4,7 +4,7 @@ import { buildHeatmap, INSIGHT_TARGETS } from "../../../lib/insights";
 import { useUiStore } from "../../../store/uiStore";
 import { FloatingWindow } from "../FloatingWindow";
 import { IconGrid } from "../icons";
-import { EmptyState } from "../parts";
+import { EmptyState, ShapBadge } from "../parts";
 import { useStudioData } from "../studioData";
 import { useStudioStore } from "../studioStore";
 
@@ -35,16 +35,19 @@ export function FactorsWindow() {
   return (
     <FloatingWindow
       actions={
-        pinned ? (
-          <button
-            className="pill-pinned"
-            onClick={() => togglePin(pinned)}
-            title="Stop showing this factor on the heart"
-            type="button"
-          >
-            Pinned ✕
-          </button>
-        ) : null
+        <>
+          {pinned && (
+            <button
+              className="pill-pinned"
+              onClick={() => togglePin(pinned)}
+              title="Stop showing this factor on the heart"
+              type="button"
+            >
+              Pinned ✕
+            </button>
+          )}
+          <ShapBadge detail="Dots are Shapley values (SHAP) of each artery's probability" />
+        </>
       }
       icon={<IconGrid />}
       id="factors"
@@ -121,6 +124,11 @@ export function FactorsWindow() {
             <span className="muted-xs">size = strength</span>
           </div>
         </div>
+      )}
+      {rows.length > 0 && (
+        <p className="muted-xs sl-method">
+          Method: Shapley values (SHAP) per artery, in percentage points of each artery&apos;s probability.
+        </p>
       )}
     </FloatingWindow>
   );

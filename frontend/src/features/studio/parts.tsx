@@ -137,3 +137,12 @@ export function Delta({ points }: { points: number }) {
 export function EmptyState({ children }: { children: ReactNode }) {
   return <div className="sl-empty">{children}</div>;
 }
+
+/** Header tag naming the explanation method; the window's footnote says the same in full. */
+export function ShapBadge({ detail }: { detail: string }) {
+  return (
+    <span className="sl-method-badge" title={detail}>
+      SHAP
+    </span>
+  );
+}

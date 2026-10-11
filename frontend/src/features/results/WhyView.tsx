@@ -82,8 +82,8 @@ export function WhyView({
       </div>
       <p className="mt-1 text-[12px] leading-5 text-slate-600">
         {probabilityScale
-          ? `Bars show how much each input moved this patient's probability, in percentage points from the reference patient's ${formatProbability(explanation.base_value)}. Top 10 shown.`
-          : "Bars show each input's signed contribution to this estimate. Top 10 shown."}
+          ? `Bars show how much each input moved this patient's probability, in percentage points from the reference patient's ${formatProbability(explanation.base_value)} (Shapley values, as in SHAP). Top 10 shown.`
+          : "Bars show each input's signed contribution to this estimate (Shapley values, as in SHAP). Top 10 shown."}
       </p>
 
       {contributions.length === 0 ? (
