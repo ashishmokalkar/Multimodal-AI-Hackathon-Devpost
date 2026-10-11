@@ -69,7 +69,7 @@ interface StudioState extends Persisted {
 }
 
 // v2: new default layout (patient left-centre, what-if closed) and no Aurora theme; v1 layouts are not reused
-const STORAGE_KEY = "cardiolens-studio-v2";
+const STORAGE_KEY = "cardioclarity-studio-v2";
 
 function viewport() {
   return typeof window === "undefined"

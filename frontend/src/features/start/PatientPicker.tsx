@@ -184,10 +184,10 @@ export function PatientPicker() {
           </span>
           {uiVersion === "studio" ? (
             <>
-              CardioLens <em>Studio</em>
+              CardioClarity <em>Studio</em>
             </>
           ) : (
-            "CAD Risk 3D Visualizer"
+            "CardioClarity"
           )}
         </span>
         <span className="pk-safety">Decision support · not a diagnosis</span>

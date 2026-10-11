@@ -57,7 +57,7 @@ const realTargetMetrics = {
   model: "Explainable Boosting Machine (EBM)",
 };
 const realMetrics: MetricsResponse = {
-  model_version: "cardiotwin-v2.0.0",
+  model_version: "cardioclarity-v2.0.0",
   validation: "Fixed-fold repeated stratified cross-validation",
   n_samples: 303,
   trained_at: "2026-10-10T10:22:44Z",
@@ -190,7 +190,7 @@ describe("ModelMetricsDrawer", () => {
         error: null,
         refetch: async () => undefined,
       },
-      "cardiotwin-v2.0.0",
+      "cardioclarity-v2.0.0",
       false,
       "Dataset patient 20: scored by models trained without this patient",
     );
@@ -219,7 +219,7 @@ describe("ModelMetricsDrawer", () => {
         error: null,
         refetch: async () => undefined,
       },
-      "cardiotwin-v2.0.0",
+      "cardioclarity-v2.0.0",
       true,
     );
 

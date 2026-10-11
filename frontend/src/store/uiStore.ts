@@ -7,8 +7,8 @@ export type ArteryMode = "flow" | "table";
 /** Which interface is shown: the immersive Studio or the original Classic layout. */
 export type UiVersion = "studio" | "classic";
 
-const UI_VERSION_STORAGE_KEY = "cad-risk-ui-version";
-const UNIT_SYSTEM_STORAGE_KEY = "cad-risk-lab-units";
+const UI_VERSION_STORAGE_KEY = "cardioclarity-ui-version";
+const UNIT_SYSTEM_STORAGE_KEY = "cardioclarity-units";
 
 function storedUnitSystem(): UnitSystem {
   try {

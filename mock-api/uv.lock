@@ -34,7 +34,7 @@ wheels = [
 ]
 
 [[package]]
-name = "cad-risk-mock-api"
+name = "cardioclarity-mock-api"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

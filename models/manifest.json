@@ -1,5 +1,5 @@
 {
-  "model_version": "cardiotwin-v2.1.0",
+  "model_version": "cardioclarity-v2.1.0",
   "created": "2026-10-11T12:31:44+01:00",
   "n_patients": 303,
   "conformal_level": 0.9,

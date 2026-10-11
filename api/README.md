@@ -1,4 +1,4 @@
-# CardioTwin API (real models, contract v1.1.0)
+# CardioClarity API (real models, contract v1.1.0)
 
 This FastAPI service serves the exported per-label models in `models/` through the five endpoints of the
 frontend contract (`docs/api-contract.md` on the `frontend` branch).
@@ -37,13 +37,13 @@ before using these same commands. WSL 2 forwards port 8000 to Windows
 localhost.
 
 - **Docs:** <http://localhost:8000/docs>.
-- **CORS:** the API accepts `http://localhost:5173` and `:5174` (and the `127.0.0.1` equivalents). To change this, set `CARDIOTWIN_CORS_ORIGINS` to a comma-separated list.
+- **CORS:** the API accepts `http://localhost:5173` and `:5174` (and the `127.0.0.1` equivalents). To change this, set `CARDIOCLARITY_CORS_ORIGINS` to a comma-separated list.
 - **Tests:** `"$HOME/.venvs/multimodal-ai-hack-real-api/bin/python" -m pytest tests/test_api.py -q -ra`, from the repository root.
 
 ## What the API serves
 | Endpoint | Source |
 |---|---|
-| `GET /health` | `models/manifest.json` → `model_version` (`cardiotwin-v2.1.0`), `mock: false` |
+| `GET /health` | `models/manifest.json` → `model_version` (`cardioclarity-v2.1.0`), `mock: false` |
 | `GET /features` | `api/features.py` (49 inputs: the 55 dataset columns, minus Exertional CP, BMI and Obesity, with chest pain and smoking merged) |
 | `GET /patients/samples` | 8 real dataset patients, one per vessel pattern, with their angiography ground truth |
 | `POST /predict` | `models/*.joblib`: cross-fitted models, so no dataset patient is scored by a model that trained on them (see below) |

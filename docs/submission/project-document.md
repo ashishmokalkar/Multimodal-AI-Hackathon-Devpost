@@ -1,4 +1,4 @@
-# CardioTwin: Interactive Coronary Risk Exploration
+# CardioClarity: Interactive Coronary Risk Exploration
 
 **Project-document draft | 10 October 2026 | source freeze:** `39ffab1c8adecd707c0f40ce826c12a568c41267`
 
@@ -6,7 +6,7 @@
 
 ## 1. Problem and system
 
-Cardiovascular risk models can return numbers that are difficult to relate to the anatomy and measurements behind them. CardioTwin is a browser-based decision-support and educational prototype for exploring predicted coronary artery disease (CAD) and vessel-level results alongside structured clinical, ECG, laboratory and echocardiographic inputs.
+Cardiovascular risk models can return numbers that are difficult to relate to the anatomy and measurements behind them. CardioClarity is a browser-based decision-support and educational prototype for exploring predicted coronary artery disease (CAD) and vessel-level results alongside structured clinical, ECG, laboratory and echocardiographic inputs.
 
 The user selects one of eight real dataset demonstration patients or supplies a complete input profile. The browser calls a local FastAPI service and presents the response's CAD, LAD, LCX and RCA probabilities, thresholds, uncertainty, cautions and fitting-set provenance. Users can rotate and zoom a 3D heart, select a vessel, and inspect model contributions and input details. For paired what-if exploration, editing a dataset sample retains its sample ID; the UI clears stale results while a fresh response is pending.
 
@@ -28,7 +28,7 @@ Eight non-synthetic sample patients are served with ground truth for demonstrati
 
 ## 3. Models and evaluation
 
-The pinned model version is `cardiotwin-v2.0.0`. The four targets use independently selected estimators: Explainable Boosting Machine (CAD), CatBoost (LAD), XGBoost (LCX), and an eight-estimator logistic stack (RCA). Probabilities are calibrated; thresholds are target-specific. The real service caps each served vessel probability at the served CAD probability. Equal values alone do not prove that this cap changed a result.
+The pinned model version is `cardioclarity-v2.0.0`. The four targets use independently selected estimators: Explainable Boosting Machine (CAD), CatBoost (LAD), XGBoost (LCX), and an eight-estimator logistic stack (RCA). Probabilities are calibrated; thresholds are target-specific. The real service caps each served vessel probability at the served CAD probability. Equal values alone do not prove that this cap changed a result.
 
 The report uses ten repeats of five-fold stratified cross-validation on fixed folds. Decisions were made using repeats 0–4 and the headline ROC-AUC below is the reported mean per-fold result on repeats 5–9, with the report's 95% confidence interval; the CAD champion carries a small earlier selection effect, and the report notes mild optimism in ensemble comparisons. This is distinct from the pooled calibrated AUC over each repeat's five test folds, which is 0.932 for CAD, 0.864 for LAD, 0.767 for LCX and 0.762 for RCA. Accuracy, precision, recall and F1 are threshold-rule metrics from Platt-calibrated probabilities at target-specific thresholds selected to maximize balanced accuracy. Calibration and thresholds were fitted inside outer training folds. All figures are cross-validation estimates, not clinical validation or independent validation of the final all-patient or demo-model refits.
 

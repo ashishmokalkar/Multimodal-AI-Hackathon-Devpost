@@ -8,7 +8,7 @@ submission or final claim.
 
 ## Project title
 
-CardioTwin: Interactive Coronary Risk Exploration
+CardioClarity: Interactive Coronary Risk Exploration
 
 ## One-line summary
 
@@ -47,7 +47,7 @@ echocardiographic features; it does not import medical images or documents.
 
 The browser app uses React, TypeScript, Vite, Three.js and React Three Fiber.
 It calls a local FastAPI service implementing the pinned real API profile
-(`1.1.0`) and model version (`cardiotwin-v2.0.0`). Four separate target
+(`1.1.0`) and model version (`cardioclarity-v2.0.0`). Four separate target
 estimators return probabilities, labels, thresholds, warnings and attribution.
 The frontend displays these responses rather than recomputing model outputs.
 

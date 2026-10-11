@@ -44,7 +44,7 @@ from ml.data import ROOT, TARGETS, VESSELS
 MODELS = ROOT / "models"
 INPUTS = MODELS / "export_inputs"
 ALPHA = 0.1
-MODEL_VERSION = "cardiotwin-v2.1.0"
+MODEL_VERSION = "cardioclarity-v2.1.0"
 DEMO_SEED = 2026
 CROSSFIT_REPEAT = "r0"
 GATE_NEAR, GATE_FAR = 0.03, 0.05

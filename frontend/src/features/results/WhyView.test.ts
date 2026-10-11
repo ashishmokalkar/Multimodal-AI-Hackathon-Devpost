@@ -83,7 +83,7 @@ const realExplanation = {
 const realTarget = { ...target, uncertain: false };
 const realPrediction: PredictionResponse = {
   ...prediction,
-  model_version: "cardiotwin-v2.0.0",
+  model_version: "cardioclarity-v2.0.0",
   cad: realTarget,
   vessels: {
     LAD: realTarget,

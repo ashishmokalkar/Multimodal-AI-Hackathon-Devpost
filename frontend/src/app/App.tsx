@@ -41,7 +41,7 @@ const PatientReport = lazy(() => import("../features/report/PatientReport"));
 // Studio is a separate full-screen interface; load it (and its effects library) only when it is chosen.
 const StudioApp = lazy(() => import("../features/studio/StudioApp"));
 
-const DISCLAIMER_STORAGE_KEY = "cad-risk-visualizer-disclaimer-acknowledged";
+const DISCLAIMER_STORAGE_KEY = "cardioclarity-disclaimer-acknowledged";
 
 function AppContent() {
   const queryClient = useQueryClient();
@@ -107,7 +107,7 @@ function AppContent() {
           fallback={
             <div className="studio-boot">
               <HeartbeatLoader
-                steps={["Loading CardioLens Studio"]}
+                steps={["Loading CardioClarity Studio"]}
                 title="Preparing the studio"
                 variant="stage"
               />
@@ -137,10 +137,10 @@ function AppContent() {
         <div className="masthead">
           <div className="brand-lockup">
             <div className="brand-mark" aria-hidden="true">
-              CAD
+              CC
             </div>
             <div className="brand-copy">
-              <h1>CAD Risk 3D Visualizer</h1>
+              <h1>CardioClarity</h1>
               <p>Clinical decision-support prototype</p>
             </div>
           </div>

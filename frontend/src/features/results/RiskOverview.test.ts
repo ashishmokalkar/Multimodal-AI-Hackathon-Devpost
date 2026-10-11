@@ -13,7 +13,7 @@ const explanation = {
 };
 const prediction: PredictionResponse = {
   request_id: "095e7b1f-22f0-4ef0-9d30-310f769c2847",
-  model_version: "cardiotwin-v2.0.0",
+  model_version: "cardioclarity-v2.0.0",
   cad: {
     probability: 0.85,
     label: "elevated",
@@ -115,7 +115,7 @@ describe("ModelPerformanceChart", () => {
       model: "Fixture boosting",
     };
     const data = {
-      model_version: "cardiotwin-v2.0.0",
+      model_version: "cardioclarity-v2.0.0",
       validation: "fixture",
       n_samples: 303,
       trained_at: "2026-10-10T00:00:00Z",

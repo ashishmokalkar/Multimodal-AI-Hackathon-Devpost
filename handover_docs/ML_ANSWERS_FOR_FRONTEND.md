@@ -72,7 +72,7 @@ Your form is data-driven, and I checked that nothing in `frontend/src` hard-code
 
 ## 4. Predictions and explanations: **Confirmed**
 
-### Models (version `cardiotwin-v2.0.0`)
+### Models (version `cardioclarity-v2.0.0`)
 
 | Target | Model | Threshold | Validated ROC-AUC (95% CI) |
 |---|---|:---:|:---:|
@@ -102,7 +102,7 @@ Your form is data-driven, and I checked that nothing in `frontend/src` hard-code
 The patient's true result is LAD-only disease. They were scored by the hold-out models, and only the top 3 contributions are shown:
 
 ```json
-{ "model_version": "cardiotwin-v2.0.0",
+{ "model_version": "cardioclarity-v2.0.0",
   "cad": { "probability": 0.9786, "label": "elevated", "threshold": 0.689, "uncertain": false },
   "vessels": {
     "LAD": { "probability": 0.9353, "label": "elevated",     "threshold": 0.5505, "uncertain": false },
@@ -154,8 +154,8 @@ The brief scores "risk estimation quality". A model that says when it isn't sure
   python -m uvicorn api.main:app --host 127.0.0.1 --port 8000
   ```
   For WSL, use the same commands with a Python 3.11 venv. Your mock setup uses Ubuntu's Python 3.12; loading the models under 3.12 hasn't been tested.
-- **CORS:** the API allows ports 5173 and 5174. Override with `CARDIOTWIN_CORS_ORIGINS`.
-- **Model version:** `cardiotwin-v2.0.0`. `/model/metrics` reports `trained_at` in UTC.
+- **CORS:** the API allows ports 5173 and 5174. Override with `CARDIOCLARITY_CORS_ORIGINS`.
+- **Model version:** `cardioclarity-v2.0.0`. `/model/metrics` reports `trained_at` in UTC.
 
 ### Validation (matches the served models exactly)
 
@@ -224,7 +224,7 @@ Typing 49 fields takes a clinician several minutes, and it's where errors creep 
 
 ### Options, best first for a real deployment
 
-1. **Import from the EHR (SMART on FHIR).** A clinician opens CardioTwin from inside the hospital record, and the patient's data loads with one click.
+1. **Import from the EHR (SMART on FHIR).** A clinician opens CardioClarity from inside the hospital record, and the patient's data loads with one click.
    - **How it works:** the app reads FHIR resources.
      - `Patient` gives age and sex.
      - `Observation` gives vitals and labs, matched by LOINC code: systolic BP 8480-6, heart rate 8867-4, height 8302-2, weight 29463-7, fasting glucose 1558-6, creatinine 2160-0, triglycerides 2571-8, LDL 13457-7, HDL 2085-9, BUN 3094-0, ESR 4537-7, haemoglobin 718-7, potassium 2823-3, sodium 2951-2, WBC 6690-2, lymphocytes % 736-9, neutrophils % 770-8, platelets 777-3, LVEF 10230-1, smoking status 72166-2.

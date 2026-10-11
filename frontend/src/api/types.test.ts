@@ -36,7 +36,7 @@ const realExplanation = {
 };
 const realPrediction = {
   ...mockPrediction,
-  model_version: "cardiotwin-v2.0.0",
+  model_version: "cardioclarity-v2.0.0",
   cad: realTarget,
   vessels: { LAD: realTarget, LCX: realTarget, RCA: realTarget },
   explanations: {
@@ -66,7 +66,7 @@ const realTargetMetrics = {
 };
 
 const realMetrics = {
-  model_version: "cardiotwin-v2.0.0",
+  model_version: "cardioclarity-v2.0.0",
   validation: "Fixed-fold cross-validation",
   n_samples: 303,
   trained_at: "2026-10-10T10:22:44Z",

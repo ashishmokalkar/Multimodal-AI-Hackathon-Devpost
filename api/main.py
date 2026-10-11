@@ -1,7 +1,7 @@
-"""CardioTwin real-model API (contract v1.1.0).
+"""CardioClarity real-model API (contract v1.1.0).
 
 Run from the repository root:  uvicorn api.main:app --port 8000
-CORS origins: env CARDIOTWIN_CORS_ORIGINS (comma-separated); defaults to the Vite dev server on ports 5173 and 5174.
+CORS origins: env CARDIOCLARITY_CORS_ORIGINS (comma-separated); defaults to the Vite dev server on ports 5173 and 5174.
 """
 
 from __future__ import annotations
@@ -36,11 +36,11 @@ MODEL_NAMES = {"phase3:ebm": "Explainable Boosting Machine (EBM)",
                "ensemble:lr_stack": "Stacked ensemble of 8 models (logistic regression on their outputs)"}
 API_KEYS = {"cad": "cad", "lad": "LAD", "lcx": "LCX", "rca": "RCA"}
 
-app = FastAPI(title="CardioTwin API", version=CONTRACT_VERSION,
+app = FastAPI(title="CardioClarity API", version=CONTRACT_VERSION,
               description="Real-model clinical decision-support API. " + DISCLAIMER)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CARDIOTWIN_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,"
+    allow_origins=os.environ.get("CARDIOCLARITY_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,"
                                  "http://localhost:5174,http://127.0.0.1:5174").split(","),
     allow_credentials=True, allow_methods=["GET", "POST"], allow_headers=["*"],
 )

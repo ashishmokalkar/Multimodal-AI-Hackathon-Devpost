@@ -1,4 +1,4 @@
-# CardioTwin demo storyboard
+# CardioClarity demo storyboard
 
 **Target:** 4:20; the measured rough cut is 4:21. Captions only, no narration
 or music. Record the frozen

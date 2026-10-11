@@ -305,7 +305,7 @@ function SummaryPage({ data, total }: { data: ReportData; total: number }) {
           <span className="rp-logo" aria-hidden="true">
             ♥
           </span>
-          CardioTwin
+          CardioClarity
         </div>
         <h1>Your heart report</h1>
         <p className="rp-hero-sub">Your heart artery results, explained · {patientLine(data)}</p>
@@ -700,7 +700,7 @@ export function PatientReport() {
 
   const print = () => {
     const title = document.title;
-    document.title = `CardioTwin-report-${new Date().toISOString().slice(0, 10)}`;
+    document.title = `CardioClarity-report-${new Date().toISOString().slice(0, 10)}`;
     const restore = () => {
       document.title = title;
       window.removeEventListener("afterprint", restore);

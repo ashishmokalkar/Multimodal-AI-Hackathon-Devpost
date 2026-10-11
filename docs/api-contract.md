@@ -1,4 +1,4 @@
-# CAD Risk Visualizer API Contract
+# CardioClarity API Contract
 
 **Profiles:** mock `1.0.0`; H-approved real serving `1.1.0` (D-038).
 
@@ -115,7 +115,7 @@ sample ground truth is not ground truth for edited inputs.
 
 The response retains a UUID `request_id` and `mock: false`.
 `/health` reports `contract_version: "1.1.0"` and the initial model version
-`cardiotwin-v2.0.0`. Model version alone does not identify the final/demo fitting
+`cardioclarity-v2.0.0`. Model version alone does not identify the final/demo fitting
 set. Unsupported/inconsistent profile or missing/invalid required real fields
 is a visible validation failure, not a success-shaped fallback.
 
@@ -194,7 +194,7 @@ request body. The mock dataset marks all five generated patients as synthetic.
 ```yaml
 openapi: 3.1.0
 info:
-  title: CAD Risk Visualizer API
+  title: CardioClarity API
   version: 1.0.0
   description: Clinical decision-support API contract; mock responses are illustrative.
 servers:

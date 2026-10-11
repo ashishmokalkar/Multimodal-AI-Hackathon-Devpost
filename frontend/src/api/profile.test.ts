@@ -15,7 +15,7 @@ const mockProfile = parseApiProfile({
 });
 const realProfile = parseApiProfile({
   status: "ok",
-  model_version: "cardiotwin-v2.0.0",
+  model_version: "cardioclarity-v2.0.0",
   contract_version: "1.1.0",
   mock: false,
 });
@@ -72,7 +72,7 @@ describe("API profile validation", () => {
     expect(mockProfile).toMatchObject({ mode: "mock" });
     expect(realProfile).toMatchObject({
       mode: "real",
-      id: "real:1.1.0:cardiotwin-v2.0.0",
+      id: "real:1.1.0:cardioclarity-v2.0.0",
     });
     expect(() =>
       parseApiProfile({
@@ -85,7 +85,7 @@ describe("API profile validation", () => {
     expect(() =>
       parseApiProfile({
         status: "degraded",
-        model_version: "cardiotwin-v2.0.0",
+        model_version: "cardioclarity-v2.0.0",
         contract_version: "1.1.0",
         mock: false,
       }),

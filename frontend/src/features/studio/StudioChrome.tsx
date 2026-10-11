@@ -197,7 +197,7 @@ export function TopBar() {
           <IconHeart size={18} />
         </span>
         <span className="brand-name">
-          CardioLens <em>Studio</em>
+          CardioClarity <em>Studio</em>
         </span>
         <span className="sr-only">: back to the patient list</span>
       </button>

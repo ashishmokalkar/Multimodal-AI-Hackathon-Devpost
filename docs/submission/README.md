@@ -1,4 +1,4 @@
-# CardioTwin review package
+# CardioClarity review package
 
 **Status: review drafts, not final submission assets.** Human Gate 2 is
 pending. This private repository requires GitHub repository access; sharing
@@ -37,7 +37,7 @@ changes.
 Frozen application source:
 [`39ffab1`](https://github.com/ashishmokalkar/Multimodal-AI-Hackathon-Devpost/tree/39ffab1c8adecd707c0f40ce826c12a568c41267).
 Submission drafts are on `frontend`, not in that older frozen-source commit.
-Real API contract: `1.1.0`; model: `cardiotwin-v2.0.0`.
+Real API contract: `1.1.0`; model: `cardioclarity-v2.0.0`.
 
 The review video is a byte-identical copy of the retained captioned rough
 cut, not a new recording:

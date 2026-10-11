@@ -22,7 +22,7 @@ CONTRACT_VERSION = "1.0.0"
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 app = FastAPI(
-    title="CAD Risk Visualizer API",
+    title="CardioClarity API",
     version=CONTRACT_VERSION,
     description=(
         "Clinical decision-support API contract; mock responses are illustrative."

@@ -1,4 +1,6 @@
-# Multimodal AI Hackathon
+# CardioClarity
+
+Multimodal AI Hackathon 2026, Track A.
 
 A clinical decision-support and educational prototype for exploring coronary
 artery disease risk, interpreting model outputs, and visualizing per-vessel
@@ -42,7 +44,7 @@ Vite 8.3.2, React 18.3.1, TypeScript 6.0.3, and Tailwind CSS 3.4.19.
 ## Run the real model API
 
 The pinned real serving bundle reports contract `1.1.0` and model version
-`cardiotwin-v2.0.0`. Its tested Linux runtime is Ubuntu 24.04.5 on WSL 2 with
+`cardioclarity-v2.0.0`. Its tested Linux runtime is Ubuntu 24.04.5 on WSL 2 with
 Python **3.11.9** and uv **0.12.24**. Run these commands in an Ubuntu/Linux
 shell from the repository root. The virtual environment and uv-managed Python
 live outside the checkout; the pinned dependencies come from

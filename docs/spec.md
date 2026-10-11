@@ -1,4 +1,4 @@
-# Frontend Specification — CAD Risk 3D Visualizer
+# Frontend Specification — CardioClarity
 
 Living document. `planning/plan.md` must stay in sync with this file (see `workflow.md §3`). Sections marked **[TBD-Sn]** are to be resolved in sprint *n*.
 
@@ -490,7 +490,7 @@ Source: `ML-dev` at `6d3e403ffae65857124929335bbc534e8fd116c4`;
 `models/manifest.json`, `reports/BEST_MODELS.md`. API/model code is from
 `9ddb96b`; the latest commit moves handoff documents and adds UI research.
 The API is declared available now, contract v1.1.0, model version
-`cardiotwin-v2.0.0`. At Gate R, O had inspected the source but not run the
+`cardioclarity-v2.0.0`. At Gate R, O had inspected the source but not run the
 runtime; Windows verification was M's report and WSL was unverified. X has
 since verified the pinned runtime and local Windows-to-WSL path as recorded
 under `docs/evidence/s3p3-*`. Gate R authorized that bounded attempt; Human
