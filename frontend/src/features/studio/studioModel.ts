@@ -1,0 +1,215 @@
+import type {
+  FeatureDefinition,
+  PredictionResponse,
+  Target,
+} from "../../api/types";
+import { buildDrivers, type Driver } from "../../lib/summary";
+import type { InsightTarget } from "../../lib/insights";
+import type { VesselId } from "../viewer/vesselMap";
+
+// ------------------------------------------------------------------------------------------- risk words
+export type RiskBand = "low" | "moderate" | "high";
+
+/**
+ * Plain risk word relative to the target's own decision threshold: at or above it is "high" (the model flags it),
+ * within 40% below it is "moderate", anything lower is "low".
+ */
+export function riskBand(probability: number, threshold: number): RiskBand {
+  if (probability >= threshold) {
+    return "high";
+  }
+  return probability >= threshold * 0.6 ? "moderate" : "low";
+}
+
+export const RISK_WORD: Record<RiskBand, string> = {
+  low: "Low",
+  moderate: "Moderate",
+  high: "High",
+};
+
+export function targetOf(
+  prediction: PredictionResponse,
+  target: InsightTarget,
+): Target {
+  return target === "cad" ? prediction.cad : prediction.vessels[target];
+}
+
+export function percent(probability: number): number {
+  return Math.round(probability * 100);
+}
+
+// ------------------------------------------------------------------------------------------- windows
+export const WINDOW_IDS = [
+  "patient",
+  "risk",
+  "drivers",
+  "whatif",
+  "vessel",
+  "factors",
+  "people",
+  "measures",
+  "model",
+] as const;
+export type WindowId = (typeof WINDOW_IDS)[number];
+
+export interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export const TOP_BAR_HEIGHT = 56;
+const GAP = 14;
+
+export const MIN_WINDOW_SIZE: Record<WindowId, { w: number; h: number }> = {
+  patient: { w: 250, h: 220 },
+  risk: { w: 280, h: 200 },
+  drivers: { w: 280, h: 200 },
+  whatif: { w: 360, h: 150 },
+  vessel: { w: 240, h: 200 },
+  factors: { w: 300, h: 220 },
+  people: { w: 240, h: 240 },
+  measures: { w: 300, h: 220 },
+  model: { w: 300, h: 200 },
+};
+
+/** Windows open on first visit; the rest wait in the dock. */
+export const DEFAULT_OPEN: Record<WindowId, boolean> = {
+  patient: true,
+  risk: true,
+  drivers: true,
+  whatif: true,
+  vessel: false,
+  factors: false,
+  people: false,
+  measures: false,
+  model: false,
+};
+
+/** Starting layout for a viewport: inputs on the left, results on the right, the heart in the middle. */
+export function defaultLayout(
+  viewportWidth: number,
+  viewportHeight: number,
+): Record<WindowId, Rect> {
+  const vw = Math.max(viewportWidth, 960);
+  const vh = Math.max(viewportHeight, 600);
+  const top = TOP_BAR_HEIGHT + GAP;
+  const sideW = 340;
+  const rightX = vw - GAP - sideW;
+  const riskH = 336;
+  const driversY = top + riskH + 12;
+  const whatIfW = Math.min(680, vw - 2 * (sideW + GAP) - 40);
+  const whatIfH = 196;
+  const centreX = sideW + GAP + 20;
+  return {
+    // leave room under the patient window for the dock
+    patient: { x: GAP, y: top, w: 310, h: Math.min(vh - top - 80, 400) },
+    risk: { x: rightX, y: top, w: sideW, h: riskH },
+    drivers: {
+      x: rightX,
+      y: driversY,
+      w: sideW,
+      h: Math.min(vh - driversY - GAP, 380),
+    },
+    whatif: {
+      x: Math.round((vw - whatIfW) / 2),
+      y: vh - GAP - whatIfH,
+      w: whatIfW,
+      h: whatIfH,
+    },
+    // the artery inspector opens under the patient window, keeping the heart clear
+    vessel: { x: GAP, y: top + 412, w: 310, h: 270 },
+    factors: { x: centreX, y: top + 50, w: 400, h: 360 },
+    people: { x: rightX - 12 - 300, y: top + 40, w: 300, h: 330 },
+    measures: { x: centreX, y: top + 30, w: 540, h: 440 },
+    model: { x: Math.round(vw / 2 - 200), y: top + 70, w: 400, h: 330 },
+  };
+}
+
+/** Keeps a window on screen: its title bar always stays reachable, and it is never smaller than its minimum. */
+export function clampRect(
+  rect: Rect,
+  viewportWidth: number,
+  viewportHeight: number,
+  min: { w: number; h: number },
+): Rect {
+  const w = Math.max(
+    min.w,
+    Math.min(rect.w, Math.max(min.w, viewportWidth - 16)),
+  );
+  const h = Math.max(
+    min.h,
+    Math.min(rect.h, Math.max(min.h, viewportHeight - TOP_BAR_HEIGHT - 8)),
+  );
+  const x = Math.min(Math.max(rect.x, 8 - w + 120), viewportWidth - 120);
+  const y = Math.min(Math.max(rect.y, TOP_BAR_HEIGHT), viewportHeight - 44);
+  return { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) };
+}
+
+// ------------------------------------------------------------------------------------------- guided tour
+export interface TourStep {
+  target: InsightTarget;
+  vessel: VesselId | null;
+  title: string;
+  subtitle: string;
+  probability: number;
+  threshold: number;
+  band: RiskBand;
+  uncertain: boolean;
+  raising: Driver[];
+  lowering: Driver[];
+}
+
+const TOUR_TEXT: Record<InsightTarget, { title: string; subtitle: string }> = {
+  cad: { title: "Overall", subtitle: "Any major coronary artery narrowed" },
+  LAD: { title: "LAD", subtitle: "Front of the heart" },
+  LCX: { title: "LCX", subtitle: "Side and back of the heart" },
+  RCA: { title: "RCA", subtitle: "Right side and bottom of the heart" },
+};
+
+/** Overview first, then each artery: the stops of the guided tour, with the main reasons at each stop. */
+export function buildTour(
+  prediction: PredictionResponse,
+  features: readonly FeatureDefinition[],
+): TourStep[] {
+  const targets: InsightTarget[] = ["cad", "LAD", "LCX", "RCA"];
+  return targets.map((target) => {
+    const value = targetOf(prediction, target);
+    const drivers = buildDrivers(
+      prediction.explanations[target],
+      features,
+      value.probability,
+    ).drivers;
+    return {
+      target,
+      vessel: target === "cad" ? null : target,
+      ...TOUR_TEXT[target],
+      probability: value.probability,
+      threshold: value.threshold,
+      band: riskBand(value.probability, value.threshold),
+      uncertain: value.uncertain === true,
+      raising: drivers.filter((driver) => driver.points > 0).slice(0, 3),
+      lowering: drivers.filter((driver) => driver.points < 0).slice(0, 2),
+    };
+  });
+}
+
+// ------------------------------------------------------------------------------------------- heartbeat
+/**
+ * Heart wall movement for one beat (0-1 phase): a sharp contraction followed by a smaller second pulse, so the
+ * model reads as "lub-dub" rather than a sine wave.
+ */
+export function beatPulse(phase: number): number {
+  const p = phase - Math.floor(phase);
+  const lub = Math.exp(-(((p - 0.08) / 0.055) ** 2));
+  const dub = 0.55 * Math.exp(-(((p - 0.3) / 0.06) ** 2));
+  return lub + dub;
+}
+
+/** Resting pulse from the patient inputs, kept in a plausible range; 70 when it is missing. */
+export function pulseRate(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.min(160, Math.max(40, value))
+    : 70;
+}

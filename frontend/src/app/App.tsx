@@ -34,6 +34,9 @@ const ViewerPanel = lazy(() =>
   })),
 );
 
+// Studio is a separate full-screen interface; load it (and its effects library) only when it is chosen.
+const StudioApp = lazy(() => import("../features/studio/StudioApp"));
+
 const DISCLAIMER_STORAGE_KEY = "cad-risk-visualizer-disclaimer-acknowledged";
 
 function AppContent() {
@@ -47,6 +50,8 @@ function AppContent() {
     (featuresQuery.data ?? []).map((feature) => [feature.name, feature.label]),
   );
   const prediction = usePatientStore((state) => state.prediction);
+  const uiVersion = useUiStore((state) => state.uiVersion);
+  const setUiVersion = useUiStore((state) => state.setUiVersion);
   const previousProfileId = useRef<string | null>(null);
   const metricsButtonRef = useRef<HTMLButtonElement>(null);
   const [isMetricsOpen, setIsMetricsOpen] = useState(false);
@@ -77,6 +82,29 @@ function AppContent() {
     setIsDisclaimerAcknowledged(true);
   };
 
+  if (uiVersion === "studio") {
+    return (
+      <>
+        <Suspense
+          fallback={
+            <div className="studio-boot">
+              <HeartbeatLoader
+                steps={["Loading CardioLens Studio"]}
+                title="Preparing the studio"
+                variant="stage"
+              />
+            </div>
+          }
+        >
+          <StudioApp />
+        </Suspense>
+        {!isDisclaimerAcknowledged && (
+          <DisclaimerModal onAcknowledge={acknowledgeDisclaimer} />
+        )}
+      </>
+    );
+  }
+
   return (
     <div className="app-shell mx-auto w-full max-w-screen-2xl">
       <header className="app-header">
@@ -91,6 +119,14 @@ function AppContent() {
             </div>
           </div>
           <div className="header-actions">
+            <button
+              className="studio-switch"
+              title="Open the immersive Studio interface"
+              type="button"
+              onClick={() => setUiVersion("studio")}
+            >
+              ✦ Studio
+            </button>
             <span aria-live="polite" className="model-version">
               API profile:{" "}
               <strong>

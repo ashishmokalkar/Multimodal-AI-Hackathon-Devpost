@@ -2948,3 +2948,27 @@ button:focus-visible {
   border-radius: 50%;
   vertical-align: 0;
 }
+
+/* switch to the Studio interface, and its loading screen */
+.studio-switch {
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0f172a, #312e81);
+  padding: 7px 14px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgb(49 46 129 / 30%);
+}
+
+.studio-switch:hover {
+  filter: brightness(1.15);
+}
+
+.studio-boot {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 45%, #14223f, #03050b 70%);
+}

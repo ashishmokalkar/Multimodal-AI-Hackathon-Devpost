@@ -1,6 +1,4 @@
-import { useEffect, useMemo } from "react";
-import { postPredict } from "../../api/client";
-import { useApiProfile } from "../../api/hooks";
+import { useMemo } from "react";
 import type {
   FeatureDefinition,
   FeatureValue,
@@ -15,8 +13,9 @@ import {
   TARGET_SHORT,
   type InsightTarget,
 } from "../../lib/insights";
-import { hasChanges, useWhatIfStore } from "../../store/whatIfStore";
+import { useWhatIfStore } from "../../store/whatIfStore";
 import { HeartbeatLoader } from "../loading/HeartbeatLoader";
+import { useWhatIfRunner } from "./useWhatIfRunner";
 
 interface WhatIfPanelProps {
   features: readonly FeatureDefinition[];
@@ -24,8 +23,6 @@ interface WhatIfPanelProps {
   basePrediction: PredictionResponse;
   sampleId: string | null;
 }
-
-const DEBOUNCE_MS = 300;
 
 function probabilityOf(
   prediction: PredictionResponse,
@@ -51,58 +48,18 @@ export function WhatIfPanel({
   basePrediction,
   sampleId,
 }: WhatIfPanelProps) {
-  const profileQuery = useApiProfile();
-  const profile = profileQuery.isSuccess ? profileQuery.data : null;
-  const open = useWhatIfStore((s) => s.open);
   const values = useWhatIfStore((s) => s.values);
   const baseValues = useWhatIfStore((s) => s.baseValues);
   const scenario = useWhatIfStore((s) => s.prediction);
   const pending = useWhatIfStore((s) => s.pending);
   const error = useWhatIfStore((s) => s.error);
-  const revision = useWhatIfStore((s) => s.revision);
   const setValue = useWhatIfStore((s) => s.setValue);
   const reset = useWhatIfStore((s) => s.reset);
   const modifiable = useMemo(
     () => features.filter((f) => f.modifiable),
     [features],
   );
-  const changed = hasChanges(baseValues, values);
-
-  useEffect(() => {
-    open(basePrediction.request_id, { ...baseInputs });
-  }, [open, basePrediction.request_id, baseInputs]);
-
-  useEffect(() => {
-    if (!changed || !profile || !pending) {
-      return;
-    }
-    const sent = revision;
-    const timer = setTimeout(() => {
-      postPredict(
-        {
-          features: { ...values },
-          ...(profile.mode === "real" && sampleId
-            ? { sample_id: sampleId }
-            : {}),
-        },
-        profile,
-      )
-        .then((prediction) =>
-          useWhatIfStore.getState().resolve(sent, prediction),
-        )
-        .catch((reason: unknown) =>
-          useWhatIfStore
-            .getState()
-            .fail(
-              sent,
-              reason instanceof Error
-                ? reason.message
-                : "The scenario request failed.",
-            ),
-        );
-    }, DEBOUNCE_MS);
-    return () => clearTimeout(timer);
-  }, [changed, pending, profile, revision, sampleId, values]);
+  const { changed } = useWhatIfRunner(baseInputs, basePrediction, sampleId);
 
   if (modifiable.length === 0) {
     return (
