@@ -1,0 +1,23 @@
+{
+  "row": {
+    "model": "catboost",
+    "auc_default": 0.8458632765926883,
+    "auc_tune_r0r2": 0.8666014604132252,
+    "auc_tuned": 0.8521956532356532,
+    "tuned_vs_default": 0.006332376642964888,
+    "tuned_vs_default_se": 0.01013267534604209,
+    "tuning_kept": false,
+    "seconds": 104,
+    "auc_seedbag5": 0.8551069798175681,
+    "seedbag_vs_single": 0.0029113265819148103
+  },
+  "run": "p3_catboost_seedbag5",
+  "params": {
+    "iterations": 500,
+    "depth": 4,
+    "learning_rate": 0.014755140413775741,
+    "l2_leaf_reg": 15.779308183787395,
+    "random_strength": 9.332448702169762,
+    "bagging_temperature": 0.21267090868830307
+  }
+}

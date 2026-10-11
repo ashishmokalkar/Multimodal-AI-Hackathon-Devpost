@@ -1,0 +1,36 @@
+{
+  "linear_preprocessing": "robust",
+  "f2": {
+    "cad": {
+      "add": [
+        "pretest_prob",
+        "age_sex"
+      ],
+      "replace": [
+        "comorbidity_count"
+      ]
+    },
+    "lad": {
+      "add": [
+        "pretest_prob",
+        "rwma_flags"
+      ],
+      "replace": []
+    },
+    "lcx": {
+      "add": [
+        "pretest_prob",
+        "age_sex"
+      ],
+      "replace": [
+        "comorbidity_count"
+      ]
+    },
+    "rca": {
+      "add": [],
+      "replace": [
+        "comorbidity_count"
+      ]
+    }
+  }
+}

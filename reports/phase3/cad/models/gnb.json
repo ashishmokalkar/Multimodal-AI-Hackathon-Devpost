@@ -1,0 +1,16 @@
+{
+  "row": {
+    "model": "gnb",
+    "auc_default": 0.8980518690915409,
+    "auc_tune_r0r2": 0.9212426363658813,
+    "auc_tuned": 0.9084408872780965,
+    "tuned_vs_default": 0.010389018186555798,
+    "tuned_vs_default_se": 0.008546352322028512,
+    "tuning_kept": true,
+    "seconds": 7
+  },
+  "run": "p3_gnb_tuned",
+  "params": {
+    "var_smoothing": 0.9287355442262339
+  }
+}

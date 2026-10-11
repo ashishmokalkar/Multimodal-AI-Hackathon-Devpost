@@ -1,0 +1,17 @@
+{
+  "row": {
+    "model": "knn",
+    "auc_default": 0.7029768667640522,
+    "auc_tune_r0r2": 0.7160205430800396,
+    "auc_tuned": 0.714317928791613,
+    "tuned_vs_default": 0.011341062027560871,
+    "tuned_vs_default_se": 0.014182167066174676,
+    "tuning_kept": false,
+    "seconds": 10
+  },
+  "run": "p3_knn_tuned",
+  "params": {
+    "n_neighbors": 38,
+    "weights": "distance"
+  }
+}

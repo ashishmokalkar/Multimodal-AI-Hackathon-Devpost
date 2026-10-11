@@ -1,0 +1,61 @@
+target,exp,probe,auc,delta,se,keep,hurt
+cad,C1 F0->F1,logreg,0.9305,0.0019,0.0025,False,False
+cad,C1 F0->F1,catboost,0.9224,-0.0003,0.0050,False,False
+cad,C1 F0->F1,tabpfn,0.9388,0.0039,0.0034,True,False
+cad,C2 rare drop,logreg,0.9345,0.0040,0.0033,True,False
+cad,C2 rare drop,catboost,0.9218,-0.0006,0.0034,False,False
+cad,C2 rare drop,tabpfn,0.9386,-0.0002,0.0019,False,False
+cad,C2 rare merge,logreg,0.9328,0.0023,0.0021,True,False
+cad,C2 rare merge,catboost,0.9231,0.0006,0.0042,False,False
+cad,C2 rare merge,tabpfn,0.9376,-0.0012,0.0018,False,False
+cad,C3 drop inconsistent,logreg,0.9359,0.0014,0.0025,False,False
+cad,C3 drop inconsistent,catboost,0.9225,0.0007,0.0032,False,False
+cad,C3 drop inconsistent,tabpfn,0.9398,0.0011,0.0022,False,False
+cad,P1 scaling robust,logreg,0.9345,0.0029,0.0027,True,False
+cad,P1 scaling quantile,logreg,0.9324,0.0009,0.0101,False,False
+cad,P2 ordinal categoricals,logreg,0.9206,-0.0109,0.0122,False,False
+lad,C1 F0->F1,logreg,0.8355,0.0014,0.0018,False,False
+lad,C1 F0->F1,catboost,0.8465,0.0051,0.0094,False,False
+lad,C1 F0->F1,tabpfn,0.8521,-0.0002,0.0036,False,False
+lad,C2 rare drop,logreg,0.8346,-0.0009,0.0049,False,False
+lad,C2 rare drop,catboost,0.8457,-0.0007,0.0060,False,False
+lad,C2 rare drop,tabpfn,0.8512,-0.0009,0.0025,False,False
+lad,C2 rare merge,logreg,0.8353,-0.0003,0.0037,False,False
+lad,C2 rare merge,catboost,0.8476,0.0011,0.0047,False,False
+lad,C2 rare merge,tabpfn,0.8516,-0.0005,0.0021,False,False
+lad,C3 drop inconsistent,logreg,0.8355,0.0000,0.0007,False,False
+lad,C3 drop inconsistent,catboost,0.8442,-0.0022,0.0042,False,False
+lad,C3 drop inconsistent,tabpfn,0.8526,0.0005,0.0015,False,False
+lad,P1 scaling robust,logreg,0.8355,0.0019,0.0038,False,False
+lad,P1 scaling quantile,logreg,0.8314,-0.0022,0.0088,False,False
+lad,P2 ordinal categoricals,logreg,0.8305,-0.0031,0.0130,False,False
+lcx,C1 F0->F1,logreg,0.6734,0.0049,0.0049,True,False
+lcx,C1 F0->F1,catboost,0.7219,-0.0069,0.0152,False,False
+lcx,C1 F0->F1,tabpfn,0.7363,-0.0039,0.0066,False,False
+lcx,C2 rare drop,logreg,0.6781,0.0096,0.0078,True,False
+lcx,C2 rare drop,catboost,0.7284,-0.0004,0.0060,False,False
+lcx,C2 rare drop,tabpfn,0.7398,-0.0004,0.0048,False,False
+lcx,C2 rare merge,logreg,0.6800,0.0115,0.0074,True,False
+lcx,C2 rare merge,catboost,0.7259,-0.0029,0.0082,False,False
+lcx,C2 rare merge,tabpfn,0.7406,0.0004,0.0037,False,False
+lcx,C3 drop inconsistent,logreg,0.6820,0.0019,0.0037,False,False
+lcx,C3 drop inconsistent,catboost,0.7260,0.0001,0.0079,False,False
+lcx,C3 drop inconsistent,tabpfn,0.7428,0.0022,0.0026,False,False
+lcx,P1 scaling robust,logreg,0.6800,0.0041,0.0057,False,False
+lcx,P1 scaling quantile,logreg,0.6784,0.0025,0.0155,False,False
+lcx,P2 ordinal categoricals,logreg,0.6759,0.0000,0.0000,False,False
+rca,C1 F0->F1,logreg,0.7200,0.0053,0.0060,False,False
+rca,C1 F0->F1,catboost,0.7086,0.0123,0.0132,False,False
+rca,C1 F0->F1,tabpfn,0.7360,-0.0017,0.0052,False,False
+rca,C2 rare drop,logreg,0.7276,0.0075,0.0066,True,False
+rca,C2 rare drop,catboost,0.7127,0.0041,0.0095,False,False
+rca,C2 rare drop,tabpfn,0.7360,0.0000,0.0025,False,False
+rca,C2 rare merge,logreg,0.7236,0.0035,0.0064,False,False
+rca,C2 rare merge,catboost,0.7101,0.0015,0.0098,False,False
+rca,C2 rare merge,tabpfn,0.7347,-0.0013,0.0018,False,False
+rca,C3 drop inconsistent,logreg,0.7281,0.0005,0.0027,False,False
+rca,C3 drop inconsistent,catboost,0.7112,-0.0015,0.0105,False,False
+rca,C3 drop inconsistent,tabpfn,0.7378,0.0018,0.0026,False,False
+rca,P1 scaling robust,logreg,0.7276,0.0013,0.0086,False,False
+rca,P1 scaling quantile,logreg,0.7173,-0.0090,0.0110,False,False
+rca,P2 ordinal categoricals,logreg,0.7175,-0.0088,0.0118,False,False

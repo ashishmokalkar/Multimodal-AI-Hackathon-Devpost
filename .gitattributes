@@ -1,0 +1,2 @@
+# Raw data is checksummed byte-for-byte: never convert line endings
+data/raw/** -text

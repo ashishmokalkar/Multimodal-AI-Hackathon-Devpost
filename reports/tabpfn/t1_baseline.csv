@@ -1,0 +1,5 @@
+target,auc_tabpfn,acc_tabpfn,auc_logreg,auc_random_forest,auc_xgboost,best_baseline,tabpfn_vs_best,tabpfn_vs_best_se,tabpfn_vs_best_keep
+cad,0.9324,0.8766,0.9230,0.9199,0.9084,logreg,0.0094,0.0089,True
+lad,0.8449,0.7911,0.8207,0.8477,0.8270,random_forest,-0.0028,0.0103,False
+lcx,0.7375,0.6769,0.6601,0.7399,0.7413,xgboost,-0.0038,0.0214,False
+rca,0.7376,0.6799,0.7176,0.7150,0.6926,logreg,0.0200,0.0168,True

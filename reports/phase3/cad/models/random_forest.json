@@ -1,0 +1,20 @@
+{
+  "row": {
+    "model": "random_forest",
+    "auc_default": 0.9201110446527685,
+    "auc_tune_r0r2": 0.9326909753989557,
+    "auc_tuned": 0.9194718140956172,
+    "tuned_vs_default": -0.0006392305571512225,
+    "tuned_vs_default_se": 0.004756589745698933,
+    "tuning_kept": false,
+    "seconds": 58
+  },
+  "run": "p3_random_forest_default",
+  "params": {
+    "n_estimators": 500,
+    "max_depth": null,
+    "min_samples_leaf": 2,
+    "max_features": "sqrt",
+    "class_weight": null
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "row": {
+    "model": "ebm",
+    "auc_default": 0.8462692638080873,
+    "auc_tune_r0r2": 0.8606934425052072,
+    "auc_tuned": 0.8415676678876679,
+    "tuned_vs_default": -0.004701595920419463,
+    "tuned_vs_default_se": 0.011982043306910802,
+    "tuning_kept": false,
+    "seconds": 200
+  },
+  "run": "p3_ebm_default",
+  "params": {
+    "interactions": 5,
+    "learning_rate": 0.01,
+    "max_bins": 64,
+    "outer_bags": 8
+  }
+}

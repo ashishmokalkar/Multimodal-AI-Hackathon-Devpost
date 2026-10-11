@@ -1,0 +1,20 @@
+{
+  "lad": {
+    "strategy": "S0",
+    "model": "svm_rbf",
+    "run": "p3_svm_rbf_tuned",
+    "auc": 0.8613186238598004
+  },
+  "lcx": {
+    "strategy": "S0",
+    "model": "random_forest",
+    "run": "p3_random_forest_seedbag5",
+    "auc": 0.772001266712937
+  },
+  "rca": {
+    "strategy": "S0",
+    "model": "logreg",
+    "run": "p3_logreg_tuned",
+    "auc": 0.7516783597447213
+  }
+}

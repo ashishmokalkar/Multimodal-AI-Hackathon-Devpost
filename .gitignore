@@ -16,7 +16,16 @@ dist/
 __pycache__/
 *.py[cod]
 .venv/
+.venv-ag/
 venv/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Data: raw files are committed (small, checksummed); derived data is regenerated
+data/interim/*
+data/processed/*
+!data/interim/.gitkeep
+!data/processed/.gitkeep
 
 # Editor and operating system files
 .idea/

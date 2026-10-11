@@ -1,0 +1,22 @@
+{
+  "cad": {
+    "experiment": "none",
+    "model": "ebm",
+    "auc": 0.9389
+  },
+  "lad": {
+    "experiment": "none",
+    "model": "svm_rbf",
+    "auc": 0.8613
+  },
+  "lcx": {
+    "experiment": "none",
+    "model": "random_forest",
+    "auc": 0.772
+  },
+  "rca": {
+    "experiment": "none",
+    "model": "logreg",
+    "auc": 0.7517
+  }
+}

@@ -1,0 +1,11 @@
+model,auc_default,auc_tune_r0r2,auc_tuned,tuned_vs_default,tuned_vs_default_se,tuning_kept,seconds,auc_seedbag5,seedbag_vs_single
+svm_rbf,0.7164,0.7455,0.7448,0.0284,0.0198,True,23,0.7448,0.0000
+catboost,0.7105,0.7355,0.7283,0.0178,0.0148,True,74,,
+ebm,0.6964,0.7179,0.7043,0.0079,0.0209,False,227,,
+extra_trees,0.7260,0.7297,0.7271,0.0010,0.0101,False,47,,
+gnb,0.7051,0.7172,0.7202,0.0151,0.0075,True,6,,
+knn,0.7030,0.7160,0.7143,0.0113,0.0142,False,10,,
+lightgbm,0.7072,0.7345,0.7334,0.0262,0.0164,True,16,0.7321,-0.0013
+logreg,0.7360,0.7526,0.7517,0.0157,0.0186,False,25,,
+random_forest,0.7042,0.7237,0.7211,0.0169,0.0169,False,55,,
+xgboost,0.6897,0.7353,0.7381,0.0484,0.0253,True,25,0.7357,-0.0024

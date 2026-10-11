@@ -1,0 +1,7 @@
+target,variant,auc,brier
+lad,platt,0.8641,0.1455
+lad,platt+consistency,0.8670,0.1443
+lcx,platt,0.7670,0.1906
+lcx,platt+consistency,0.7686,0.1905
+rca,platt,0.7615,0.1909
+rca,platt+consistency,0.7640,0.1900

@@ -1,0 +1,20 @@
+{
+  "row": {
+    "model": "extra_trees",
+    "auc_default": 0.7260471377290598,
+    "auc_tune_r0r2": 0.7296606978529174,
+    "auc_tuned": 0.7270650882779031,
+    "tuned_vs_default": 0.001017950548843003,
+    "tuned_vs_default_se": 0.01007060489598996,
+    "tuning_kept": false,
+    "seconds": 47
+  },
+  "run": "p3_extra_trees_tuned",
+  "params": {
+    "n_estimators": 500,
+    "max_depth": 6,
+    "min_samples_leaf": 6,
+    "max_features": 0.2,
+    "class_weight": "balanced"
+  }
+}

@@ -1,0 +1,29 @@
+target,model,exp,auc,delta,se,keep,hurt,vs_S0
+cad,classical:ebm,M4 joint 8-pattern,0.9356,-0.0078,0.0084,False,False,
+lad,classical:catboost,M4 joint 8-pattern,0.8585,-0.0177,0.0142,False,True,
+lad,classical:catboost,M2 hierarchical,0.8700,-0.0061,0.0116,False,False,
+lad,classical:catboost,M3 stacked BR,0.8751,-0.0010,0.0088,False,False,
+lad,classical:catboost,E3 pooled all w=0.25,0.8649,-0.0051,0.0071,False,False,-0.0112
+lad,classical:catboost,E3 pooled all w=0.5,0.8622,-0.0078,0.0085,False,False,-0.0139
+lad,classical:catboost,E3 pooled all w=1.0,0.8578,-0.0122,0.0102,False,True,-0.0183
+lad,classical:catboost,E3 pooled angina w=0.25,0.8706,0.0006,0.0070,False,False,-0.0055
+lad,classical:catboost,E3 pooled angina w=0.5,0.8708,0.0008,0.0087,False,False,-0.0053
+lad,classical:catboost,E3 pooled angina w=1.0,0.8706,0.0006,0.0082,False,False,-0.0055
+lcx,classical:xgboost,M4 joint 8-pattern,0.7632,-0.0240,0.0124,False,True,
+lcx,classical:xgboost,M2 hierarchical,0.7800,-0.0071,0.0128,False,False,
+lcx,classical:xgboost,M3 stacked BR,0.7763,-0.0109,0.0097,False,True,
+lcx,classical:xgboost,E3 pooled all w=0.25,0.7748,-0.0053,0.0101,False,False,-0.0124
+lcx,classical:xgboost,E3 pooled all w=0.5,0.7750,-0.0051,0.0120,False,False,-0.0122
+lcx,classical:xgboost,E3 pooled all w=1.0,0.7745,-0.0055,0.0153,False,False,-0.0127
+lcx,classical:xgboost,E3 pooled angina w=0.25,0.7817,0.0017,0.0057,False,False,-0.0054
+lcx,classical:xgboost,E3 pooled angina w=0.5,0.7819,0.0018,0.0069,False,False,-0.0053
+lcx,classical:xgboost,E3 pooled angina w=1.0,0.7819,0.0019,0.0083,False,False,-0.0053
+rca,classical:ebm,M4 joint 8-pattern,0.7515,-0.0222,0.0200,False,True,
+rca,classical:ebm,M2 hierarchical,0.7323,-0.0414,0.0237,False,True,
+rca,classical:ebm,M3 stacked BR,0.7600,-0.0138,0.0122,False,True,
+rca,classical:ebm,E3 pooled all w=0.25,0.7358,0.0035,0.0134,False,False,-0.0379
+rca,classical:ebm,E3 pooled all w=0.5,0.7321,-0.0002,0.0128,False,False,-0.0416
+rca,classical:ebm,E3 pooled all w=1.0,0.7323,0.0000,0.0142,False,False,-0.0414
+rca,classical:ebm,E3 pooled angina w=0.25,0.7388,0.0065,0.0140,False,False,-0.0349
+rca,classical:ebm,E3 pooled angina w=0.5,0.7433,0.0110,0.0148,False,False,-0.0304
+rca,classical:ebm,E3 pooled angina w=1.0,0.7483,0.0160,0.0167,False,False,-0.0255

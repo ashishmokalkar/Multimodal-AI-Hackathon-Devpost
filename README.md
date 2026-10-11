@@ -6,19 +6,36 @@ A clinical decision-support and educational prototype for exploring coronary
 artery disease risk, interpreting model outputs, and visualizing per-vessel
 results in an interactive 3D heart.
 
+## Track A deliverables
+
+| Deliverable | Where |
+|---|---|
+| **Working software prototype**: web app with the interactive 3D viewer on the ML backend | [`frontend/`](frontend) (React + React Three Fiber) calling the real-model FastAPI app in [`api/`](api/README.md); run steps below |
+| **Trained prediction pipeline**: code and model weights for CAD and LAD / LCX / RCA stenosis | Training and validation code in [`ml/`](ml/README.md), model weights in [`models/`](models), write-up in [`reports/BEST_MODELS.md`](reports/BEST_MODELS.md) |
+| **Clinical explanation dashboard**: prediction metrics, feature importances (SHAP), patient breakdown | In the app: *Model performance* (ROC-AUC, calibration, thresholds), *Why* and *Factor map* (per-patient Shapley/SHAP contributions plus global importance), *Patient* and *Measurements* (each value against its reference range) |
+
+| Target | Model | ROC-AUC (untouched CV repeats) | 95% CI |
+|---|---|:---:|:---:|
+| CAD | Explainable Boosting Machine | 0.939 | 0.908–0.962 |
+| LAD | CatBoost | 0.866 | 0.824–0.905 |
+| LCX | XGBoost | 0.784 | 0.727–0.824 |
+| RCA | Logistic stack of 8 models | 0.767 | 0.715–0.811 |
+
+How the numbers were validated, and everything that was tried: [`ml/README.md`](ml/README.md).
+
 ## Repository layout
 
 - `frontend/` — React application, patient inputs, results, and 3D viewer.
 - `api/` — real FastAPI serving application.
-- `models/` — pinned model manifest and exported final/demo estimators served by
+- `models/` — pinned model manifest and exported cross-fitted final estimators served by
   `api/`.
 - `mock-api/` — separate contract-compatible synthetic stub for local UI work.
 - `docs/` — product specification, workflow, planning, evidence, and API
   contract.
 - `assets/` — heart asset and licence records.
 - `data/` — source data used by the pinned real serving bundle.
-- `ml/`, `reports/`, `tests/` — model research/training material, validation
-  reports, and real API tests.
+- `ml/`, `reports/`, `tests/` — training pipeline ([ml/README.md](ml/README.md)), validation
+  reports, and tests.
 
 ## Run the frontend
 
@@ -44,7 +61,7 @@ Vite 8.3.2, React 18.3.1, TypeScript 6.0.3, and Tailwind CSS 3.4.19.
 ## Run the real model API
 
 The pinned real serving bundle reports contract `1.1.0` and model version
-`cardioclarity-v2.0.0`. Its tested Linux runtime is Ubuntu 24.04.5 on WSL 2 with
+`cardioclarity-v2.1.0`. Its tested Linux runtime is Ubuntu 24.04.5 on WSL 2 with
 Python **3.11.9** and uv **0.12.24**. Run these commands in an Ubuntu/Linux
 shell from the repository root. The virtual environment and uv-managed Python
 live outside the checkout; the pinned dependencies come from

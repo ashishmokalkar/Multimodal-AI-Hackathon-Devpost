@@ -1,0 +1,20 @@
+{
+  "row": {
+    "model": "svm_rbf",
+    "auc_default": 0.7164002779334586,
+    "auc_tune_r0r2": 0.7455231595391777,
+    "auc_tuned": 0.7448045741409586,
+    "tuned_vs_default": 0.028404296207499846,
+    "tuned_vs_default_se": 0.019810329801350952,
+    "tuning_kept": true,
+    "seconds": 23,
+    "auc_seedbag5": 0.7448045741409586,
+    "seedbag_vs_single": 0.0
+  },
+  "run": "p3_svm_rbf_tuned",
+  "params": {
+    "C": 1.777473258312918,
+    "gamma": 0.0011198114112216336,
+    "class_weight": "balanced"
+  }
+}
