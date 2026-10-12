@@ -9,7 +9,9 @@ import {
   MIN_WINDOW_SIZE,
   pulseRate,
   riskBand,
+  targetHeadline,
   TOP_BAR_HEIGHT,
+  whyRows,
   WINDOW_IDS,
   type Rect,
 } from "./studioModel";
@@ -186,3 +188,72 @@ describe("guided tour", () => {
     expect(overall.lowering.map((driver) => driver.feature)).toEqual(["Sex"]);
   });
 });
+
+describe("why window", () => {
+  const target = (probability: number, threshold: number) => ({
+    probability,
+    threshold,
+    label: "",
+    uncertain: false,
+  });
+  const empty = { base_value: 0.3, scale: "probability" as const, method: "test", contributions: [] };
+  const prediction = {
+    request_id: "00000000-0000-4000-8000-000000000000",
+    model_version: "test",
+    risk_summary: "",
+    mock: false,
+    warnings: [],
+    derived: { BMI: 25, Obesity: false },
+    prediction_source: "test",
+    cad: target(0.61, 0.69),
+    vessels: { LAD: target(0.88, 0.55), LCX: target(0.25, 0.32), RCA: target(0.09, 0.39) },
+    explanations: { cad: empty, LAD: empty, LCX: empty, RCA: empty },
+  } as PredictionResponse;
+
+  it("names the artery, its chance, its risk word and the part of the heart it supplies", () => {
+    expect(targetHeadline(prediction, "LAD").text).toBe("LAD · 88% ▲ High · Front of the heart");
+    expect(targetHeadline(prediction, "LCX").text).toBe(
+      "LCX · 25% Moderate · Side and back of the heart",
+    );
+    expect(targetHeadline(prediction, "RCA").text).toBe(
+      "RCA · 9% Low · Right side and bottom of the heart",
+    );
+  });
+
+  it("shows only the chance for the overall result", () => {
+    const line = targetHeadline(prediction, "cad");
+    expect(line.text).toBe("Overall heart disease · 61%");
+    expect(line.band).toBeNull();
+    expect(line.region).toBeNull();
+  });
+
+  it("joins each reason with its measured value and typical range, in the reasons' order", () => {
+    const drivers = [
+      { feature: "LDL", label: "LDL", valueText: "190 mg/dL", group: "Lab", points: 9 },
+      { feature: "DM", label: "Diabetes", valueText: "Yes", group: "History", points: 4 },
+    ];
+    const card = {
+      feature: "LDL",
+      label: "LDL",
+      value: 190,
+      valueText: "190 mg/dL",
+      points: 9,
+      sameAsReference: false,
+      status: "high" as const,
+      rangeText: "< 130 mg/dL",
+      bar: { bandStart: 0, bandEnd: 60, marker: 85 },
+      attention: true,
+    };
+    const rows = whyRows(drivers, [card]);
+    expect(rows.map((row) => row.feature)).toEqual(["LDL", "DM"]);
+    expect(rows[0]).toMatchObject({ points: 9, status: "high", rangeText: "< 130 mg/dL", bar: card.bar });
+    // a yes/no answer has no range: no chip and no bar
+    expect(rows[1]).toMatchObject({ status: null, rangeText: null, bar: null });
+  });
+
+  it("has no separate artery window: clicking an artery explains it in Why", () => {
+    expect(WINDOW_IDS).not.toContain("vessel");
+    expect(Object.keys(defaultLayout(1920, 1080)).sort()).toEqual([...WINDOW_IDS].sort());
+  });
+});
+

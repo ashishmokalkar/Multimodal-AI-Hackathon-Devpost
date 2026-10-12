@@ -57,6 +57,7 @@ import {
   type VesselId,
 } from "../viewer/vesselMap";
 import { SCENE_THEMES, type SceneTheme } from "./sceneTheme";
+import { clearSelection, toggleArtery } from "./selection";
 import { beatPulse, pulseRate } from "./studioModel";
 import { heartCovered, useStudioStore } from "./studioStore";
 import { isFlagged } from "../../lib/flags";
@@ -532,12 +533,10 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
   });
 
   const setHovered = useUiStore((state) => state.setHoveredVessel);
+  // click picks this artery for the Why window; clicking it again goes back to the overall result
   const select = (event: { stopPropagation: () => void }) => {
     event.stopPropagation();
-    useUiStore.getState().setSelectedVessel(vessel);
-    const studio = useStudioStore.getState();
-    studio.focus(vessel);
-    studio.openWindow("vessel");
+    toggleArtery(vessel);
   };
 
   return (
@@ -744,8 +743,6 @@ function Framing({ heartBox }: { heartBox: Box3 | null }) {
   const whatifOpen = useStudioStore((state) => state.open.whatif);
   const whatif = useStudioStore((state) => state.rects.whatif);
   const setHeartCentre = useStudioStore((state) => state.setHeartCentre);
-  const vesselOpen = useStudioStore((state) => state.open.vessel);
-  const vessel = useStudioStore((state) => state.rects.vessel);
 
   useEffect(() => {
     const view = get().camera as PerspectiveCamera;
@@ -792,7 +789,6 @@ function Framing({ heartBox }: { heartBox: Box3 | null }) {
     const bandBottom = Math.min(
       size.height - 96,
       under(whatifOpen, whatif) ? whatif.y - FRAME_MARGIN : Infinity,
-      under(vesselOpen, vessel) ? vessel.y - FRAME_MARGIN : Infinity,
     );
     const zoom = Math.min(1, Math.max(0.6, (bandBottom - bandTop) / (bottom - top)));
     const centre = size.height / 2 + ((top + bottom) / 2 - size.height / 2) * zoom;
@@ -802,7 +798,7 @@ function Framing({ heartBox }: { heartBox: Box3 | null }) {
     view.updateProjectionMatrix();
     setHeartCentre({ x: Math.round(size.width / 2), y: Math.round((bandTop + bandBottom) / 2) });
     invalidate();
-  }, [get, heartBox, invalidate, setHeartCentre, size.height, size.width, vessel, vesselOpen, whatif, whatifOpen]);
+  }, [get, heartBox, invalidate, setHeartCentre, size.height, size.width, whatif, whatifOpen]);
 
   return null;
 }
@@ -973,16 +969,13 @@ export function StudioScene() {
   return (
     <SceneErrorBoundary>
       <Canvas
-        aria-label={`3D heart with the LAD, LCX and RCA arteries. ${summary} Drag to rotate, scroll to zoom, click an artery to inspect it.`}
+        aria-label={`3D heart with the LAD, LCX and RCA arteries. ${summary} Drag to rotate, scroll to zoom, click an artery to explain it in the Why window.`}
         camera={{ position: [...STUDIO_OVERVIEW_POSITION], fov: 32 }}
         className="studio-canvas"
         dpr={quality === "high" ? [1, 1.75] : [1, 1.25]}
         frameloop={animated ? "always" : "demand"}
         gl={{ antialias: true, powerPreference: "high-performance" }}
-        onPointerMissed={() => {
-          useUiStore.getState().setSelectedVessel(null);
-          useStudioStore.getState().closeWindow("vessel");
-        }}
+        onPointerMissed={clearSelection}
       >
         <PerformanceMonitor
           flipflops={2}

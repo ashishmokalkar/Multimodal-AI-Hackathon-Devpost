@@ -3,8 +3,13 @@ import type {
   PredictionResponse,
   Target,
 } from "../../api/types";
-import { buildDrivers, type Driver } from "../../lib/summary";
-import type { InsightTarget } from "../../lib/insights";
+import { ARTERY_INFO, buildDrivers, type Driver } from "../../lib/summary";
+import {
+  type InsightTarget,
+  type MeasurementCard,
+  type RangeBar,
+  type RangeStatus,
+} from "../../lib/insights";
 import type { VesselId } from "../viewer/vesselMap";
 import { isFlagged } from "../../lib/flags";
 
@@ -43,13 +48,83 @@ export function percent(probability: number): number {
   return Math.round(probability * 100);
 }
 
+// ------------------------------------------------------------------------------------------- why window
+export interface TargetHeadline {
+  name: string;
+  percent: number;
+  /** Arteries only: the overall line shows just the chance. */
+  band: RiskBand | null;
+  region: string | null;
+  /** The whole line as text, for screen readers and tests. */
+  text: string;
+}
+
+/** Where an artery's blood goes, as a short phrase: "Front of the heart". */
+export function arteryRegion(artery: VesselId): string {
+  const region = ARTERY_INFO[artery].region.replace(/^Supplies the /, "");
+  return region.charAt(0).toUpperCase() + region.slice(1);
+}
+
+/**
+ * The line under the target chips naming what the Why window explains: "LAD · 88% ▲ High · Front of the heart",
+ * or "Overall heart disease · 61%".
+ */
+export function targetHeadline(
+  prediction: PredictionResponse,
+  target: InsightTarget,
+): TargetHeadline {
+  const value = targetOf(prediction, target);
+  const chance = percent(value.probability);
+  if (target === "cad") {
+    return {
+      name: "Overall heart disease",
+      percent: chance,
+      band: null,
+      region: null,
+      text: `Overall heart disease · ${chance}%`,
+    };
+  }
+  const band = riskBand(value.probability, value.threshold, isFlagged(value));
+  const region = arteryRegion(target);
+  return {
+    name: target,
+    percent: chance,
+    band,
+    region,
+    text: `${target} · ${chance}% ${band === "high" ? "▲ " : ""}${RISK_WORD[band]} · ${region}`,
+  };
+}
+
+/** A reason in the Why window: how much it moves the estimate, with the measured value against its typical range. */
+export interface WhyRow extends Driver {
+  status: RangeStatus | null;
+  rangeText: string | null;
+  bar: RangeBar | null;
+}
+
+/** Joins the biggest drivers with their measurement (High/Low and the range bar), keeping the drivers' order. */
+export function whyRows(
+  drivers: readonly Driver[],
+  cards: readonly MeasurementCard[],
+): WhyRow[] {
+  const byFeature = new Map(cards.map((card) => [card.feature, card]));
+  return drivers.map((driver) => {
+    const card = byFeature.get(driver.feature);
+    return {
+      ...driver,
+      status: card?.status ?? null,
+      rangeText: card?.rangeText ?? null,
+      bar: card?.bar ?? null,
+    };
+  });
+}
+
 // ------------------------------------------------------------------------------------------- windows
 export const WINDOW_IDS = [
   "patient",
   "risk",
   "drivers",
   "whatif",
-  "vessel",
   "factors",
   "people",
   "compare",
@@ -73,7 +148,6 @@ export const MIN_WINDOW_SIZE: Record<WindowId, { w: number; h: number }> = {
   risk: { w: 280, h: 200 },
   drivers: { w: 280, h: 200 },
   whatif: { w: 360, h: 150 },
-  vessel: { w: 240, h: 200 },
   factors: { w: 300, h: 220 },
   people: { w: 240, h: 240 },
   compare: { w: 300, h: 300 },
@@ -87,7 +161,6 @@ export const DEFAULT_OPEN: Record<WindowId, boolean> = {
   risk: true,
   drivers: true,
   whatif: false,
-  vessel: false,
   factors: false,
   people: false,
   compare: false,
@@ -135,8 +208,6 @@ export function defaultLayout(
   const dockTop = vh - DOCK_SPACE;
   const patientH = clamp(dockTop - top - GAP, MIN_WINDOW_SIZE.patient.h, 440);
   const patientY = Math.max(top, Math.round(top + (dockTop - top - patientH) / 2));
-  const vesselW = 360;
-  const vesselH = 260;
   return {
     // patient on the left, centred in the height between the top bar and the dock
     patient: { x: GAP, y: patientY, w: patientW, h: patientH },
@@ -147,13 +218,6 @@ export function defaultLayout(
       y: vh - GAP - whatIfH,
       w: whatIfW,
       h: whatIfH,
-    },
-    // the artery inspector opens at the bottom centre; the heart is framed above it
-    vessel: {
-      x: Math.round((vw - vesselW) / 2),
-      y: vh - GAP - vesselH,
-      w: vesselW,
-      h: vesselH,
     },
     factors: { x: centreX, y: top + 50, w: 400, h: 360 },
     people: { x: rightX - 12 - 300, y: top + 40, w: 300, h: 470 },

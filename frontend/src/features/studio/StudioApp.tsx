@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { useUiStore } from "../../store/uiStore";
 import { CommandPalette } from "./CommandPalette";
 import { Dock, Toasts, Toolbar, TopBar, Watermark } from "./StudioChrome";
 import { StudioScene } from "./StudioScene";
 import { TourOverlay } from "./TourOverlay";
 import { usePredictionDriver } from "./usePredictionDriver";
+import { clearSelection } from "./selection";
 import { useStudioStore } from "./studioStore";
 import { useStudioData } from "./studioData";
 import { isFlagged } from "../../lib/flags";
@@ -18,7 +18,6 @@ import { ModelWindow } from "./windows/ModelWindow";
 import { PatientWindow } from "./windows/PatientWindow";
 import { PeopleWindow } from "./windows/PeopleWindow";
 import { RiskWindow } from "./windows/RiskWindow";
-import { VesselWindow } from "./windows/VesselWindow";
 import { WhatIfWindow } from "./windows/WhatIfWindow";
 import "./studio.css";
 
@@ -70,15 +69,8 @@ export function StudioApp() {
         studio.setPaletteOpen(!studio.paletteOpen);
         return;
       }
-      if (
-        event.key === "Escape" &&
-        !studio.paletteOpen &&
-        !studio.tour.active &&
-        useUiStore.getState().selectedVessel
-      ) {
-        useUiStore.getState().setSelectedVessel(null);
-        studio.closeWindow("vessel");
-        studio.focus(null);
+      if (event.key === "Escape" && !studio.paletteOpen && !studio.tour.active) {
+        clearSelection();
       }
     };
     window.addEventListener("keydown", onKey);
@@ -102,7 +94,6 @@ export function StudioApp() {
         <PatientWindow />
         <RiskWindow />
         <DriversWindow />
-        <VesselWindow />
         <WhatIfWindow />
         <FactorsWindow />
         <PeopleWindow />

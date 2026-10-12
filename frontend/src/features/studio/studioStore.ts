@@ -180,8 +180,7 @@ function load(): Persisted & Pick<StudioState, "anchored"> {
       quality: saved.quality === "lite" ? "lite" : "high",
       rects,
       anchored,
-      // the vessel inspector follows the selection, so it never reopens by itself
-      open: { ...open, vessel: false },
+      open,
       order: [...order, ...WINDOW_IDS.filter((id) => !order.includes(id))],
     };
   } catch {

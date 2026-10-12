@@ -5,7 +5,6 @@ export const WINDOW_TITLES: Record<WindowId, string> = {
   risk: "Risk",
   drivers: "Why",
   whatif: "What if",
-  vessel: "Artery",
   factors: "Factor map",
   people: "Out of 100 patients",
   compare: "Similar patients",

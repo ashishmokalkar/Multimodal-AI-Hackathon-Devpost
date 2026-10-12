@@ -1,57 +1,103 @@
 import { useMemo } from "react";
-import { targetColor } from "../../../lib/colorScale";
-import type { InsightTarget } from "../../../lib/insights";
-import { buildDrivers, driverPillText } from "../../../lib/summary";
+import { riskColor, targetColor } from "../../../lib/colorScale";
+import { buildMeasurementGroups, type InsightTarget } from "../../../lib/insights";
+import { buildDrivers } from "../../../lib/summary";
+import { usePatientStore } from "../../../store/patientStore";
 import { useUiStore } from "../../../store/uiStore";
+import { useWhatIfStore } from "../../../store/whatIfStore";
+import { HeartbeatLoader } from "../../loading/HeartbeatLoader";
 import { FloatingWindow } from "../FloatingWindow";
 import { IconBars } from "../icons";
-import { EmptyState, ShapBadge, TargetChips } from "../parts";
+import { BandChip, EmptyState, ShapBadge, TargetChips } from "../parts";
+import { selectTarget } from "../selection";
 import { probabilityOf, useStudioData } from "../studioData";
+import { targetHeadline, whyRows } from "../studioModel";
 import { useStudioStore } from "../studioStore";
 
 /**
- * What moves the estimate: each bar is one input, pushing right (raises) or left (lowers) from a typical patient's
- * score. Hovering a bar lights up the arteries it moves on the 3D heart.
+ * The one place for explanations, for the overall result or the artery picked on the heart. Each row is one input:
+ * its value against the typical range, and a bar pushing right (raises) or left (lowers) from a typical patient's
+ * score. Hovering a row lights up the arteries it moves on the 3D heart and opens a small card beside the row with
+ * its points for every target.
  */
 export function DriversWindow() {
-  const { shown, features } = useStudioData();
+  const { shown, features, predictionInputs, scenario } = useStudioData();
+  const whatIfValues = useWhatIfStore((state) => state.values);
+  const whyFlash = useStudioStore((state) => state.whyFlash);
+  const predictionError = usePatientStore((state) => state.predictionError);
   const selectedVessel = useUiStore((state) => state.selectedVessel);
   const hoveredFactor = useUiStore((state) => state.hoveredFactor);
   const setHoveredFactor = useUiStore((state) => state.setHoveredFactor);
   const pinned = useStudioStore((state) => state.pinnedFactor);
   const target: InsightTarget = selectedVessel ?? "cad";
-  const summary = useMemo(
-    () =>
-      shown && !shown.mock
-        ? buildDrivers(
-            shown.explanations[target],
-            features,
-            probabilityOf(shown, target),
-            7,
-          )
-        : null,
-    [features, shown, target],
-  );
+  const summary = useMemo(() => {
+    if (!shown || shown.mock) {
+      return null;
+    }
+    const explanation = shown.explanations[target];
+    const drivers = buildDrivers(explanation, features, probabilityOf(shown, target), 7);
+    const cards = buildMeasurementGroups(
+      features,
+      scenario ? whatIfValues : predictionInputs,
+      explanation,
+    ).flatMap((group) => group.cards);
+    return { ...drivers, rows: whyRows(drivers.drivers, cards) };
+  }, [features, predictionInputs, scenario, shown, target, whatIfValues]);
   const maxAbs = summary
-    ? Math.max(1, ...summary.drivers.map((driver) => Math.abs(driver.points)))
+    ? Math.max(1, ...summary.rows.map((row) => Math.abs(row.points)))
     : 1;
+  const headline = shown ? targetHeadline(shown, target) : null;
+  const flashed = whyFlash && shown ? shown.vessels[whyFlash.vessel] : null;
 
-  const choose = (next: InsightTarget) => {
-    const vessel = next === "cad" ? null : next;
-    useUiStore.getState().setSelectedVessel(vessel);
-    useStudioStore.getState().focus(vessel);
-  };
+
+  // the chips switch the explanation and the camera without the border flash (the eye is already here)
+  const choose = (next: InsightTarget) =>
+    selectTarget(next === "cad" ? null : next, { flash: false });
 
   return (
     <FloatingWindow
       accent={targetColor(target)}
       actions={<ShapBadge detail="Bars are Shapley values (SHAP) of the calibrated probability" />}
+      flash={
+        whyFlash
+          ? {
+              sequence: whyFlash.sequence,
+              color: flashed
+                ? riskColor(flashed.probability, flashed.threshold)
+                : targetColor(whyFlash.vessel),
+            }
+          : null
+      }
       icon={<IconBars />}
       id="drivers"
       title="Why"
     >
       <TargetChips onChange={choose} value={target} />
-      {!summary ? (
+      {headline && (
+        <p className="why-head">
+          <b>{headline.name}</b>
+          <span aria-hidden="true">·</span>
+          <span className="why-head-pct">{headline.percent}%</span>
+          {headline.band && <BandChip band={headline.band} small />}
+          {headline.region && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span className="why-head-region">{headline.region}</span>
+            </>
+          )}
+        </p>
+      )}
+      {!shown ? (
+        // no prediction yet: it is being scored (or failed)
+        <EmptyState>
+          {predictionError ? (
+            <span className="text-flag">{predictionError}</span>
+          ) : (
+            <HeartbeatLoader steps={["Scoring"]} variant="inline" />
+          )}
+        </EmptyState>
+      ) : !summary ? (
+        // the mock API returns no explanations
         <EmptyState>Explanations appear with the real model.</EmptyState>
       ) : (
         <>
@@ -72,11 +118,11 @@ export function DriversWindow() {
             <span className="sl-lower">◀ lowers</span>
             <span className="sl-raise">raises ▶</span>
           </div>
-          {summary.drivers.length === 0 && (
+          {summary.rows.length === 0 && (
             <EmptyState>Matches a typical patient: no input moves it.</EmptyState>
           )}
           <ul className="sl-drivers">
-            {summary.drivers.map((driver) => {
+            {summary.rows.map((driver) => {
               const width = (Math.abs(driver.points) / maxAbs) * 38;
               const raise = driver.points > 0;
               return (
@@ -85,9 +131,31 @@ export function DriversWindow() {
                   key={driver.feature}
                   onPointerEnter={() => setHoveredFactor(driver.feature)}
                   onPointerLeave={() => setHoveredFactor(pinned)}
-                  title={`${driver.label}: ${driver.valueText}`}
+                  title={`${driver.label}: ${driver.valueText}${driver.rangeText ? ` (typical ${driver.rangeText})` : ""}`}
                 >
-                  <span className="sl-driver-label">{driverPillText(driver)}</span>
+                  <span className="sl-driver-info">
+                    <span className="sl-driver-line">
+                      <span className="sl-driver-label">{driver.label}</span>
+                      <span className="sl-driver-value">{driver.valueText}</span>
+                      {driver.status === "high" && <em className="sl-tile-flag">High</em>}
+                      {driver.status === "low" && <em className="sl-tile-flag">Low</em>}
+                    </span>
+                    {driver.bar && (
+                      <span className="sl-tile-bar sl-driver-range" aria-hidden="true">
+                        <i
+                          className="sl-tile-band"
+                          style={{
+                            left: `${driver.bar.bandStart}%`,
+                            width: `${driver.bar.bandEnd - driver.bar.bandStart}%`,
+                          }}
+                        />
+                        <i
+                          className="sl-tile-marker"
+                          style={{ left: `${Math.min(100, Math.max(0, driver.bar.marker))}%` }}
+                        />
+                      </span>
+                    )}
+                  </span>
                   <span className="sl-driver-track">
                     <span
                       className={`sl-driver-bar ${raise ? "sl-raise" : "sl-lower"}`}

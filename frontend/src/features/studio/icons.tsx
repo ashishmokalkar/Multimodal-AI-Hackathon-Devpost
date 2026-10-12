@@ -93,12 +93,6 @@ export const IconChart = (p: IconProps) => (
     <path d="m7 15 4-5 3 3 5-7" />
   </Icon>
 );
-export const IconVessel = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M6 3c0 5 4 5 4 10s-3 5-3 8" />
-    <path d="M10 13c3 0 6 1 8 5" />
-  </Icon>
-);
 export const IconClose = (p: IconProps) => (
   <Icon {...p}>
     <path d="M6 6l12 12M18 6 6 18" />

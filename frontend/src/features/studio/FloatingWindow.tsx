@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
@@ -23,6 +24,14 @@ interface FloatingWindowProps {
   children: ReactNode;
   /** Lets keyboard users scroll a window whose content has nothing focusable (WCAG 2.1.1). */
   focusableBody?: boolean;
+  /** Flashes the border once in this colour each time the sequence changes (skipped with reduced motion). */
+  flash?: { sequence: number; color: string } | null;
+}
+
+const FLASH_MS = 400;
+
+function prefersReducedMotion(): boolean {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
 }
 
 /**
@@ -37,6 +46,7 @@ export function FloatingWindow({
   actions,
   children,
   focusableBody = false,
+  flash = null,
 }: FloatingWindowProps) {
   const rect = useStudioStore((state) => state.rects[id]);
   const open = useStudioStore((state) => state.open[id]);
@@ -58,7 +68,43 @@ export function FloatingWindow({
   // where Restore returns to: a fixed rect, or "layout" for a window that was on the default layout
   const restore = useRef<Rect | "layout" | null>(null);
   const [active, setActive] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const expanded = useStudioStore((state) => state.expanded[id] === true);
+  const storeExpanded = useStudioStore((state) => state.setExpanded);
+  const setExpanded = (value: boolean) => storeExpanded(id, value);
+  const frame = useRef<HTMLElement>(null);
+  const flashColor = useRef(flash?.color);
+  useEffect(() => {
+    flashColor.current = flash?.color;
+  });
+  const flashSequence = flash?.sequence ?? 0;
+  // the sequence already seen when the window mounted: coming back to the Studio does not replay an old flash
+  const flashSeen = useRef(flashSequence);
+  // one flash per new sequence, never when the colour alone changes (a what-if result arriving)
+  useEffect(() => {
+    const element = frame.current;
+    const color = flashColor.current;
+    if (flashSequence === flashSeen.current) {
+      return;
+    }
+    flashSeen.current = flashSequence;
+    if (
+      !element ||
+      !color ||
+      typeof element.animate !== "function" ||
+      prefersReducedMotion()
+    ) {
+      return;
+    }
+    const lit = {
+      borderColor: color,
+      boxShadow: `0 0 0 2px ${color}, 0 0 28px color-mix(in srgb, ${color} 55%, transparent)`,
+    };
+    const animation = element.animate([lit, { ...lit, offset: 0.35 }, {}], {
+      duration: FLASH_MS,
+      easing: "ease-out",
+    });
+    return () => animation.cancel();
+  }, [flashSequence]);
 
   if (!open) {
     return null;
@@ -194,6 +240,7 @@ export function FloatingWindow({
       className={`sw${isTop ? " is-top" : ""}${active ? " is-dragging" : ""}${compact ? " is-compact" : ""}`}
       data-window={id}
       onPointerDownCapture={() => raiseWindow(id)}
+      ref={frame}
       style={style}
     >
       <header

@@ -7,7 +7,8 @@ import { DISCLAIMER_LINE } from "../safety/disclaimer";
 import { SpeakButton } from "../speech/SpeakButton";
 import { useSpokenResult } from "../speech/useSpokenResult";
 import { UnitToggle } from "../units/UnitToggle";
-import { vesselIds, type VesselId } from "../viewer/vesselMap";
+import { vesselIds } from "../viewer/vesselMap";
+import { selectTarget, toggleArtery } from "./selection";
 import {
   IconBars,
   IconChart,
@@ -46,17 +47,6 @@ const THEME_SWATCH: Record<StudioTheme, string> = {
   midnight: "linear-gradient(135deg, #14223f, #03050b 70%, #5eead4)",
   clinical: "linear-gradient(135deg, #e3eaf2, #8fa2b8 70%, #0f766e)",
 };
-
-function focusVessel(vessel: VesselId | null) {
-  useUiStore.getState().setSelectedVessel(vessel);
-  const studio = useStudioStore.getState();
-  studio.focus(vessel);
-  if (vessel) {
-    studio.openWindow("vessel");
-  } else {
-    studio.closeWindow("vessel");
-  }
-}
 
 function ToolButton({
   label,
@@ -281,7 +271,7 @@ export function Toolbar() {
 
   return (
     <div className="toolbar" role="toolbar" aria-label="3D view">
-      <ToolButton label="Overview" onClick={() => focusVessel(null)} pressed={selected === null}>
+      <ToolButton label="Overview" onClick={() => selectTarget(null)} pressed={selected === null}>
         <IconTarget size={16} />
       </ToolButton>
       {vesselIds.map((vessel) => (
@@ -290,7 +280,7 @@ export function Toolbar() {
           className="tool tool-vessel"
           data-tip={`Fly to ${vessel}`}
           key={vessel}
-          onClick={() => focusVessel(selected === vessel ? null : vessel)}
+          onClick={() => toggleArtery(vessel)}
           style={{ ["--artery" as string]: targetColor(vessel) }}
           type="button"
         >

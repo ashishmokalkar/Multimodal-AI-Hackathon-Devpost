@@ -2,11 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useFeatures, useSamples } from "../../api/hooks";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
-import { vesselIds, type VesselId } from "../viewer/vesselMap";
+import { vesselIds } from "../viewer/vesselMap";
 import { useSpeechStore } from "../speech/speechStore";
 import { useSpokenResult } from "../speech/useSpokenResult";
 import { IconSearch } from "./icons";
 import { WINDOW_TITLES } from "./windowTitles";
+import { selectTarget } from "./selection";
 import { WINDOW_IDS } from "./studioModel";
 import { STUDIO_THEMES, THEME_LABEL, useStudioStore } from "./studioStore";
 
@@ -16,17 +17,6 @@ interface Command {
   label: string;
   keywords?: string;
   run: () => void;
-}
-
-function focusVessel(vessel: VesselId | null) {
-  useUiStore.getState().setSelectedVessel(vessel);
-  const studio = useStudioStore.getState();
-  studio.focus(vessel);
-  if (vessel) {
-    studio.openWindow("vessel");
-  } else {
-    studio.closeWindow("vessel");
-  }
 }
 
 function useCommands(): Command[] {
@@ -46,14 +36,14 @@ function useCommands(): Command[] {
         group: "View",
         label: "Overview",
         keywords: "reset camera home whole heart",
-        run: () => focusVessel(null),
+        run: () => selectTarget(null),
       },
       ...vesselIds.map((vessel) => ({
         id: `focus-${vessel}`,
         group: "View",
         label: `Fly to ${vessel}`,
         keywords: "focus artery vessel",
-        run: () => focusVessel(vessel),
+        run: () => selectTarget(vessel),
       })),
       {
         id: "solid",
@@ -89,7 +79,7 @@ function useCommands(): Command[] {
         keywords: "walkthrough demo story",
         run: () => studio().startTour(),
       },
-      ...WINDOW_IDS.filter((id) => id !== "vessel").map((id) => ({
+      ...WINDOW_IDS.map((id) => ({
         id: `window-${id}`,
         group: "Windows",
         label: `Show ${WINDOW_TITLES[id]}`,

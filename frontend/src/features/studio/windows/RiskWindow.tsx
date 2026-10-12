@@ -25,9 +25,7 @@ export function RiskWindow() {
     const studio = useStudioStore.getState();
     studio.focus(next);
     if (next) {
-      studio.openWindow("vessel");
-    } else {
-      studio.closeWindow("vessel");
+      studio.openWindow("drivers");
     }
   };
 
