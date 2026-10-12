@@ -1158,10 +1158,6 @@
   letter-spacing: 0;
 }
 
-.studio .vessel .sl-ring-value {
-  font-size: 30px;
-}
-
 .studio .sl-ring-caption {
   margin-top: 4px;
   color: var(--s-muted);
@@ -1178,67 +1174,39 @@
 }
 
 /* ------------------------------------------------------------------ risk window */
-.studio .sl-risk-hero {
+.studio .rk-eyebrow {
+  color: var(--s-muted);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.studio .rk-big {
+  font-size: 40px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.studio .rk-big small {
+  margin-left: 2px;
+  color: var(--s-muted);
+  font-size: 0.42em;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.studio .rk-bars-headline {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  padding: 2px 0 10px;
+  gap: 6px 10px;
 }
 
-.studio .sl-risk-hero-side,
-.studio .vessel-side {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 7px;
-}
-
-.studio .sl-risk-hero-side .sl-band {
-  font-size: 15px;
-}
-
-.studio .risk-arteries {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-  border-top: 1px solid var(--s-line);
-  padding-top: 10px;
-}
-
-.studio .risk-artery {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  border: 1px solid transparent;
-  border-radius: 14px;
-  padding: 6px 2px 8px;
-  transition:
-    background 0.15s,
-    border-color 0.15s;
-}
-
-.studio .risk-artery:hover {
-  background: var(--s-hover);
-}
-
-.studio .risk-artery[aria-pressed="true"] {
-  border-color: color-mix(in srgb, var(--artery) 55%, transparent);
-  background: color-mix(in srgb, var(--artery) 12%, transparent);
-}
-
-.studio .risk-artery-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--artery);
-  font-size: 12px;
-  font-weight: 750;
-}
-
-.studio .risk-artery-name em {
-  display: grid;
+.studio .rk-unsure {
+  display: inline-grid;
   width: 15px;
   height: 15px;
   place-items: center;
@@ -1247,6 +1215,250 @@
   color: var(--s-muted);
   font-size: 9.5px;
   font-style: normal;
+}
+
+/* the threshold-centred scale shared by both views */
+.studio .rk-scale {
+  position: relative;
+  display: block;
+  height: 10px;
+}
+
+.studio .rk-scale-sm {
+  height: 6px;
+}
+
+.studio .rk-scale-track,
+.studio .rk-scale-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 999px;
+}
+
+.studio .rk-scale-track {
+  right: 0;
+  opacity: 0.18;
+}
+
+.studio .rk-scale-fill {
+  transition:
+    width 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    background-size 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.studio .rk-scale-threshold {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--s-text);
+  opacity: 0.55;
+}
+
+.studio .rk-scale-dot,
+.studio .rk-scale-ghost {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.studio .rk-scale-dot {
+  border: 2.5px solid var(--s-panel-solid);
+  box-shadow: 0 0 0 1px var(--s-line-strong), 0 2px 8px rgb(0 0 0 / 35%);
+  transition:
+    left 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.6s;
+}
+
+.studio .rk-scale-sm .rk-scale-dot,
+.studio .rk-scale-sm .rk-scale-ghost {
+  width: 12px;
+  height: 12px;
+}
+
+.studio .rk-scale-sm .rk-scale-dot {
+  border-width: 2px;
+}
+
+.studio .rk-scale-ghost {
+  border: 1.5px dashed var(--s-muted);
+  background: transparent;
+}
+
+.studio .rk-scale-ticks {
+  display: flex;
+  justify-content: space-between;
+  color: var(--s-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.studio .rk-scale-ticks span:nth-child(2) {
+  color: var(--s-text);
+}
+
+/* option 1: bars */
+.studio .rk-bars {
+  display: grid;
+  gap: 10px;
+}
+
+.studio .rk-bars-hero {
+  display: grid;
+  gap: 9px;
+}
+
+.studio .rk-bars-rows {
+  display: grid;
+  gap: 2px;
+  border-top: 1px solid var(--s-line);
+  padding-top: 10px;
+}
+
+.studio .rk-row {
+  display: grid;
+  grid-template-columns: 58px minmax(60px, 1fr) 36px 52px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 5px 8px;
+  color: var(--s-text);
+  text-align: left;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.studio .rk-row:hover,
+.studio .rk-tile-artery:hover {
+  background: var(--s-hover);
+}
+
+.studio .rk-row[aria-pressed="true"],
+.studio .rk-tile-artery[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--artery) 55%, transparent);
+  background: color-mix(in srgb, var(--artery) 12%, transparent);
+}
+
+.studio .rk-row-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 750;
+}
+
+.studio .rk-row-name > i {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--artery);
+}
+
+.studio .rk-row-pct {
+  font-size: 13.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.studio .rk-row-band {
+  border-radius: 999px;
+  padding: 1px 0;
+  font-size: 10.5px;
+  font-weight: 750;
+  text-align: center;
+}
+
+.studio .rk-rows-caption {
+  margin-top: 2px;
+  color: var(--s-muted);
+  font-size: 10.5px;
+  text-align: center;
+}
+
+/* option 2: tiles */
+.studio .rk-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.studio .rk-tile {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  border: 1px solid var(--s-line);
+  border-radius: 14px;
+  background: var(--s-hover);
+  padding: 10px 11px;
+  color: var(--s-text);
+  text-align: left;
+}
+
+.studio .rk-tile-hero {
+  grid-column: 1 / -1;
+  gap: 9px;
+  padding: 12px 14px;
+}
+
+.studio .rk-tile-hero .rk-big {
+  font-size: 38px;
+}
+
+.studio .rk-tile-threshold {
+  margin-left: auto;
+  color: var(--s-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.studio .rk-tile-artery {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+/* the bar sits on the bottom edge of every tile, whether or not a what-if change is shown above it */
+.studio .rk-tile-artery .rk-scale {
+  width: 100%;
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.studio .rk-tile-pct {
+  font-size: 26px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.studio .rk-tile-pct small {
+  margin-left: 1px;
+  color: var(--s-muted);
+  font-size: 0.5em;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio .rk-scale-fill,
+  .studio .rk-scale-dot {
+    transition: none;
+  }
 }
 
 /* ------------------------------------------------------------------ drivers window */

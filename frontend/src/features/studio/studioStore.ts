@@ -22,6 +22,8 @@ export const THEME_LABEL: Record<StudioTheme, string> = {
 };
 
 export type Quality = "high" | "lite";
+/** How the Risk window shows the chances: aligned threshold bars, or one tile per target. */
+export type RiskView = "bars" | "tiles";
 
 interface Persisted {
   theme: StudioTheme;
@@ -36,6 +38,7 @@ interface Persisted {
   motion: boolean;
   labels: boolean;
   quality: Quality;
+  riskView: RiskView;
   rects: Record<WindowId, Rect>;
   open: Record<WindowId, boolean>;
   order: WindowId[];
@@ -64,6 +67,7 @@ interface StudioState extends Persisted {
   setDepth: (depth: number) => void;
   toggle: (key: "motion" | "labels") => void;
   setQuality: (quality: Quality) => void;
+  setRiskView: (view: RiskView) => void;
   focus: (vessel: VesselId | null) => void;
   setPaletteOpen: (open: boolean) => void;
   startTour: () => void;
@@ -126,6 +130,7 @@ function defaults(): Persisted & Pick<StudioState, "anchored"> {
     motion: !reducedMotion,
     labels: true,
     quality: "high",
+    riskView: "bars",
     ...freshLayout(),
   };
 }
@@ -178,6 +183,7 @@ function load(): Persisted & Pick<StudioState, "anchored"> {
       motion: saved.motion ?? (saved as { beat?: boolean }).beat ?? base.motion,
       labels: saved.labels ?? base.labels,
       quality: saved.quality === "lite" ? "lite" : "high",
+      riskView: saved.riskView === "tiles" ? "tiles" : "bars",
       rects,
       anchored,
       open,
@@ -196,6 +202,7 @@ function save(state: StudioState) {
     motion: state.motion,
     labels: state.labels,
     quality: state.quality,
+    riskView: state.riskView,
     rects: state.rects,
     open: state.open,
     order: state.order,
@@ -225,6 +232,7 @@ export const useStudioStore = create<StudioState>((set) => ({
   setDepth: (depth) => set({ depth: Math.min(1, Math.max(0, depth)) }),
   toggle: (key) => set((state) => ({ [key]: !state[key] })),
   setQuality: (quality) => set({ quality }),
+  setRiskView: (riskView) => set({ riskView }),
   focus: (vessel) =>
     set((state) => ({
       camera: { vessel, sequence: state.camera.sequence + 1 },
