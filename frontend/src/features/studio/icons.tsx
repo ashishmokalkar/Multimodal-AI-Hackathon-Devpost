@@ -245,3 +245,29 @@ export const IconShrink = (p: IconProps) => (
     <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7" />
   </Icon>
 );
+export const IconQr = (p: IconProps) => (
+  <Icon {...p}>
+    <rect height="6" rx="1" width="6" x="3" y="3" />
+    <rect height="6" rx="1" width="6" x="15" y="3" />
+    <rect height="6" rx="1" width="6" x="3" y="15" />
+    <path d="M15 15h2v2M21 15v6h-4M15 19v2M13 3v4M13 11h-2M3 12h4M11 13v2" />
+  </Icon>
+);
+export const IconUpload = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 15V4M7 9l5-5 5 5" />
+    <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+  </Icon>
+);
+export const IconMic = (p: IconProps) => (
+  <Icon {...p}>
+    <rect height="11" rx="3" width="6" x="9" y="3" />
+    <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+  </Icon>
+);
+export const IconSheet = (p: IconProps) => (
+  <Icon {...p}>
+    <rect height="16" rx="2" width="16" x="4" y="4" />
+    <path d="M4 10h16M4 15h16M10 4v16" />
+  </Icon>
+);

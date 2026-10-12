@@ -8,6 +8,7 @@ import { useUiStore } from "../../store/uiStore";
 import { HeartbeatLoader } from "../loading/HeartbeatLoader";
 import { DISCLAIMER_LINE } from "../safety/disclaimer";
 import { PatientAvatar } from "../patient/PatientAvatar";
+import { AddPatientPanel } from "./AddPatientPanel";
 import { IconHeart, IconShield } from "../studio/icons";
 import { useStudioStore } from "../studio/studioStore";
 import "./picker.css";
@@ -193,8 +194,8 @@ function PatientRow({
 }
 
 /**
- * The first screen: the clinician picks whose results to open (or starts a new patient) before the workspace
- * appears. Uses the Studio theme in Studio and the light look in Classic.
+ * The first screen, as two doors: open a patient (four featured, or search all of them) or add a new one (ABHA,
+ * reports, speech, a spreadsheet or the form). Uses the Studio theme in Studio and the light look in Classic.
  */
 export function PatientPicker() {
   const profileQuery = useApiProfile();
@@ -285,23 +286,8 @@ export function PatientPicker() {
         <div className="pk-intro">
           <div>
             <h1 id="pk-title">Choose a patient</h1>
-            <p>Select whose heart-risk results to open. You can switch patients at any time.</p>
+            <p>Open a study patient, or bring in your own. You can switch patients at any time.</p>
           </div>
-          <button
-            className="pk-new"
-            disabled={!features}
-            onClick={openNew}
-            title="Start from typical values and enter the patient's own details"
-            type="button"
-          >
-            <span aria-hidden="true" className="pk-new-plus">
-              +
-            </span>
-            <span className="pk-new-text">
-              <strong>New patient</strong>
-              <small>Enter details from scratch</small>
-            </span>
-          </button>
         </div>
         {loading ? (
           <div className="pk-state">
@@ -316,97 +302,106 @@ export function PatientPicker() {
           </div>
         ) : (
           <>
-            {/* one search box for both views (it stays mounted, so typing carries on): typing on the featured view
-                opens the full list with the matches */}
-            <div className="pk-tools">
-              {showAll && (
-                <button
-                  className="pk-back"
-                  onClick={() => {
-                    setShowAll(false);
-                    setQuery("");
-                  }}
-                  type="button"
-                >
-                  <span aria-hidden="true">←</span> Featured patients
-                </button>
-              )}
-              <label className="pk-search">
-                <span className="pk-sr">Search all patients</span>
-                <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" width="16">
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="m20 20-3.5-3.5" />
-                </svg>
-                <input
-                  onChange={(event) => {
-                    setQuery(event.target.value);
-                    if (event.target.value.trim()) {
-                      setShowAll(true);
-                    }
-                  }}
-                  onFocus={() => setWantDataset(true)}
-                  placeholder="Search all patients: number, age, woman, diabetes…"
-                  ref={searchInput}
-                  type="search"
-                  value={query}
-                />
-              </label>
-              {showAll && (
-                <span aria-live="polite" className="pk-count">
-                  {datasetQuery.data ? `${shown.length} of ${everyone.length} patients` : ""}
-                </span>
-              )}
-            </div>
-            {showAll ? (
-              <>
-                {datasetQuery.isError ? (
-                  <div className="pk-state pk-state-small pk-error" role="alert">
-                    <p>The full list could not be loaded: {datasetQuery.error.message}</p>
-                    <button className="pk-btn" onClick={() => void datasetQuery.refetch()} type="button">
-                      Try again
+            <div className={`pk-doors${showAll ? " is-list" : ""}`}>
+              <section aria-labelledby="pk-open-title" className="pk-door pk-door-open">
+                <h2 className="pk-door-title" id="pk-open-title">
+                  {showAll ? "All patients" : "Open a patient"}
+                </h2>
+                {/* one search box for both views (it stays mounted, so typing carries on): typing on the featured view
+                    opens the full list with the matches */}
+                <div className="pk-tools">
+                  {showAll && (
+                    <button
+                      className="pk-back"
+                      onClick={() => {
+                        setShowAll(false);
+                        setQuery("");
+                      }}
+                      type="button"
+                    >
+                      <span aria-hidden="true">←</span> Featured patients
                     </button>
-                  </div>
-                ) : !datasetQuery.data ? (
-                  <div className="pk-state pk-state-small">
-                    <HeartbeatLoader steps={["Loading every patient"]} title="Loading patients" />
-                  </div>
-                ) : shown.length ? (
-                  <ul aria-label="All patients" className="pk-list">
-                    {shown.map((sample) => (
-                      <PatientRow definitions={definitions} key={sample.id} onOpen={open} sample={sample} />
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="pk-empty">No patient matches “{query.trim()}”.</p>
-                )}
-              </>
-            ) : (
-              <>
-                <ul aria-label="Featured patients" className="pk-grid">
-                  {samples.map((sample, index) => (
-                    <PatientCard definitions={definitions} index={index} key={sample.id} onOpen={open} sample={sample} />
-                  ))}
-                </ul>
-                <div className="pk-after">
-                  <button
-                    className="pk-all"
-                    onClick={() => {
-                      setShowAll(true);
-                      searchInput.current?.focus();
-                    }}
-                    type="button"
-                  >
-                    View all patients <span aria-hidden="true">→</span>
-                  </button>
-                  {footnote}
+                  )}
+                  <label className="pk-search">
+                    <span className="pk-sr">Search all patients</span>
+                    <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" width="16">
+                      <circle cx="11" cy="11" r="7" />
+                      <path d="m20 20-3.5-3.5" />
+                    </svg>
+                    <input
+                      onChange={(event) => {
+                        setQuery(event.target.value);
+                        if (event.target.value.trim()) {
+                          setShowAll(true);
+                        }
+                      }}
+                      onFocus={() => setWantDataset(true)}
+                      placeholder="Search all patients: number, age, woman, diabetes…"
+                      ref={searchInput}
+                      type="search"
+                      value={query}
+                    />
+                  </label>
+                  {showAll && (
+                    <span aria-live="polite" className="pk-count">
+                      {datasetQuery.data ? `${shown.length} of ${everyone.length} patients` : ""}
+                    </span>
+                  )}
                 </div>
-                {/* the heartbeat trace runs edge to edge just under the content, so it never crosses the text */}
-                <svg aria-hidden="true" className="pk-ecg" preserveAspectRatio="none" viewBox="0 0 1200 100">
-                  <path d="M0 60h300l18-40 24 80 20-56 14 16h250l18-40 24 80 20-56 14 16h498" />
-                </svg>
-              </>
+                {showAll ? (
+                  <>
+                    {datasetQuery.isError ? (
+                      <div className="pk-state pk-state-small pk-error" role="alert">
+                        <p>The full list could not be loaded: {datasetQuery.error.message}</p>
+                        <button className="pk-btn" onClick={() => void datasetQuery.refetch()} type="button">
+                          Try again
+                        </button>
+                      </div>
+                    ) : !datasetQuery.data ? (
+                      <div className="pk-state pk-state-small">
+                        <HeartbeatLoader steps={["Loading every patient"]} title="Loading patients" />
+                      </div>
+                    ) : shown.length ? (
+                      <ul aria-label="All patients" className="pk-list">
+                        {shown.map((sample) => (
+                          <PatientRow definitions={definitions} key={sample.id} onOpen={open} sample={sample} />
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="pk-empty">No patient matches “{query.trim()}”.</p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <ul aria-label="Featured patients" className="pk-grid">
+                      {samples.map((sample, index) => (
+                        <PatientCard definitions={definitions} index={index} key={sample.id} onOpen={open} sample={sample} />
+                      ))}
+                    </ul>
+                    <div className="pk-after">
+                      <button
+                        className="pk-all"
+                        onClick={() => {
+                          setShowAll(true);
+                          searchInput.current?.focus();
+                        }}
+                        type="button"
+                      >
+                        View all patients <span aria-hidden="true">→</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </section>
+              {!showAll && <AddPatientPanel manualReady={Boolean(features)} onManual={openNew} />}
+            </div>
+            {footnote}
+            {!showAll && (
+              // the heartbeat trace runs edge to edge just under the content, so it never crosses the text
+              <svg aria-hidden="true" className="pk-ecg" preserveAspectRatio="none" viewBox="0 0 1200 100">
+                <path d="M0 60h300l18-40 24 80 20-56 14 16h250l18-40 24 80 20-56 14 16h498" />
+              </svg>
             )}
-            {showAll && footnote}
           </>
         )}
       </main>

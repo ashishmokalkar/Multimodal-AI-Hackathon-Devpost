@@ -165,7 +165,7 @@
 }
 .pk-main {
   position: relative;
-  max-width: 1180px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 24px 28px 48px;
 }
@@ -560,30 +560,35 @@
   color: var(--pk-muted);
   text-align: center;
 }
-/* in the 2 x 2 block each card is wide: who and why on the left, the four measurements as a small square on the right */
-.pk-grid .pk-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto auto 1fr;
-  align-items: start;
-  gap: 12px 26px;
+/* a card with room shows who and why on the left and the four measurements as a small square on the right */
+.pk-grid > li {
+  container: pk-card / inline-size;
 }
-.pk-grid .pk-card > :not(.pk-metrics) {
-  grid-column: 1;
-}
-.pk-grid .pk-metrics {
-  grid-column: 2;
-  grid-row: 1 / -1;
-  grid-template-columns: repeat(2, minmax(72px, auto));
-  align-self: center;
-  gap: 16px 24px;
-  margin: 0;
-  padding: 2px 0 2px 26px;
-  border-top: 0;
-  border-left: 1px solid var(--pk-line);
-}
-.pk-grid .pk-metric b {
-  font-size: 14px;
+@container pk-card (min-width: 400px) {
+  .pk-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto 1fr;
+    align-items: start;
+    gap: 12px 26px;
+  }
+  .pk-card > :not(.pk-metrics) {
+    grid-column: 1;
+  }
+  .pk-metrics {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    grid-template-columns: repeat(2, minmax(64px, auto));
+    align-self: center;
+    gap: 16px 22px;
+    margin: 0;
+    padding: 2px 0 2px 24px;
+    border-top: 0;
+    border-left: 1px solid var(--pk-line);
+  }
+  .pk-metric b {
+    font-size: 14px;
+  }
 }
 /* hovering lifts the card and lights its border; the corner hint would sit on the measurements */
 .pk-grid .pk-open {
@@ -592,17 +597,6 @@
 @media (max-width: 700px) {
   .pk-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-}
-@media (max-width: 460px) {
-  .pk-grid .pk-card {
-    display: flex;
-  }
-  .pk-grid .pk-metrics {
-    grid-template-columns: repeat(4, 1fr);
-    padding: 12px 0 0;
-    border-top: 1px solid var(--pk-line);
-    border-left: 0;
   }
 }
 @media (max-width: 900px) {
@@ -640,68 +634,204 @@
 }
 
 /* New patient: a different kind of action from opening an existing patient, so it gets its own look */
-.pk-new {
-  --pk-new-a: #f472b6;
-  --pk-new-b: #8b5cf6;
-  display: inline-flex;
-  align-items: center;
+/* ------------------------------------------------------------------------------------------- two doors */
+.pk-doors {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  align-items: start;
+  gap: 40px;
+  margin-top: 30px;
+}
+.pk-doors.is-list {
+  grid-template-columns: minmax(0, 1fr);
+}
+.pk-door-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+.pk-door-open .pk-tools {
+  margin: 14px 0 18px;
+}
+.pk-door-open .pk-search {
+  max-width: none;
+}
+.pk-door-open .pk-grid {
+  margin: 0;
+  gap: 18px;
+}
+.pk-door-open .pk-card {
+  padding: 20px;
+}
+.picker .pk-foot {
+  margin: 26px 0 0;
+}
+
+/* the add door: a quiet panel, ABHA first and largest, the other four as compact tiles */
+.pk-door-add {
+  --pk-hero-a: #f472b6;
+  --pk-hero-b: #8b5cf6;
+}
+/* level with the search box opposite (same gap under the title) */
+.pk-add-box {
+  display: grid;
   gap: 12px;
-  padding: 10px 20px 10px 10px;
-  border: 0;
-  border-radius: 16px;
-  background: linear-gradient(135deg, var(--pk-new-a), var(--pk-new-b));
-  color: #fff;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--pk-line);
+  border-radius: 22px;
+  background: var(--pk-card);
+  backdrop-filter: blur(18px);
+}
+.picker[data-theme="classic"] .pk-door-add,
+.picker[data-theme="clinical"] .pk-door-add {
+  --pk-hero-a: #db2777;
+  --pk-hero-b: #7c3aed;
+}
+.pk-method {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--pk-line);
+  border-radius: 14px;
+  background: transparent;
+  color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
-  box-shadow:
-    0 12px 30px color-mix(in srgb, var(--pk-new-b) 40%, transparent),
-    inset 0 1px 0 rgb(255 255 255 / 30%);
   transition:
     transform 0.18s ease,
-    box-shadow 0.18s ease,
-    filter 0.18s ease;
+    border-color 0.18s ease,
+    background 0.18s ease;
 }
-.picker[data-theme="classic"] .pk-new,
-.picker[data-theme="clinical"] .pk-new {
-  --pk-new-a: #db2777;
-  --pk-new-b: #7c3aed;
-}
-.pk-new:hover {
+.pk-method:hover:not(:disabled) {
   transform: translateY(-2px);
-  filter: brightness(1.06);
+  border-color: color-mix(in srgb, var(--pk-accent) 60%, transparent);
+  background: var(--pk-card-hover);
 }
-.pk-new:focus-visible {
+.pk-method:focus-visible {
   outline: 3px solid var(--pk-accent);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
-.pk-new:disabled {
+.pk-method:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
-.pk-new-plus {
+.pk-method-text {
   display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+.pk-method-text strong {
+  overflow: hidden;
+  font-size: 13.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pk-method-icon {
+  display: grid;
+  flex: none;
+  width: 32px;
+  height: 32px;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: rgb(255 255 255 / 22%);
-  font-size: 24px;
-  line-height: 1;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pk-accent) 15%, transparent);
+  color: var(--pk-accent);
 }
-.pk-new-text {
+.pk-method-detail {
+  color: var(--pk-muted);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+.pk-methods {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
-.pk-new-text strong {
-  font-size: 15px;
+
+/* the ABHA tile: the brand gradient and a QR code with a scanning line */
+.pk-method-hero {
+  gap: 14px;
+  padding: 14px;
+  border: 0;
+  background: linear-gradient(135deg, var(--pk-hero-a), var(--pk-hero-b));
+  color: #fff;
+  box-shadow:
+    0 12px 28px color-mix(in srgb, var(--pk-hero-b) 32%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 30%);
 }
-.pk-new-text small {
+.pk-method-hero:hover:not(:disabled) {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--pk-hero-a), var(--pk-hero-b));
+  filter: brightness(1.06);
+}
+.pk-method-hero .pk-method-text strong {
+  font-size: 16px;
+}
+.pk-method-hero .pk-method-detail {
+  color: rgb(255 255 255 / 88%);
   font-size: 12px;
-  opacity: 0.9;
+}
+.pk-qr {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 58px;
+  height: 58px;
+  padding: 6px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+}
+.pk-qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: #1e1b4b;
+  shape-rendering: crispEdges;
+}
+.pk-qr-scan {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 5px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--pk-hero-a);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--pk-hero-a) 70%, transparent);
+  animation: pk-scan 2.4s ease-in-out infinite alternate;
+}
+@keyframes pk-scan {
+  to {
+    top: calc(100% - 7px);
+  }
+}
+.pk-notice {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--pk-accent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--pk-accent) 10%, transparent);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.pk-notice:empty {
+  display: none;
+}
+@media (max-width: 1100px) {
+  .pk-doors {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pk-new {
+  .pk-method {
     transition: none;
+  }
+  .pk-qr-scan {
+    animation: none;
   }
 }
 
@@ -725,5 +855,31 @@
   .pk-ecg {
     height: 56px;
     margin-top: 14px;
+  }
+  .pk-intro h1 {
+    font-size: 34px;
+  }
+  .pk-intro p {
+    margin-top: 6px;
+    font-size: 14.5px;
+  }
+  .pk-doors {
+    margin-top: 20px;
+  }
+  .pk-door-open .pk-tools {
+    margin: 10px 0 14px;
+  }
+  .pk-add-box {
+    margin-top: 10px;
+  }
+  .pk-door-open .pk-grid {
+    gap: 14px;
+  }
+  .pk-door-open .pk-card {
+    gap: 10px;
+    padding: 14px 18px;
+  }
+  .pk-door-open .pk-metrics {
+    padding-top: 10px;
   }
 }
