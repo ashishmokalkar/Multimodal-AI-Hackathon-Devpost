@@ -6,6 +6,7 @@ import { displayNumber } from "../../lib/units";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 import { HeartbeatLoader } from "../loading/HeartbeatLoader";
+import { DISCLAIMER_LINE } from "../safety/disclaimer";
 import { PatientAvatar } from "../patient/PatientAvatar";
 import { useStudioStore } from "../studio/studioStore";
 import "./picker.css";
@@ -190,7 +191,7 @@ export function PatientPicker() {
             "CardioClarity"
           )}
         </span>
-        <span className="pk-safety">Decision support · not a diagnosis</span>
+        <span className="pk-safety">{DISCLAIMER_LINE}</span>
       </header>
       <main aria-labelledby="pk-title" className="pk-main">
         <div className="pk-intro">

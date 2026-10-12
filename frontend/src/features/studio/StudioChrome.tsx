@@ -3,7 +3,7 @@ import { useApiProfile } from "../../api/hooks";
 import { targetColor } from "../../lib/colorScale";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
-import { DISCLAIMER_TEXT } from "../safety/disclaimer";
+import { DISCLAIMER_LINE } from "../safety/disclaimer";
 import { SpeakButton } from "../speech/SpeakButton";
 import { useSpokenResult } from "../speech/useSpokenResult";
 import { UnitToggle } from "../units/UnitToggle";
@@ -201,9 +201,9 @@ export function TopBar() {
         </span>
         <span className="sr-only">: back to the patient list</span>
       </button>
-      <div className="disclaimer-chip" title={DISCLAIMER_TEXT}>
+      <div className="disclaimer-chip">
         <IconShield size={14} />
-        <span>Decision support · not a diagnosis</span>
+        <span>{DISCLAIMER_LINE}</span>
       </div>
       <div className="topbar-right">
         <span

@@ -32,6 +32,7 @@ import { useUiStore } from "../../store/uiStore";
 import { useActiveScenario, useWhatIfStore } from "../../store/whatIfStore";
 import { PercentileTrack } from "../cohort/CohortCompare";
 import { comparisonFor } from "../cohort/useCohortComparison";
+import { DISCLAIMER_LINE } from "../safety/disclaimer";
 import { SpeakButton } from "../speech/SpeakButton";
 import { HeartSnapshot } from "./HeartSnapshot";
 import "./report.css";
@@ -238,7 +239,7 @@ function Page({
     <section aria-label={label} className="rp-page" style={{ ["--rp-accent" as string]: accent }}>
       {children}
       <footer className="rp-foot">
-        <span>This report is to help you talk with your doctor. It is not a diagnosis.</span>
+        <span>{DISCLAIMER_LINE}</span>
         <span>
           Page {number} of {total}
         </span>
