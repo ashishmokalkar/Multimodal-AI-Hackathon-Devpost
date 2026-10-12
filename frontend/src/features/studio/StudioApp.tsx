@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { CommandPalette } from "./CommandPalette";
-import { Dock, Toasts, Toolbar, TopBar, Watermark } from "./StudioChrome";
+import { Dock, HeartBar, Toasts, TopBar, Watermark } from "./StudioChrome";
 import { StudioScene } from "./StudioScene";
 import { TourOverlay } from "./TourOverlay";
 import { usePredictionDriver } from "./usePredictionDriver";
@@ -88,7 +88,7 @@ export function StudioApp() {
       </section>
       <TopBar />
       <aside aria-label="3D view controls" className="studio-landmark">
-        <Toolbar />
+        <HeartBar />
       </aside>
       <main className="studio-windows" aria-label="Results">
         <PatientWindow />

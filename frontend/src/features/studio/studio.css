@@ -198,6 +198,26 @@
   opacity: 0;
 }
 
+/* ------------------------------------------------------------------ risk legend under the heart */
+.studio .risk-legend-bar {
+  height: 8px;
+  border-radius: 999px;
+}
+
+.studio .risk-legend-ticks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--s-text);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.studio .risk-legend-ticks .risk-legend-bar {
+  width: 150px;
+  height: 7px;
+}
+
 /* ------------------------------------------------------------------ factor card beside a Why reason */
 .studio .factor-peek {
   position: fixed;
@@ -649,22 +669,80 @@
   border-radius: 6px;
 }
 
-/* ------------------------------------------------------------------ 3D toolbar */
-.studio .toolbar {
+/* ------------------------------------------------------------------ heart bar: 3D controls and colour key, under the heart */
+.studio .heart-bar {
   position: absolute;
   z-index: 90;
-  top: 58px;
+  bottom: 12px;
   left: 50%;
+  display: flex;
+  height: 54px;
+  align-items: stretch;
+  gap: 10px;
+  transform: translateX(-50%);
+  transition: bottom 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* view controls: an ordinary toolbar pill */
+.studio .heart-bar-tools {
   display: flex;
   align-items: center;
   gap: 4px;
-  transform: translateX(-50%);
   border: 1px solid var(--s-line);
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--s-panel);
-  padding: 5px;
+  padding: 5px 8px 5px 6px;
   backdrop-filter: blur(var(--s-blur)) saturate(140%);
   box-shadow: var(--s-shadow), var(--s-highlight);
+}
+
+/* the colour key: information, not a control, so a quieter pill with no buttons */
+.studio .heart-bar-legend {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 4px;
+  border: 1px solid var(--s-line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--s-panel) 70%, transparent);
+  padding: 6px 14px;
+  backdrop-filter: blur(var(--s-blur)) saturate(140%);
+}
+
+.studio .heart-bar-legend p {
+  margin: 0;
+  color: var(--s-muted);
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+/* laptop widths: the pills share the bottom row with the dock, so the slider and colour bar narrow */
+@media (max-width: 1440px) {
+  .studio .heart-bar .depth input {
+    width: 72px;
+  }
+
+  .studio .heart-bar .depth-word {
+    display: none;
+  }
+
+  .studio .risk-legend-ticks .risk-legend-bar {
+    width: 80px;
+  }
+
+  .studio .heart-bar-legend {
+    padding: 6px 10px;
+  }
+
+  .studio .heart-bar-legend p {
+    font-size: 10px;
+  }
+}
+
+/* the bar is at the bottom of the screen, so its tooltips open upwards */
+.studio .heart-bar [data-tip]:hover::after {
+  top: auto;
+  bottom: calc(100% + 10px);
 }
 
 .studio .tool {
@@ -953,7 +1031,7 @@
 
 .studio.is-touring .sw,
 .studio.is-touring .dock,
-.studio.is-touring .toolbar {
+.studio.is-touring .heart-bar {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.97);
@@ -2741,17 +2819,9 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
-  color: var(--s-faint);
-  font-size: 10.5px;
+  color: var(--s-muted);
+  font-size: 11px;
   pointer-events: none;
-}
-
-.studio .watermark span {
-  font-size: 12px;
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  opacity: 0.7;
-  text-transform: uppercase;
 }
 
 .studio .watermark a {
@@ -3077,12 +3147,15 @@
   min-width: 0;
 }
 
-.studio.is-compact .toolbar {
+.studio.is-compact .heart-bar {
   position: fixed;
-  top: auto;
   bottom: 70px;
   max-width: calc(100% - 24px);
   overflow-x: auto;
+}
+
+.studio.is-compact .heart-bar-legend {
+  display: none;
 }
 
 .studio.is-compact .depth input {
@@ -3216,7 +3289,8 @@
   min-width: max-content;
 }
 
-/* the clinical stage darkens towards its edges, so the corner watermark uses dark ink there */
+/* the clinical stage darkens towards its edges, so the corner credit uses dark ink there */
 .studio[data-theme="clinical"] .watermark {
   color: #1e293b;
+  text-shadow: 0 1px 6px rgb(255 255 255 / 70%);
 }

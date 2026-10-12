@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useApiProfile } from "../../api/hooks";
-import { targetColor } from "../../lib/colorScale";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 import { DISCLAIMER_LINE } from "../safety/disclaimer";
+import { RISK_GRADIENT_CSS } from "../../lib/colorScale";
 import { SpeakButton } from "../speech/SpeakButton";
 import { useSpokenResult } from "../speech/useSpokenResult";
 import { UnitToggle } from "../units/UnitToggle";
-import { vesselIds } from "../viewer/vesselMap";
-import { selectTarget, toggleArtery } from "./selection";
+import { selectTarget } from "./selection";
 import {
   IconBars,
   IconChart,
@@ -29,7 +28,7 @@ import {
   IconTarget,
   IconUser,
 } from "./icons";
-import { pulseRate, type WindowId } from "./studioModel";
+import { heartBarLift, type WindowId } from "./studioModel";
 import {
   GLASS_MAX,
   GLASS_MIN,
@@ -259,64 +258,69 @@ export function TopBar() {
   );
 }
 
-/** Camera and heart controls floating above the 3D stage. */
-export function Toolbar() {
+/**
+ * Under the heart, two separate pills: the view controls (back to the overview, solid to x-ray, motion, artery
+ * labels) and, beside them, the key to the artery colours, which explains the heart rather than changing it. Both sit
+ * on the bottom edge, or just above the What-if window when that is open.
+ * (Artery fly-to lives on the heart itself, the Risk rows and the Why chips; Ctrl+K keeps "Fly to" as well.)
+ */
+export function HeartBar() {
   const selected = useUiStore((state) => state.selectedVessel);
   const depth = useStudioStore((state) => state.depth);
   const setDepth = useStudioStore((state) => state.setDepth);
   const motion = useStudioStore((state) => state.motion);
   const labels = useStudioStore((state) => state.labels);
   const toggle = useStudioStore((state) => state.toggle);
-  const pulse = usePatientStore((state) => Math.round(pulseRate(state.features.PR)));
+  const whatIfOpen = useStudioStore((state) => state.open.whatif);
+  const whatIf = useStudioStore((state) => state.rects.whatif);
+  const lift = heartBarLift(whatIfOpen, whatIf);
 
   return (
-    <div className="toolbar" role="toolbar" aria-label="3D view">
-      <ToolButton label="Overview" onClick={() => selectTarget(null)} pressed={selected === null}>
-        <IconTarget size={16} />
-      </ToolButton>
-      {vesselIds.map((vessel) => (
-        <button
-          aria-pressed={selected === vessel}
-          className="tool tool-vessel"
-          data-tip={`Fly to ${vessel}`}
-          key={vessel}
-          onClick={() => toggleArtery(vessel)}
-          style={{ ["--artery" as string]: targetColor(vessel) }}
-          type="button"
+    <div className="heart-bar" style={lift ? { bottom: lift } : undefined}>
+      <div aria-label="3D view" className="heart-bar-tools" role="toolbar">
+        <ToolButton label="Reset view" onClick={() => selectTarget(null)} pressed={selected === null}>
+          <IconTarget size={16} />
+        </ToolButton>
+        <span className="toolbar-sep" />
+        <div className="depth" data-tip="Peel the heart: solid → x-ray → arteries">
+          <IconPlayLayers />
+          <input
+            aria-label="Heart depth: solid, x-ray, arteries only"
+            aria-valuetext={depth < 0.25 ? "Solid" : depth < 0.75 ? "X-ray" : "Arteries only"}
+            max={1}
+            min={0}
+            onChange={(event) => setDepth(Number(event.target.value))}
+            step={0.01}
+            type="range"
+            value={depth}
+          />
+          <span className="depth-word">
+            {depth < 0.25 ? "Solid" : depth < 0.75 ? "X-ray" : "Arteries"}
+          </span>
+        </div>
+        <span className="toolbar-sep" />
+        <ToolButton
+          label="Motion: heartbeat, blood flow and slow rotation"
+          onClick={() => toggle("motion")}
+          pressed={motion}
         >
-          <i />
-          {vessel}
-        </button>
-      ))}
-      <span className="toolbar-sep" />
-      <div className="depth" data-tip="Peel the heart: solid → x-ray → arteries">
-        <IconPlayLayers />
-        <input
-          aria-label="Heart depth: solid, x-ray, arteries only"
-          aria-valuetext={depth < 0.25 ? "Solid" : depth < 0.75 ? "X-ray" : "Arteries only"}
-          max={1}
-          min={0}
-          onChange={(event) => setDepth(Number(event.target.value))}
-          step={0.01}
-          type="range"
-          value={depth}
-        />
-        <span className="depth-word">
-          {depth < 0.25 ? "Solid" : depth < 0.75 ? "X-ray" : "Arteries"}
-        </span>
+          <IconHeart size={15} />
+        </ToolButton>
+        <ToolButton label="Artery labels" onClick={() => toggle("labels")} pressed={labels}>
+          <IconTag size={15} />
+        </ToolButton>
       </div>
-      <span className="toolbar-sep" />
-      <ToolButton
-        label={`Motion: heartbeat at ${pulse} bpm, blood flow and slow rotation`}
-        onClick={() => toggle("motion")}
-        pressed={motion}
-      >
-        <IconHeart size={15} />
-        <small>{pulse}</small>
-      </ToolButton>
-      <ToolButton label="Labels" onClick={() => toggle("labels")} pressed={labels}>
-        <IconTag size={15} />
-      </ToolButton>
+      <div className="heart-bar-legend">
+        <span aria-hidden="true" className="risk-legend-ticks">
+          <span>Low</span>
+          <i className="risk-legend-bar" style={{ background: RISK_GRADIENT_CSS }} />
+          <span>High</span>
+        </span>
+        <p>
+          Artery colour = chance of narrowing
+          <span className="sr-only">: blue is low, amber is at the artery's own threshold, red is high</span>
+        </p>
+      </div>
     </div>
   );
 }
@@ -365,10 +369,10 @@ export function Dock() {
   );
 }
 
+/** Credit for the heart model (CC BY 4.0 asks for it to stay visible); the disclaimer is in the top bar. */
 export function Watermark() {
   return (
     <footer className="watermark">
-      <span>Decision support only · not a diagnosis</span>
       <a href="/models/ATTRIBUTION.md" rel="noreferrer" target="_blank">
         Heart model: neshallads, CC BY 4.0 · schematic arteries
       </a>

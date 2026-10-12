@@ -9,6 +9,8 @@ import {
   defaultLayout,
   EXPLAIN_SPACE,
   factorBreakdown,
+  HEART_BAR_GAP,
+  heartBarLift,
   MIN_WINDOW_SIZE,
   pulseRate,
   riskBand,
@@ -333,3 +335,16 @@ describe("explain on demand", () => {
   });
 });
 
+describe("heart bar", () => {
+  const whatIf = (x: number, y: number) => ({ x, y, w: 680, h: 196 });
+
+  it("sits on the bottom edge while the What-if window is closed or moved aside", () => {
+    expect(heartBarLift(false, whatIf(620, 870), 1920, 1080)).toBeNull();
+    expect(heartBarLift(true, whatIf(40, 870), 1920, 1080)).toBeNull();
+    expect(heartBarLift(true, whatIf(620, 200), 1920, 1080)).toBeNull();
+  });
+
+  it("rises above the What-if window when that is open under the heart", () => {
+    expect(heartBarLift(true, whatIf(620, 870), 1920, 1080)).toBe(1080 - 870 + HEART_BAR_GAP);
+  });
+});

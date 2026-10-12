@@ -59,7 +59,7 @@ import {
 } from "../viewer/vesselMap";
 import { SCENE_THEMES, type SceneTheme } from "./sceneTheme";
 import { clearSelection, toggleArtery } from "./selection";
-import { beatPulse, pulseRate } from "./studioModel";
+import { beatPulse, HEART_BAR_GAP, HEART_BAR_HEIGHT, heartBarLift, pulseRate } from "./studioModel";
 import { heartCovered, useStudioStore } from "./studioStore";
 import { isFlagged } from "../../lib/flags";
 
@@ -736,12 +736,14 @@ function CameraRig({
   return null;
 }
 
-/** Breathing room between the heart and the toolbar above it or the window below it, in pixels. */
+/** Breathing room between the heart and the top bar above it or the heart bar below it, in pixels. */
 const FRAME_MARGIN = 14;
+/** Share of the band's spare height kept above the heart (0 = touching the top bar, 0.5 = centred). */
+const HEART_HIGH = 0.06;
 
 /**
- * Keeps the heart in the clear band of the screen: below the 3D toolbar and above the bottom window (or the dock
- * when that window is closed or moved aside). The camera's view is shifted up and, when the band is short,
+ * Keeps the heart in the clear band of the screen: below the top bar and above the heart bar (which itself sits on
+ * the bottom edge, or above the What-if window when that is open). The camera's view is shifted and, when the band is short,
  * zoomed out a little, so windows cover as little of the heart as possible. Orbiting and flying to an artery work
  * as before, inside the same band.
  */
@@ -786,26 +788,21 @@ function Framing({ heartBox }: { heartBox: Box3 | null }) {
         }
       }
     }
-    const toolbarBottom =
-      document.querySelector(".studio .toolbar")?.getBoundingClientRect().bottom ?? 104;
-    const bandTop = toolbarBottom + FRAME_MARGIN;
-    // a window only limits the band when it sits under the heart (the what-if sliders or the artery inspector)
-    const under = (open: boolean, rect: { x: number; y: number; w: number }) =>
-      open &&
-      rect.x < size.width * 0.6 &&
-      rect.x + rect.w > size.width * 0.4 &&
-      rect.y > bandTop + 240;
-    const bandBottom = Math.min(
-      size.height - 96,
-      under(whatifOpen, whatif) ? whatif.y - FRAME_MARGIN : Infinity,
-    );
+    const topBarBottom =
+      document.querySelector(".studio .topbar")?.getBoundingClientRect().bottom ?? 50;
+    const bandTop = topBarBottom + FRAME_MARGIN;
+    const barLift = heartBarLift(whatifOpen, whatif, size.width, size.height) ?? HEART_BAR_GAP;
+    const bandBottom = size.height - barLift - HEART_BAR_HEIGHT - FRAME_MARGIN;
     const zoom = Math.min(1, Math.max(0.6, (bandBottom - bandTop) / (bottom - top)));
     const centre = size.height / 2 + ((top + bottom) / 2 - size.height / 2) * zoom;
-    const shift = centre - (bandTop + bandBottom) / 2;
+    // the heart sits high in the band, just under the top bar; the spare height goes below it, to the pedestal
+    const height = (bottom - top) * zoom;
+    const spare = Math.max(0, bandBottom - bandTop - height);
+    const target = bandTop + spare * HEART_HIGH + height / 2;
     view.zoom = zoom;
-    view.setViewOffset(size.width, size.height, 0, shift, size.width, size.height);
+    view.setViewOffset(size.width, size.height, 0, centre - target, size.width, size.height);
     view.updateProjectionMatrix();
-    setHeartCentre({ x: Math.round(size.width / 2), y: Math.round((bandTop + bandBottom) / 2) });
+    setHeartCentre({ x: Math.round(size.width / 2), y: Math.round(target) });
     invalidate();
   }, [get, heartBox, invalidate, setHeartCentre, size.height, size.width, whatif, whatifOpen]);
 

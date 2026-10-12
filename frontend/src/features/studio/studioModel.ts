@@ -277,6 +277,25 @@ export function defaultLayout(
   };
 }
 
+/** Height of the heart bar (the 3D controls and colour key under the heart) and its gap to the bottom edge (or to the What-if window when that is open under it). */
+export const HEART_BAR_HEIGHT = 54;
+export const HEART_BAR_GAP = 12;
+
+/** How far the heart bar sits from the bottom: on the edge, or above the What-if window when it is open under it. */
+export function heartBarLift(
+  whatIfOpen: boolean,
+  whatIf: { x: number; y: number; w: number; h: number },
+  viewportWidth = typeof window === "undefined" ? 1440 : window.innerWidth,
+  viewportHeight = typeof window === "undefined" ? 900 : window.innerHeight,
+): number | null {
+  const under =
+    whatIfOpen &&
+    whatIf.x < viewportWidth * 0.6 &&
+    whatIf.x + whatIf.w > viewportWidth * 0.4 &&
+    whatIf.y > viewportHeight / 2;
+  return under ? Math.round(viewportHeight - whatIf.y + HEART_BAR_GAP) : null;
+}
+
 /** Keeps a window on screen: its title bar always stays reachable, and it is never smaller than its minimum. */
 export function clampRect(
   rect: Rect,
