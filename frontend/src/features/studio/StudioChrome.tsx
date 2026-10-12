@@ -171,7 +171,6 @@ export function TopBar() {
   const profile = profileQuery.isSuccess ? profileQuery.data : null;
   const setPaletteOpen = useStudioStore((state) => state.setPaletteOpen);
   const startTour = useStudioStore((state) => state.startTour);
-  const setUiVersion = useUiStore((state) => state.setUiVersion);
   const hasPrediction = usePatientStore((state) => state.prediction !== null);
   const spoken = useSpokenResult();
   const setReportOpen = useUiStore((state) => state.setReportOpen);
@@ -185,7 +184,7 @@ export function TopBar() {
         type="button"
       >
         <span className="brand-glyph" aria-hidden="true">
-          <IconHeart size={18} />
+          <IconHeart size={21} />
         </span>
         <span className="brand-name">
           CardioClarity <em>Studio</em>
@@ -220,15 +219,6 @@ export function TopBar() {
           <span>Search</span>
           <kbd>{isMac ? "⌘" : "Ctrl"} K</kbd>
         </button>
-        <button
-          className="topbar-btn topbar-tour"
-          disabled={!hasPrediction}
-          onClick={startTour}
-          type="button"
-        >
-          <IconPlay size={13} />
-          <span>Tour</span>
-        </button>
         <SpeakButton
           className="topbar-speak"
           resultKey={spoken.resultKey}
@@ -245,13 +235,15 @@ export function TopBar() {
           <span>Report</span>
         </button>
         <SettingsMenu />
+        {/* the guided tour, last in the bar where the eye ends */}
         <button
-          className="topbar-btn topbar-classic"
-          onClick={() => setUiVersion("classic")}
-          title="Switch to the Classic layout"
+          className="topbar-btn topbar-tour"
+          disabled={!hasPrediction}
+          onClick={startTour}
           type="button"
         >
-          Classic
+          <IconPlay size={13} />
+          <span>Tour</span>
         </button>
       </div>
     </header>
