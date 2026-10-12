@@ -2,7 +2,7 @@
 
 /* ------------------------------------------------------------------ theme tokens */
 .studio {
-  --glass: 0.55;
+  --glass: 0.93;
   --s-panel-rgb: 12 18 34;
   --s-panel: rgb(var(--s-panel-rgb) / var(--glass));
   --s-panel-solid: rgb(var(--s-panel-rgb) / 0.97);
@@ -193,6 +193,11 @@
   opacity: 0.3;
 }
 
+/* a window is enlarged or covers the middle of the heart: the tags would float over its text */
+.studio .sv-tag.is-hidden {
+  opacity: 0;
+}
+
 /* ------------------------------------------------------------------ top bar */
 .studio .topbar {
   position: absolute;
@@ -272,7 +277,37 @@
 }
 
 .studio .disclaimer-chip svg {
+  flex: none;
   color: var(--s-moderate);
+}
+
+/* the full disclaimer stays on one line on laptop screens: shorter controls make room for it */
+@media (min-width: 1180px) {
+  .studio .disclaimer-chip span {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 1440px) {
+  .studio .disclaimer-chip {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  /* the icon, the shortcut and the status dot stay; their words remain for screen readers */
+  .studio .topbar-search span,
+  .studio .api-dot-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .studio .topbar-search {
+    min-width: 0;
+  }
 }
 
 .studio .topbar-right {

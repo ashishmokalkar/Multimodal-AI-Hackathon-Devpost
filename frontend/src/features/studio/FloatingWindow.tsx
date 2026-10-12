@@ -83,7 +83,11 @@ export function FloatingWindow({
       startY: event.clientY,
       rect,
     };
+    // dragging or resizing an enlarged window makes it an ordinary window again
     restore.current = null;
+    if (expanded) {
+      setExpanded(false);
+    }
     setActive(true);
     raiseWindow(id);
   };

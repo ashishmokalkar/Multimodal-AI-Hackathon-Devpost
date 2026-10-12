@@ -25,7 +25,7 @@ export type Quality = "high" | "lite";
 
 interface Persisted {
   theme: StudioTheme;
-  /** Window glass opacity, 0.25 (very see-through) to 0.95 (nearly solid). */
+  /** Window background opacity, GLASS_MIN to GLASS_MAX: mostly opaque, so the heart never shows through text. */
   glass: number;
   /** 0 solid heart, 0.5 x-ray, 1 arteries only. */
   depth: number;
@@ -53,6 +53,12 @@ interface StudioState extends Persisted {
   tour: { active: boolean; step: number; playing: boolean };
   /** A factor kept lit on the heart after the pointer leaves it (chosen from the factor map or command bar). */
   pinnedFactor: string | null;
+  /** Windows currently enlarged with Expand (the 3D artery tags hide while one is). */
+  expanded: Partial<Record<WindowId, boolean>>;
+  /** Where the middle of the heart is on screen (set by the camera framing); null in the stacked phone layout. */
+  heartCentre: { x: number; y: number } | null;
+  /** Bumped when an artery is picked, so the Why window flashes its border once in that artery's risk colour. */
+  whyFlash: { vessel: VesselId; sequence: number } | null;
   setTheme: (theme: StudioTheme) => void;
   setGlass: (glass: number) => void;
   setDepth: (depth: number) => void;
@@ -65,6 +71,9 @@ interface StudioState extends Persisted {
   setTourStep: (step: number) => void;
   setTourPlaying: (playing: boolean) => void;
   setPinnedFactor: (feature: string | null) => void;
+  setExpanded: (id: WindowId, expanded: boolean) => void;
+  setHeartCentre: (centre: { x: number; y: number } | null) => void;
+  flashWhy: (vessel: VesselId) => void;
   openWindow: (id: WindowId) => void;
   closeWindow: (id: WindowId) => void;
   toggleWindow: (id: WindowId) => void;
@@ -78,6 +87,13 @@ interface StudioState extends Persisted {
 
 // v2: new default layout (patient left-centre, what-if closed) and no Aurora theme; v1 layouts are not reused
 const STORAGE_KEY = "cardioclarity-studio-v2";
+export const GLASS_MIN = 0.85;
+export const GLASS_MAX = 0.98;
+const GLASS_DEFAULT = 0.93;
+
+function clampGlass(glass: number): number {
+  return Math.min(GLASS_MAX, Math.max(GLASS_MIN, glass));
+}
 
 function viewport() {
   return typeof window === "undefined"
@@ -105,7 +121,7 @@ function defaults(): Persisted & Pick<StudioState, "anchored"> {
     window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   return {
     theme: "midnight",
-    glass: 0.55,
+    glass: GLASS_DEFAULT,
     depth: 0,
     motion: !reducedMotion,
     labels: true,
@@ -149,9 +165,10 @@ function load(): Persisted & Pick<StudioState, "anchored"> {
       theme: STUDIO_THEMES.includes(saved.theme as StudioTheme)
         ? (saved.theme as StudioTheme)
         : base.theme,
+      // layouts saved when windows were see-through start mostly opaque now
       glass:
-        typeof saved.glass === "number"
-          ? Math.min(0.95, Math.max(0.25, saved.glass))
+        typeof saved.glass === "number" && saved.glass >= GLASS_MIN
+          ? clampGlass(saved.glass)
           : base.glass,
       depth:
         typeof saved.depth === "number"
@@ -201,8 +218,11 @@ export const useStudioStore = create<StudioState>((set) => ({
   paletteOpen: false,
   tour: { active: false, step: 0, playing: true },
   pinnedFactor: null,
+  expanded: {},
+  heartCentre: null,
+  whyFlash: null,
   setTheme: (theme) => set({ theme }),
-  setGlass: (glass) => set({ glass: Math.min(0.95, Math.max(0.25, glass)) }),
+  setGlass: (glass) => set({ glass: clampGlass(glass) }),
   setDepth: (depth) => set({ depth: Math.min(1, Math.max(0, depth)) }),
   toggle: (key) => set((state) => ({ [key]: !state[key] })),
   setQuality: (quality) => set({ quality }),
@@ -222,6 +242,18 @@ export const useStudioStore = create<StudioState>((set) => ({
   setTourPlaying: (playing) =>
     set((state) => ({ tour: { ...state.tour, playing } })),
   setPinnedFactor: (pinnedFactor) => set({ pinnedFactor }),
+  setExpanded: (id, expanded) =>
+    set((state) => ({ expanded: { ...state.expanded, [id]: expanded } })),
+  setHeartCentre: (heartCentre) =>
+    set((state) =>
+      state.heartCentre?.x === heartCentre?.x && state.heartCentre?.y === heartCentre?.y
+        ? state
+        : { heartCentre },
+    ),
+  flashWhy: (vessel) =>
+    set((state) => ({
+      whyFlash: { vessel, sequence: (state.whyFlash?.sequence ?? 0) + 1 },
+    })),
   openWindow: (id) =>
     set((state) => ({
       open: { ...state.open, [id]: true },
@@ -275,3 +307,32 @@ useStudioStore.subscribe((state) => {
   }
   saveTimer = setTimeout(() => save(state), 250);
 });
+
+/** Half-size of the area around the heart's centre that, when a window covers it, hides the 3D artery tags. */
+const HEART_CORE = 40;
+
+/**
+ * Whether the 3D artery tags should hide: a window is enlarged, or an open window covers the middle of the heart
+ * (the tags would otherwise float over the window's text).
+ */
+export function heartCovered(
+  state: Pick<StudioState, "open" | "rects" | "expanded" | "heartCentre">,
+): boolean {
+  if (WINDOW_IDS.some((id) => state.open[id] && state.expanded[id])) {
+    return true;
+  }
+  const centre = state.heartCentre;
+  if (!centre) {
+    return false;
+  }
+  return WINDOW_IDS.some((id) => {
+    const rect = state.rects[id];
+    return (
+      state.open[id] &&
+      rect.x < centre.x + HEART_CORE &&
+      rect.x + rect.w > centre.x - HEART_CORE &&
+      rect.y < centre.y + HEART_CORE &&
+      rect.y + rect.h > centre.y - HEART_CORE
+    );
+  });
+}

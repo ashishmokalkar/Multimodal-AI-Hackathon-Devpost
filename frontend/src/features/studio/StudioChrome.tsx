@@ -30,6 +30,8 @@ import {
 } from "./icons";
 import { pulseRate, type WindowId } from "./studioModel";
 import {
+  GLASS_MAX,
+  GLASS_MIN,
   STUDIO_THEMES,
   THEME_LABEL,
   useStudioStore,
@@ -136,14 +138,14 @@ function SettingsMenu() {
             ))}
           </div>
           <label className="menu-label" htmlFor="studio-glass">
-            Window glass <span>{Math.round((1 - glass) * 100)}% clear</span>
+            Window opacity <span>{Math.round(glass * 100)}%</span>
           </label>
           <input
             id="studio-glass"
-            max={0.95}
-            min={0.25}
+            max={GLASS_MAX}
+            min={GLASS_MIN}
             onChange={(event) => setGlass(Number(event.target.value))}
-            step={0.05}
+            step={0.01}
             type="range"
             value={glass}
           />
@@ -216,7 +218,9 @@ export function TopBar() {
                 : "Checking the API"
           }
         >
-          {profile ? (profile.mode === "real" ? "Live model" : "Mock") : profileQuery.isError ? "Offline" : "…"}
+          <span className="api-dot-label">
+            {profile ? (profile.mode === "real" ? "Live model" : "Mock") : profileQuery.isError ? "Offline" : "…"}
+          </span>
         </span>
         <button
           className="topbar-search"

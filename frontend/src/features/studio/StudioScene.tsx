@@ -58,7 +58,7 @@ import {
 } from "../viewer/vesselMap";
 import { SCENE_THEMES, type SceneTheme } from "./sceneTheme";
 import { beatPulse, pulseRate } from "./studioModel";
-import { useStudioStore } from "./studioStore";
+import { heartCovered, useStudioStore } from "./studioStore";
 import { isFlagged } from "../../lib/flags";
 
 type OrbitControlsImpl = ComponentRef<typeof OrbitControls>;
@@ -423,6 +423,7 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
   const hoveredFactor = useUiStore((state) => state.hoveredFactor);
   const flow = useStudioStore((state) => state.motion);
   const labels = useStudioStore((state) => state.labels);
+  const covered = useStudioStore(heartCovered);
   const target = display.target;
   const flagged = target !== null && isFlagged(target);
   // null while the next prediction is being scored: the artery keeps its current look until it arrives
@@ -589,7 +590,7 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
           zIndexRange={[20, 0]}
         >
           <span
-            className={`sv-tag${flagged ? " is-flagged" : ""}${isSelected || isHovered ? " is-active" : ""}${faded ? " is-faded" : ""}`}
+            className={`sv-tag${flagged ? " is-flagged" : ""}${isSelected || isHovered ? " is-active" : ""}${faded ? " is-faded" : ""}${covered ? " is-hidden" : ""}`}
             style={{ backgroundColor: tagColor, color: inkOn(tagColor) }}
           >
             <i style={{ backgroundColor: display.color }} />
@@ -742,6 +743,7 @@ function Framing({ heartBox }: { heartBox: Box3 | null }) {
   const invalidate = useThree((state) => state.invalidate);
   const whatifOpen = useStudioStore((state) => state.open.whatif);
   const whatif = useStudioStore((state) => state.rects.whatif);
+  const setHeartCentre = useStudioStore((state) => state.setHeartCentre);
   const vesselOpen = useStudioStore((state) => state.open.vessel);
   const vessel = useStudioStore((state) => state.rects.vessel);
 
@@ -749,6 +751,7 @@ function Framing({ heartBox }: { heartBox: Box3 | null }) {
     const view = get().camera as PerspectiveCamera;
     // compact (phone) layout stacks the windows below the stage, so the heart keeps the plain centred view
     if (!heartBox || heartBox.isEmpty() || size.width < 760) {
+      setHeartCentre(null);
       view.clearViewOffset();
       view.zoom = 1;
       view.updateProjectionMatrix();
@@ -797,8 +800,9 @@ function Framing({ heartBox }: { heartBox: Box3 | null }) {
     view.zoom = zoom;
     view.setViewOffset(size.width, size.height, 0, shift, size.width, size.height);
     view.updateProjectionMatrix();
+    setHeartCentre({ x: Math.round(size.width / 2), y: Math.round((bandTop + bandBottom) / 2) });
     invalidate();
-  }, [get, heartBox, invalidate, size.height, size.width, vessel, vesselOpen, whatif, whatifOpen]);
+  }, [get, heartBox, invalidate, setHeartCentre, size.height, size.width, vessel, vesselOpen, whatif, whatifOpen]);
 
   return null;
 }
