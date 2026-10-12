@@ -5,7 +5,9 @@ import {
   beatPulse,
   buildTour,
   clampRect,
+  DEFAULT_OPEN,
   defaultLayout,
+  EXPLAIN_SPACE,
   factorBreakdown,
   MIN_WINDOW_SIZE,
   pulseRate,
@@ -77,9 +79,9 @@ describe("window layout", () => {
     expect(overlaps(layout.patient, layout.risk)).toBe(false);
     expect(overlaps(layout.patient, layout.drivers)).toBe(false);
     expect(overlaps(layout.risk, layout.drivers)).toBe(false);
-    // the right column stays clear of the watermark, the patient window of the dock
+    // the right column stays clear of the model credit in the corner, the patient window of the dock
     if (vh >= 720) {
-      expect(layout.drivers.y + layout.drivers.h).toBeLessThanOrEqual(vh - 44);
+      expect(layout.drivers.y + layout.drivers.h).toBeLessThanOrEqual(vh - 30);
     }
     expect(layout.patient.y + layout.patient.h).toBeLessThanOrEqual(vh - 80);
     // and leaves the middle third for the heart
@@ -302,6 +304,32 @@ describe("factor breakdown", () => {
     const breakdown = factorBreakdown(prediction, features, "RWMA");
     expect(breakdown.valueText).toBeNull();
     expect(breakdown.items.every((item) => !item.moves && item.points === 0)).toBe(true);
+  });
+});
+
+describe("explain on demand", () => {
+  it("starts with Why closed, so the first screen is the patient and the risk", () => {
+    expect(DEFAULT_OPEN.patient).toBe(true);
+    expect(DEFAULT_OPEN.risk).toBe(true);
+    expect(DEFAULT_OPEN.drivers).toBe(false);
+  });
+
+  it.each([
+    [1280, 720],
+    [1366, 768],
+    [1920, 1080],
+    [2560, 1440],
+  ])("centres Risk, with room for its button, in the right column of a %ix%i screen", (vw, vh) => {
+    const open = defaultLayout(vw, vh, { whyOpen: true });
+    const closed = defaultLayout(vw, vh, { whyOpen: false });
+    expect(closed.risk.h).toBe(open.risk.h + EXPLAIN_SPACE);
+    expect(closed.risk.x).toBe(open.risk.x);
+    expect(closed.risk.y).toBeGreaterThan(open.risk.y);
+    // equal space above and below, within the column between the top bar and the watermark
+    const above = closed.risk.y - open.risk.y;
+    const below = vh - 32 - (closed.risk.y + closed.risk.h);
+    expect(Math.abs(above - below)).toBeLessThanOrEqual(1);
+    expect(closed.risk.y + closed.risk.h).toBeLessThanOrEqual(vh - 30);
   });
 });
 

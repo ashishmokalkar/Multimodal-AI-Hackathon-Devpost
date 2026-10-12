@@ -790,10 +790,27 @@
   backdrop-filter: blur(var(--s-blur)) saturate(150%);
   -webkit-backdrop-filter: blur(var(--s-blur)) saturate(150%);
   animation: studio-window-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  /* windows glide when the layout moves them (Risk sliding up as Why opens, expand and restore); not while dragged */
   transition:
     opacity 0.35s,
     transform 0.35s,
-    border-color 0.2s;
+    border-color 0.2s,
+    left 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Why rises into the space Risk leaves, a moment after Risk starts moving up */
+.studio .sw[data-window="drivers"]:not(.is-compact) {
+  animation: studio-why-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s backwards;
+}
+
+@keyframes studio-why-rise {
+  from {
+    opacity: 0;
+    transform: translateY(56px);
+  }
 }
 
 .studio .sw.is-top {
@@ -1459,6 +1476,100 @@
   .studio .rk-scale-dot {
     transition: none;
   }
+}
+
+/* the way into the Why window, at the foot of Risk while Why is closed */
+.studio .rk-explain-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.studio .rk-explain {
+  display: inline-flex;
+  width: 100%;
+  max-width: 300px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid color-mix(in srgb, var(--s-accent) 70%, white 10%);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--s-accent), color-mix(in srgb, var(--s-accent) 70%, #6366f1));
+  padding: 10px 18px;
+  box-shadow:
+    0 6px 22px color-mix(in srgb, var(--s-accent) 45%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 25%);
+  color: #04111a;
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s,
+    filter 0.18s;
+}
+
+/* the arrow keeps nudging down towards where the explanation will open; faster on hover */
+.studio .rk-explain svg {
+  animation: rk-explain-arrow 1.4s ease-in-out infinite;
+}
+
+/* a calm, steady nudge: 5 px down and back */
+@keyframes rk-explain-arrow {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(4px);
+  }
+}
+
+.studio .rk-explain:hover {
+  box-shadow:
+    0 10px 30px color-mix(in srgb, var(--s-accent) 60%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 30%);
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.studio .rk-explain:hover svg {
+  animation-duration: 0.9s;
+}
+
+.studio .rk-explain:focus-visible {
+  outline: 2px solid var(--s-text);
+  outline-offset: 3px;
+}
+
+/* first visit only: a soft ring pulses out twice so the way to the explanation is noticed */
+.studio .rk-explain.is-hint {
+  animation: rk-explain-hint 1.6s ease-out 0.8s 2;
+}
+
+@keyframes rk-explain-hint {
+  0% {
+    box-shadow:
+      0 6px 22px color-mix(in srgb, var(--s-accent) 45%, transparent),
+      0 0 0 0 color-mix(in srgb, var(--s-accent) 55%, transparent);
+  }
+  100% {
+    box-shadow:
+      0 6px 22px color-mix(in srgb, var(--s-accent) 45%, transparent),
+      0 0 0 14px transparent;
+  }
+}
+
+.studio[data-theme="clinical"] .rk-explain {
+  color: #ffffff;
+}
+
+.studio .sw[data-window="risk"] .sw-body {
+  display: flex;
+  flex-direction: column;
 }
 
 /* ------------------------------------------------------------------ drivers window */

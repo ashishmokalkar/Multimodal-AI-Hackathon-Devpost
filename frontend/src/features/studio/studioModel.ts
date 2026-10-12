@@ -192,11 +192,14 @@ export const MIN_WINDOW_SIZE: Record<WindowId, { w: number; h: number }> = {
   model: { w: 300, h: 200 },
 };
 
-/** Windows open on first visit; the rest wait in the dock. */
+/**
+ * Windows open on first visit; the rest wait in the dock. Why starts closed for a calm first screen: the Risk
+ * window's "Explain this prediction" button opens it.
+ */
 export const DEFAULT_OPEN: Record<WindowId, boolean> = {
   patient: true,
   risk: true,
-  drivers: true,
+  drivers: false,
   whatif: false,
   factors: false,
   people: false,
@@ -213,8 +216,10 @@ export const ANCHORED_WINDOWS: readonly WindowId[] = ["patient", "risk", "driver
 
 /** Height kept free at the bottom left for the dock. */
 const DOCK_SPACE = 80;
-/** Height kept free at the bottom right for the "decision support only" watermark. */
-const WATERMARK_SPACE = 48;
+/** Height kept free at the bottom right for the one-line heart model credit. */
+const WATERMARK_SPACE = 32;
+/** Extra height the Risk window takes while Why is closed, for its "Explain this prediction" button. */
+export const EXPLAIN_SPACE = 58;
 
 function clamp(value: number, low: number, high: number): number {
   return Math.round(Math.min(high, Math.max(low, value)));
@@ -222,12 +227,14 @@ function clamp(value: number, low: number, high: number): number {
 
 /**
  * Starting layout for a viewport: inputs on the left, results on the right, the heart in the middle. Column widths
- * grow with the screen width; the right column (Risk above Why) fills the height, and the patient window is centred
- * between the top bar and the dock.
+ * grow with the screen width and the patient window is centred between the top bar and the dock. While Why is
+ * closed, Risk (with its explain button) sits in the middle of the right column; once Why opens, Risk moves to the
+ * top and Why fills the height below it.
  */
 export function defaultLayout(
   viewportWidth: number,
   viewportHeight: number,
+  { whyOpen = true }: { whyOpen?: boolean } = {},
 ): Record<WindowId, Rect> {
   const vw = Math.max(viewportWidth, 900);
   const vh = Math.max(viewportHeight, 560);
@@ -236,7 +243,10 @@ export function defaultLayout(
   const patientW = clamp(vw * 0.21, 270, 400);
   const rightX = vw - GAP - sideW;
   const column = vh - top - WATERMARK_SPACE;
-  const riskH = clamp(column * 0.5, 260, 360);
+  // the risk window needs about 330 px for its gauge and the three artery rings with their labels
+  const riskH = clamp(column * 0.55, 280, 360);
+  const riskClosedH = riskH + EXPLAIN_SPACE;
+  const riskClosedY = top + Math.max(0, Math.round((column - riskClosedH) / 2));
   const driversY = top + riskH + 12;
   const driversH = clamp(column - riskH - 12, MIN_WINDOW_SIZE.drivers.h, 520);
   const whatIfW = Math.min(680, vw - 2 * (sideW + GAP) - 40);
@@ -248,7 +258,9 @@ export function defaultLayout(
   return {
     // patient on the left, centred in the height between the top bar and the dock
     patient: { x: GAP, y: patientY, w: patientW, h: patientH },
-    risk: { x: rightX, y: top, w: sideW, h: riskH },
+    risk: whyOpen
+      ? { x: rightX, y: top, w: sideW, h: riskH }
+      : { x: rightX, y: riskClosedY, w: sideW, h: riskClosedH },
     drivers: { x: rightX, y: driversY, w: sideW, h: driversH },
     whatif: {
       x: Math.round((vw - whatIfW) / 2),

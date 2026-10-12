@@ -54,3 +54,33 @@ describe("picking an artery", () => {
   });
 });
 
+describe("opening and closing Why", () => {
+  beforeEach(() => {
+    useStudioStore.getState().resetLayout();
+  });
+
+  it("moves Risk from the middle of the column to the top, and back", () => {
+    const centred = useStudioStore.getState().rects.risk;
+    useStudioStore.getState().openWindow("drivers");
+    const top = useStudioStore.getState().rects.risk;
+    expect(top.y).toBeLessThan(centred.y);
+    expect(top.h).toBeLessThan(centred.h);
+    expect(useStudioStore.getState().rects.drivers.y).toBeGreaterThan(top.y + top.h);
+    useStudioStore.getState().closeWindow("drivers");
+    expect(useStudioStore.getState().rects.risk).toEqual(centred);
+  });
+
+  it("opens Why the same way when an artery is picked", () => {
+    const centred = useStudioStore.getState().rects.risk;
+    toggleArtery("LAD");
+    expect(useStudioStore.getState().open.drivers).toBe(true);
+    expect(useStudioStore.getState().rects.risk.y).toBeLessThan(centred.y);
+  });
+
+  it("leaves a Risk window the user has placed where it is", () => {
+    const placed = { x: 300, y: 200, w: 320, h: 300 };
+    useStudioStore.getState().moveWindow("risk", placed);
+    useStudioStore.getState().openWindow("drivers");
+    expect(useStudioStore.getState().rects.risk).toEqual(placed);
+  });
+});

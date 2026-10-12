@@ -29,6 +29,7 @@ interface FloatingWindowProps {
 }
 
 const FLASH_MS = 400;
+const HIDE_MS = 220;
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
@@ -109,6 +110,27 @@ export function FloatingWindow({
   if (!open) {
     return null;
   }
+
+  // the window slides down and fades before it goes to the dock (instant with reduced motion)
+  const hide = () => {
+    const element = frame.current;
+    if (!element || compact || typeof element.animate !== "function" || prefersReducedMotion()) {
+      closeWindow(id);
+      return;
+    }
+    element
+      .animate(
+        [
+          { opacity: 1, transform: "translateY(0)" },
+          { opacity: 0, transform: "translateY(28px) scale(0.98)" },
+        ],
+        { duration: HIDE_MS, easing: "cubic-bezier(0.4, 0, 1, 1)", fill: "forwards" },
+      )
+      .finished.then(
+        () => closeWindow(id),
+        () => closeWindow(id),
+      );
+  };
 
   const begin = (event: ReactPointerEvent<HTMLElement>) => {
     const edge = (event.currentTarget.dataset.edge ?? "move") as Edge;
@@ -273,7 +295,7 @@ export function FloatingWindow({
           <button
             aria-label={`Hide ${title}`}
             className="sw-btn"
-            onClick={() => closeWindow(id)}
+            onClick={hide}
             type="button"
           >
             <IconMinus size={14} />

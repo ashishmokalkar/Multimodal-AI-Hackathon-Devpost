@@ -109,10 +109,37 @@ function allAnchored(): Record<WindowId, boolean> {
   return Object.fromEntries(WINDOW_IDS.map((id) => [id, true])) as Record<WindowId, boolean>;
 }
 
-function freshLayout(): Pick<StudioState, "rects" | "open" | "order" | "anchored"> {
+/** The default layout for this screen with the windows open as given (Risk sits higher once Why is open). */
+function layoutFor(open: Record<WindowId, boolean>): Record<WindowId, Rect> {
   const { w, h } = viewport();
+  return defaultLayout(w, h, { whyOpen: open.drivers });
+}
+
+/**
+ * Opening or closing Why moves Risk between the middle and the top of the right column, if Risk still follows the
+ * default layout; a window the user has placed stays where it is.
+ */
+function withOpen(
+  state: Pick<StudioState, "rects" | "anchored">,
+  open: Record<WindowId, boolean>,
+): Pick<StudioState, "open" | "rects"> {
+  if (!state.anchored.risk) {
+    return { open, rects: state.rects };
+  }
+  const layout = layoutFor(open);
   return {
-    rects: defaultLayout(w, h),
+    open,
+    rects: {
+      ...state.rects,
+      risk: layout.risk,
+      drivers: state.anchored.drivers ? layout.drivers : state.rects.drivers,
+    },
+  };
+}
+
+function freshLayout(): Pick<StudioState, "rects" | "open" | "order" | "anchored"> {
+  return {
+    rects: layoutFor(DEFAULT_OPEN),
     open: { ...DEFAULT_OPEN },
     order: [...WINDOW_IDS],
     anchored: allAnchored(),
@@ -147,7 +174,7 @@ function load(): Persisted & Pick<StudioState, "anchored"> {
     const open = { ...base.open };
     const anchored = { ...base.anchored };
     for (const id of WINDOW_IDS) {
-      // the patient, risk and why windows always start on the layout for this screen, open
+      // the patient, risk and why windows always start on the layout for this screen (Why closed)
       if (ANCHORED_WINDOWS.includes(id)) {
         continue;
       }
@@ -238,8 +265,13 @@ export const useStudioStore = create<StudioState>((set) => ({
       camera: { vessel, sequence: state.camera.sequence + 1 },
     })),
   setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
+  // the tour explains each target, so Why opens with it
   startTour: () =>
-    set({ tour: { active: true, step: 0, playing: true }, paletteOpen: false }),
+    set((state) => ({
+      ...withOpen(state, { ...state.open, drivers: true }),
+      tour: { active: true, step: 0, playing: true },
+      paletteOpen: false,
+    })),
   stopTour: () =>
     set((state) => ({
       tour: { ...state.tour, active: false },
@@ -263,15 +295,15 @@ export const useStudioStore = create<StudioState>((set) => ({
     })),
   openWindow: (id) =>
     set((state) => ({
-      open: { ...state.open, [id]: true },
+      ...withOpen(state, { ...state.open, [id]: true }),
       order: raised(state.order, id),
     })),
-  closeWindow: (id) => set((state) => ({ open: { ...state.open, [id]: false } })),
+  closeWindow: (id) => set((state) => withOpen(state, { ...state.open, [id]: false })),
   toggleWindow: (id) =>
     set((state) =>
       state.open[id] && state.order[state.order.length - 1] === id
-        ? { open: { ...state.open, [id]: false } }
-        : { open: { ...state.open, [id]: true }, order: raised(state.order, id) },
+        ? withOpen(state, { ...state.open, [id]: false })
+        : { ...withOpen(state, { ...state.open, [id]: true }), order: raised(state.order, id) },
     ),
   raiseWindow: (id) =>
     set((state) =>
@@ -286,16 +318,15 @@ export const useStudioStore = create<StudioState>((set) => ({
     })),
   anchorWindow: (id) =>
     set((state) => {
-      const { w, h } = viewport();
       return {
-        rects: { ...state.rects, [id]: defaultLayout(w, h)[id] },
+        rects: { ...state.rects, [id]: layoutFor(state.open)[id] },
         anchored: { ...state.anchored, [id]: true },
       };
     }),
   fitToViewport: () =>
     set((state) => {
       const { w, h } = viewport();
-      const layout = defaultLayout(w, h);
+      const layout = layoutFor(state.open);
       const rects = { ...state.rects };
       for (const id of WINDOW_IDS) {
         rects[id] = state.anchored[id]
