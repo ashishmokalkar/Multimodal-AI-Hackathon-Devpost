@@ -38,10 +38,12 @@ import {
   type InstancedMesh,
   type Material,
   type Mesh,
+  type MeshBasicMaterial,
   type MeshStandardMaterial,
 } from "three";
 import { useFeatures } from "../../api/hooks";
 import { cameraPositionFacing, type Point3 } from "../../lib/cameraFocus";
+import { inkOn, riskColorAt, riskHeat, thresholdPosition } from "../../lib/colorScale";
 import { factorImpact } from "../../lib/insights";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
@@ -287,58 +289,101 @@ function LeftMain() {
 }
 
 const FLOW_DUMMY = new Object3D();
+/** Most blood-flow particles on one artery (the hottest); cool arteries show none. */
+const FLOW_MAX = 30;
+/** Time for an artery to heat up or cool down to a new prediction. */
+const RISK_EASE_MS = 600;
+/** The tube is built at this radius; a vertex shader widens or narrows it every frame without rebuilding it. */
+const TUBE_RADIUS = 0.016;
+const MATTE_GREY = new Color("#8a94a6");
+const RAISE_COLOR = new Color(RAISE_GLOW);
+const LOWER_COLOR = new Color(LOWER_GLOW);
+/** The risk scale sampled every 1%, so per-frame colour updates need no string work. */
+const RISK_LUT = Array.from({ length: 101 }, (_, i) => new Color(riskColorAt(i / 100)));
 
-/** Glowing particles running along a vessel: blood flow, faster and denser on flagged arteries. */
+function riskColorInto(target: Color, position: number): Color {
+  const x = Math.min(1, Math.max(0, position)) * 100;
+  const lo = Math.floor(x);
+  return target.copy(RISK_LUT[lo]).lerp(RISK_LUT[Math.min(100, lo + 1)], x - lo);
+}
+
+function easeInOut(k: number): number {
+  return k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2;
+}
+
+/** Shader hook that moves every vertex of a tube along its normal by `grow`: animated thickness, no new geometry. */
+function growTube(
+  shader: { uniforms: Record<string, unknown>; vertexShader: string },
+  grow: { value: number },
+) {
+  shader.uniforms.uGrow = grow;
+  shader.vertexShader = `uniform float uGrow;\n${shader.vertexShader.replace(
+    "#include <begin_vertex>",
+    "#include <begin_vertex>\ntransformed += normalize(normal) * uGrow;",
+  )}`;
+}
+const growCacheKey = () => "artery-grow";
+
+/** What the artery currently looks like, shared with its blood flow: risk colour and flow density (0-1). */
+interface VesselLook {
+  color: Color;
+  flow: number;
+}
+
+/** Blood flow along an artery, in its risk colour: none on a cool artery, more and faster as it heats up. */
 function FlowParticles({
   points,
-  color,
-  count,
-  speed,
+  look,
   beatRef,
 }: {
   points: Vector3[];
-  color: string;
-  count: number;
-  speed: number;
+  look: { current: VesselLook };
   beatRef: { current: number };
 }) {
   const ref = useRef<InstancedMesh>(null);
-  const offsets = useMemo(
-    () => Array.from({ length: count }, (_, i) => i / count),
-    [count],
-  );
+  const materialRef = useRef<MeshBasicMaterial>(null);
   const progress = useRef(0);
-  const glow = useMemo(() => new Color(color).multiplyScalar(2.6), [color]);
 
   useFrame((_, delta) => {
     const mesh = ref.current;
-    if (!mesh) {
+    const material = materialRef.current;
+    if (!mesh || !material) {
       return;
     }
-    progress.current += delta * speed * (0.6 + beatRef.current * 1.4);
+    const { flow, color } = look.current;
+    const active = Math.round(FLOW_MAX * flow);
+    mesh.visible = active > 0;
+    if (active === 0) {
+      return;
+    }
+    // above display range, so bloom catches the particles
+    material.color.copy(color).multiplyScalar(2.8);
+    progress.current += delta * (0.05 + 0.24 * flow) * (0.6 + beatRef.current * 1.4);
     const last = points.length - 1;
-    offsets.forEach((offset, index) => {
-      const t = (offset + progress.current) % 1;
-      const point = points[Math.round(t * last)];
-      FLOW_DUMMY.position.copy(point);
-      // particles fade in at the origin and out at the tip
-      const scale = Math.sin(Math.PI * t) * 0.9 + 0.1;
-      FLOW_DUMMY.scale.setScalar(scale);
+    for (let index = 0; index < FLOW_MAX; index += 1) {
+      if (index < active) {
+        const t = (index / active + progress.current) % 1;
+        FLOW_DUMMY.position.copy(points[Math.round(t * last)]);
+        // particles fade in at the origin and out at the tip, and grow on hot arteries
+        FLOW_DUMMY.scale.setScalar((Math.sin(Math.PI * t) * 0.9 + 0.1) * (0.8 + 0.7 * flow));
+      } else {
+        FLOW_DUMMY.scale.setScalar(0);
+      }
       FLOW_DUMMY.updateMatrix();
       mesh.setMatrixAt(index, FLOW_DUMMY.matrix);
-    });
+    }
     mesh.instanceMatrix.needsUpdate = true;
   });
 
   return (
     <instancedMesh
-      args={[undefined, undefined, count]}
+      args={[undefined, undefined, FLOW_MAX]}
       frustumCulled={false}
       raycast={() => null}
       ref={ref}
     >
       <sphereGeometry args={[0.011, 8, 6]} />
-      <meshBasicMaterial color={glow} toneMapped={false} />
+      <meshBasicMaterial ref={materialRef} toneMapped={false} />
     </instancedMesh>
   );
 }
@@ -348,9 +393,16 @@ interface StudioVesselProps {
   beatRef: { current: number };
 }
 
+/**
+ * One coronary artery, coloured by its chance of narrowing against its own threshold (blue → amber → hot
+ * red-magenta). Cool arteries are thin, matte and still; hot ones are thicker, glow above display range for bloom,
+ * pulse with the heartbeat and carry faster, denser blood flow. Everything scales with the probability, and eases
+ * over 600 ms when the prediction changes, so the artery visibly heats up or cools down.
+ */
 function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
   const definition = vesselMap[vessel];
   const lightStage = useStudioStore((state) => SCENE_THEMES[state.theme].light);
+  const invalidate = useThree((state) => state.invalidate);
   const curve = useMemo(
     () =>
       new CatmullRomCurve3(
@@ -373,6 +425,9 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
   const labels = useStudioStore((state) => state.labels);
   const target = display.target;
   const flagged = target !== null && isFlagged(target);
+  // null while the next prediction is being scored: the artery keeps its current look until it arrives
+  const position = target ? thresholdPosition(target.probability, target.threshold) : null;
+  const tagColor = position === null ? display.color : riskColorAt(position);
   const impact =
     hoveredFactor && prediction && !prediction.mock
       ? factorImpact(prediction.explanations, hoveredFactor)[vessel]
@@ -381,48 +436,97 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
   const faded =
     (impact !== null && !affected) ||
     (impact === null && anySelected && !isSelected && !isHovered);
-  const radius = affected
-    ? 0.022
-    : isSelected
-      ? 0.024
-      : flagged
-        ? 0.019
-        : 0.012;
-  const glowColor = affected
-    ? impact > 0
-      ? RAISE_GLOW
-      : LOWER_GLOW
-    : display.color;
-  const baseGlow = affected
-    ? 1.4
-    : isHovered
-      ? 1.2
-      : isSelected
-        ? 1.0
-        : flagged
-          ? 0.8
-          : 0.1;
-  // only lit vessels go above display range and bloom; low-risk vessels stay matte
-  const glows = affected || isHovered || isSelected || flagged;
+  // lit arteries go above display range and bloom; cool ones stay matte
+  const glows = affected || isHovered || isSelected || riskHeat(position ?? 0) > 0.12;
   const materialRef = useRef<MeshStandardMaterial>(null);
   const haloRef = useRef<Mesh>(null);
+  const haloMaterialRef = useRef<MeshBasicMaterial>(null);
+  const grow = useRef({ value: 0 });
+  const haloGrow = useRef({ value: 0 });
+  const look = useRef<VesselLook>({ color: new Color(), flow: 0 });
   const motion = useStudioStore((state) => state.motion);
   const animate = motion && !reducedMotion();
+  // start -1: the transition begins on the next frame
+  const ease = useRef({ from: 0, to: 0, start: -1, value: 0 });
 
-  useFrame((state) => {
+  // a new prediction (another patient, a what-if change) starts a transition from wherever the artery is now
+  useEffect(() => {
+    if (position === null) {
+      return;
+    }
+    const now = ease.current;
+    ease.current = { from: now.value, to: position, start: -1, value: now.value };
+    invalidate();
+  }, [invalidate, position]);
+
+  useFrame(() => {
     const material = materialRef.current;
     if (!material) {
       return;
     }
-    // high-risk vessels breathe softly while motion is on; low-risk vessels stay matte
-    const breathe =
-      animate && flagged && !affected
-        ? 0.75 + 0.25 * Math.sin(state.clock.elapsedTime * 2.2)
-        : 1;
-    material.emissiveIntensity = baseGlow * breathe;
+    const e = ease.current;
+    // wall-clock time: frames are rendered on demand while motion is off, so the scene clock is not continuous
+    const time = performance.now();
+    if (e.start < 0) {
+      e.start = time;
+    }
+    const k = reducedMotion() ? 1 : Math.min(1, (time - e.start) / RISK_EASE_MS);
+    e.value = e.from + (e.to - e.from) * easeInOut(k);
+    if (k < 1) {
+      invalidate();
+    }
+    const heat = riskHeat(e.value);
+    const beat = animate ? beatRef.current : 0;
+    const current = look.current;
+    riskColorInto(current.color, e.value);
+    current.flow = Math.min(1, Math.max(0, (e.value - 0.25) / 0.75));
+
+    // thickness: thin when cool, thick when hot; hover, selection and factor highlights widen it further
+    let radius = 0.0085 + 0.004 * e.value + 0.0145 * heat;
+    if (affected) {
+      radius = Math.max(radius, 0.022);
+    }
+    if (isSelected) {
+      radius = Math.max(radius, 0.024);
+    }
+    if (isHovered) {
+      radius += 0.003;
+    }
+    grow.current.value = radius - TUBE_RADIUS;
+
+    // colour: desaturated and matte when cool; glossy and glowing with the heartbeat when hot, where the glow
+    // carries the colour (the lit surface dims) so a hot artery stays saturated red-pink instead of turning white
+    material.color
+      .copy(current.color)
+      .lerp(MATTE_GREY, 0.3 * (1 - heat))
+      .multiplyScalar(1 - 0.55 * heat);
+    material.emissive.copy(affected ? (impact > 0 ? RAISE_COLOR : LOWER_COLOR) : current.color);
+    let glow = (0.02 + 1.7 * heat ** 1.15) * (1 + 0.6 * heat * beat);
+    if (affected) {
+      glow = Math.max(glow, 1.4);
+    } else if (isHovered) {
+      glow = Math.max(glow, 1.2);
+    } else if (isSelected) {
+      // the picked artery is brighter than any other, whatever its risk; the other two fade (see faded)
+      glow = Math.max(glow * 1.35, 1.3);
+    }
+    material.emissiveIntensity = glow;
+    material.roughness = 0.85 - 0.6 * heat;
+    material.metalness = 0.04 + 0.2 * heat;
+
+    // halo: fades in with the heat and swells and brightens on every heartbeat
     const halo = haloRef.current;
-    if (halo) {
-      halo.scale.setScalar(1 + beatRef.current * 0.04);
+    const haloMaterial = haloMaterialRef.current;
+    if (halo && haloMaterial) {
+      const hot = Math.min(1, Math.max(0, (heat - 0.2) / 0.8)) ** 1.2;
+      const opacity = Math.max(
+        hot * (lightStage ? 0.22 : 0.14) * (1 + 1.8 * beat),
+        isSelected ? (lightStage ? 0.38 : 0.26) : affected || isHovered ? (lightStage ? 0.3 : 0.18) : 0,
+      );
+      halo.visible = opacity > 0.005 && !faded;
+      haloMaterial.opacity = opacity;
+      haloMaterial.color.copy(material.emissive);
+      haloGrow.current.value = radius * (1.7 + 0.6 * beat * hot) - TUBE_RADIUS;
     }
   });
 
@@ -451,41 +555,31 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
           document.body.style.cursor = "pointer";
         }}
       >
-        <tubeGeometry args={[curve, 64, radius, 10, false]} />
+        <tubeGeometry args={[curve, 64, TUBE_RADIUS, 12, false]} />
         <meshStandardMaterial
-          color={display.color}
-          emissive={glowColor}
-          emissiveIntensity={baseGlow}
-          metalness={0.15}
+          customProgramCacheKey={growCacheKey}
+          onBeforeCompile={(shader) => growTube(shader, grow.current)}
           opacity={faded ? 0.22 : 1}
           ref={materialRef}
-          roughness={0.28}
           toneMapped={!glows}
           transparent={faded}
         />
       </mesh>
-      {(isSelected || isHovered || affected) && (
-        <mesh raycast={() => null} ref={haloRef}>
-          <tubeGeometry args={[curve, 64, radius * 1.6, 10, false]} />
-          <meshBasicMaterial
-            blending={lightStage ? NormalBlending : AdditiveBlending}
-            color={glowColor}
-            depthWrite={false}
-            opacity={lightStage ? 0.3 : 0.18}
-            side={DoubleSide}
-            toneMapped={false}
-            transparent
-          />
-        </mesh>
-      )}
-      {flow && target && !faded && (
-        <FlowParticles
-          beatRef={beatRef}
-          color={display.color}
-          count={flagged ? 16 : 8}
-          points={spaced}
-          speed={flagged ? 0.16 : 0.1}
+      <mesh raycast={() => null} ref={haloRef} visible={false}>
+        <tubeGeometry args={[curve, 64, TUBE_RADIUS, 12, false]} />
+        <meshBasicMaterial
+          blending={lightStage ? NormalBlending : AdditiveBlending}
+          customProgramCacheKey={growCacheKey}
+          depthWrite={false}
+          onBeforeCompile={(shader) => growTube(shader, haloGrow.current)}
+          ref={haloMaterialRef}
+          side={DoubleSide}
+          toneMapped={false}
+          transparent
         />
+      </mesh>
+      {flow && target && !faded && (
+        <FlowParticles beatRef={beatRef} look={look} points={spaced} />
       )}
       {labels && target && (
         <Html
@@ -496,6 +590,7 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
         >
           <span
             className={`sv-tag${flagged ? " is-flagged" : ""}${isSelected || isHovered ? " is-active" : ""}${faded ? " is-faded" : ""}`}
+            style={{ backgroundColor: tagColor, color: inkOn(tagColor) }}
           >
             <i style={{ backgroundColor: display.color }} />
             {vessel}

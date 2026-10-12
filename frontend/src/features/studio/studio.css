@@ -133,10 +133,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgb(255 255 255 / 14%);
+  border: 1px solid rgb(255 255 255 / 35%);
   border-radius: 999px;
   background: rgb(8 12 24 / 62%);
-  padding: 3px 9px 3px 6px;
+  padding: 3px 9px 3px 5px;
   color: #e9eefb;
   font-family: var(--s-font);
   font-size: 11px;
@@ -145,16 +145,22 @@
   white-space: nowrap;
   backdrop-filter: blur(8px);
   box-shadow: 0 6px 18px rgb(0 0 0 / 30%);
+  /* the background eases with the artery itself when the prediction changes */
   transition:
-    opacity 0.25s,
-    transform 0.25s;
+    background-color 0.6s ease,
+    color 0.6s ease,
+    opacity 0.25s ease,
+    transform 0.25s ease;
 }
 
+/* the artery's identity colour, ringed so it stays visible on any risk colour */
 .studio .sv-tag i {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  box-shadow: 0 0 8px currentColor;
+  box-shadow:
+    0 0 0 1.5px rgb(255 255 255 / 90%),
+    0 0 0 2.5px rgb(8 12 24 / 45%);
 }
 
 .studio .sv-tag b {
@@ -164,21 +170,17 @@
 
 .studio .sv-tag em {
   border-radius: 50%;
-  background: rgb(255 255 255 / 18%);
+  background: rgb(0 0 0 / 18%);
   padding: 0 5px;
   font-style: normal;
 }
 
 .studio .sv-tag.is-flagged {
-  border-color: rgb(255 92 147 / 70%);
-  box-shadow:
-    0 0 0 1px rgb(255 92 147 / 25%),
-    0 0 18px rgb(255 92 147 / 35%);
+  border-color: rgb(255 255 255 / 75%);
 }
 
 .studio .sv-tag.is-flagged b::after {
   content: " ▲";
-  color: #ff8ab3;
   font-size: 9px;
 }
 
