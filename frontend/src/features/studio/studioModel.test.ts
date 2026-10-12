@@ -6,6 +6,7 @@ import {
   buildTour,
   clampRect,
   defaultLayout,
+  factorBreakdown,
   MIN_WINDOW_SIZE,
   pulseRate,
   riskBand,
@@ -254,6 +255,53 @@ describe("why window", () => {
   it("has no separate artery window: clicking an artery explains it in Why", () => {
     expect(WINDOW_IDS).not.toContain("vessel");
     expect(Object.keys(defaultLayout(1920, 1080)).sort()).toEqual([...WINDOW_IDS].sort());
+  });
+});
+
+describe("factor breakdown", () => {
+  const features: FeatureDefinition[] = [
+    { name: "CP", label: "Chest pain type", group: "Symptoms", type: "categorical", default: "None", options: ["None", "Typical"] },
+    { name: "RWMA", label: "Regional wall-motion abnormality", group: "Echo", type: "number", default: 0 },
+  ];
+  const explanation = (points: number) => ({
+    base_value: 0.2,
+    scale: "probability" as const,
+    method: "test",
+    contributions: points
+      ? [{ feature: "CP", value: "Typical", contribution: points / 100, direction: "positive" as const }]
+      : [],
+  });
+  const target = (probability: number) => ({ probability, threshold: 0.5, label: "", uncertain: false });
+  const prediction = {
+    request_id: "00000000-0000-4000-8000-000000000000",
+    model_version: "test",
+    risk_summary: "",
+    mock: false,
+    warnings: [],
+    derived: { BMI: 25, Obesity: false },
+    prediction_source: "test",
+    cad: target(0.9),
+    vessels: { LAD: target(0.9), LCX: target(0.7), RCA: target(0.4) },
+    explanations: { cad: explanation(56), LAD: explanation(57), LCX: explanation(0.4), RCA: explanation(20) },
+  } as PredictionResponse;
+
+  it("lists the input's points for every target, in text", () => {
+    const breakdown = factorBreakdown(prediction, features, "CP");
+    expect(breakdown.label).toBe("Chest pain type");
+    expect(breakdown.valueText).toBe("Typical");
+    expect(breakdown.items.map((item) => [item.target, Math.round(item.points), item.moves])).toEqual([
+      ["cad", 56, true],
+      ["LAD", 57, true],
+      // under one point: the heart hides this artery rather than fading it
+      ["LCX", 0, false],
+      ["RCA", 20, true],
+    ]);
+  });
+
+  it("moves nothing when the input matches a typical patient", () => {
+    const breakdown = factorBreakdown(prediction, features, "RWMA");
+    expect(breakdown.valueText).toBeNull();
+    expect(breakdown.items.every((item) => !item.moves && item.points === 0)).toBe(true);
   });
 });
 

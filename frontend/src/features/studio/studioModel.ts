@@ -3,8 +3,10 @@ import type {
   PredictionResponse,
   Target,
 } from "../../api/types";
-import { ARTERY_INFO, buildDrivers, type Driver } from "../../lib/summary";
+import { ARTERY_INFO, buildDrivers, MIN_DRIVER_POINTS, type Driver } from "../../lib/summary";
 import {
+  factorImpact,
+  formatFeatureValue,
   type InsightTarget,
   type MeasurementCard,
   type RangeBar,
@@ -92,6 +94,41 @@ export function targetHeadline(
     band,
     region,
     text: `${target} · ${chance}% ${band === "high" ? "▲ " : ""}${RISK_WORD[band]} · ${region}`,
+  };
+}
+
+export interface FactorBreakdown {
+  label: string;
+  /** Null when the input matches the typical patient for every target (it then moves nothing). */
+  valueText: string | null;
+  items: { target: InsightTarget; points: number; moves: boolean }[];
+}
+
+/**
+ * What one input does to each target, in points from a typical patient: the text version of the factor highlight
+ * on the heart. "moves" is false below one point, where the heart hides that artery.
+ */
+export function factorBreakdown(
+  prediction: PredictionResponse,
+  features: readonly FeatureDefinition[],
+  feature: string,
+): FactorBreakdown {
+  const definition = features.find((item) => item.name === feature);
+  const impact = factorImpact(prediction.explanations, feature);
+  const targets: InsightTarget[] = ["cad", "LAD", "LCX", "RCA"];
+  const measured = targets
+    .map((target) =>
+      prediction.explanations[target].contributions.find((item) => item.feature === feature),
+    )
+    .find((item) => item !== undefined);
+  return {
+    label: definition?.label ?? feature,
+    valueText: measured ? formatFeatureValue(measured.value, definition) : null,
+    items: targets.map((target) => ({
+      target,
+      points: impact[target],
+      moves: Math.abs(impact[target]) >= MIN_DRIVER_POINTS,
+    })),
   };
 }
 

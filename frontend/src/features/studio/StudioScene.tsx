@@ -45,6 +45,7 @@ import { useFeatures } from "../../api/hooks";
 import { cameraPositionFacing, type Point3 } from "../../lib/cameraFocus";
 import { inkOn, riskColorAt, riskHeat, thresholdPosition } from "../../lib/colorScale";
 import { factorImpact } from "../../lib/insights";
+import { MIN_DRIVER_POINTS } from "../../lib/summary";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 import { useActiveScenario } from "../../store/whatIfStore";
@@ -434,10 +435,10 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
     hoveredFactor && prediction && !prediction.mock
       ? factorImpact(prediction.explanations, hoveredFactor)[vessel]
       : null;
-  const affected = impact !== null && Math.abs(impact) >= 1;
-  const faded =
-    (impact !== null && !affected) ||
-    (impact === null && anySelected && !isSelected && !isHovered);
+  const affected = impact !== null && Math.abs(impact) >= MIN_DRIVER_POINTS;
+  // an input that does not move this artery hides it outright: a faded artery would read as a small effect
+  const absent = impact !== null && !affected;
+  const faded = impact === null && anySelected && !isSelected && !isHovered;
   // lit arteries go above display range and bloom; cool ones stay matte
   const glows = affected || isHovered || isSelected || riskHeat(position ?? 0) > 0.12;
   const materialRef = useRef<MeshStandardMaterial>(null);
@@ -525,7 +526,7 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
         hot * (lightStage ? 0.22 : 0.14) * (1 + 1.8 * beat),
         isSelected ? (lightStage ? 0.38 : 0.26) : affected || isHovered ? (lightStage ? 0.3 : 0.18) : 0,
       );
-      halo.visible = opacity > 0.005 && !faded;
+      halo.visible = opacity > 0.005 && !faded && !absent;
       haloMaterial.opacity = opacity;
       haloMaterial.color.copy(material.emissive);
       haloGrow.current.value = radius * (1.7 + 0.6 * beat * hot) - TUBE_RADIUS;
@@ -535,6 +536,10 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
   const setHovered = useUiStore((state) => state.setHoveredVessel);
   // click picks this artery for the Why window; clicking it again goes back to the overall result
   const select = (event: { stopPropagation: () => void }) => {
+    // a hidden artery still sits in the scene; it must not catch clicks meant for what is behind it
+    if (absent) {
+      return;
+    }
     event.stopPropagation();
     toggleArtery(vessel);
   };
@@ -544,12 +549,16 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
       <mesh
         name={definition.nodeName}
         onClick={select}
+        visible={!absent}
         onPointerOut={(event) => {
           event.stopPropagation();
           setHovered(null);
           document.body.style.cursor = "";
         }}
         onPointerOver={(event) => {
+          if (absent) {
+            return;
+          }
           event.stopPropagation();
           setHovered(vessel);
           document.body.style.cursor = "pointer";
@@ -578,7 +587,7 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
           transparent
         />
       </mesh>
-      {flow && target && !faded && (
+      {flow && target && !faded && !absent && (
         <FlowParticles beatRef={beatRef} look={look} points={spaced} />
       )}
       {labels && target && (
@@ -589,14 +598,14 @@ function StudioVessel({ vessel, beatRef }: StudioVesselProps) {
           zIndexRange={[20, 0]}
         >
           <span
-            className={`sv-tag${flagged ? " is-flagged" : ""}${isSelected || isHovered ? " is-active" : ""}${faded ? " is-faded" : ""}${covered ? " is-hidden" : ""}`}
+            className={`sv-tag${flagged ? " is-flagged" : ""}${isSelected || isHovered ? " is-active" : ""}${faded ? " is-faded" : ""}${covered || absent ? " is-hidden" : ""}`}
             style={{ backgroundColor: tagColor, color: inkOn(tagColor) }}
           >
             <i style={{ backgroundColor: display.color }} />
             {vessel}
             <b>
               {affected
-                ? `${impact > 0 ? "+" : "−"}${Math.abs(Math.round(impact))} pts`
+                ? `${impact > 0 ? "+" : "−"}${Math.abs(Math.round(impact))} ${Math.abs(Math.round(impact)) === 1 ? "pt" : "pts"}`
                 : `${Math.round(target.probability * 100)}%`}
             </b>
             {target.uncertain && !affected ? <em>?</em> : null}

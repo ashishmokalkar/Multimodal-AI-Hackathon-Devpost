@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, type PointerEvent } from "react";
 import { riskColor, targetColor } from "../../../lib/colorScale";
 import { buildMeasurementGroups, type InsightTarget } from "../../../lib/insights";
 import { buildDrivers } from "../../../lib/summary";
@@ -6,6 +6,7 @@ import { usePatientStore } from "../../../store/patientStore";
 import { useUiStore } from "../../../store/uiStore";
 import { useWhatIfStore } from "../../../store/whatIfStore";
 import { HeartbeatLoader } from "../../loading/HeartbeatLoader";
+import { FactorPeek, type PeekAnchor } from "../FactorPeek";
 import { FloatingWindow } from "../FloatingWindow";
 import { IconBars } from "../icons";
 import { BandChip, EmptyState, ShapBadge, TargetChips } from "../parts";
@@ -29,6 +30,7 @@ export function DriversWindow() {
   const hoveredFactor = useUiStore((state) => state.hoveredFactor);
   const setHoveredFactor = useUiStore((state) => state.setHoveredFactor);
   const pinned = useStudioStore((state) => state.pinnedFactor);
+  const [peek, setPeek] = useState<PeekAnchor | null>(null);
   const target: InsightTarget = selectedVessel ?? "cad";
   const summary = useMemo(() => {
     if (!shown || shown.mock) {
@@ -49,6 +51,16 @@ export function DriversWindow() {
   const headline = shown ? targetHeadline(shown, target) : null;
   const flashed = whyFlash && shown ? shown.vessels[whyFlash.vessel] : null;
 
+  const enterRow = (feature: string, event: PointerEvent<HTMLLIElement>) => {
+    setHoveredFactor(feature);
+    const root = event.currentTarget.closest<HTMLElement>(".studio");
+    const { top, left, bottom, height } = event.currentTarget.getBoundingClientRect();
+    setPeek(root ? { feature, rect: { top, left, bottom, height }, root } : null);
+  };
+  const leaveRow = () => {
+    setHoveredFactor(pinned);
+    setPeek(null);
+  };
 
   // the chips switch the explanation and the camera without the border flash (the eye is already here)
   const choose = (next: InsightTarget) =>
@@ -129,8 +141,8 @@ export function DriversWindow() {
                 <li
                   className={`sl-driver${hoveredFactor === driver.feature ? " is-hot" : ""}`}
                   key={driver.feature}
-                  onPointerEnter={() => setHoveredFactor(driver.feature)}
-                  onPointerLeave={() => setHoveredFactor(pinned)}
+                  onPointerEnter={(event) => enterRow(driver.feature, event)}
+                  onPointerLeave={leaveRow}
                   title={`${driver.label}: ${driver.valueText}${driver.rangeText ? ` (typical ${driver.rangeText})` : ""}`}
                 >
                   <span className="sl-driver-info">
@@ -181,6 +193,9 @@ export function DriversWindow() {
               );
             })}
           </ul>
+          {peek && hoveredFactor === peek.feature && (
+            <FactorPeek anchor={peek} current={target} features={features} prediction={shown} />
+          )}
           {summary.rest && (
             <p className="muted-xs sl-drivers-rest">
               +{summary.rest.count} smaller inputs ({summary.rest.points > 0 ? "+" : "−"}
