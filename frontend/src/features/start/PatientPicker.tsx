@@ -266,9 +266,6 @@ export function PatientPicker() {
       <div aria-hidden="true" className="pk-backdrop">
         <i className="pk-orb pk-orb-a" />
         <i className="pk-orb pk-orb-b" />
-        <svg className="pk-ecg" preserveAspectRatio="none" viewBox="0 0 1200 100">
-          <path d="M0 60h300l18-40 24 80 20-56 14 16h250l18-40 24 80 20-56 14 16h498" />
-        </svg>
       </div>
       <header className="pk-head">
         <span className="pk-brand">
@@ -403,6 +400,10 @@ export function PatientPicker() {
                   </button>
                   {footnote}
                 </div>
+                {/* the heartbeat trace runs edge to edge just under the content, so it never crosses the text */}
+                <svg aria-hidden="true" className="pk-ecg" preserveAspectRatio="none" viewBox="0 0 1200 100">
+                  <path d="M0 60h300l18-40 24 80 20-56 14 16h250l18-40 24 80 20-56 14 16h498" />
+                </svg>
               </>
             )}
             {showAll && footnote}
