@@ -1780,7 +1780,7 @@
   display: flex;
   min-height: 100%;
   flex-direction: column;
-  gap: 12px;
+  gap: 11px;
 }
 
 .studio .patient-id {
@@ -1832,83 +1832,151 @@
   font-variant-numeric: tabular-nums;
 }
 
+.studio .pulse-badge small {
+  margin-left: 1px;
+  font-size: 10px;
+  font-weight: 650;
+  opacity: 0.8;
+}
+
 .studio .pulse-badge svg {
   animation: studio-glyph 0.9s ease-in-out infinite;
 }
 
-.studio .conditions {
+/* sections in clinical reading order: presenting, ECG and echo, history, measurements, angiogram */
+.studio .pt-section {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
   gap: 5px;
 }
 
-.studio .condition {
-  border: 1px solid var(--s-line);
-  border-radius: 9px;
-  padding: 5px 6px;
-  color: var(--s-faint);
-  font-size: 11px;
-  font-weight: 650;
-  text-align: center;
-}
-
-.studio .condition.is-on {
-  border-color: color-mix(in srgb, var(--s-flag) 50%, transparent);
-  background: color-mix(in srgb, var(--s-flag) 14%, transparent);
-  color: var(--s-text);
-}
-
-.studio .metrics {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
-  gap: 6px;
-}
-
-.studio .metric {
-  display: flex;
-  flex-direction: column;
-  border-radius: 11px;
-  background: var(--s-hover);
-  padding: 6px 8px;
-}
-
-.studio .metric-label {
+.studio .pt-section h3 {
+  margin: 0;
   color: var(--s-muted);
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
-.studio .metric-value {
-  font-size: 16px;
-  font-weight: 750;
-  font-variant-numeric: tabular-nums;
-}
-
-.studio .metric.is-out .metric-value {
-  color: var(--s-flag);
-}
-
-.studio .truth {
+.studio .pt-chips {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 5px;
 }
 
-.studio .truth-chip {
-  border: 1px solid var(--s-line);
+.studio .pt-chips li {
+  border: 1px solid var(--s-line-strong);
+  border-radius: 999px;
+  background: var(--s-hover);
+  padding: 2px 9px;
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.studio .pt-none {
+  margin: 0;
+  color: var(--s-muted);
+  font-size: 12px;
+}
+
+.studio .pt-measures {
+  display: grid;
+  gap: 2px;
+}
+
+.studio .pt-measure {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
   border-radius: 7px;
-  padding: 1px 6px;
-  color: var(--s-faint);
-  font-size: 10.5px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.studio .pt-measure.is-high,
+.studio .pt-measure.is-low {
+  background: color-mix(in srgb, var(--s-flag) 10%, transparent);
+}
+
+.studio .pt-measure b {
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.studio .pt-measure em {
+  color: var(--s-flag);
+  font-style: normal;
+}
+
+.studio .pt-normal {
+  margin: 0;
+  padding: 0 8px;
+  color: var(--s-muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.studio .pt-normal span {
+  color: var(--s-good);
   font-weight: 700;
 }
 
-.studio .truth-chip.is-pos {
-  border-color: var(--s-line-strong);
+.studio .pt-match {
+  justify-self: start;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--s-warn, #f59e0b) 16%, transparent);
+  padding: 2px 10px;
   color: var(--s-text);
+  font-size: 11.5px;
+  font-weight: 750;
+}
+
+.studio .pt-match.is-all {
+  background: color-mix(in srgb, var(--s-good) 18%, transparent);
+  color: var(--s-good);
+}
+
+.studio .pt-angio {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.studio .pt-angio li {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 2px 6px;
+  border: 1px solid var(--s-line);
+  border-radius: 10px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+.studio .pt-angio i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--s-good);
+}
+
+.studio .pt-angio .is-narrowed i {
+  background: var(--s-flag);
+}
+
+.studio .pt-angio span {
+  color: var(--s-muted);
+  font-weight: 600;
+}
+
+.studio .pt-angio em {
+  grid-column: 1 / -1;
+  color: var(--s-flag);
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .studio .patient-foot {
@@ -1942,6 +2010,70 @@
 .studio .editor-fields {
   display: grid;
   gap: 4px;
+}
+
+.studio .editor-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--s-line);
+  padding-top: 8px;
+}
+
+.studio .patient-editor {
+  position: absolute;
+  z-index: 300;
+  display: flex;
+  width: 470px;
+  max-height: calc(100vh - 140px);
+  flex-direction: column;
+  border: 1px solid var(--s-line-strong);
+  border-radius: var(--s-radius);
+  background: var(--s-panel-solid);
+  padding: 0 14px 12px;
+  box-shadow: var(--s-shadow);
+  animation: patient-editor-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.studio .patient-editor:focus {
+  outline: none;
+}
+
+.studio .patient-editor .editor {
+  min-height: 0;
+  flex: 1;
+}
+
+.studio .patient-editor .editor-fields {
+  overflow: auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 14px;
+  padding-right: 2px;
+}
+
+@keyframes patient-editor-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+}
+
+.studio .patient-editor-head {
+  display: flex;
+  height: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  color: var(--s-accent);
+}
+
+.studio .patient-editor-head h2 {
+  flex: 1;
+  margin: 0;
+  color: var(--s-text);
+  font-size: 13px;
+  font-weight: 750;
 }
 
 .studio .field {

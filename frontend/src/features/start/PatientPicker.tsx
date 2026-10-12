@@ -58,6 +58,7 @@ function PatientCard({
       <button className="pk-card" onClick={() => onOpen(sample)} type="button">
         <span className="pk-card-top">
           <PatientAvatar
+            age={typeof sample.features.Age === "number" ? sample.features.Age : null}
             className="pk-avatar"
             sex={sex === "Female" || sex === "Male" ? sex : null}
             size={46}

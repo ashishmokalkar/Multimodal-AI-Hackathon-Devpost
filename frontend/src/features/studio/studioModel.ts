@@ -253,7 +253,8 @@ export function defaultLayout(
   const whatIfH = 196;
   const centreX = patientW + GAP + 20;
   const dockTop = vh - DOCK_SPACE;
-  const patientH = clamp(dockTop - top - GAP, MIN_WINDOW_SIZE.patient.h, 440);
+  // tall enough for the patient's facts (symptoms, findings, history, measurements, angiogram) without scrolling
+  const patientH = clamp(dockTop - top - GAP, MIN_WINDOW_SIZE.patient.h, 720);
   const patientY = Math.max(top, Math.round(top + (dockTop - top - patientH) / 2));
   return {
     // patient on the left, centred in the height between the top bar and the dock
