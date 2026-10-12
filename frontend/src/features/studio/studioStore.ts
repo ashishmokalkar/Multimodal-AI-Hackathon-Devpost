@@ -60,6 +60,8 @@ interface StudioState extends Persisted {
   expanded: Partial<Record<WindowId, boolean>>;
   /** Where the middle of the heart is on screen (set by the camera framing); null in the stacked phone layout. */
   heartCentre: { x: number; y: number } | null;
+  /** The Patient window shows the full profile instead of the summary (each visit starts with the summary). */
+  patientFull: boolean;
   /** Bumped when an artery is picked, so the Why window flashes its border once in that artery's risk colour. */
   whyFlash: { vessel: VesselId; sequence: number } | null;
   setTheme: (theme: StudioTheme) => void;
@@ -68,6 +70,7 @@ interface StudioState extends Persisted {
   toggle: (key: "motion" | "labels") => void;
   setQuality: (quality: Quality) => void;
   setRiskView: (view: RiskView) => void;
+  setPatientFull: (full: boolean) => void;
   focus: (vessel: VesselId | null) => void;
   setPaletteOpen: (open: boolean) => void;
   startTour: () => void;
@@ -110,9 +113,9 @@ function allAnchored(): Record<WindowId, boolean> {
 }
 
 /** The default layout for this screen with the windows open as given (Risk sits higher once Why is open). */
-function layoutFor(open: Record<WindowId, boolean>): Record<WindowId, Rect> {
+function layoutFor(open: Record<WindowId, boolean>, patientFull = false): Record<WindowId, Rect> {
   const { w, h } = viewport();
-  return defaultLayout(w, h, { whyOpen: open.drivers });
+  return defaultLayout(w, h, { whyOpen: open.drivers, patientFull });
 }
 
 /**
@@ -253,6 +256,7 @@ export const useStudioStore = create<StudioState>((set) => ({
   pinnedFactor: null,
   expanded: {},
   heartCentre: null,
+  patientFull: false,
   whyFlash: null,
   setTheme: (theme) => set({ theme }),
   setGlass: (glass) => set({ glass: clampGlass(glass) }),
@@ -260,6 +264,21 @@ export const useStudioStore = create<StudioState>((set) => ({
   toggle: (key) => set((state) => ({ [key]: !state[key] })),
   setQuality: (quality) => set({ quality }),
   setRiskView: (riskView) => set({ riskView }),
+  // the patient window grows to the full profile in place (or keeps its own spot if the user moved it)
+  setPatientFull: (patientFull) =>
+    set((state) => {
+      const target = layoutFor(state.open, patientFull).patient;
+      const { w, h } = viewport();
+      return {
+        patientFull,
+        rects: {
+          ...state.rects,
+          patient: state.anchored.patient
+            ? target
+            : clampRect({ ...state.rects.patient, h: target.h }, w, h, MIN_WINDOW_SIZE.patient),
+        },
+      };
+    }),
   focus: (vessel) =>
     set((state) => ({
       camera: { vessel, sequence: state.camera.sequence + 1 },
@@ -319,14 +338,14 @@ export const useStudioStore = create<StudioState>((set) => ({
   anchorWindow: (id) =>
     set((state) => {
       return {
-        rects: { ...state.rects, [id]: layoutFor(state.open)[id] },
+        rects: { ...state.rects, [id]: layoutFor(state.open, state.patientFull)[id] },
         anchored: { ...state.anchored, [id]: true },
       };
     }),
   fitToViewport: () =>
     set((state) => {
       const { w, h } = viewport();
-      const layout = layoutFor(state.open);
+      const layout = layoutFor(state.open, state.patientFull);
       const rects = { ...state.rects };
       for (const id of WINDOW_IDS) {
         rects[id] = state.anchored[id]
@@ -335,7 +354,7 @@ export const useStudioStore = create<StudioState>((set) => ({
       }
       return { rects };
     }),
-  resetLayout: () => set(freshLayout()),
+  resetLayout: () => set({ ...freshLayout(), patientFull: false }),
 }));
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;

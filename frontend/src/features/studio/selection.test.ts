@@ -84,3 +84,28 @@ describe("opening and closing Why", () => {
     expect(useStudioStore.getState().rects.risk).toEqual(placed);
   });
 });
+
+describe("patient summary and full profile", () => {
+  beforeEach(() => {
+    useStudioStore.getState().resetLayout();
+  });
+
+  it("starts with the summary and grows to the full profile in place, then back", () => {
+    const summary = useStudioStore.getState().rects.patient;
+    expect(useStudioStore.getState().patientFull).toBe(false);
+    useStudioStore.getState().setPatientFull(true);
+    const full = useStudioStore.getState().rects.patient;
+    expect(full.h).toBeGreaterThan(summary.h);
+    expect(full.x).toBe(summary.x);
+    useStudioStore.getState().setPatientFull(false);
+    expect(useStudioStore.getState().rects.patient).toEqual(summary);
+  });
+
+  it("keeps a window the user has moved where it is, only changing its height", () => {
+    useStudioStore.getState().moveWindow("patient", { x: 200, y: 120, w: 320, h: 300 });
+    useStudioStore.getState().setPatientFull(true);
+    const rect = useStudioStore.getState().rects.patient;
+    expect([rect.x, rect.y, rect.w]).toEqual([200, 120, 320]);
+    expect(rect.h).toBeGreaterThan(300);
+  });
+});

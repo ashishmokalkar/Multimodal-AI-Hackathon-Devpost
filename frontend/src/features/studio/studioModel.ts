@@ -218,6 +218,9 @@ export const ANCHORED_WINDOWS: readonly WindowId[] = ["patient", "risk", "driver
 const DOCK_SPACE = 80;
 /** Height kept free at the bottom right for the one-line heart model credit. */
 const WATERMARK_SPACE = 32;
+/** Height of the Patient window's summary (the full profile takes the column's height); narrow windows wrap more. */
+export const PATIENT_COMPACT_H = 320;
+const PATIENT_COMPACT_NARROW_H = 380;
 /** Extra height the Risk window takes while Why is closed, for its "Explain this prediction" button. */
 export const EXPLAIN_SPACE = 58;
 
@@ -234,7 +237,7 @@ function clamp(value: number, low: number, high: number): number {
 export function defaultLayout(
   viewportWidth: number,
   viewportHeight: number,
-  { whyOpen = true }: { whyOpen?: boolean } = {},
+  { whyOpen = true, patientFull = true }: { whyOpen?: boolean; patientFull?: boolean } = {},
 ): Record<WindowId, Rect> {
   const vw = Math.max(viewportWidth, 900);
   const vh = Math.max(viewportHeight, 560);
@@ -254,7 +257,10 @@ export function defaultLayout(
   const centreX = patientW + GAP + 20;
   const dockTop = vh - DOCK_SPACE;
   // tall enough for the patient's facts (symptoms, findings, history, measurements, angiogram) without scrolling
-  const patientH = clamp(dockTop - top - GAP, MIN_WINDOW_SIZE.patient.h, 720);
+  const patientFullH = clamp(dockTop - top - GAP, MIN_WINDOW_SIZE.patient.h, 720);
+  // the summary first; "Show full profile" grows the window to the full height
+  const compactH = patientW < 330 ? PATIENT_COMPACT_NARROW_H : PATIENT_COMPACT_H;
+  const patientH = patientFull ? patientFullH : Math.min(compactH, patientFullH);
   const patientY = Math.max(top, Math.round(top + (dockTop - top - patientH) / 2));
   return {
     // patient on the left, centred in the height between the top bar and the dock

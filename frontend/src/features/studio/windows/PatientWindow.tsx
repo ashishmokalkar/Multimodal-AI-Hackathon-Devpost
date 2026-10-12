@@ -10,7 +10,13 @@ import { UnitNumberInput } from "../../units/UnitNumberInput";
 import { UnitToggle } from "../../units/UnitToggle";
 import { FloatingWindow } from "../FloatingWindow";
 import { IconChevronLeft, IconChevronRight, IconClose, IconEdit, IconHeart, IconUser } from "../icons";
-import { checkAngiogram, summarisePatient, type Measurement } from "../patientSummary";
+import {
+  angiogramLine,
+  checkAngiogram,
+  complaintLine,
+  summarisePatient,
+  type Measurement,
+} from "../patientSummary";
 import { useStudioData } from "../studioData";
 import { pulseRate } from "../studioModel";
 import { useStudioStore } from "../studioStore";
@@ -205,7 +211,8 @@ function MeasurementRow({ item }: { item: Measurement }) {
 }
 
 /**
- * Who the patient is, in a clinician's reading order: what they came in with, what the tests found, their history,
+ * Who the patient is: first a short summary (complaint, abnormal results, angiogram), then on request the full profile
+ * in a clinician's reading order: what they came in with, what the tests found, their history,
  * the measurements outside the normal range, and what the angiogram really showed. Facts only: what the model makes
  * of them is the Why window's job.
  */
@@ -231,6 +238,9 @@ export function PatientWindow() {
     Object.entries(sample.features).some(([feature, value]) => values[feature] !== value);
   const truth = sample?.ground_truth ?? null;
   const check = truth && accepted && !edited ? checkAngiogram(truth, accepted) : null;
+  const full = useStudioStore((state) => state.patientFull);
+  const setFull = useStudioStore((state) => state.setPatientFull);
+  const angio = truth ? angiogramLine(truth, check) : null;
 
   const step = (by: number) => {
     if (!samples.length) {
@@ -305,6 +315,41 @@ export function PatientWindow() {
 
         {editingInline ? (
           <InputEditor onClose={closeEditor} />
+        ) : !full ? (
+          // the summary a clinician scans first: why they came in, what is abnormal, what the angiogram showed
+          <dl className="pt-summary">
+            <div>
+              <dt>Complaint</dt>
+              <dd>{complaintLine(summary)}</dd>
+            </div>
+            <div>
+              <dt>Abnormal</dt>
+              <dd>
+                {summary.outOfRange.length
+                  ? summary.outOfRange.map((item, i) => (
+                      <span className="pt-abnormal" key={item.feature}>
+                        {i > 0 && <span aria-hidden="true"> · </span>}
+                        {item.label} <b>{item.valueText.split(" ")[0]}</b>
+                        <em aria-label={item.status === "high" ? "above normal" : "below normal"}>
+                          {item.status === "high" ? "↑" : "↓"}
+                        </em>
+                      </span>
+                    ))
+                  : "None: all measured values in range"}
+              </dd>
+            </div>
+            {angio && (
+              <div>
+                <dt>Angiogram</dt>
+                <dd>
+                  {angio.text}
+                  {angio.score && (
+                    <span className={`pt-score${angio.allMatched ? " is-all" : ""}`}>{angio.score}</span>
+                  )}
+                </dd>
+              </div>
+            )}
+          </dl>
         ) : (
           <>
             <Section title="Presenting with">
@@ -372,14 +417,34 @@ export function PatientWindow() {
         )}
 
         <div className="patient-foot">
+          {!editingInline && (
+            <button
+              aria-expanded={full}
+              className="pt-more"
+              onClick={() => setFull(!full)}
+              type="button"
+            >
+              {full ? "Show less" : "Show full profile"}
+              <svg aria-hidden="true" fill="none" height="13" viewBox="0 0 14 14" width="13">
+                <path
+                  d={full ? "M7 12V2M2.5 6.5 7 2l4.5 4.5" : "M7 2v10M2.5 7.5 7 12l4.5-4.5"}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.8"
+                />
+              </svg>
+            </button>
+          )}
           <button
             aria-expanded={editing}
+            aria-label={editing ? "Close editor" : "Edit inputs"}
             className="btn-ghost"
             onClick={(event) => toggleEditor(event.currentTarget)}
             type="button"
           >
             <IconEdit size={13} />
-            {editing ? "Close editor" : "Edit inputs"}
+            {editing ? "Close editor" : "Edit"}
           </button>
         </div>
       </div>

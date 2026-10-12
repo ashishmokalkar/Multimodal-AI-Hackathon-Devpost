@@ -211,6 +211,27 @@ export function summarisePatient(
   };
 }
 
+// ------------------------------------------------------------------------------------------- summary lines
+/** What the patient came in with, as one sentence-case line: "Typical chest pain, short of breath". */
+export function complaintLine(summary: PatientSummary): string {
+  if (!summary.presenting.length) {
+    return "No symptoms recorded";
+  }
+  return summary.presenting
+    .map((item, index) => (index === 0 ? item : item.charAt(0).toLowerCase() + item.slice(1)))
+    .join(", ");
+}
+
+/** The out-of-range measurements as one line, values without units: "LDL 144↑ · Triglycerides 210↑". */
+export function abnormalLine(summary: PatientSummary): string {
+  if (!summary.outOfRange.length) {
+    return "None: all measured values in range";
+  }
+  return summary.outOfRange
+    .map((item) => `${item.label} ${item.valueText.split(" ")[0]}${item.status === "high" ? "↑" : "↓"}`)
+    .join(" · ");
+}
+
 // ------------------------------------------------------------------------------------------- angiogram
 export interface AngiogramCheck {
   target: InsightTarget;
@@ -236,4 +257,34 @@ export function checkAngiogram(
     return { target, narrowed, flagged, matched: narrowed === flagged };
   });
   return { items, matched: items.filter((item) => item.matched).length };
+}
+
+/**
+ * The angiogram on one line: which arteries were narrowed, and (when compared) how many targets the model got
+ * right, naming every miss so the summary never hides one: "LAD, LCX, RCA narrowed" + "✔ 4/4" or "3/4 · RCA missed".
+ */
+export function angiogramLine(
+  truth: GroundTruth,
+  check: { items: AngiogramCheck[]; matched: number } | null,
+): { text: string; score: string | null; allMatched: boolean } {
+  const narrowed = (["LAD", "LCX", "RCA"] as const).filter((artery) => truth.vessels[artery]);
+  const text = narrowed.length
+    ? `${narrowed.join(", ")} narrowed`
+    : truth.cad
+      ? "Disease, no single artery narrowed"
+      : "No artery narrowed";
+  if (!check) {
+    return { text, score: null, allMatched: false };
+  }
+  const misses = check.items
+    .filter((item) => !item.matched)
+    .map((item) => `${item.target === "cad" ? "CAD" : item.target} ${item.narrowed ? "missed" : "flagged"}`);
+  const allMatched = check.matched === check.items.length;
+  return {
+    text,
+    score: allMatched
+      ? `✔ ${check.matched}/${check.items.length}`
+      : `${check.matched}/${check.items.length} · ${misses.join(", ")}`,
+    allMatched,
+  };
 }

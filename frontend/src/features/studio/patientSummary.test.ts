@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { FeatureDefinition, PredictionResponse } from "../../api/types";
-import { checkAngiogram, summarisePatient } from "./patientSummary";
+import {
+  abnormalLine,
+  angiogramLine,
+  checkAngiogram,
+  complaintLine,
+  summarisePatient,
+} from "./patientSummary";
 
 const features: FeatureDefinition[] = [
   { name: "DM", label: "Diabetes", group: "Demographics", type: "boolean", default: false },
@@ -77,5 +83,43 @@ describe("angiogram check", () => {
       ["LCX", true, false],
       ["RCA", false, true],
     ]);
+  });
+});
+
+describe("patient summary lines", () => {
+  const summary = summarisePatient(
+    { "Chest Pain": "Typical", Dyspnea: true, BP: 110, TG: 210, LDL: 144, "EF-TTE": 50 },
+    features,
+  );
+
+  it("reads the complaint as one sentence", () => {
+    expect(complaintLine(summary)).toBe("Typical chest pain, short of breath");
+    expect(complaintLine(summarisePatient({ "Chest Pain": "None" }, features))).toBe("No symptoms recorded");
+  });
+
+  it("lists only the abnormal values, worst first, without units", () => {
+    expect(abnormalLine(summary)).toBe("LDL 144↑ · Triglycerides 210↑");
+    expect(abnormalLine(summarisePatient({ BP: 110 }, features))).toBe("None: all measured values in range");
+  });
+
+  it("names every miss on the angiogram line, so the summary never hides one", () => {
+    const truth = { cad: true, vessels: { LAD: true, LCX: true, RCA: false } };
+    const target = (probability: number) => ({ probability, threshold: 0.5, label: "", uncertain: false });
+    const prediction = {
+      cad: target(0.9),
+      vessels: { LAD: target(0.9), LCX: target(0.2), RCA: target(0.7) },
+    } as PredictionResponse;
+    const line = angiogramLine(truth, checkAngiogram(truth, prediction));
+    expect(line.text).toBe("LAD, LCX narrowed");
+    expect(line.score).toBe("2/4 · LCX missed, RCA flagged");
+    expect(line.allMatched).toBe(false);
+    const right = {
+      cad: target(0.9),
+      vessels: { LAD: target(0.9), LCX: target(0.8), RCA: target(0.1) },
+    } as PredictionResponse;
+    const all = angiogramLine(truth, checkAngiogram(truth, right));
+    expect(all.score).toBe("✔ 4/4");
+    // inputs edited: what the angiogram showed, without a score
+    expect(angiogramLine(truth, null)).toEqual({ text: "LAD, LCX narrowed", score: null, allMatched: false });
   });
 });
