@@ -23,7 +23,8 @@ local stub set `mock` to `true`.
 | --- | --- | --- |
 | `GET /health` | No request body. | `HealthResponse`, including the contract version. |
 | `GET /features` | No request body. | An array of `FeatureSchema` objects used to construct the patient form. |
-| `GET /patients/samples` | No request body. | An array of sample patients; `synthetic` identifies generated examples. |
+| `GET /patients/samples` | No request body. | The featured sample patients for the start screen; `synthetic` identifies generated examples. |
+| `GET /patients/dataset` | No request body. | Every patient the start screen can list (same shape as the samples); any of their ids is a valid `sample_id`. |
 | `POST /predict` | `PredictRequest` containing a `features` object. | `PredictionResponse` with CAD and per-vessel targets and signed contributions. |
 | `GET /model/metrics` | No request body. | `MetricsResponse` with validation metrics for CAD and each vessel. |
 

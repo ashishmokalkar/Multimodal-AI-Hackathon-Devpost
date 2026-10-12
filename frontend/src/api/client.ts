@@ -71,6 +71,18 @@ export async function fetchSamples(
   return validateSamplesForProfile(profile, samples, featureNames);
 }
 
+/** Every dataset patient, for the start screen's full list (the samples are the featured few). */
+export async function fetchDataset(
+  profile: ApiProfile,
+  featureNames?: readonly string[],
+): Promise<SamplePatient[]> {
+  const patients = await requestJson(
+    "/patients/dataset",
+    SamplePatientSchema.array(),
+  );
+  return validateSamplesForProfile(profile, patients, featureNames);
+}
+
 export function postPredict(
   request: PredictRequest,
   profile: ApiProfile,

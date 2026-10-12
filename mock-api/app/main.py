@@ -180,6 +180,12 @@ def get_samples() -> list[SamplePatient]:
     return load_samples()
 
 
+@app.get("/patients/dataset", response_model=list[SamplePatient])
+def get_dataset() -> list[SamplePatient]:
+    """The mock has no dataset: its full list is the same synthetic samples."""
+    return load_samples()
+
+
 @app.post(
     "/predict",
     response_model=PredictionResponse,

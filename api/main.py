@@ -37,6 +37,11 @@ MODEL_NAMES = {"phase3:ebm": "Explainable Boosting Machine (EBM)",
                "classical:xgboost": "XGBoost (gradient-boosted trees)",
                "ensemble:lr_stack": "Stacked ensemble of 8 models (logistic regression on their outputs)"}
 API_KEYS = {"cad": "cad", "lad": "LAD", "lcx": "LCX", "rca": "RCA"}
+# The start screen's four patients (dataset numbers), each a different story as scored by the cross-validation model
+# that never saw them: all three arteries narrowed and every target right (174); no chest pain at 36, the narrowed LAD
+# found from the echo and ECG (125); typical chest pain, smoking and family history but a clear angiogram, correctly
+# scored low (151); typical chest pain in a smoker with a clear angiogram, over-called (176), the model's known limit.
+FEATURED = (174, 125, 151, 176)
 
 app = FastAPI(title="CardioClarity API", version=CONTRACT_VERSION,
               description="Real-model clinical decision-support API. " + DISCLAIMER)
@@ -61,17 +66,17 @@ def state() -> dict:
         warnings.warn(f"The models were saved with Python {manifest['python']}; this is Python "
                       f"{platform.python_version()}. Use Python {saved} (see README) if loading or predictions fail.")
     df = load_clean()
-    samples = []
-    for row in manifest["demo_patients"]["rows"]:
-        r = df.iloc[row]
-        samples.append({"id": f"patient-{row + 1}",
-                        "label": f"Dataset patient {row + 1}: {int(r.age)}-year-old {'man' if r.sex_male else 'woman'}",
-                        "features": from_model_row(r),
-                        "ground_truth": {"cad": bool(r.cad), "vessels": {"LAD": bool(r.lad), "LCX": bool(r.lcx),
-                                                                         "RCA": bool(r.rca)}},
-                        "synthetic": False})
+    dataset = [{"id": f"patient-{row + 1}",
+                "label": f"Dataset patient {row + 1}: {int(r.age)}-year-old {'man' if r.sex_male else 'woman'}",
+                "features": from_model_row(r),
+                "ground_truth": {"cad": bool(r.cad), "vessels": {"LAD": bool(r.lad), "LCX": bool(r.lcx),
+                                                                 "RCA": bool(r.rca)}},
+                "synthetic": False}
+               for row, (_, r) in enumerate(df.iterrows())]
+    samples = [dataset[n - 1] for n in FEATURED]
     sub = pd.read_csv(ROOT / "reports" / "v2" / "s9" / "s9_subgroups.csv")
-    return {"models": load_models(), "manifest": manifest, "samples": samples, "sample_ids": {s["id"] for s in samples},
+    return {"models": load_models(), "manifest": manifest, "samples": samples, "dataset": dataset,
+            "sample_ids": {s["id"] for s in dataset},
             "ranges": training_ranges(),
             "auc_65": sub[sub.group == "age>=65"].set_index("target").auc.to_dict()}
 
@@ -97,7 +102,14 @@ def features():
 
 @app.get("/patients/samples", response_model=list[SamplePatient], response_model_exclude_none=True)
 def samples():
+    """The featured patients for the start screen (see FEATURED)."""
     return state()["samples"]
+
+
+@app.get("/patients/dataset", response_model=list[SamplePatient], response_model_exclude_none=True)
+def dataset_patients():
+    """Every dataset patient, in dataset order, each with the angiogram result; any of them can be sent as sample_id."""
+    return state()["dataset"]
 
 
 @app.post("/predict", response_model=PredictionResponse, response_model_exclude_none=True)

@@ -4,6 +4,7 @@ import { localiseFeatures } from "../lib/units";
 import { useUiStore } from "../store/uiStore";
 import {
   fetchCohort,
+  fetchDataset,
   fetchFeatures,
   fetchHealth,
   fetchImportance,
@@ -60,6 +61,19 @@ export function useSamples() {
     queryFn: () =>
       requireProfile(profile, (active) => fetchSamples(active, featureNames)),
     enabled: profile !== null && featureNames !== undefined,
+    staleTime: Infinity,
+  });
+}
+
+/** Every dataset patient: fetched only when `enabled` (the list is large), then kept for the session. */
+export function useDataset(enabled = true) {
+  const profile = useActiveProfile();
+  const featureNames = useFeatures().data?.map((feature) => feature.name);
+  return useQuery({
+    queryKey: ["api-profile-data", profile?.id, "dataset"],
+    queryFn: () =>
+      requireProfile(profile, (active) => fetchDataset(active, featureNames)),
+    enabled: enabled && profile !== null && featureNames !== undefined,
     staleTime: Infinity,
   });
 }

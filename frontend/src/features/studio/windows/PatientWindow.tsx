@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { useSamples } from "../../../api/hooks";
+import { useDataset, useSamples } from "../../../api/hooks";
 import type { FeatureDefinition, FeatureValue } from "../../../api/types";
 import { prettyUnit } from "../../../lib/insights";
 import { displayUnit } from "../../../lib/units";
@@ -217,10 +217,14 @@ function MeasurementRow({ item }: { item: Measurement }) {
  * of them is the Why window's job.
  */
 export function PatientWindow() {
-  const samples = useSamples().data ?? [];
+  const featured = useSamples().data ?? [];
   const { features, accepted } = useStudioData();
   const values = usePatientStore((state) => state.features);
   const sampleId = usePatientStore((state) => state.selectedSampleId);
+  // a patient opened from the full list is looked up there (fetched if needed), and stepping walks that list
+  const isFeatured = featured.some((sample) => sample.id === sampleId);
+  const dataset = useDataset(sampleId !== null && !isFeatured).data;
+  const samples = isFeatured || !dataset ? featured : dataset;
   const setFromSample = usePatientStore((state) => state.setFromSample);
   const compact = useCompact();
   const [editorRoot, setEditorRoot] = useState<HTMLElement | null>(null);
@@ -287,7 +291,7 @@ export function PatientWindow() {
               aria-label="Choose a patient"
               className="patient-select"
               onChange={(event) => {
-                const next = samples.find((item) => item.id === event.target.value);
+                const next = featured.find((item) => item.id === event.target.value);
                 if (next) {
                   setFromSample(next);
                 }
@@ -295,7 +299,8 @@ export function PatientWindow() {
               value={sampleId ?? ""}
             >
               {!sample && <option value="">Custom patient</option>}
-              {samples.map((item) => (
+              {sample && !isFeatured && <option value={sample.id}>{name}</option>}
+              {featured.map((item) => (
                 <option key={item.id} value={item.id}>
                   {splitLabel(item.label)[0]}
                 </option>

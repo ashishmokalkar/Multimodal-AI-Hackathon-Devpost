@@ -1,5 +1,6 @@
 import pytest
 
+from api.main import FEATURED
 from ml.export import MODELS
 
 pytestmark = pytest.mark.skipif(not (MODELS / "rca.joblib").exists(), reason="run python -m ml.export first")
@@ -24,10 +25,15 @@ def test_health_features_and_samples(client):
     bbb = next(f for f in feats if f["name"] == "BBB")
     assert bbb["type"] == "categorical" and bbb["options"] == ["None", "LBBB", "RBBB"]
     samples = client.get("/patients/samples").json()
-    assert len(samples) == 8 and not any(s["synthetic"] for s in samples)
-    patterns = {(s["ground_truth"]["vessels"]["LAD"], s["ground_truth"]["vessels"]["LCX"],
-                 s["ground_truth"]["vessels"]["RCA"]) for s in samples}
-    assert len(patterns) == 8                                                                  # every vessel pattern once
+    assert [s["id"] for s in samples] == [f"patient-{n}" for n in FEATURED]
+    assert not any(s["synthetic"] for s in samples)
+    dataset = client.get("/patients/dataset").json()
+    assert [s["id"] for s in dataset] == [f"patient-{n}" for n in range(1, 304)]
+    assert all(s in dataset for s in samples)                                                  # featured = dataset rows
+    assert sum(s["ground_truth"]["cad"] for s in dataset) > 0 and not any(s["synthetic"] for s in dataset)
+    # any dataset patient can be sent as sample_id
+    last = dataset[-1]
+    assert client.post("/predict", json={"features": last["features"], "sample_id": last["id"]}).status_code == 200
 
 
 def test_predict_is_consistent_additive_and_uses_holdout_models_for_dataset_patients(client):
