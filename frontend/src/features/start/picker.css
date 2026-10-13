@@ -651,11 +651,18 @@
   font-weight: 750;
   letter-spacing: -0.01em;
 }
+/* the search box opens the left door; the add door's title sits on the same row, so the cards and the add box start level */
 .pk-door-open .pk-tools {
-  margin: 14px 0 18px;
+  margin: 0 0 18px;
 }
 .pk-door-open .pk-search {
   max-width: none;
+  height: 46px;
+}
+.pk-door-add .pk-door-title {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
 }
 .pk-door-open .pk-grid {
   margin: 0;
@@ -673,11 +680,10 @@
   --pk-hero-a: #f472b6;
   --pk-hero-b: #8b5cf6;
 }
-/* level with the search box opposite (same gap under the title) */
 .pk-add-box {
   display: grid;
   gap: 12px;
-  margin-top: 14px;
+  margin-top: 18px;
   padding: 16px;
   border: 1px solid var(--pk-line);
   border-radius: 22px;
@@ -867,10 +873,10 @@
     margin-top: 20px;
   }
   .pk-door-open .pk-tools {
-    margin: 10px 0 14px;
+    margin: 0 0 14px;
   }
   .pk-add-box {
-    margin-top: 10px;
+    margin-top: 14px;
   }
   .pk-door-open .pk-grid {
     gap: 14px;

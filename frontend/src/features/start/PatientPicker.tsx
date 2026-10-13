@@ -37,8 +37,13 @@ function splitLabel(label: string): [string, string] {
   return [head.replace("Dataset patient", "Patient").trim(), (tail ?? "").trim()];
 }
 
-function chestPain(value: FeatureValue | undefined): string {
-  return value === "None" || value === undefined ? "No chest pain" : `${String(value)} chest pain`;
+/** The presenting symptom. Breathlessness without chest pain is named, since it can be how heart disease shows. */
+function symptomOf(features: SamplePatient["features"]): string {
+  const pain = features["Chest Pain"];
+  if (pain !== "None" && pain !== undefined) {
+    return `${String(pain)} chest pain`;
+  }
+  return features.Dyspnea === true ? "Breathless, no chest pain" : "No chest pain";
 }
 
 interface MetricReading {
@@ -105,7 +110,7 @@ function PatientCard({
             Open →
           </span>
         </span>
-        <span className="pk-symptom">{chestPain(sample.features["Chest Pain"])}</span>
+        <span className="pk-symptom">{symptomOf(sample.features)}</span>
         <span className="pk-chips">
           {conditions.length ? (
             conditions.map((condition) => (
@@ -169,7 +174,7 @@ function PatientRow({
           <strong>{name}</strong>
           <span>{who}</span>
         </span>
-        <span className="pk-row-pain">{chestPain(sample.features["Chest Pain"])}</span>
+        <span className="pk-row-pain">{symptomOf(sample.features)}</span>
         <span className={`pk-row-history${conditions.length ? "" : " is-none"}`}>
           {conditions.length ? conditions.map((condition) => condition.label).join(" · ") : "No listed conditions"}
         </span>
@@ -225,7 +230,7 @@ export function PatientPicker() {
     }
     const haystack = [
       sample.label,
-      chestPain(sample.features["Chest Pain"]),
+      symptomOf(sample.features),
       ...conditionsOf(sample).map((c) => c.label),
     ]
       .join(" ")
@@ -235,7 +240,7 @@ export function PatientPicker() {
 
   const footnote = samples.some((sample) => !sample.synthetic) && (
     <p className="pk-foot">
-      Patients from the study dataset, shown for demonstration. Each is scored by a model that never saw them.
+      Every study patient is scored by a model that never saw them.
     </p>
   );
 
@@ -303,10 +308,7 @@ export function PatientPicker() {
         ) : (
           <>
             <div className={`pk-doors${showAll ? " is-list" : ""}`}>
-              <section aria-labelledby="pk-open-title" className="pk-door pk-door-open">
-                <h2 className="pk-door-title" id="pk-open-title">
-                  {showAll ? "All patients" : "Open a patient"}
-                </h2>
+              <section aria-label={showAll ? "All patients" : "Study patients"} className="pk-door pk-door-open">
                 {/* one search box for both views (it stays mounted, so typing carries on): typing on the featured view
                     opens the full list with the matches */}
                 <div className="pk-tools">
