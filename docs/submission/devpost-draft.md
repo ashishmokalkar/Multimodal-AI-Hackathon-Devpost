@@ -85,7 +85,7 @@ CatBoost, XGBoost, EBM, and the Z-Alizadeh Sani extension dataset.
 - Frozen application source: [`39ffab1`](https://github.com/ashishmokalkar/Multimodal-AI-Hackathon-Devpost/tree/39ffab1c8adecd707c0f40ce826c12a568c41267)
 - Dataset: [UCI Machine Learning Repository #411](https://archive.ics.uci.edu/dataset/411/extension+of+z-alizadeh+sani+dataset), credited under CC BY 4.0 in the repository.
 - Heart mesh: *Realistic Human Heart* by neshallads, [Sketchfab](https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089), CC BY 4.0. Vessel overlays are project-authored schematics.
-- Project document: [corrected review PDF](project-document.pdf), also linked from the [GitHub review package](README.md); final acceptance and judge-accessible link remain pending.
+- Project document: [six-page PDF](CardioClarity-Project-Document.pdf), also linked from the [GitHub review package](README.md).
 - Demo video: [4:21 captioned review rough cut](demo-review.mp4), copied unchanged from the S5 session artifacts for colleague review. This private-repository copy is not a YouTube upload; full human review and the final public video link remain pending.
 
 ## Draft-review dependencies
