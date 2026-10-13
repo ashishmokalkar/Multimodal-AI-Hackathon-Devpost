@@ -21,6 +21,9 @@ import { RiskWindow } from "./windows/RiskWindow";
 import { WhatIfWindow } from "./windows/WhatIfWindow";
 import "./studio.css";
 
+/** The window dock (bottom left) is hidden for now: the windows stay reachable from Ctrl+K and the Risk window. */
+const SHOW_DOCK = false;
+
 /**
  * Studio: the heart fills the screen and every result floats over it in a glass window that can be moved, resized,
  * hidden to the dock or found with the command bar.
@@ -105,7 +108,7 @@ export function StudioApp() {
           Arrow keys move the window; Shift and arrow keys resize it.
         </p>
       </main>
-      <Dock />
+      {SHOW_DOCK && <Dock />}
       <Watermark />
       <Toasts />
       <TourOverlay />
