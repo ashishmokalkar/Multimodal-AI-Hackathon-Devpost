@@ -1,11 +1,27 @@
 import { create } from "zustand";
 
+export type SpeechLanguage = "en" | "hi";
+
 interface SpeechState {
   /** Sentence being spoken, or -1 when silent. */
   index: number;
   sentences: string[];
+  language: SpeechLanguage;
+  setLanguage: (language: SpeechLanguage) => void;
   speak: (sentences: string[]) => void;
+  /** Plays a recorded clip of these sentences, captioning each in turn (timed by its share of the text). */
+  playClip: (url: string, sentences: string[]) => void;
   stop: () => void;
+}
+
+const LANGUAGE_KEY = "cardioclarity-listen-language";
+
+function storedLanguage(): SpeechLanguage {
+  try {
+    return window.localStorage.getItem(LANGUAGE_KEY) === "hi" ? "hi" : "en";
+  } catch {
+    return "en";
+  }
 }
 
 export function speechSupported(): boolean {
@@ -30,6 +46,7 @@ function pickVoice(): SpeechSynthesisVoice | null {
 
 /** Each run gets a token so callbacks from a cancelled run are ignored. */
 let run = 0;
+let audio: HTMLAudioElement | null = null;
 
 /**
  * Reads a summary aloud with the browser's speech engine, one sentence per utterance (long utterances get cut off
@@ -38,6 +55,46 @@ let run = 0;
 export const useSpeechStore = create<SpeechState>((set, get) => ({
   index: -1,
   sentences: [],
+  language: storedLanguage(),
+  setLanguage: (language) => {
+    get().stop();
+    try {
+      window.localStorage.setItem(LANGUAGE_KEY, language);
+    } catch {
+      // the choice still applies for this visit
+    }
+    set({ language });
+  },
+  playClip: (url, sentences) => {
+    get().stop();
+    const token = ++run;
+    const clip = new Audio(url);
+    audio = clip;
+    // where each sentence ends, as a share of the whole text
+    const total = sentences.reduce((sum, sentence) => sum + sentence.length, 0) || 1;
+    let running = 0;
+    const ends = sentences.map((sentence) => (running += sentence.length) / total);
+    const finish = () => {
+      if (token === run) {
+        audio = null;
+        set({ index: -1 });
+      }
+    };
+    clip.ontimeupdate = () => {
+      if (token !== run || !clip.duration) {
+        return;
+      }
+      const at = clip.currentTime / clip.duration;
+      const index = Math.max(0, ends.findIndex((end) => at < end));
+      if (index !== get().index) {
+        set({ index });
+      }
+    };
+    clip.onended = finish;
+    clip.onerror = finish;
+    set({ sentences, index: 0 });
+    void clip.play().catch(finish);
+  },
   speak: (sentences) => {
     if (!speechSupported() || !sentences.length) {
       return;
@@ -77,6 +134,8 @@ export const useSpeechStore = create<SpeechState>((set, get) => ({
     if (speechSupported()) {
       window.speechSynthesis.cancel();
     }
+    audio?.pause();
+    audio = null;
     if (get().index !== -1) {
       set({ index: -1 });
     }

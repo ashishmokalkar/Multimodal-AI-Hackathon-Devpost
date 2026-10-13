@@ -18,6 +18,7 @@ import {
 } from "../../lib/insights";
 import { ARTERY_PLAIN, plainFinding, plainName, plainWarnings } from "../../lib/plainLanguage";
 import { spokenSummary } from "../../lib/spokenSummary";
+import { spokenSummaryHindi } from "../../lib/spokenSummaryHindi";
 import { buildDrivers, type DriverSummary } from "../../lib/summary";
 import { UNIT_SYSTEM_LABEL } from "../../lib/units";
 import { usePatientStore } from "../../store/patientStore";
@@ -574,6 +575,7 @@ export function PatientReport() {
           <SpeakButton
             captions={false}
             className="rp-speak"
+            hindi={() => spokenSummaryHindi(data.prediction, data.features, data.inputs)}
             resultKey={data.prediction.request_id}
             sentences={() => spokenSummary(data.prediction, data.features, data.inputs)}
           />

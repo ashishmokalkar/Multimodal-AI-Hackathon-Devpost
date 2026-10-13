@@ -1,5 +1,6 @@
 import { useFeatures } from "../../api/hooks";
 import { spokenSummary } from "../../lib/spokenSummary";
+import { spokenSummaryHindi } from "../../lib/spokenSummaryHindi";
 import { usePatientStore } from "../../store/patientStore";
 import { useActiveScenario, useWhatIfStore } from "../../store/whatIfStore";
 
@@ -15,5 +16,6 @@ export function useSpokenResult() {
   return {
     resultKey: shown?.request_id ?? null,
     sentences: () => (shown ? spokenSummary(shown, features, inputs) : []),
+    hindi: () => (shown ? spokenSummaryHindi(shown, features, inputs) : []),
   };
 }

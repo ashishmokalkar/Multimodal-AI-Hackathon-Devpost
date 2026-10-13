@@ -221,6 +221,7 @@ export function TopBar() {
         </button>
         <SpeakButton
           className="topbar-speak"
+          hindi={spoken.hindi}
           resultKey={spoken.resultKey}
           sentences={spoken.sentences}
         />

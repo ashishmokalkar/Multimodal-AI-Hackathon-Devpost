@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { Explanation, FeatureDefinition, PredictionResponse } from "../api/types";
+import { HINDI_CLIPS } from "../features/speech/hindiClips";
 import { speakable, spokenSummary } from "./spokenSummary";
+import { clipKey, spokenSummaryHindi } from "./spokenSummaryHindi";
 
 const features: FeatureDefinition[] = [
   { name: "Age", label: "Age", group: "Demographics", type: "number", unit: "years", default: 58 },
@@ -51,6 +53,7 @@ describe("spoken summary", () => {
   it("summarises the result, the arteries, the main factors and what to do next", () => {
     const lines = spokenSummary(prediction("not elevated"), features, {});
     expect(lines).toEqual([
+      "Hi.",
       "This 66-year-old patient has a 67 percent chance of significant coronary artery disease.",
       "That is below the alert level of 69 percent.",
       "No artery is flagged, although the left anterior descending artery is fairly high at 67 percent.",
@@ -66,9 +69,35 @@ describe("spoken summary", () => {
       feature.name === "LDL" ? { ...feature, reference_range: { high: 100 } } : feature,
     );
     const lines = spokenSummary(prediction("elevated"), withRange, { Sex: "Male" });
-    expect(lines[0]).toBe("This patient, a 66-year-old man, has a 67 percent chance of significant coronary artery disease.");
+    expect(lines[1]).toBe("This patient, a 66-year-old man, has a 67 percent chance of significant coronary artery disease.");
     expect(lines).toContain("The artery most likely to be narrowed is the left anterior descending artery at 67 percent.");
     expect(lines).toContain("High readings: LDL cholesterol 160.");
     expect(lines).toContain("Further tests, such as an angiogram, may be worth discussing with a cardiologist.");
+  });
+});
+
+describe("Hindi spoken summary", () => {
+  it("greets in Hindi and keeps the medical terms in English", () => {
+    const lines = spokenSummaryHindi(prediction("elevated"), features, { Sex: "Female" });
+    expect(lines[0]).toBe("नमस्ते।");
+    expect(lines[1]).toBe("66 साल की इस महिला मरीज़ में significant coronary artery disease की संभावना 67 प्रतिशत है।");
+    expect(lines).toContain("सबसे ज़्यादा narrowing की संभावना left anterior descending artery में है, 67 प्रतिशत।");
+    expect(lines.join(" ")).toContain("LDL cholesterol 160 milligrams per decilitre");
+    expect(lines[lines.length - 1]).toBe("यह सिर्फ़ decision support है, diagnosis नहीं।");
+  });
+
+  it("keys a clip to its exact text", () => {
+    const lines = spokenSummaryHindi(prediction("elevated"), features, {});
+    expect(clipKey(lines)).toMatch(/^[0-9a-f]{8}$/);
+    expect(clipKey(lines)).toBe(clipKey([...lines]));
+    expect(clipKey([...lines, "x"])).not.toBe(clipKey(lines));
+  });
+
+  it("has an audio file for every recorded clip", () => {
+    const files = Object.keys(import.meta.glob("../../public/audio/hi/*.mp3"));
+    expect(HINDI_CLIPS).toHaveLength(4);
+    for (const key of HINDI_CLIPS) {
+      expect(files).toContain(`../../public/audio/hi/${key}.mp3`);
+    }
   });
 });

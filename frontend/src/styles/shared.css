@@ -115,6 +115,29 @@
   font-weight: 650;
   cursor: pointer;
 }
+/* EN / हिं switch beside Listen */
+.speak-lang {
+  display: inline-flex;
+  margin-right: 6px;
+  padding: 2px;
+  border: 1px solid var(--sh-line);
+  border-radius: 999px;
+}
+.speak-lang button {
+  min-width: 30px;
+  padding: 3px 7px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sh-muted);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.speak-lang button[aria-pressed="true"] {
+  background: var(--sh-accent);
+  color: var(--sh-on-accent, #fff);
+}
 .speak-btn:hover {
   background: var(--sh-soft);
 }
