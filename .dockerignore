@@ -10,8 +10,6 @@
 .venv
 **/.env*
 docs
-mock-api
-handover_docs
 assets
 tests
 scripts

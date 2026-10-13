@@ -1,8 +1,7 @@
 # CardioClarity API (real models, contract v1.1.0)
 
-This FastAPI service serves the exported per-label models in `models/` through the five endpoints of the
-frontend contract (`docs/api-contract.md` on the `frontend` branch).
-- **Backwards compatibility:** it is a drop-in replacement for `mock-api/`. Every response parses with the frontend's current zod schemas in `frontend/src/api/types.ts`.
+This FastAPI service serves the exported per-label models in `models/` to the frontend.
+- **One contract:** every response parses with the frontend's zod schemas in `frontend/src/api/types.ts`.
 - **Contract version:** this API reports `1.1.0`, which is v1.0.0 plus the changes listed below.
 
 ## Run
