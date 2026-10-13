@@ -24,3 +24,5 @@ reports/figures
 reports/phase*
 reports/tabpfn
 reports/autogluon
+# Office lock files (a spreadsheet open in Excel) cannot be read and are never needed
+**/~$*
