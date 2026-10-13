@@ -259,11 +259,6 @@
   flex: 1;
   min-height: 0;
 }
-.rp-grid-artery {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 4mm;
-}
 .rp-stack {
   display: flex;
   flex-direction: column;
@@ -329,23 +324,6 @@
   color: var(--rp-brand);
 }
 
-.rp-people-block {
-  display: flex;
-  align-items: center;
-  gap: 4mm;
-  margin-top: 3mm;
-  padding-top: 3mm;
-  border-top: 1px dashed var(--rp-line);
-}
-.rp-people {
-  width: 52%;
-  flex: none;
-}
-.rp-people-block p {
-  margin: 0;
-  font-size: 9.5pt;
-}
-
 .rp-card-heart {
   display: flex;
   flex-direction: column;
@@ -395,59 +373,6 @@
   font-size: 8pt;
 }
 
-.rp-drivers {
-  display: grid;
-  gap: 1.8mm;
-  margin: 2mm 0 0;
-  padding: 0;
-  list-style: none;
-}
-.rp-drivers li {
-  display: grid;
-  grid-template-columns: 1.7fr 1fr 12mm;
-  align-items: center;
-  gap: 2mm;
-  font-size: 8.8pt;
-}
-.rp-driver-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.rp-driver-track {
-  position: relative;
-  height: 3mm;
-  border-radius: 2mm;
-  background: linear-gradient(90deg, transparent calc(50% - 0.5px), #c4ced6 calc(50% - 0.5px), #c4ced6 calc(50% + 0.5px), transparent calc(50% + 0.5px)), var(--rp-soft);
-}
-.rp-driver-track i {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  border-radius: 2mm;
-}
-.rp-driver-points {
-  text-align: right;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.rp-compare-head {
-  display: flex;
-  align-items: center;
-  gap: 3mm;
-}
-.rp-compare-head b {
-  font-size: 22pt;
-  font-weight: 750;
-  line-height: 1;
-  color: var(--rp-accent);
-  letter-spacing: -0.02em;
-}
-.rp-compare-head span {
-  font-size: 9pt;
-}
-
 .rp-artery-head {
   display: flex;
   align-items: center;
@@ -480,26 +405,6 @@
   color: var(--rp-muted);
 }
 
-.rp-facts {
-  display: grid;
-  gap: 2mm;
-  margin: 3mm 0 0;
-  padding: 0;
-  list-style: none;
-  font-size: 9pt;
-}
-.rp-facts li {
-  padding: 2mm 3mm;
-  border-radius: 2mm;
-  background: var(--rp-soft);
-}
-.rp-facts b {
-  display: block;
-  font-size: 7.5pt;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--rp-muted);
-}
 .rp-note {
   margin-top: 3mm;
   padding: 2.5mm 3mm;
@@ -567,19 +472,6 @@
   margin: 0;
   font-size: 9pt;
 }
-.rp-glossary {
-  display: grid;
-  gap: 1.6mm;
-  margin: 0;
-  font-size: 8.6pt;
-}
-.rp-glossary dt {
-  font-weight: 700;
-}
-.rp-glossary dd {
-  margin: 0;
-  color: var(--rp-muted);
-}
 .rp-about p {
   margin: 0;
   font-size: 8.8pt;
@@ -594,15 +486,6 @@
   flex: none;
 }
 
-/* the shared comparison visuals, in print colours */
-.report-root .cc-track {
-  margin: 2.5mm 0 1mm;
-}
-.report-root .cc-nomogram {
-  width: 100%;
-  height: auto;
-  margin-top: 1mm;
-}
 
 /* ------------------------------------------------------------------------------------------- print */
 @media print {
@@ -645,49 +528,90 @@
   }
 }
 
-/* what pushes the chance up or down, in words */
-.rp-factor-cols {
-  display: grid;
-  gap: 3mm;
-}
-.rp-factors-title {
-  margin: 0 0 1.2mm;
-  font-size: 8.5pt;
-  font-weight: 700;
-}
-.rp-factors ul {
-  display: grid;
-  gap: 1.4mm;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.rp-factors li {
-  display: grid;
-  grid-template-columns: 1fr 26mm;
-  align-items: center;
-  gap: 3mm;
-  font-size: 9pt;
-  line-height: 1.3;
-}
-.rp-effect {
-  display: grid;
-  gap: 0.6mm;
-}
-.rp-effect i {
-  display: block;
-  height: 2mm;
-  border-radius: 2mm;
-}
-.rp-effect em {
-  color: var(--rp-muted);
-  font-size: 7.5pt;
-  font-style: normal;
-}
 .rp-gauge-ticklabel {
   font-size: 10px;
   font-weight: 600;
 }
 .rp-table tbody th {
   width: 40%;
+}
+
+/* the summary page has room for a larger heart and result */
+.rp-grid-hero .rp-snapshot {
+  height: 104mm;
+}
+.rp-card-main .rp-headline {
+  flex-direction: column;
+  gap: 2mm;
+  margin-top: 4mm;
+  text-align: center;
+}
+.rp-card-main .rp-lead {
+  font-size: 13pt;
+}
+.rp-pill {
+  white-space: nowrap;
+}
+
+/* the main reasons: what raises and what lowers the chance, as two short lists */
+.rp-reasons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+}
+.rp-reason-title {
+  margin: 0 0 1.5mm;
+  font-size: 8.5pt;
+  font-weight: 700;
+}
+.rp-reason-list ul {
+  display: grid;
+  gap: 1.2mm;
+  margin: 0;
+  padding-left: 4.5mm;
+  font-size: 9.5pt;
+  line-height: 1.35;
+}
+
+/* the arteries page: one row per artery, its picture beside its chance */
+.rp-artery-rows {
+  display: grid;
+  gap: 4mm;
+}
+.rp-artery-row {
+  display: grid;
+  grid-template-columns: 52mm 1fr;
+  align-items: center;
+  gap: 5mm;
+}
+.rp-artery-row .rp-snapshot {
+  height: 56mm;
+  border-radius: 2.5mm;
+  background: radial-gradient(circle at 50% 42%, #f3f8fb, #e4edf2 75%);
+}
+.rp-artery-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 2mm;
+  margin: 0 0 1mm;
+  font-size: 13pt;
+}
+.rp-artery-name i {
+  width: 3mm;
+  height: 3mm;
+  border-radius: 50%;
+}
+.rp-artery-name span {
+  flex-basis: 100%;
+  color: var(--rp-muted);
+  font-size: 8.5pt;
+  font-weight: 400;
+}
+.rp-artery-row .rp-lead {
+  margin: 1.5mm 0 1mm;
+  font-size: 10.5pt;
+}
+.rp-artery-row .rp-muted {
+  font-size: 9pt;
 }

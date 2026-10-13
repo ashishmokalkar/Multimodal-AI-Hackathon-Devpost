@@ -48,22 +48,27 @@ describe("spoken summary", () => {
     );
   });
 
-  it("explains a held-back artery and the uncertainty, and ends with the disclaimer", () => {
-    const lines = spokenSummary(prediction("not elevated"), features);
-    expect(lines[0]).toBe(
-      "The estimated chance of significant coronary artery disease is 67 percent.",
-    );
-    expect(lines[1]).toContain("below the 69 percent decision threshold");
-    expect(lines[2]).toContain("left anterior descending artery is above its own threshold");
-    expect(lines[3]).toContain("not confident about the left circumflex artery");
-    expect(lines.join(" ")).toContain("160 milligrams per decilitre");
-    expect(lines[lines.length - 1]).toContain("not a diagnosis");
+  it("summarises the result, the arteries, the main factors and what to do next", () => {
+    const lines = spokenSummary(prediction("not elevated"), features, {});
+    expect(lines).toEqual([
+      "This 66-year-old patient has a 67 percent chance of significant coronary artery disease.",
+      "That is below the alert level of 69 percent.",
+      "No artery is flagged, although the left anterior descending artery is fairly high at 67 percent.",
+      "The model is unsure about the left circumflex artery.",
+      "The two main factors raising the risk are age 66 and LDL cholesterol of 160 milligrams per decilitre.",
+      "A doctor will weigh this with the symptoms and any other tests.",
+      "This is decision support, not a diagnosis.",
+    ]);
   });
 
-  it("names flagged arteries", () => {
-    const lines = spokenSummary(prediction("elevated"), features);
-    expect(lines[2]).toBe(
-      "Arteries flagged: the left anterior descending artery at 67 percent.",
+  it("names the flagged arteries, the readings out of range and suggests next steps", () => {
+    const withRange = features.map((feature) =>
+      feature.name === "LDL" ? { ...feature, reference_range: { high: 100 } } : feature,
     );
+    const lines = spokenSummary(prediction("elevated"), withRange, { Sex: "Male" });
+    expect(lines[0]).toBe("This patient, a 66-year-old man, has a 67 percent chance of significant coronary artery disease.");
+    expect(lines).toContain("The artery most likely to be narrowed is the left anterior descending artery at 67 percent.");
+    expect(lines).toContain("High readings: LDL cholesterol 160.");
+    expect(lines).toContain("Further tests, such as an angiogram, may be worth discussing with a cardiologist.");
   });
 });

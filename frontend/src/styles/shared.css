@@ -273,9 +273,6 @@
   border-radius: 4px;
   box-shadow: 0 0 0 2px var(--sh-on-accent, #fff);
 }
-.report-root .cc-track-marker {
-  box-shadow: 0 0 0 2px #fff;
-}
 .cc-track-scale {
   display: flex;
   justify-content: space-between;

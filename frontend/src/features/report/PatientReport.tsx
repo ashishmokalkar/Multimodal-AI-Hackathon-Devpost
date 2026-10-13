@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { useCohort, useFeatures } from "../../api/hooks";
+import { useFeatures } from "../../api/hooks";
 import type {
   FeatureDefinition,
   FeatureValue,
   PredictionResponse,
   Target,
 } from "../../api/types";
-import { percentileWord, type CohortComparison } from "../../lib/cohort";
 import { targetColor } from "../../lib/colorScale";
 import { isFlagged, isHeldBack } from "../../lib/flags";
 import {
@@ -17,21 +16,13 @@ import {
   RAISE_COLOR,
   rangeStatus,
 } from "../../lib/insights";
-import {
-  ARTERY_PLAIN,
-  effectWord,
-  plainFinding,
-  plainName,
-  plainWarnings,
-} from "../../lib/plainLanguage";
+import { ARTERY_PLAIN, plainFinding, plainName, plainWarnings } from "../../lib/plainLanguage";
 import { spokenSummary } from "../../lib/spokenSummary";
-import { buildDrivers, type Driver, type DriverSummary } from "../../lib/summary";
+import { buildDrivers, type DriverSummary } from "../../lib/summary";
 import { UNIT_SYSTEM_LABEL } from "../../lib/units";
 import { usePatientStore } from "../../store/patientStore";
 import { useUiStore } from "../../store/uiStore";
 import { useActiveScenario, useWhatIfStore } from "../../store/whatIfStore";
-import { PercentileTrack } from "../cohort/CohortCompare";
-import { comparisonFor } from "../cohort/useCohortComparison";
 import { DISCLAIMER_LINE } from "../safety/disclaimer";
 import { SpeakButton } from "../speech/SpeakButton";
 import { HeartSnapshot } from "./HeartSnapshot";
@@ -54,10 +45,6 @@ const QUESTIONS = [
 
 function pct(probability: number): string {
   return `${Math.round(probability * 100)}%`;
-}
-
-function inHundred(probability: number): number {
-  return Math.round(probability * 100);
 }
 
 // ------------------------------------------------------------------------------------------- visuals
@@ -84,7 +71,7 @@ function Gauge({
   const [lx, ly] = tick(r + 27);
   return (
     <svg
-      aria-label={`About ${inHundred(target.probability)} in 100 chance; alert level ${pct(target.threshold)}`}
+      aria-label={`${pct(target.probability)} chance; alert level ${pct(target.threshold)}`}
       className="rp-gauge"
       height={size}
       role="img"
@@ -115,7 +102,7 @@ function Gauge({
         alert
       </text>
       <text className="rp-gauge-value" textAnchor="middle" x="100" y="108">
-        {inHundred(target.probability)}
+        {Math.round(target.probability * 100)}
         <tspan className="rp-gauge-unit">%</tspan>
       </text>
       <text className="rp-gauge-caption" textAnchor="middle" x="100" y="132">
@@ -125,53 +112,16 @@ function Gauge({
   );
 }
 
-const PERSON =
-  "M12 4.2a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2Zm-4.2 16v-5.4c0-2.5 1.8-4.2 4.2-4.2s4.2 1.7 4.2 4.2v5.4Z";
-
-function IconArray({ count, color }: { count: number; color: string }) {
+function ReasonList({ title, items, raise }: { title: string; items: string[]; raise: boolean }) {
   return (
-    <svg aria-label={`${count} of 100 people highlighted`} className="rp-people" role="img" viewBox="0 0 240 75">
-      {Array.from({ length: 100 }, (_, index) => {
-        const row = Math.floor(index / 20);
-        const col = index % 20;
-        return (
-          <path
-            d={PERSON}
-            fill={index < count ? color : "#d7dee5"}
-            key={index}
-            transform={`translate(${col * 12} ${row * 15}) scale(0.5)`}
-          />
-        );
-      })}
-    </svg>
-  );
-}
-
-function FactorList({
-  title,
-  drivers,
-  raise,
-}: {
-  title: string;
-  drivers: PlainDriver[];
-  raise: boolean;
-}) {
-  const color = raise ? RAISE_COLOR : LOWER_COLOR;
-  return (
-    <div className="rp-factors">
-      <p className="rp-factors-title" style={{ color }}>
+    <div className="rp-reason-list">
+      <p className="rp-reason-title" style={{ color: raise ? RAISE_COLOR : LOWER_COLOR }}>
         <span aria-hidden="true">{raise ? "▲" : "▼"}</span> {title}
       </p>
-      {drivers.length ? (
+      {items.length ? (
         <ul>
-          {drivers.map((driver) => (
-            <li key={driver.feature}>
-              <span>{driver.finding}</span>
-              <span className="rp-effect">
-                <i aria-hidden="true" style={{ background: color, width: `${Math.min(100, 20 + Math.abs(driver.points) * 2.4)}%` }} />
-                <em>{effectWord(driver.points)}</em>
-              </span>
-            </li>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
           ))}
         </ul>
       ) : (
@@ -181,33 +131,29 @@ function FactorList({
   );
 }
 
-type PlainDriver = Driver & { finding: string };
-
-/** The findings that raise and lower a result, worded for a patient. */
-function Factors({
+/** The findings that raise and lower the result, in everyday words (several ECG items read the same, so once). */
+function Reasons({
   summary,
   features,
   inputs,
-  raising = 4,
-  lowering = 3,
 }: {
   summary: DriverSummary;
   features: FeatureDefinition[];
   inputs: Readonly<Record<string, FeatureValue>>;
-  raising?: number;
-  lowering?: number;
 }) {
   const definitions = new Map(features.map((feature) => [feature.name, feature]));
-  const plain = (driver: Driver): PlainDriver => ({
-    ...driver,
-    finding: plainFinding(driver.feature, inputs[driver.feature] ?? "", definitions.get(driver.feature)),
-  });
-  const up = summary.drivers.filter((driver) => driver.points > 0).slice(0, raising).map(plain);
-  const down = summary.drivers.filter((driver) => driver.points < 0).slice(0, lowering).map(plain);
+  const findings = (keep: (points: number) => boolean, limit: number) =>
+    [
+      ...new Set(
+        summary.drivers
+          .filter((driver) => keep(driver.points))
+          .map((driver) => plainFinding(driver.feature, inputs[driver.feature] ?? "", definitions.get(driver.feature))),
+      ),
+    ].slice(0, limit);
   return (
-    <div className="rp-factor-cols">
-      <FactorList drivers={up} raise title="Pushing your chance up" />
-      <FactorList drivers={down} raise={false} title="Pulling your chance down" />
+    <div className="rp-reasons">
+      <ReasonList items={findings((points) => points > 0, 4)} raise title="Raising your chance" />
+      <ReasonList items={findings((points) => points < 0, 3)} raise={false} title="Lowering your chance" />
     </div>
   );
 }
@@ -248,34 +194,11 @@ function Page({
   );
 }
 
-function groupWords(comparison: CohortComparison): string {
-  const people = comparison.sex === "Female" ? "women" : "men";
-  return `${people} aged ${comparison.ageLow}–${comparison.ageHigh}`;
-}
-
-/** "Higher than about 80 in 100 women aged 60–70 who had the same check." */
-function Compare({ comparison, what }: { comparison: CohortComparison; what: string }) {
-  const at = Math.round(comparison.percentile);
-  return (
-    <div className="rp-compare">
-      <div className="rp-compare-head">
-        <b>{at}%</b>
-        <span>
-          <strong>{percentileWord(comparison.percentile)}.</strong> {what} is higher than about {at} in 100{" "}
-          {groupWords(comparison)} who were also sent for a heart artery test.
-        </span>
-      </div>
-      <PercentileTrack comparison={comparison} />
-    </div>
-  );
-}
-
 // ------------------------------------------------------------------------------------------- report
 interface ReportData {
   prediction: PredictionResponse;
   inputs: Readonly<Record<string, FeatureValue>>;
   features: FeatureDefinition[];
-  comparisons: Partial<Record<"cad" | Artery, CohortComparison>>;
   scenario: boolean;
 }
 
@@ -295,7 +218,6 @@ function SummaryPage({ data, total }: { data: ReportData; total: number }) {
   );
   const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
   const flagged = isFlagged(cad);
-  const count = inHundred(cad.probability);
   return (
     <Page accent={CAD_ACCENT} label="Summary" number={1} total={total}>
       <header className="rp-hero">
@@ -331,12 +253,12 @@ function SummaryPage({ data, total }: { data: ReportData; total: number }) {
         <div className="rp-card rp-card-main">
           <h2 className="rp-h">Your result</h2>
           <div className="rp-headline">
-            <Gauge color={CAD_ACCENT} target={cad} />
+            <Gauge color={CAD_ACCENT} size={190} target={cad} />
             <div>
               <StatusPill artery={false} target={cad} />
               <p className="rp-lead">
-                There is about a <strong>{count} in 100</strong> chance that one or more of the arteries feeding
-                your heart is badly narrowed.
+                The chance that one or more of the arteries feeding your heart is badly narrowed is{" "}
+                <strong>{pct(cad.probability)}</strong>.
               </p>
               <p className="rp-muted">
                 {flagged
@@ -345,13 +267,6 @@ function SummaryPage({ data, total }: { data: ReportData; total: number }) {
                 {cad.uncertain ? " Your result is close to the line, so it could go either way." : ""}
               </p>
             </div>
-          </div>
-          <div className="rp-people-block">
-            <IconArray color={CAD_ACCENT} count={count} />
-            <p>
-              Picture <strong>100 people</strong> with the same health details as you. About{" "}
-              <strong>{count}</strong> of them would have a narrowed heart artery.
-            </p>
           </div>
         </div>
         <div className="rp-card rp-card-heart">
@@ -383,117 +298,73 @@ function SummaryPage({ data, total }: { data: ReportData; total: number }) {
         </div>
       </div>
 
-      <div className="rp-grid-two">
-        <div className="rp-card">
-          <h2 className="rp-h">What affects your result</h2>
-          <Factors features={features} inputs={data.inputs} summary={drivers} />
-        </div>
-        <div className="rp-card">
-          <h2 className="rp-h">How you compare</h2>
-          {data.comparisons.cad ? (
-            <Compare comparison={data.comparisons.cad} what="Your chance" />
-          ) : (
-            <p className="rp-muted">Not available for this result.</p>
-          )}
-          <p className="rp-muted rp-small">
-            This compares you with people of your sex and a similar age who were sent for a heart artery test, not
-            with everyone.
-          </p>
-        </div>
+      <div className="rp-card">
+        <h2 className="rp-h">The main reasons</h2>
+        <Reasons features={features} inputs={data.inputs} summary={drivers} />
       </div>
     </Page>
   );
 }
 
-function ArteryPage({
-  data,
-  artery,
-  number,
-  total,
-}: {
-  data: ReportData;
-  artery: Artery;
-  number: number;
-  total: number;
-}) {
-  const { prediction, features } = data;
-  const target = prediction.vessels[artery];
-  const color = targetColor(artery);
-  const plain = ARTERY_PLAIN[artery];
-  const drivers = useMemo(
-    () => buildDrivers(prediction.explanations[artery], features, target.probability, 12),
-    [prediction, features, artery, target.probability],
-  );
-  const comparison = data.comparisons[artery];
+/** One page for the three arteries: each lit up on the heart, with its chance and what it means. */
+function ArteriesPage({ data, number, total }: { data: ReportData; number: number; total: number }) {
+  const { prediction } = data;
   return (
-    <Page accent={color} label={plain.name} number={number} total={total}>
+    <Page accent={CAD_ACCENT} label="Your three heart arteries" number={number} total={total}>
       <header className="rp-artery-head">
-        <span className="rp-artery-tag">{artery}</span>
+        <span aria-hidden="true" className="rp-artery-tag">
+          ♥
+        </span>
         <div>
-          <h1>Your {plain.name.toLowerCase()}</h1>
-          <p>
-            {plain.medical} · supplies {plain.supplies}
-          </p>
+          <h1>Your three heart arteries</h1>
+          <p>The chance that each main artery is badly narrowed</p>
         </div>
       </header>
-
-      <div className="rp-grid-artery">
-        <div className="rp-card rp-card-heart">
-          <HeartSnapshot
-            alt={`Picture of the heart, see-through, with the ${plain.name.toLowerCase()} lit up`}
-            focus={artery}
-            prediction={prediction}
-          />
-          <p className="rp-muted rp-small rp-center">The {plain.name.toLowerCase()} is lit up.</p>
-        </div>
-        <div className="rp-card">
-          <h2 className="rp-h">Chance this artery is narrowed</h2>
-          <div className="rp-headline">
-            <Gauge color={color} size={150} target={target} />
-            <div>
-              <StatusPill artery target={target} />
-              <p className="rp-lead">
-                About a <strong>{inHundred(target.probability)} in 100</strong> chance that this artery is badly
-                narrowed.
-              </p>
-            </div>
-          </div>
-          <ul className="rp-facts">
-            <li>
-              <b>What this means</b>
-              {isFlagged(target)
-                ? "It is above the alert level, so your doctor may want to look at this artery more closely."
-                : isHeldBack(target)
-                  ? "Its chance is fairly high. We only raise an alert for an artery when your overall result is also above the alert level, so your doctor will weigh it up with your other results."
-                  : "It is below the alert level for this artery."}
-            </li>
-            <li>
-              <b>How sure is this?</b>
-              {target.uncertain
-                ? "Not very sure. Your result is close to the line, so it could go either way."
-                : "Fairly sure."}
-            </li>
-          </ul>
-        </div>
+      <div className="rp-artery-rows">
+        {ARTERIES.map((artery) => {
+          const target = prediction.vessels[artery];
+          const plain = ARTERY_PLAIN[artery];
+          const color = targetColor(artery);
+          return (
+            <section aria-label={plain.name} className="rp-card rp-artery-row" key={artery}>
+              <HeartSnapshot
+                alt={`Picture of the heart, see-through, with the ${plain.name.toLowerCase()} lit up`}
+                focus={artery}
+                prediction={prediction}
+              />
+              <div>
+                <h2 className="rp-artery-name">
+                  <i style={{ background: color }} />
+                  {plain.name}
+                  <span>
+                    {plain.medical} · supplies {plain.supplies}
+                  </span>
+                </h2>
+                <div className="rp-headline">
+                  <Gauge color={color} size={112} target={target} />
+                  <div>
+                    <StatusPill artery target={target} />
+                    <p className="rp-lead">
+                      The chance this artery is badly narrowed is <strong>{pct(target.probability)}</strong>.
+                    </p>
+                    <p className="rp-muted">
+                      {isFlagged(target)
+                        ? "Your doctor may want to look at this artery more closely."
+                        : isHeldBack(target)
+                          ? "Fairly high, but an artery is only alerted when your overall result is too."
+                          : "Below the alert level for this artery."}
+                      {target.uncertain ? " It is close to the line, so it could go either way." : ""}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          );
+        })}
       </div>
-
-      <div className="rp-grid-two">
-        <div className="rp-card">
-          <h2 className="rp-h">How you compare</h2>
-          {comparison ? (
-            <Compare comparison={comparison} what={`Your chance for this artery`} />
-          ) : (
-            <p className="rp-muted">Not available for this result.</p>
-          )}
-          <div className="rp-note">
-            <b>Good to know.</b> This is the chance that the artery is narrowed, not how narrow it is. Only a scan
-            or an angiogram can show how narrow an artery is and what the build-up is made of.
-          </div>
-        </div>
-        <div className="rp-card">
-          <h2 className="rp-h">What affects this artery</h2>
-          <Factors features={features} inputs={data.inputs} lowering={2} raising={4} summary={drivers} />
-        </div>
+      <div className="rp-note">
+        <b>Good to know.</b> This is the chance that an artery is narrowed, not how narrow it is. Only a scan or an
+        angiogram can show how narrow an artery is.
       </div>
     </Page>
   );
@@ -596,23 +467,6 @@ function TakeHomePage({ data, number, total }: { data: ReportData; number: numbe
               sick. Do not wait for an appointment.
             </p>
           </div>
-          <div className="rp-card">
-            <h2 className="rp-h">Words used in this report</h2>
-            <dl className="rp-glossary">
-              <div>
-                <dt>Narrowed artery</dt>
-                <dd>Fatty build-up blocks at least half of the artery, so less blood reaches the heart.</dd>
-              </div>
-              <div>
-                <dt>Chance</dt>
-                <dd>Out of 100 people with your health details, how many would have a narrowed artery.</dd>
-              </div>
-              <div>
-                <dt>Alert level</dt>
-                <dd>The point above which the tool flags a result for your doctor to look at more closely.</dd>
-              </div>
-            </dl>
-          </div>
         </div>
       </div>
       <div className="rp-card rp-about">
@@ -646,10 +500,9 @@ function useZoom() {
 }
 
 /**
- * The take-home patient report, written for the patient: a summary page (their chance, a 100-people picture,
- * the colour-coded 3D heart, what pushes the chance up or down, how they compare with similar people), one page
- * per artery, and a take-home page (their numbers, questions for the doctor, when to get help). Saved as a PDF
- * with the browser's print dialog.
+ * The take-home patient report, written for the patient: a summary page (their chance, the colour-coded 3D heart
+ * and the main reasons), a page for the three arteries, and a take-home page (their numbers, questions for the
+ * doctor, when to get help). Saved as a PDF with the browser's print dialog.
  */
 export function PatientReport() {
   const setReportOpen = useUiStore((state) => state.setReportOpen);
@@ -658,7 +511,6 @@ export function PatientReport() {
   const scenario = useActiveScenario();
   const scenarioValues = useWhatIfStore((state) => state.values);
   const features = useFeatures().data;
-  const cohort = useCohort().data ?? null;
   const zoom = useZoom();
   const dialog = useRef<HTMLDivElement>(null);
   const prediction = scenario ?? accepted;
@@ -689,15 +541,8 @@ export function PatientReport() {
     if (!prediction || !inputs || !features) {
       return null;
     }
-    const comparisons: ReportData["comparisons"] = {};
-    for (const target of ["cad", ...ARTERIES] as const) {
-      const comparison = comparisonFor(cohort, prediction, inputs, target);
-      if (comparison) {
-        comparisons[target] = comparison;
-      }
-    }
-    return { prediction, inputs, features, comparisons, scenario: scenario !== null };
-  }, [prediction, inputs, features, cohort, scenario]);
+    return { prediction, inputs, features, scenario: scenario !== null };
+  }, [prediction, inputs, features, scenario]);
 
   const print = () => {
     const title = document.title;
@@ -710,7 +555,7 @@ export function PatientReport() {
     window.print();
   };
 
-  const total = 2 + ARTERIES.length;
+  const total = 3;
   return createPortal(
     <div
       aria-labelledby="report-title"
@@ -730,7 +575,7 @@ export function PatientReport() {
             captions={false}
             className="rp-speak"
             resultKey={data.prediction.request_id}
-            sentences={() => spokenSummary(data.prediction, data.features, data.comparisons.cad ?? null)}
+            sentences={() => spokenSummary(data.prediction, data.features, data.inputs)}
           />
         )}
         <button className="rp-btn rp-btn-primary" disabled={!data} onClick={print} type="button">
@@ -743,10 +588,8 @@ export function PatientReport() {
       {data ? (
         <div className="rp-pages" style={{ zoom }}>
           <SummaryPage data={data} total={total} />
-          {ARTERIES.map((artery, index) => (
-            <ArteryPage artery={artery} data={data} key={artery} number={index + 2} total={total} />
-          ))}
-          <TakeHomePage data={data} number={total} total={total} />
+          <ArteriesPage data={data} number={2} total={total} />
+          <TakeHomePage data={data} number={3} total={total} />
         </div>
       ) : (
         <p className="rp-empty">Open a patient first; the report is built from the result on screen.</p>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { FeatureDefinition } from "../api/types";
-import { effectWord, plainFinding, plainWarnings } from "./plainLanguage";
+import { plainFinding, plainWarnings } from "./plainLanguage";
 
 const fbs: FeatureDefinition = {
   name: "FBS",
@@ -22,12 +22,6 @@ describe("plain language for patients", () => {
       "2 areas of heart wall moving less well on the scan",
     );
     expect(plainFinding("FBS", 227, fbs)).toBe("Blood sugar (fasting): 227 mg/dL");
-  });
-
-  it("describes size of effect in words", () => {
-    expect(effectWord(42)).toBe("Big effect");
-    expect(effectWord(-6)).toBe("Some effect");
-    expect(effectWord(2)).toBe("Small effect");
   });
 
   it("drops technical figures from reliability notes", () => {

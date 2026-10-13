@@ -127,12 +127,6 @@ export function plainFinding(
   return `${plainName(feature, definition)}: ${formatFeatureValue(value, definition)}`;
 }
 
-/** How much a finding moves the result, in words rather than percentage points. */
-export function effectWord(points: number): string {
-  const size = Math.abs(points);
-  return size >= 15 ? "Big effect" : size >= 5 ? "Some effect" : "Small effect";
-}
-
 /** Everyday names for the three arteries, with the medical name kept alongside. */
 export const ARTERY_PLAIN = {
   LAD: { name: "Front artery", medical: "Left anterior descending artery (LAD)", supplies: "the front of your heart" },
