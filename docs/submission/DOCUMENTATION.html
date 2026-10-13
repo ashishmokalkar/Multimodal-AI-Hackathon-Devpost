@@ -149,9 +149,9 @@ pre .c { color: #7fa6a0; }
 
 /* additions for the criteria-led version */
 .lede { max-width: none; font-size: 9.6pt; line-height: 1.42; }
-.score th:first-child, .score td:first-child { width: 31mm; }
+.score th:first-child, .score td:first-child { width: 29mm; }
 .score td { font-size: 7.9pt; line-height: 1.36; }
-.score td:last-child { width: 42mm; color: var(--muted); }
+.score td:last-child { width: 52mm; color: var(--muted); }
 .score .w { display: block; font: 600 7pt var(--mono); color: var(--teal); }
 .st { display: inline-block; padding: 0.1mm 1.4mm; border-radius: 99px; font: 600 6.6pt var(--mono); letter-spacing: 0.03em; vertical-align: 0.2mm; }
 .st.live { background: var(--teal-soft); color: var(--teal); }
@@ -175,27 +175,19 @@ pre .c { color: #7fa6a0; }
   <div class="stack" style="gap:2mm">
     <span class="eyebrow">Multimodal AI Hackathon 2026 · Track A · Project documentation</span>
     <h1>Coronary risk you can see on the heart, with a reason behind every number</h1>
-    <p class="lede"><b>The problem.</b> In India a primary-care consultation lasts about two minutes on average (Irving et al., <i>BMJ Open</i> 2017): little time to interpret an ECG, an echocardiogram and a page of blood tests, let alone explain them. Only about one in ten Indians speaks English (Census of India 2011), yet most medical reports are written in it. Risk calculators give a single number, but not <b>where</b> the disease is likely to be or <b>why</b>.</p>
-    <p class="lede"><b>Our solution.</b> CardioClarity Studio turns the tests a patient already has into a picture of heart risk: the probability of coronary artery disease (CAD) and of narrowing in each main artery (LAD, LCX, RCA) on an interactive 3D heart, explained input by input and summarised for the patient in English or Hindi. With consent, records are designed to arrive through ABHA, India's digital health ID (93.95 crore accounts by July 2026).</p>
-  </div>
-
-  <div class="glance" role="group" aria-label="Results at a glance">
-    <div><span class="k">CAD</span><span class="v">0.939</span><span class="m">ROC-AUC · EBM</span></div>
-    <div><span class="k">LAD</span><span class="v">0.869</span><span class="m">ROC-AUC · CatBoost</span></div>
-    <div><span class="k">LCX</span><span class="v">0.782</span><span class="m">ROC-AUC · XGBoost</span></div>
-    <div><span class="k">RCA</span><span class="v">0.770</span><span class="m">ROC-AUC · stack</span></div>
-    <div><span class="m"><b>Served pipeline</b> on held-out repeats; 303 patients. Live on Cloud Run.</span></div>
+    <p class="lede"><b>The problem.</b> Heart disease is India's biggest killer: <b>2.8 million deaths a year, 28% of all deaths</b> (GBD India, <i>Lancet Global Health</i> 2018). It strikes Indians about a decade earlier than Western populations, and <b>52% of these deaths come before the age of 70</b>, against 23% in the West (Prabhakaran et al., <i>Circulation</i> 2016): parents and earners in their working years. India has <b>fewer than five cardiologists per million people</b>, and five states hold 79% of its cath-lab capacity (<i>JSCAI</i> 2026). So most patients get <b>about two minutes</b> with a primary-care doctor (Irving et al., <i>BMJ Open</i> 2017), are handed reports in English, which only about <b>one in ten Indians</b> speaks (Census of India 2011), and leave with at most a single risk number: not <b>where</b> the disease is, not <b>why</b>, and not <b>what to do next</b>.</p>
+    <p class="lede"><b>Our solution.</b> CardioClarity Studio turns the tests a patient already has (blood tests, ECG, echo) into an answer a doctor can read at a glance and a patient can understand: a <b>simple dashboard</b> with the risk of coronary artery disease (CAD) and of narrowing in each main artery (LAD, LCX, RCA) shown on the heart itself, the reasons in plain words, and <b>clear next steps</b> (the tests to ask about and when to seek help at once), spoken in <b>English or Hindi</b> through Sarvam AI, with more Indian languages designed. With consent, records are designed to arrive through ABHA, India's digital health ID (93.95 crore accounts by July 2026), instead of being typed in.</p>
   </div>
 
   <h2><span class="n">00</span>How CardioClarity meets the Track A evaluation criteria</h2>
   <table class="score">
     <thead><tr><th>Criterion</th><th>What we deliver</th><th>Evidence to check</th></tr></thead>
     <tbody>
-      <tr><td><b>Predictive performance</b><span class="w">30% · pages 2–3</span></td><td>Best model per target from 10+ families, TabPFN and AutoGluon. <b>Validation:</b> 10 × 5 repeated stratified CV; half the repeats for every choice, the other half opened once for the final numbers. Calibrated, with 90% conformal uncertainty.</td><td>ROC-AUC 0.939 / 0.869 / 0.782 / 0.770 with 95% CIs, plus accuracy, precision, recall, F1 (page 3).</td></tr>
-      <tr><td><b>3D visualization</b><span class="w">25% · page 4</span></td><td>Anatomical glTF heart; LAD, LCX and RCA as separate objects. <b>Spatial risk mapping:</b> colour, thickness, glow and blood flow per artery, centred on its own threshold. Click, fly-to, X-ray, live transitions.</td><td><b>56–59 fps on integrated Intel graphics, no dedicated GPU</b> (measured).</td></tr>
-      <tr><td><b>Clinical interpretability</b><span class="w">20% · page 5</span></td><td><b>Feature attribution with SHAP:</b> exact Shapley values per patient and target, ranked as each patient's feature importance. Breakdown against normal ranges, what-if, plain-language report, spoken summary in English and <b>Hindi (Sarvam AI)</b>.</td><td>Press “Explain this prediction”; SHAP points add up exactly to the score.</td></tr>
-      <tr><td><b>System integration</b><span class="w">15% · page 6</span></td><td>One typed contract from model to browser. <b>Real-time updates:</b> a what-if re-scores, re-explains and recolours the heart. India intake (ABHA, report scans, voice) designed on the same contract.</td><td><b>About 1.0 s</b> from slider to recoloured heart on the live site (median of 10, measured).</td></tr>
-      <tr><td><b>Technical implementation</b><span class="w">10% · page 6</span></td><td>FastAPI + React in one Docker image on Cloud Run (CPU only). <b>Reproducibility:</b> one command rebuilds the models. Public dataset and CC BY heart.</td><td>70 Python and 163 frontend tests pass; axe accessibility scan: 0 violations.</td></tr>
+      <tr><td><b>Predictive performance</b><span class="w">30% · pages 2–3</span></td><td>Best model per target from 10+ families, TabPFN and AutoGluon. <b>Validation:</b> 10 × 5 repeated stratified CV, half for every choice, half opened once at the end. Calibrated, with conformal uncertainty.</td><td><b>ROC-AUC: CAD 0.939, LAD 0.869, LCX 0.782, RCA 0.770</b>, on held-out repeats, with 95% CIs.</td></tr>
+      <tr><td><b>3D visualization</b><span class="w">25% · page 4</span></td><td>Anatomical glTF heart; LAD, LCX and RCA as separate objects. <b>Spatial risk mapping:</b> colour, thickness, glow and flow per artery. Click, fly-to, X-ray, live transitions.</td><td><b>56–59 fps on integrated Intel graphics, no dedicated GPU</b> (measured).</td></tr>
+      <tr><td><b>Clinical interpretability</b><span class="w">20% · page 5</span></td><td><b>Feature attribution with SHAP</b> per patient and target. Breakdown against normal ranges, what-if, plain-language report, spoken summary in English and <b>Hindi (Sarvam AI)</b>.</td><td>Press “Explain this prediction”; SHAP points add up exactly to the score.</td></tr>
+      <tr><td><b>System integration</b><span class="w">15% · page 6</span></td><td>One typed contract, model to browser. <b>Real-time updates:</b> a what-if re-scores, re-explains and recolours the heart. ABHA, report-scan and voice intake designed on it.</td><td><b>About 1.0 s</b> from slider to recoloured heart, live (measured).</td></tr>
+      <tr><td><b>Technical implementation</b><span class="w">10% · page 6</span></td><td>FastAPI + React, one Docker image on Cloud Run (CPU only). <b>Reproducibility:</b> one command rebuilds the models.</td><td>70 Python and 163 frontend tests pass; 0 accessibility violations (axe).</td></tr>
     </tbody>
   </table>
 
