@@ -6,7 +6,7 @@ these links does not establish public or judge access.
 
 | Asset | Link | Current candidate |
 |---|---|---|
-| Project document | [PDF](CardioClarity-Project-Document.pdf) / [HTML source](CardioClarity-Project-Document.html) | Six pages, organised by the Track A evaluation criteria |
+| Project document | [PDF](DOCUMENTATION.pdf) / [HTML source](DOCUMENTATION.html) | Six pages, organised by the Track A evaluation criteria |
 | Captioned demo | [Review video](demo-review.mp4) | 4:21, H.264, 1920x1080, no audio; unchanged Phase 1 rough cut |
 | Video text | [Storyboard](demo-storyboard.md) / [Captions](demo-captions.vtt) | Captions are also burned into the video |
 | Submission text | [Devpost draft](devpost-draft.md) | Not submitted or checked against the current live form |
