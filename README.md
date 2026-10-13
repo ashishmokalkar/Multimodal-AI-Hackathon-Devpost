@@ -5,10 +5,30 @@
 ### Your heart tests, explained simply.
 **See which artery is at risk, the main reasons why, and what to do next, on an interactive 3D heart, with a spoken summary in English or Hindi.**
 
-[![Live demo](https://img.shields.io/badge/Live_demo-Open_the_app-e11d63?style=for-the-badge)](https://cardioclarity-962866578386.us-central1.run.app)
-[![Documentation](https://img.shields.io/badge/Documentation-6_page_PDF-0f766e?style=for-the-badge)](docs/submission/DOCUMENTATION.pdf)
-[![Track A](https://img.shields.io/badge/Multimodal_AI_Hackathon_2026-Track_A-4338ca?style=for-the-badge)](https://multimodal-ai-hackathon-2026-7.devpost.com/)
+<table align="center">
+<tr>
+<td align="center" width="50%">
 
+### 🚀 Try it live
+
+<a href="https://cardioclarity-962866578386.us-central1.run.app"><img src="https://img.shields.io/badge/OPEN_THE_LIVE_DEMO-e11d63?style=for-the-badge&logo=googlechrome&logoColor=white" height="44" alt="Open the live demo"></a>
+
+<sub>cardioclarity-962866578386.us-central1.run.app<br>No sign-in · works in any browser</sub>
+
+</td>
+<td align="center" width="50%">
+
+### 📄 Read the documentation
+
+<a href="docs/submission/DOCUMENTATION.pdf"><img src="https://img.shields.io/badge/OPEN_THE_DOCUMENTATION-0f766e?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" height="44" alt="Open the documentation (PDF)"></a>
+
+<sub>6-page PDF, organised by the Track A criteria<br><a href="docs/submission/DOCUMENTATION.html">HTML version</a></sub>
+
+</td>
+</tr>
+</table>
+
+[![Track A](https://img.shields.io/badge/Multimodal_AI_Hackathon_2026-Track_A-4338ca)](https://multimodal-ai-hackathon-2026-7.devpost.com/)
 ![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-WebGL-000?logo=threedotjs)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Python_3.11-009688?logo=fastapi&logoColor=white)
@@ -220,6 +240,16 @@ flowchart LR
 | **Voice** | Sarvam AI (Bulbul text-to-speech) |
 | **Deploy** | One Docker image on Google Cloud Run, CPU only |
 | **Quality** | 70 pytest + 163 Vitest tests, ESLint, axe accessibility checks, GitHub Actions |
+
+---
+
+<div align="center">
+
+<a href="https://cardioclarity-962866578386.us-central1.run.app"><img src="https://img.shields.io/badge/OPEN_THE_LIVE_DEMO-e11d63?style=for-the-badge&logo=googlechrome&logoColor=white" height="36" alt="Open the live demo"></a>
+&nbsp;
+<a href="docs/submission/DOCUMENTATION.pdf"><img src="https://img.shields.io/badge/OPEN_THE_DOCUMENTATION-0f766e?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" height="36" alt="Open the documentation (PDF)"></a>
+
+</div>
 
 ---
 
