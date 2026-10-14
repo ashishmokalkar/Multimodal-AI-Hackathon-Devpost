@@ -85,6 +85,7 @@ function SettingsMenu() {
   const setQuality = useStudioStore((state) => state.setQuality);
   const resetLayout = useStudioStore((state) => state.resetLayout);
   const ref = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -95,8 +96,20 @@ function SettingsMenu() {
         setOpen(false);
       }
     };
+    // Escape closes the menu and gives focus back to its button
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
     window.addEventListener("pointerdown", close);
-    return () => window.removeEventListener("pointerdown", close);
+    window.addEventListener("keydown", escape, true);
+    return () => {
+      window.removeEventListener("pointerdown", close);
+      window.removeEventListener("keydown", escape, true);
+    };
   }, [open]);
 
   return (
@@ -105,6 +118,7 @@ function SettingsMenu() {
         aria-expanded={open}
         aria-label="Appearance"
         className="topbar-btn"
+        ref={buttonRef}
         onClick={() => setOpen(!open)}
         type="button"
       >

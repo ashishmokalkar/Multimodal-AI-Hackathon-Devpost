@@ -246,8 +246,9 @@ export function defaultLayout(
   const patientW = clamp(vw * 0.21, 270, 400);
   const rightX = vw - GAP - sideW;
   const column = vh - top - WATERMARK_SPACE;
-  // the risk window needs about 330 px for its gauge and the three artery rings with their labels
-  const riskH = clamp(column * 0.55, 280, 360);
+  // the risk window needs about 330 px for its gauge and the three artery rings with their labels, plus room for
+  // the response's reliability warning and the model line
+  const riskH = clamp(column * 0.55, 280, 430);
   const riskClosedH = riskH + EXPLAIN_SPACE;
   const riskClosedY = top + Math.max(0, Math.round((column - riskClosedH) / 2));
   const driversY = top + riskH + 12;

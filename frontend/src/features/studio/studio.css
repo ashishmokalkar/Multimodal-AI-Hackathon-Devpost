@@ -1553,12 +1553,60 @@
   }
 }
 
+/* the response's reliability warnings and which model scored it, under the risk */
+.studio .rk-notes {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.studio .rk-warnings {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.studio .rk-warnings li {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  padding: 6px 8px;
+  border: 1px solid rgb(245 158 11 / 35%);
+  border-radius: 8px;
+  background: rgb(245 158 11 / 10%);
+  color: var(--s-text);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.studio .rk-warnings svg {
+  flex: none;
+  margin-top: 1px;
+  color: #f59e0b;
+}
+
+.studio .rk-source {
+  margin: 0;
+  color: var(--s-muted);
+  font-size: 10px;
+  line-height: 1.35;
+  text-align: center;
+}
+
 /* the way into the Why window, at the foot of Risk while Why is closed */
 .studio .rk-explain-wrap {
   display: flex;
   justify-content: center;
   margin-top: auto;
   padding-top: 12px;
+  /* stays in view when a warning makes Risk scroll on a short screen */
+  position: sticky;
+  bottom: -14px;
+  padding-bottom: 14px;
+  margin-bottom: -14px;
+  background: linear-gradient(to bottom, transparent, rgb(var(--s-panel-rgb) / 0.94) 40%);
 }
 
 .studio .rk-explain {

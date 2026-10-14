@@ -258,6 +258,40 @@ function TilesView({ shown, accepted, scenario, selected }: ViewProps) {
   );
 }
 
+/**
+ * The response's own reliability warnings (outside the training range, age 65 or over, implausible values) and which
+ * model scored it. Both come from the shown response, so they change with a what-if and clear with the prediction.
+ */
+function ResultNotes({ shown }: { shown: PredictionResponse }) {
+  const warnings = shown.mock ? [] : shown.warnings;
+  const source = shown.mock ? "Mock model" : shown.prediction_source;
+  return (
+    <div className="rk-notes">
+      {warnings.length > 0 && (
+        <ul aria-label="Reliability warnings" className="rk-warnings">
+          {warnings.map((warning) => (
+            <li key={warning}>
+              <svg aria-hidden="true" fill="none" height="13" viewBox="0 0 24 24" width="13">
+                <path
+                  d="M12 3 2 20h20L12 3Z M12 10v4 M12 17v.5"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                />
+              </svg>
+              <span>{warning}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="rk-source">
+        Model {shown.model_version} · {source}
+      </p>
+    </div>
+  );
+}
+
 const HINT_KEY = "cardioclarity-explain-hint-seen";
 
 function hintSeen(): boolean {
@@ -358,6 +392,7 @@ export function RiskWindow() {
           shown={shown}
         />
       )}
+      {shown && <ResultNotes shown={shown} />}
       {shown && !whyOpen && <ExplainButton />}
     </FloatingWindow>
   );

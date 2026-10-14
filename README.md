@@ -104,7 +104,7 @@ Each artery takes the **colour, thickness and glow of its own risk**: blue when 
 <td width="42%"><img src="docs/images/xray.jpg" alt="X-ray view of the heart with the LCX artery selected at 73%."></td>
 <td>
 
-- **Spatial risk mapping**: the number and the colour come from the same result, matched by artery name, so they can never disagree.
+- **Spatial risk mapping**: an artery's colour and its number are drawn from the same result and matched by artery name, not by position.
 - **Smooth on ordinary laptops**: 56–59 frames per second on built-in Intel graphics, no graphics card (measured). If frames drop, it switches to a lighter setting by itself.
 - **Accessible**: screen readers get a text summary of the heart, all motion can be switched off, and the whole app works from the keyboard.
 
