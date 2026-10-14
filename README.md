@@ -7,7 +7,16 @@
 
 <table align="center">
 <tr>
-<td align="center" width="50%">
+<td align="center" width="33%">
+
+### 🎬 Watch the demo
+
+<a href="https://youtu.be/oskivSGjGLw"><img src="https://img.shields.io/badge/WATCH_ON_YOUTUBE-ff0000?style=for-the-badge&logo=youtube&logoColor=white" height="44" alt="Watch the demo video on YouTube"></a>
+
+<sub>The whole app in a few minutes<br>Narrated walkthrough</sub>
+
+</td>
+<td align="center" width="33%">
 
 ### 🚀 Try it live
 
@@ -16,7 +25,7 @@
 <sub>cardioclarity-962866578386.us-central1.run.app<br>No sign-in · works in any browser</sub>
 
 </td>
-<td align="center" width="50%">
+<td align="center" width="33%">
 
 ### 📄 Read the documentation
 
@@ -41,6 +50,12 @@
 <img src="docs/images/heart.gif" alt="The CardioClarity heart for patient 174: it rotates, the camera flies to the LCX artery, and the heart turns see-through to show the three arteries." width="760">
 
 <sub>Live recording: patient 174 · rotate the heart · click an artery and the camera flies to it · peel the heart to X-ray</sub>
+
+### 🎬 Demo video
+
+<a href="https://youtu.be/oskivSGjGLw"><img src="https://img.youtube.com/vi/oskivSGjGLw/maxresdefault.jpg" alt="Watch the CardioClarity Studio demo video on YouTube" width="640"></a>
+
+<sub>Click to watch on YouTube</sub>
 
 </div>
 
@@ -245,6 +260,8 @@ flowchart LR
 
 <div align="center">
 
+<a href="https://youtu.be/oskivSGjGLw"><img src="https://img.shields.io/badge/WATCH_ON_YOUTUBE-ff0000?style=for-the-badge&logo=youtube&logoColor=white" height="36" alt="Watch the demo video on YouTube"></a>
+&nbsp;
 <a href="https://cardioclarity-962866578386.us-central1.run.app"><img src="https://img.shields.io/badge/OPEN_THE_LIVE_DEMO-e11d63?style=for-the-badge&logo=googlechrome&logoColor=white" height="36" alt="Open the live demo"></a>
 &nbsp;
 <a href="docs/submission/DOCUMENTATION.pdf"><img src="https://img.shields.io/badge/OPEN_THE_DOCUMENTATION-0f766e?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" height="36" alt="Open the documentation (PDF)"></a>
