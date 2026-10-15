@@ -184,7 +184,7 @@ Medical software often shows everything at once. We show **the answer first and 
 A good prediction saves no one if it takes ten minutes to type in, or if the patient can't read the answer. So we designed the whole path, from the patient's paperwork to their understanding.
 
 <p align="center"><img src="docs/images/picker.jpg" alt="Start screen: four featured patients and a search on the left; on the right, five ways to add a new patient: Import via ABHA, Upload reports, Speak it, Excel / CSV, Fill in manually." width="92%"></p>
-<p align="center"><sub>The start screen: five ways to bring a patient in, most automatic first. Each one shows what it will do.</sub></p>
+<p align="center"><sub>The start screen: five ways to bring a patient in, most automatic first. Four work today; <b>Speak it</b> is next.</sub></p>
 
 | Way in | What it does | Status |
 |---|---|:-:|
@@ -196,24 +196,31 @@ A good prediction saves no one if it takes ten minutes to type in, or if the pat
 
 ### 📄 Upload reports: multimodal AI reads them
 
-<p align="center"><img src="docs/images/upload.jpg" alt="Upload reports: a 3-page sample report on the left with every value the AI read outlined in colour (lab in teal, ECG in pink, echo in amber, patient details in blue), and the 29 values found listed on the right." width="92%"></p>
+<p align="center"><img src="docs/images/flow-upload.gif" alt="Upload reports: the sample report is selected and read; every value the AI found is outlined on the page in colour and listed beside it; the few missing answers are added and the patient opens on the 3D heart." width="88%"></p>
 <p align="center"><sub>A 3-page sample report (lab, ECG, echo) made from study patient 174's values. The vision AI found <b>29 values in 10 seconds, all correct</b>, each outlined where it was read. Answer the few questions reports don't cover, and the patient scores exactly like patient 174.</sub></p>
 
 The server sends the pages to the vision model with our 49 inputs, their units and options, and a strict answer format. Every value that comes back is checked against the input's type and range before it is used, and each one keeps the exact text it was read from. **In the public demo, the reading of the sample report was recorded once and is replayed**, so the demo is free and instant; the same endpoint (`POST /extract`, [`api/extract.py`](api/extract.py)) reads any upload when the server has an `OPENAI_API_KEY`.
 
 ### 🪪 Import via ABHA: records arrive with consent
 
-<p align="center"><img src="docs/images/abha.jpg" alt="Import via ABHA: a QR code to scan with the ABHA app and the three steps (scan, approve, records arrive); then the records received from a sample hospital, each value shown with its FHIR source such as Condition SNOMED 44054006 or Observation LOINC 1558-6." width="92%"></p>
+<p align="center"><img src="docs/images/flow-abha.gif" alt="Import via ABHA: a QR code to scan with the ABHA app, the simulated approval, the records received with their FHIR codes, and the patient opening on the 3D heart." width="88%"></p>
 <p align="center"><sub>Scan, approve, and a sample ABHA record arrives as a FHIR R4 bundle: 27 records (diagnoses, vital signs, a lab report, ECG and echo) fill 33 inputs, each traced to its code. The patient then scores exactly like patient 174.</sub></p>
 
 The mapping from FHIR to the model's inputs is real code ([`fhir.ts`](frontend/src/features/start/fhir.ts), with tests): measurements by **LOINC** code with unit conversion, diagnoses by **SNOMED CT**, ECG and echo impressions by plain rules, and every value checked against its range. **The demo simulates the patient's approval and loads a sample record**, because the live connection to Ayushman Bharat needs registration with ABDM, our next step. Scanning the QR code with a phone opens the consent request the patient would see.
 
+**Why ABHA matters:** India has created **93.95 crore ABHA health IDs** (July 2026). With consent, a patient's records can arrive in seconds instead of being typed.
+
 ### 📊 Screening camps: a whole list, highest risk first
 
-<p align="center"><img src="docs/images/screening.jpg" alt="Excel / CSV: 10 patients from a screening-camp list scored and ranked, highest risk first, with the overall heart-disease risk and the highest-risk artery for each, and an Open button per patient." width="88%"></p>
+<p align="center"><img src="docs/images/flow-sheet.gif" alt="Excel / CSV: the sample screening-camp list is scored and ranked highest risk first, and the top patient opens on the 3D heart." width="88%"></p>
 <p align="center"><sub>The sample list (10 study patients, as Excel or CSV) scored in about 5 seconds. Their angiograms agree with the ranking for 9 of 10: all 7 flagged patients have heart disease, and one patient rated low (P-05) was missed.</sub></p>
 
-**Why ABHA matters:** India has created **93.95 crore ABHA health IDs** (July 2026). With consent, a patient's records can arrive in seconds instead of being typed.
+### ✍️ Fill in manually: one simple form
+
+<p align="center"><img src="docs/images/flow-manual.gif" alt="Fill in manually: a form with tabs for patient details, symptoms and exam, ECG, blood tests and echo; age, diabetes, chest pain and blood sugar are entered and the patient opens on the 3D heart." width="88%"></p>
+<p align="center"><sub>A tab per group, every value with its unit and normal range, yes/no and options as buttons. Inputs start at typical values, changed ones are marked, and out-of-range numbers block scoring.</sub></p>
+
+### 🔄 Every route, one check
 
 Every route ends on **one review screen**, so a person checks every value before anything is scored:
 
