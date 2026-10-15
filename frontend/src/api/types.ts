@@ -273,3 +273,32 @@ export type ImportanceResponse = z.infer<typeof ImportanceResponseSchema>;
 export type CohortPatient = z.infer<typeof CohortPatientSchema>;
 export type CohortResponse = z.infer<typeof CohortResponseSchema>;
 export type ReferenceRange = NonNullable<FeatureDefinition["reference_range"]>;
+
+export const ExtractResponseSchema = z.object({
+  documents: z.array(z.object({ file: z.string(), kind: z.string() })),
+  values: z.array(
+    z.object({
+      name: z.string(),
+      label: z.string(),
+      group: z.string(),
+      value: FeatureValueSchema,
+      unit: z.string().optional(),
+      as_written: z.string(),
+      evidence: z.string(),
+      document: z.string(),
+    }),
+  ),
+  skipped: z.array(
+    z.object({
+      name: z.string(),
+      label: z.string(),
+      reason: z.string(),
+      evidence: z.string(),
+      document: z.string(),
+    }),
+  ),
+  model: z.string(),
+});
+
+export type ExtractResponse = z.infer<typeof ExtractResponseSchema>;
+export type ExtractedValue = ExtractResponse["values"][number];

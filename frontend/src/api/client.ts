@@ -1,6 +1,8 @@
 import {
   CohortResponseSchema,
   type CohortResponse,
+  ExtractResponseSchema,
+  type ExtractResponse,
   FeatureSchema,
   ImportanceResponseSchema,
   type ImportanceResponse,
@@ -147,4 +149,29 @@ export async function fetchCohort(
     throw new Error(`API GET /cohort failed (${response.status}).`);
   }
   return CohortResponseSchema.parse(await response.json());
+}
+
+export interface ReportUpload {
+  name: string;
+  media_type: string;
+  /** the file's bytes, base64-encoded */
+  data: string;
+}
+
+/** Sends report photos or PDFs to be read; the server answers with the inputs found and where each came from. */
+export async function postExtract(files: ReportUpload[]): Promise<ExtractResponse> {
+  const response = await fetch(`${API_BASE_URL}/extract`, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify({ files }),
+  });
+  const body: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    const detail =
+      body && typeof body === "object" && "detail" in body && typeof body.detail === "string"
+        ? body.detail
+        : `The reports could not be read (${response.status}).`;
+    throw new Error(detail);
+  }
+  return ExtractResponseSchema.parse(body);
 }

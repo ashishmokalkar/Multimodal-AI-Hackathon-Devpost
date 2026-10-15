@@ -190,9 +190,16 @@ A good prediction saves no one if it takes ten minutes to type in, or if the pat
 |---|---|:-:|
 | ✍️ **Fill in manually** | All 49 inputs with units, normal ranges and checks | ✅ **Live** |
 | 🪪 **Import via ABHA** | The patient scans the clinic's QR code with their **ABHA** app and approves consent. Lab results, diagnoses and vitals arrive through the **Ayushman Bharat Digital Mission** in the standard FHIR format | 🧭 Designed |
-| 📄 **Upload reports** | A photo, PDF or **WhatsApp forward** of the lab, ECG and echo reports, read by a **multimodal (vision) AI model** that shows where every value came from | 🧭 Designed |
+| 📄 **Upload reports** | Lab, ECG and echo reports as photos or PDFs, read by a **multimodal (vision) AI model** (OpenAI gpt-5.5) that outlines where every value came from | ✅ **Live demo** |
 | 🎙️ **Speak it** | Describe the patient in Hindi or English; **Sarvam AI** speech recognition fills the form | 🧭 Designed |
 | 📊 **Excel / CSV** | For screening camps: score a whole list, **highest risk first**, so the right people are referred | 🧭 Designed |
+
+### 📄 Upload reports: multimodal AI reads them
+
+<p align="center"><img src="docs/images/upload.jpg" alt="Upload reports: a 3-page sample report on the left with every value the AI read outlined in colour (lab in teal, ECG in pink, echo in amber, patient details in blue), and the 29 values found listed on the right." width="92%"></p>
+<p align="center"><sub>A 3-page sample report (lab, ECG, echo) made from study patient 174's values. The vision AI found <b>29 values in 10 seconds, all correct</b>, each outlined where it was read. Answer the few questions reports don't cover, and the patient scores exactly like patient 174.</sub></p>
+
+The server sends the pages to the vision model with our 49 inputs, their units and options, and a strict answer format. Every value that comes back is checked against the input's type and range before it is used, and each one keeps the exact text it was read from. **In the public demo, the reading of the sample report was recorded once and is replayed**, so the demo is free and instant; the same endpoint (`POST /extract`, [`api/extract.py`](api/extract.py)) reads any upload when the server has an `OPENAI_API_KEY`.
 
 **Why ABHA matters:** India has created **93.95 crore ABHA health IDs** (July 2026). With consent, a patient's records can arrive in seconds instead of being typed.
 
@@ -252,7 +259,7 @@ flowchart LR
 | **App** | React 18, TypeScript, Vite, React Three Fiber (Three.js / WebGL), zustand, TanStack Query, Zod |
 | **API** | FastAPI, Pydantic, Python 3.11 |
 | **ML** | scikit-learn, InterpretML (EBM), CatBoost, XGBoost, LightGBM, Optuna, TabPFN, pandas |
-| **Voice** | Sarvam AI (Bulbul text-to-speech) |
+| **Multimodal AI** | OpenAI gpt-5.5 vision (report reading), Sarvam AI Bulbul (Hindi speech) |
 | **Deploy** | One Docker image on Google Cloud Run, CPU only |
 | **Quality** | 70 pytest + 163 Vitest tests, ESLint, axe accessibility checks, GitHub Actions |
 
@@ -325,7 +332,7 @@ python -m ml.export
 
 - 🇮🇳 **Test on Indian patients.** Our models learned from one hospital in Iran, and Indians get heart disease about ten years younger.
 - 🪪 **ABHA import**, live, through the Ayushman Bharat Digital Mission.
-- 📄 **Report reading** with a vision model, for photos, PDFs and WhatsApp forwards.
+- 📄 **Report reading for every upload**, including phone photos and WhatsApp forwards (today the public demo replays a recorded reading).
 - 🗣️ **More Indian languages** (Bengali, Marathi, Tamil, Telugu and more) through Sarvam AI, for every patient, and **speaking instead of typing**.
 - 🏕️ **Screening camps**: score a whole list at once and refer the highest risk first.
 

@@ -889,3 +889,308 @@
     padding-top: 10px;
   }
 }
+
+/* ------------------------------------------------------------------------------------------- upload reports */
+.ru-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: rgb(2 6 16 / 62%);
+  backdrop-filter: blur(6px);
+}
+.ru-dialog {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 22px 24px;
+  border: 1px solid var(--pk-line-strong);
+  border-radius: 20px;
+  background: var(--pk-bg-2);
+  box-shadow: var(--pk-shadow);
+  outline: none;
+}
+.ru-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.ru-head h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+.ru-head p {
+  margin: 0;
+  color: var(--pk-muted);
+}
+.ru-close {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--pk-line);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+.ru-primary,
+.ru-secondary {
+  margin-top: 16px;
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ru-primary {
+  width: 100%;
+  background: var(--pk-accent);
+  color: var(--pk-accent-ink);
+}
+.ru-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.ru-secondary {
+  border-color: var(--pk-line-strong);
+  background: transparent;
+  color: inherit;
+}
+.ru-busy {
+  display: grid;
+  place-items: center;
+  min-height: 90px;
+  margin-top: 12px;
+}
+.ru-summary {
+  margin: 0 0 12px;
+}
+.ru-group {
+  margin-top: 12px;
+}
+.ru-group h3 {
+  margin: 0 0 6px;
+  color: var(--pk-accent);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ru-group table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.ru-group th,
+.ru-group td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--pk-line);
+  text-align: left;
+  vertical-align: top;
+}
+.ru-group th {
+  width: 34%;
+  font-weight: 600;
+}
+.ru-value {
+  width: 22%;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ru-evidence {
+  color: var(--pk-muted);
+  font-size: 12.5px;
+  font-style: italic;
+}
+.ru-ask-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--pk-line);
+}
+.ru-seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ru-seg button {
+  padding: 5px 11px;
+  border: 1px solid var(--pk-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.ru-seg button[aria-pressed="true"] {
+  border-color: var(--pk-accent);
+  background: var(--pk-accent);
+  color: var(--pk-accent-ink);
+  font-weight: 700;
+}
+.ru-number {
+  width: 90px;
+  padding: 5px 8px;
+  border: 1px solid var(--pk-line-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.ru-skipped,
+.ru-note {
+  margin: 12px 0 0;
+  color: var(--pk-muted);
+  font-size: 13px;
+}
+.ru-actions {
+  display: flex;
+  gap: 10px;
+}
+.ru-actions .ru-primary {
+  flex: 1;
+}
+.ru-error {
+  margin: 12px 0 0;
+  color: var(--pk-flag);
+  font-weight: 600;
+}
+
+.ru-dialog.is-wide {
+  width: min(1180px, 100%);
+}
+.ru-sample {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--pk-accent) 55%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--pk-accent) 7%, transparent);
+}
+.ru-thumb {
+  position: relative;
+  flex: none;
+  width: 120px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 30%);
+}
+.ru-thumb img {
+  display: block;
+  width: 100%;
+}
+/* a scan line sweeping down the page while it is read */
+.ru-scan {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 28%;
+  background: linear-gradient(to bottom, transparent, rgb(45 212 191 / 55%) 85%, #2dd4bf);
+  animation: ru-scan 1.3s ease-in-out infinite alternate;
+}
+@keyframes ru-scan {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(360%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ru-scan { animation: none; }
+}
+.ru-sample-text {
+  display: grid;
+  gap: 4px;
+}
+.ru-sample-text b {
+  font-size: 16px;
+}
+.ru-sample-text span {
+  color: var(--pk-muted);
+}
+.ru-sample-text .ru-selected {
+  color: var(--pk-accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.ru-sample-text a {
+  color: var(--pk-accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+.ru-demo-note {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin: 12px 0 0;
+  color: var(--pk-muted);
+  font-size: 13px;
+}
+.ru-demo-note svg {
+  flex: none;
+  margin-top: 2px;
+}
+.ru-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.ru-pages,
+.ru-list {
+  max-height: min(62vh, 640px);
+  overflow: auto;
+  padding-right: 4px;
+}
+.ru-pages {
+  display: grid;
+  gap: 12px;
+}
+.ru-page {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #fff;
+}
+.ru-page img {
+  display: block;
+  width: 100%;
+}
+/* a value the model read, outlined where it sits on the page */
+.ru-box {
+  position: absolute;
+  border: 2px solid var(--box);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--box) 16%, transparent);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.ru-box.is-active {
+  background: color-mix(in srgb, var(--box) 40%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--box) 45%, transparent);
+}
+.ru-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.ru-group h3 i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--box);
+}
+.ru-group tr.is-active th,
+.ru-group tr.is-active td {
+  background: var(--pk-chip);
+}
+@media (max-width: 820px) {
+  .ru-split {
+    grid-template-columns: 1fr;
+  }
+}

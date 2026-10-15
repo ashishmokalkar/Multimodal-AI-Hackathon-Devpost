@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useApiProfile, useDataset, useFeatures, useSamples } from "../../api/hooks";
-import type { FeatureDefinition, FeatureValue, SamplePatient } from "../../api/types";
+import type { ExtractResponse, FeatureDefinition, FeatureValue, SamplePatient } from "../../api/types";
 import { formatFeatureValue, rangeStatus } from "../../lib/insights";
 import { displayNumber } from "../../lib/units";
 import { usePatientStore } from "../../store/patientStore";
@@ -9,6 +9,8 @@ import { HeartbeatLoader } from "../loading/HeartbeatLoader";
 import { DISCLAIMER_LINE } from "../safety/disclaimer";
 import { PatientAvatar } from "../patient/PatientAvatar";
 import { AddPatientPanel } from "./AddPatientPanel";
+import { ReportUpload } from "./ReportUpload";
+import { useReportStore } from "./reportStore";
 import { IconHeart, IconShield } from "../studio/icons";
 import { useStudioStore } from "../studio/studioStore";
 import "./picker.css";
@@ -244,7 +246,9 @@ export function PatientPicker() {
     </p>
   );
 
+  const [uploading, setUploading] = useState(false);
   const open = (sample: SamplePatient) => {
+    useReportStore.getState().clear();
     usePatientStore.getState().setFromSample(sample);
     setPatientChosen(true);
   };
@@ -252,9 +256,19 @@ export function PatientPicker() {
     if (!features) {
       return;
     }
+    useReportStore.getState().clear();
     usePatientStore
       .getState()
       .setFeatures(Object.fromEntries(features.map((feature) => [feature.name, feature.default])));
+    setPatientChosen(true);
+  };
+  const openFromReports = (values: Record<string, FeatureValue>, result: ExtractResponse) => {
+    useReportStore.getState().setFromReports(
+      result.values,
+      [...new Set(result.documents.map((document) => document.file))],
+    );
+    usePatientStore.getState().setFeatures(values);
+    setUploading(false);
     setPatientChosen(true);
   };
 
@@ -395,7 +409,7 @@ export function PatientPicker() {
                   </>
                 )}
               </section>
-              {!showAll && <AddPatientPanel manualReady={Boolean(features)} onManual={openNew} />}
+              {!showAll && <AddPatientPanel manualReady={Boolean(features)} onManual={openNew} onUpload={() => setUploading(true)} />}
             </div>
             {footnote}
             {!showAll && (
@@ -407,6 +421,9 @@ export function PatientPicker() {
           </>
         )}
       </main>
+      {uploading && features && (
+        <ReportUpload features={features} onClose={() => setUploading(false)} onOpen={openFromReports} />
+      )}
     </div>
   );
 }

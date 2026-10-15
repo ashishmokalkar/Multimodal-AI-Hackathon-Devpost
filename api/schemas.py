@@ -175,3 +175,44 @@ class CohortResponse(ContractModel):
     n_patients: int = Field(ge=1)
     population: str = Field(description="Who the comparison group is (a referral cohort, not the general population).")
     patients: list[CohortPatient]
+
+
+class ReportFile(ContractModel):
+    name: StrictStr = Field(min_length=1, max_length=200)
+    media_type: StrictStr
+    data: StrictStr = Field(description="The file's bytes, base64-encoded.")
+
+
+class ExtractRequest(ContractModel):
+    files: list[ReportFile] = Field(min_length=1, max_length=4)
+
+
+class ReportDocument(ContractModel):
+    file: str
+    kind: str
+
+
+class ExtractedValue(ContractModel):
+    name: str
+    label: str
+    group: str
+    value: FeatureValue
+    unit: str | None = None
+    as_written: str
+    evidence: str
+    document: str
+
+
+class SkippedValue(ContractModel):
+    name: str
+    label: str
+    reason: str
+    evidence: str
+    document: str
+
+
+class ExtractResponse(ContractModel):
+    documents: list[ReportDocument]
+    values: list[ExtractedValue]
+    skipped: list[SkippedValue]
+    model: str

@@ -28,7 +28,6 @@ const METHODS: Method[] = [
     title: "Upload reports",
     detail: "Lab, ECG, echo, notes",
     icon: <IconUpload size={18} />,
-    plan: "Coming soon: one slot each for the lab report, ECG printout, echo report and clinic note (photo, PDF or WhatsApp forward), read by a vision model that shows where every value came from.",
   },
   {
     id: "speak",
@@ -82,11 +81,21 @@ function QrArt() {
  * The "Add a new patient" door on the start screen: ABHA first as the largest tile, then report upload, speech,
  * a spreadsheet and the manual form. Methods not built yet say what they will do instead of opening.
  */
-export function AddPatientPanel({ onManual, manualReady }: { onManual: () => void; manualReady: boolean }) {
+export function AddPatientPanel({
+  onManual,
+  onUpload,
+  manualReady,
+}: {
+  onManual: () => void;
+  onUpload: () => void;
+  manualReady: boolean;
+}) {
   const [notice, setNotice] = useState<string | null>(null);
   const choose = (method: Method) => {
     if (method.plan) {
       setNotice(method.plan);
+    } else if (method.id === "upload") {
+      onUpload();
     } else {
       onManual();
     }

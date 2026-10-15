@@ -9,6 +9,7 @@ import { PatientAvatar } from "../../patient/PatientAvatar";
 import { UnitNumberInput } from "../../units/UnitNumberInput";
 import { UnitToggle } from "../../units/UnitToggle";
 import { FloatingWindow } from "../FloatingWindow";
+import { useReportStore } from "../../start/reportStore";
 import { IconChevronLeft, IconChevronRight, IconClose, IconEdit, IconHeart, IconUser } from "../icons";
 import {
   angiogramLine,
@@ -89,6 +90,7 @@ function InputEditor({ onClose }: { onClose: () => void }) {
   const { features } = useStudioData();
   const values = usePatientStore((state) => state.features);
   const status = usePatientStore((state) => state.predictionStatus);
+  const fromReports = useReportStore((state) => state.fromReports);
   const [group, setGroup] = useState<string | null>(null);
   const groups = useMemo(
     () => Array.from(new Set(features.map((feature) => feature.group))),
@@ -114,13 +116,20 @@ function InputEditor({ onClose }: { onClose: () => void }) {
       <div className="editor-fields">
         {features
           .filter((feature) => feature.group === activeGroup)
-          .map((feature) => (
-            <FeatureControl
-              feature={feature}
-              key={feature.name}
-              value={values[feature.name] ?? feature.default}
-            />
-          ))}
+          .map((feature) => {
+            const read = fromReports?.[feature.name];
+            const value = values[feature.name] ?? feature.default;
+            return (
+              <div className="editor-field" key={feature.name}>
+                <FeatureControl feature={feature} value={value} />
+                {read && read.value === value && (
+                  <p className="from-report" title={read.evidence}>
+                    Read from {read.document}
+                  </p>
+                )}
+              </div>
+            );
+          })}
       </div>
       <div className="editor-foot">
         <span aria-live="polite" className={`sl-status sl-status-${status}`}>
@@ -232,7 +241,16 @@ export function PatientWindow() {
   const editing = editorRoot !== null || editingInline;
   const index = samples.findIndex((sample) => sample.id === sampleId);
   const sample = index >= 0 ? samples[index] : null;
-  const [name, description] = sample ? splitLabel(sample.label) : ["Custom patient", "Edited inputs"];
+  const fromReports = useReportStore((state) => state.fromReports);
+  const reportFiles = useReportStore((state) => state.documents);
+  const [name, description] = sample
+    ? splitLabel(sample.label)
+    : fromReports
+      ? [
+          "Patient from reports",
+          `${Object.keys(fromReports).length} values read from ${reportFiles.length} report${reportFiles.length === 1 ? "" : "s"}`,
+        ]
+      : ["Custom patient", "Edited inputs"];
   const summary = useMemo(() => summarisePatient(values, features), [features, values]);
   const age = typeof values.Age === "number" ? values.Age : null;
   const sex = values.Sex === "Female" || values.Sex === "Male" ? values.Sex : null;
@@ -250,6 +268,7 @@ export function PatientWindow() {
     if (!samples.length) {
       return;
     }
+    useReportStore.getState().clear();
     setFromSample(samples[(Math.max(index, 0) + by + samples.length) % samples.length]);
   };
   const closeEditor = () => {

@@ -191,7 +191,7 @@ pre .c { color: #7fa6a0; }
         <tr><td>In my language?</td><td>English only</td><td>A spoken summary in English or <b>Hindi</b> (Sarvam AI)</td></tr>
       </tbody>
     </table>
-    <p class="lede"><b>Our solution is multimodal at both ends.</b> <b>Seven kinds of clinical data in:</b> body measures, history, symptoms, examination, ECG, blood tests and echo. <b>Three ways out:</b> a 3D picture for the doctor, plain words for the patient, Hindi speech. <b>Designed next:</b> vision AI for report photos, voice input, ABHA import with consent (93.95 crore IDs).</p>
+    <p class="lede"><b>Our solution is multimodal at both ends.</b> <b>Seven kinds of clinical data in:</b> body measures, history, symptoms, examination, ECG, blood tests and echo. <b>Three ways out:</b> a 3D picture for the doctor, plain words for the patient, Hindi speech. <b>Vision AI reads report PDFs</b> (live demo). <b>Next:</b> voice input, ABHA import with consent (93.95 crore IDs).</p>
   </div>
 
   <h2><span class="n">00</span>How CardioClarity meets the Track A evaluation criteria</h2>
@@ -582,8 +582,8 @@ pre .c { color: #7fa6a0; }
       <ul class="small">
         <li><span class="st live">LIVE</span> <b>Fill in manually</b>, with units, normal ranges and checks.</li>
         <li><span class="st plan">DESIGNED</span> <b>Import via ABHA:</b> the patient scans the clinic's QR code with the ABHA app and gives consent. Lab results, diagnoses and vital signs arrive in the standard FHIR format and are matched to our 49 inputs.</li>
-        <li><span class="st plan">DESIGNED</span> <b>Upload reports:</b> photos, PDFs or WhatsApp forwards of lab, ECG and echo reports, read by <b>multimodal (vision) AI</b> that shows where each value came from.</li>
-        <li><span class="st plan">DESIGNED</span> <b>Speak it</b> in Hindi or another Indian language; Sarvam AI turns speech into values.</li>
+        <li><span class="st live">LIVE DEMO</span> <b>Upload reports:</b> lab, ECG and echo reports as photos or PDFs, read by <b>multimodal (vision) AI</b> (OpenAI gpt-5.5), each value outlined where it was read. On a 3-page sample it found 29 values, all correct; the demo replays that reading.</li>
+        <li><span class="st plan">DESIGNED</span> <b>Speak it</b> in Hindi or English; Sarvam AI turns speech into values.</li>
         <li><span class="st plan">DESIGNED</span> <b>Excel / CSV</b> for health camps: score many patients and rank who to refer first.</li>
       </ul>
       <p class="small"><b>Privacy:</b> the server keeps no patient data; values are scored and forgotten. ABHA import works only with the patient's consent, in line with India's DPDP Act 2023.</p>
@@ -615,7 +615,7 @@ python scripts/download_data.py
 python -m ml.export</pre>
   </div>
   <div class="box">
-    <p class="small"><b>Limitations.</b> The models learned from 303 patients at one hospital in Iran and have not yet been tested on patients from other hospitals. They are weaker for patients over 65 and for the LCX and RCA arteries. Indians often get heart disease younger, so the models must be checked on Indian patients before any clinical use. <b>Credits:</b> dataset UCI #411 (Alizadehsani et al., CC BY 4.0); heart model “Realistic Human Heart” by neshallads (CC BY 4.0); open-source EBM, CatBoost, XGBoost, LightGBM, scikit-learn, FastAPI, React and Three.js; Hindi voice by Sarvam AI. Full details: <span class="mono">reports/BEST_MODELS.md</span>.</p>
+    <p class="small"><b>Limitations.</b> The models learned from 303 patients at one hospital in Iran and have not yet been tested on patients from other hospitals. They are weaker for patients over 65 and for the LCX and RCA arteries. Indians often get heart disease younger, so the models must be checked on Indian patients before any clinical use. <b>Credits:</b> dataset UCI #411 (Alizadehsani et al., CC BY 4.0); heart model “Realistic Human Heart” by neshallads (CC BY 4.0); open-source EBM, CatBoost, XGBoost, LightGBM, scikit-learn, FastAPI, React and Three.js; Hindi voice by Sarvam AI; report reading by OpenAI. Full details: <span class="mono">reports/BEST_MODELS.md</span>.</p>
   </div>
   <div class="foot"><span>CardioClarity Studio · Track A project document</span><span>6 / 6</span></div>
 </section>

@@ -23,8 +23,8 @@ from fastapi.responses import JSONResponse
 
 from api.explain import explain
 from api.features import NAMES, SPECS, from_model_row, public_schema, to_model_frame, training_ranges, validate
-from api.schemas import (CohortResponse, FeatureSchema, HealthResponse, ImportanceResponse, MetricsResponse,
-                         PredictionResponse, PredictRequest, SamplePatient)
+from api.schemas import (CohortResponse, ExtractRequest, ExtractResponse, FeatureSchema, HealthResponse,
+                         ImportanceResponse, MetricsResponse, PredictionResponse, PredictRequest, SamplePatient)
 from ml.data import ROOT, TARGETS, VESSELS
 
 CONTRACT_VERSION = "1.1.0"
@@ -144,6 +144,21 @@ def predict_endpoint(request: PredictRequest):
         "derived": _derived(patient),
         "prediction_source": _source(models, patient),
     }
+
+
+@app.post("/extract", response_model=ExtractResponse, response_model_exclude_none=True)
+def extract_endpoint(request: ExtractRequest):
+    """Reads lab, ECG and echo reports (photos or PDFs) with a vision model and returns the inputs it found, each with
+    the text it read it from. The values are a starting point for a person to review; nothing is scored or stored."""
+    from api.extract import ExtractError, extract
+
+    try:
+        return extract([f.model_dump() for f in request.files])
+    except ExtractError as error:
+        return JSONResponse(status_code=422, content={"detail": str(error)})
+    except Exception:  # the model's service or its reply; the user can try again
+        return JSONResponse(status_code=502, content={"detail": "The reports could not be read just now; please try "
+                                                                 "again."})
 
 
 @app.get("/model/metrics", response_model=MetricsResponse)
