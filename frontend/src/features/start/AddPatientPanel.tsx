@@ -40,7 +40,6 @@ const METHODS: Method[] = [
     title: "Excel / CSV",
     detail: "Screening-camp lists",
     icon: <IconSheet size={18} />,
-    plan: "Coming soon: fill in the template for a screening camp, and every patient is scored, highest risk first.",
   },
   {
     id: "manual",
@@ -84,11 +83,13 @@ export function AddPatientPanel({
   onManual,
   onUpload,
   onAbha,
+  onSheet,
   manualReady,
 }: {
   onManual: () => void;
   onUpload: () => void;
   onAbha: () => void;
+  onSheet: () => void;
   manualReady: boolean;
 }) {
   const [notice, setNotice] = useState<string | null>(null);
@@ -99,6 +100,8 @@ export function AddPatientPanel({
       onUpload();
     } else if (method.id === "abha") {
       onAbha();
+    } else if (method.id === "sheet") {
+      onSheet();
     } else {
       onManual();
     }

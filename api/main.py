@@ -24,7 +24,8 @@ from fastapi.responses import JSONResponse
 from api.explain import explain
 from api.features import NAMES, SPECS, from_model_row, public_schema, to_model_frame, training_ranges, validate
 from api.schemas import (CohortResponse, ExtractRequest, ExtractResponse, FeatureSchema, HealthResponse,
-                         ImportanceResponse, MetricsResponse, PredictionResponse, PredictRequest, SamplePatient)
+                         ImportanceResponse, MetricsResponse, PredictionResponse, PredictRequest, SamplePatient,
+                         SheetRequest, SheetResponse)
 from ml.data import ROOT, TARGETS, VESSELS
 
 CONTRACT_VERSION = "1.1.0"
@@ -159,6 +160,17 @@ def extract_endpoint(request: ExtractRequest):
     except Exception:  # the model's service or its reply; the user can try again
         return JSONResponse(status_code=502, content={"detail": "The reports could not be read just now; please try "
                                                                  "again."})
+
+
+@app.post("/sheet", response_model=SheetResponse)
+def sheet_endpoint(request: SheetRequest):
+    """Reads a screening-camp list (CSV or Excel .xlsx) into its header and rows, as text. Nothing is stored."""
+    from api.sheet import SheetError, read_sheet
+
+    try:
+        return read_sheet(request.name, request.data)
+    except SheetError as error:
+        return JSONResponse(status_code=422, content={"detail": str(error)})
 
 
 @app.get("/model/metrics", response_model=MetricsResponse)

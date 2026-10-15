@@ -216,3 +216,13 @@ class ExtractResponse(ContractModel):
     values: list[ExtractedValue]
     skipped: list[SkippedValue]
     model: str
+
+
+class SheetRequest(ContractModel):
+    name: StrictStr = Field(min_length=1, max_length=200)
+    data: StrictStr = Field(description="The file's bytes, base64-encoded.")
+
+
+class SheetResponse(ContractModel):
+    columns: list[str]
+    rows: list[list[str]]

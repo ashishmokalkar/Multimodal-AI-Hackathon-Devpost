@@ -175,3 +175,21 @@ export async function postExtract(files: ReportUpload[]): Promise<ExtractRespons
   }
   return ExtractResponseSchema.parse(body);
 }
+
+/** Reads a screening-camp list (CSV or Excel) on the server into its header and rows, as text. */
+export async function postSheet(name: string, data: string): Promise<{ columns: string[]; rows: string[][] }> {
+  const response = await fetch(`${API_BASE_URL}/sheet`, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify({ name, data }),
+  });
+  const body: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    const detail =
+      body && typeof body === "object" && "detail" in body && typeof body.detail === "string"
+        ? body.detail
+        : `The file could not be read (${response.status}).`;
+    throw new Error(detail);
+  }
+  return body as { columns: string[]; rows: string[][] };
+}

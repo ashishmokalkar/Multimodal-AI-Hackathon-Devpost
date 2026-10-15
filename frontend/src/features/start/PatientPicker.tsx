@@ -10,6 +10,8 @@ import { DISCLAIMER_LINE } from "../safety/disclaimer";
 import { PatientAvatar } from "../patient/PatientAvatar";
 import { AddPatientPanel } from "./AddPatientPanel";
 import { AbhaImport } from "./AbhaImport";
+import { ManualEntry } from "./ManualEntry";
+import { SheetImport } from "./SheetImport";
 import { ReportUpload } from "./ReportUpload";
 import { useReportStore } from "./reportStore";
 import { IconHeart, IconShield } from "../studio/icons";
@@ -249,19 +251,11 @@ export function PatientPicker() {
 
   const [uploading, setUploading] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [listing, setListing] = useState(false);
+  const [typing, setTyping] = useState(false);
   const open = (sample: SamplePatient) => {
     useReportStore.getState().clear();
     usePatientStore.getState().setFromSample(sample);
-    setPatientChosen(true);
-  };
-  const openNew = () => {
-    if (!features) {
-      return;
-    }
-    useReportStore.getState().clear();
-    usePatientStore
-      .getState()
-      .setFeatures(Object.fromEntries(features.map((feature) => [feature.name, feature.default])));
     setPatientChosen(true);
   };
   const openFromReports = (values: Record<string, FeatureValue>, result: ExtractResponse) => {
@@ -271,6 +265,14 @@ export function PatientPicker() {
     );
     usePatientStore.getState().setFeatures(values);
     setUploading(false);
+    setPatientChosen(true);
+  };
+  /** Opens a patient whose values came from the form or a screening-camp list. */
+  const openWithValues = (values: Record<string, FeatureValue>) => {
+    useReportStore.getState().clear();
+    usePatientStore.getState().setFeatures(values);
+    setTyping(false);
+    setListing(false);
     setPatientChosen(true);
   };
   const openFromAbha = (values: Record<string, FeatureValue>, read: ExtractedValue[]) => {
@@ -417,7 +419,7 @@ export function PatientPicker() {
                   </>
                 )}
               </section>
-              {!showAll && <AddPatientPanel manualReady={Boolean(features)} onManual={openNew} onUpload={() => setUploading(true)} onAbha={() => setImporting(true)} />}
+              {!showAll && <AddPatientPanel manualReady={Boolean(features)} onManual={() => setTyping(true)} onUpload={() => setUploading(true)} onAbha={() => setImporting(true)} onSheet={() => setListing(true)} />}
             </div>
             {footnote}
             {!showAll && (
@@ -429,6 +431,17 @@ export function PatientPicker() {
           </>
         )}
       </main>
+      {typing && features && (
+        <ManualEntry features={features} onClose={() => setTyping(false)} onOpen={openWithValues} />
+      )}
+      {listing && features && profileQuery.data && (
+        <SheetImport
+          features={features}
+          onClose={() => setListing(false)}
+          onOpen={openWithValues}
+          profile={profileQuery.data}
+        />
+      )}
       {importing && features && (
         <AbhaImport features={features} onClose={() => setImporting(false)} onOpen={openFromAbha} />
       )}

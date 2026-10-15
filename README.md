@@ -188,11 +188,11 @@ A good prediction saves no one if it takes ten minutes to type in, or if the pat
 
 | Way in | What it does | Status |
 |---|---|:-:|
-| ✍️ **Fill in manually** | All 49 inputs with units, normal ranges and checks | ✅ **Live** |
+| ✍️ **Fill in manually** | A simple form, a tab per group (patient details, symptoms & exam, ECG, blood tests, echo), each value with its unit and normal range | ✅ **Live** |
 | 🪪 **Import via ABHA** | The patient scans the clinic's QR code with their **ABHA** app and approves. Records arrive through the **Ayushman Bharat Digital Mission** as **FHIR R4** (LOINC, SNOMED CT), and our code maps them to the inputs | ✅ **Live demo** |
 | 📄 **Upload reports** | Lab, ECG and echo reports as photos or PDFs, read by a **multimodal (vision) AI model** (OpenAI gpt-5.5) that outlines where every value came from | ✅ **Live demo** |
 | 🎙️ **Speak it** | Describe the patient in Hindi or English; **Sarvam AI** speech recognition fills the form | 🧭 Designed |
-| 📊 **Excel / CSV** | For screening camps: score a whole list, **highest risk first**, so the right people are referred | 🧭 Designed |
+| 📊 **Excel / CSV** | For screening camps: the sample list or your own CSV / Excel file is scored, **highest risk first**, so the right people are referred | ✅ **Live** |
 
 ### 📄 Upload reports: multimodal AI reads them
 
@@ -207,6 +207,11 @@ The server sends the pages to the vision model with our 49 inputs, their units a
 <p align="center"><sub>Scan, approve, and a sample ABHA record arrives as a FHIR R4 bundle: 27 records (diagnoses, vital signs, a lab report, ECG and echo) fill 33 inputs, each traced to its code. The patient then scores exactly like patient 174.</sub></p>
 
 The mapping from FHIR to the model's inputs is real code ([`fhir.ts`](frontend/src/features/start/fhir.ts), with tests): measurements by **LOINC** code with unit conversion, diagnoses by **SNOMED CT**, ECG and echo impressions by plain rules, and every value checked against its range. **The demo simulates the patient's approval and loads a sample record**, because the live connection to Ayushman Bharat needs registration with ABDM, our next step. Scanning the QR code with a phone opens the consent request the patient would see.
+
+### 📊 Screening camps: a whole list, highest risk first
+
+<p align="center"><img src="docs/images/screening.jpg" alt="Excel / CSV: 10 patients from a screening-camp list scored and ranked, highest risk first, with the overall heart-disease risk and the highest-risk artery for each, and an Open button per patient." width="88%"></p>
+<p align="center"><sub>The sample list (10 study patients, as Excel or CSV) scored in about 5 seconds. Their angiograms agree with the ranking for 9 of 10: all 7 flagged patients have heart disease, and one patient rated low (P-05) was missed.</sub></p>
 
 **Why ABHA matters:** India has created **93.95 crore ABHA health IDs** (July 2026). With consent, a patient's records can arrive in seconds instead of being typed.
 
@@ -341,7 +346,6 @@ python -m ml.export
 - 🪪 **ABHA, live:** register with ABDM so real records flow in; the FHIR mapping is already built and tested.
 - 📄 **Report reading for every upload**, including phone photos and WhatsApp forwards (today the public demo replays a recorded reading).
 - 🗣️ **More Indian languages** (Bengali, Marathi, Tamil, Telugu and more) through Sarvam AI, for every patient, and **speaking instead of typing**.
-- 🏕️ **Screening camps**: score a whole list at once and refer the highest risk first.
 
 ## ⚠️ Limitations
 

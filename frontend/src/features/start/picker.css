@@ -1275,3 +1275,175 @@
   .abha-scan { grid-template-columns: 1fr; justify-items: center; }
   .abha-qr { width: 200px; }
 }
+
+/* ------------------------------------------------------------------------------------------- excel / csv */
+.sh-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.sh-choice {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+  border: 1px solid var(--pk-line-strong);
+  border-radius: 16px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.sh-choice:hover {
+  transform: translateY(-2px);
+  border-color: var(--pk-accent);
+}
+.sh-choice b {
+  font-size: 17px;
+}
+.sh-choice span {
+  color: var(--pk-muted);
+}
+.sh-choice em {
+  color: var(--pk-accent);
+  font-style: normal;
+  font-weight: 700;
+}
+.ru-demo-note a,
+.ru-note a {
+  color: var(--pk-accent);
+  font-weight: 600;
+}
+.sh-table-wrap {
+  max-height: min(60vh, 600px);
+}
+.sh-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.sh-table th {
+  position: sticky;
+  top: 0;
+  padding: 8px;
+  background: var(--pk-bg-2);
+  color: var(--pk-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+}
+.sh-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--pk-line);
+}
+.sh-band {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.sh-high { background: color-mix(in srgb, var(--pk-flag) 20%, transparent); color: var(--pk-flag); }
+.sh-moderate { background: color-mix(in srgb, var(--pk-moderate) 18%, transparent); color: var(--pk-moderate); }
+.sh-low { background: color-mix(in srgb, var(--pk-accent) 16%, transparent); color: var(--pk-accent); }
+.sh-warn {
+  color: var(--pk-moderate);
+  font-size: 12px;
+  cursor: help;
+}
+.sh-open {
+  padding: 5px 12px;
+  border: 1px solid var(--pk-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.sh-open:hover {
+  border-color: var(--pk-accent);
+  color: var(--pk-accent);
+}
+
+/* ------------------------------------------------------------------------------------------- fill in manually */
+.me-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.me-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--pk-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.me-tabs button[aria-selected="true"] {
+  border-color: var(--pk-accent);
+  background: var(--pk-accent);
+  color: var(--pk-accent-ink);
+}
+.me-count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--pk-flag);
+  color: #fff;
+  font-size: 11px;
+  text-align: center;
+}
+.me-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 22px;
+  max-height: min(56vh, 560px);
+  overflow: auto;
+  padding-right: 4px;
+}
+.me-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--pk-line);
+}
+.me-field.is-set .me-label b::after {
+  content: " •";
+  color: var(--pk-accent);
+}
+.me-label {
+  display: grid;
+}
+.me-label span {
+  color: var(--pk-muted);
+  font-size: 12px;
+}
+.me-label .me-bad {
+  color: var(--pk-flag);
+  font-weight: 600;
+}
+.me-next {
+  margin-left: auto;
+}
+.ru-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+@media (max-width: 760px) {
+  .sh-choices,
+  .me-fields {
+    grid-template-columns: 1fr;
+  }
+}
