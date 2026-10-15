@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useApiProfile, useDataset, useFeatures, useSamples } from "../../api/hooks";
-import type { ExtractResponse, FeatureDefinition, FeatureValue, SamplePatient } from "../../api/types";
+import type { ExtractedValue, ExtractResponse, FeatureDefinition, FeatureValue, SamplePatient } from "../../api/types";
 import { formatFeatureValue, rangeStatus } from "../../lib/insights";
 import { displayNumber } from "../../lib/units";
 import { usePatientStore } from "../../store/patientStore";
@@ -9,6 +9,7 @@ import { HeartbeatLoader } from "../loading/HeartbeatLoader";
 import { DISCLAIMER_LINE } from "../safety/disclaimer";
 import { PatientAvatar } from "../patient/PatientAvatar";
 import { AddPatientPanel } from "./AddPatientPanel";
+import { AbhaImport } from "./AbhaImport";
 import { ReportUpload } from "./ReportUpload";
 import { useReportStore } from "./reportStore";
 import { IconHeart, IconShield } from "../studio/icons";
@@ -247,6 +248,7 @@ export function PatientPicker() {
   );
 
   const [uploading, setUploading] = useState(false);
+  const [importing, setImporting] = useState(false);
   const open = (sample: SamplePatient) => {
     useReportStore.getState().clear();
     usePatientStore.getState().setFromSample(sample);
@@ -269,6 +271,12 @@ export function PatientPicker() {
     );
     usePatientStore.getState().setFeatures(values);
     setUploading(false);
+    setPatientChosen(true);
+  };
+  const openFromAbha = (values: Record<string, FeatureValue>, read: ExtractedValue[]) => {
+    useReportStore.getState().setFromReports(read, ["ABHA"], "abha");
+    usePatientStore.getState().setFeatures(values);
+    setImporting(false);
     setPatientChosen(true);
   };
 
@@ -409,7 +417,7 @@ export function PatientPicker() {
                   </>
                 )}
               </section>
-              {!showAll && <AddPatientPanel manualReady={Boolean(features)} onManual={openNew} onUpload={() => setUploading(true)} />}
+              {!showAll && <AddPatientPanel manualReady={Boolean(features)} onManual={openNew} onUpload={() => setUploading(true)} onAbha={() => setImporting(true)} />}
             </div>
             {footnote}
             {!showAll && (
@@ -421,6 +429,9 @@ export function PatientPicker() {
           </>
         )}
       </main>
+      {importing && features && (
+        <AbhaImport features={features} onClose={() => setImporting(false)} onOpen={openFromAbha} />
+      )}
       {uploading && features && (
         <ReportUpload features={features} onClose={() => setUploading(false)} onOpen={openFromReports} />
       )}

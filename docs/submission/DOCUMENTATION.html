@@ -191,7 +191,7 @@ pre .c { color: #7fa6a0; }
         <tr><td>In my language?</td><td>English only</td><td>A spoken summary in English or <b>Hindi</b> (Sarvam AI)</td></tr>
       </tbody>
     </table>
-    <p class="lede"><b>Our solution is multimodal at both ends.</b> <b>Seven kinds of clinical data in:</b> body measures, history, symptoms, examination, ECG, blood tests and echo. <b>Three ways out:</b> a 3D picture for the doctor, plain words for the patient, Hindi speech. <b>Vision AI reads report PDFs</b> (live demo). <b>Next:</b> voice input, ABHA import with consent (93.95 crore IDs).</p>
+    <p class="lede"><b>Our solution is multimodal at both ends.</b> <b>Seven kinds of clinical data in:</b> body measures, history, symptoms, examination, ECG, blood tests and echo. <b>Three ways out:</b> a 3D picture for the doctor, plain words for the patient, Hindi speech. <b>Live demos:</b> vision AI reads report PDFs; ABHA records (93.95 crore IDs) arrive as FHIR. <b>Next:</b> voice input.</p>
   </div>
 
   <h2><span class="n">00</span>How CardioClarity meets the Track A evaluation criteria</h2>
@@ -578,10 +578,10 @@ pre .c { color: #7fa6a0; }
     </figure>
     <div class="stack">
       <h3>Getting patient data in, designed for India</h3>
-      <p class="small">Typing 49 values is slow, and most already exist in the patient's records. Every route ends on one review screen, so nothing is scored until a person checks the values.</p>
+      <p class="small">Typing 49 values is slow. Every route ends on one review screen, so a person checks every value before scoring.</p>
       <ul class="small">
         <li><span class="st live">LIVE</span> <b>Fill in manually</b>, with units, normal ranges and checks.</li>
-        <li><span class="st plan">DESIGNED</span> <b>Import via ABHA:</b> the patient scans the clinic's QR code with the ABHA app and gives consent. Lab results, diagnoses and vital signs arrive in the standard FHIR format and are matched to our 49 inputs.</li>
+        <li><span class="st live">LIVE DEMO</span> <b>Import via ABHA:</b> the patient scans the clinic's QR code in the ABHA app and approves; FHIR R4 records (LOINC, SNOMED CT) are mapped by our code to 33 inputs. The demo simulates approval; live use needs ABDM registration.</li>
         <li><span class="st live">LIVE DEMO</span> <b>Upload reports:</b> lab, ECG and echo reports as photos or PDFs, read by <b>multimodal (vision) AI</b> (OpenAI gpt-5.5), each value outlined where it was read. On a 3-page sample it found 29 values, all correct; the demo replays that reading.</li>
         <li><span class="st plan">DESIGNED</span> <b>Speak it</b> in Hindi or English; Sarvam AI turns speech into values.</li>
         <li><span class="st plan">DESIGNED</span> <b>Excel / CSV</b> for health camps: score many patients and rank who to refer first.</li>

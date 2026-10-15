@@ -21,7 +21,6 @@ const METHODS: Method[] = [
     title: "Import via ABHA",
     detail: "Scan & Share with the patient's ABHA app",
     icon: <IconQr size={20} />,
-    plan: "Coming next: the patient scans the clinic's QR code with their ABHA app and approves the consent request; their lab reports, diagnoses and vitals then arrive through the Ayushman Bharat Digital Mission and fill the form.",
   },
   {
     id: "upload",
@@ -84,10 +83,12 @@ function QrArt() {
 export function AddPatientPanel({
   onManual,
   onUpload,
+  onAbha,
   manualReady,
 }: {
   onManual: () => void;
   onUpload: () => void;
+  onAbha: () => void;
   manualReady: boolean;
 }) {
   const [notice, setNotice] = useState<string | null>(null);
@@ -96,6 +97,8 @@ export function AddPatientPanel({
       setNotice(method.plan);
     } else if (method.id === "upload") {
       onUpload();
+    } else if (method.id === "abha") {
+      onAbha();
     } else {
       onManual();
     }
@@ -108,7 +111,7 @@ export function AddPatientPanel({
       </h2>
       {/* the panel starts level with the search box opposite, as both door titles sit above their content */}
       <div className="pk-add-box">
-        <button className="pk-method pk-method-hero" onClick={() => choose(abha)} type="button">
+        <button className="pk-method pk-method-hero" disabled={!manualReady} onClick={() => choose(abha)} type="button">
           <QrArt />
           <span className="pk-method-text">
             <strong>{abha.title}</strong>

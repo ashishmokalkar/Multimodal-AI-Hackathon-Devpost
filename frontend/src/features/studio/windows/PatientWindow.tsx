@@ -124,7 +124,7 @@ function InputEditor({ onClose }: { onClose: () => void }) {
                 <FeatureControl feature={feature} value={value} />
                 {read && read.value === value && (
                   <p className="from-report" title={read.evidence}>
-                    Read from {read.document}
+                    {read.document === "ABHA" ? "From ABHA record" : `Read from ${read.document}`}
                   </p>
                 )}
               </div>
@@ -243,14 +243,17 @@ export function PatientWindow() {
   const sample = index >= 0 ? samples[index] : null;
   const fromReports = useReportStore((state) => state.fromReports);
   const reportFiles = useReportStore((state) => state.documents);
+  const via = useReportStore((state) => state.via);
   const [name, description] = sample
     ? splitLabel(sample.label)
-    : fromReports
-      ? [
-          "Patient from reports",
-          `${Object.keys(fromReports).length} values read from ${reportFiles.length} report${reportFiles.length === 1 ? "" : "s"}`,
-        ]
-      : ["Custom patient", "Edited inputs"];
+    : fromReports && via === "abha"
+      ? ["Patient from ABHA", `${Object.keys(fromReports).length} values from shared records`]
+      : fromReports
+        ? [
+            "Patient from reports",
+            `${Object.keys(fromReports).length} values read from ${reportFiles.length} report${reportFiles.length === 1 ? "" : "s"}`,
+          ]
+        : ["Custom patient", "Edited inputs"];
   const summary = useMemo(() => summarisePatient(values, features), [features, values]);
   const age = typeof values.Age === "number" ? values.Age : null;
   const sex = values.Sex === "Female" || values.Sex === "Male" ? values.Sex : null;

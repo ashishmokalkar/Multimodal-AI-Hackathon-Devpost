@@ -189,7 +189,7 @@ A good prediction saves no one if it takes ten minutes to type in, or if the pat
 | Way in | What it does | Status |
 |---|---|:-:|
 | ✍️ **Fill in manually** | All 49 inputs with units, normal ranges and checks | ✅ **Live** |
-| 🪪 **Import via ABHA** | The patient scans the clinic's QR code with their **ABHA** app and approves consent. Lab results, diagnoses and vitals arrive through the **Ayushman Bharat Digital Mission** in the standard FHIR format | 🧭 Designed |
+| 🪪 **Import via ABHA** | The patient scans the clinic's QR code with their **ABHA** app and approves. Records arrive through the **Ayushman Bharat Digital Mission** as **FHIR R4** (LOINC, SNOMED CT), and our code maps them to the inputs | ✅ **Live demo** |
 | 📄 **Upload reports** | Lab, ECG and echo reports as photos or PDFs, read by a **multimodal (vision) AI model** (OpenAI gpt-5.5) that outlines where every value came from | ✅ **Live demo** |
 | 🎙️ **Speak it** | Describe the patient in Hindi or English; **Sarvam AI** speech recognition fills the form | 🧭 Designed |
 | 📊 **Excel / CSV** | For screening camps: score a whole list, **highest risk first**, so the right people are referred | 🧭 Designed |
@@ -200,6 +200,13 @@ A good prediction saves no one if it takes ten minutes to type in, or if the pat
 <p align="center"><sub>A 3-page sample report (lab, ECG, echo) made from study patient 174's values. The vision AI found <b>29 values in 10 seconds, all correct</b>, each outlined where it was read. Answer the few questions reports don't cover, and the patient scores exactly like patient 174.</sub></p>
 
 The server sends the pages to the vision model with our 49 inputs, their units and options, and a strict answer format. Every value that comes back is checked against the input's type and range before it is used, and each one keeps the exact text it was read from. **In the public demo, the reading of the sample report was recorded once and is replayed**, so the demo is free and instant; the same endpoint (`POST /extract`, [`api/extract.py`](api/extract.py)) reads any upload when the server has an `OPENAI_API_KEY`.
+
+### 🪪 Import via ABHA: records arrive with consent
+
+<p align="center"><img src="docs/images/abha.jpg" alt="Import via ABHA: a QR code to scan with the ABHA app and the three steps (scan, approve, records arrive); then the records received from a sample hospital, each value shown with its FHIR source such as Condition SNOMED 44054006 or Observation LOINC 1558-6." width="92%"></p>
+<p align="center"><sub>Scan, approve, and a sample ABHA record arrives as a FHIR R4 bundle: 27 records (diagnoses, vital signs, a lab report, ECG and echo) fill 33 inputs, each traced to its code. The patient then scores exactly like patient 174.</sub></p>
+
+The mapping from FHIR to the model's inputs is real code ([`fhir.ts`](frontend/src/features/start/fhir.ts), with tests): measurements by **LOINC** code with unit conversion, diagnoses by **SNOMED CT**, ECG and echo impressions by plain rules, and every value checked against its range. **The demo simulates the patient's approval and loads a sample record**, because the live connection to Ayushman Bharat needs registration with ABDM, our next step. Scanning the QR code with a phone opens the consent request the patient would see.
 
 **Why ABHA matters:** India has created **93.95 crore ABHA health IDs** (July 2026). With consent, a patient's records can arrive in seconds instead of being typed.
 
@@ -331,7 +338,7 @@ python -m ml.export
 ## 🛣️ What's next
 
 - 🇮🇳 **Test on Indian patients.** Our models learned from one hospital in Iran, and Indians get heart disease about ten years younger.
-- 🪪 **ABHA import**, live, through the Ayushman Bharat Digital Mission.
+- 🪪 **ABHA, live:** register with ABDM so real records flow in; the FHIR mapping is already built and tested.
 - 📄 **Report reading for every upload**, including phone photos and WhatsApp forwards (today the public demo replays a recorded reading).
 - 🗣️ **More Indian languages** (Bengali, Marathi, Tamil, Telugu and more) through Sarvam AI, for every patient, and **speaking instead of typing**.
 - 🏕️ **Screening camps**: score a whole list at once and refer the highest risk first.

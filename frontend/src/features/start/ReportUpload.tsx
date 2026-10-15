@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ExtractResponseSchema, type ExtractResponse, type FeatureDefinition, type FeatureValue } from "../../api/types";
 import { HeartbeatLoader } from "../loading/HeartbeatLoader";
 import { IconUpload } from "../studio/icons";
+import { ASK_FIRST, show } from "./intake";
 
 /**
  * The public demo reads one sample report: a 3-page PDF (lab report, ECG, echo) made from study patient 174's values.
@@ -31,18 +32,10 @@ const GROUP_COLOUR: Record<string, string> = {
   Lab: "#2dd4bf",
   Echo: "#fbbf24",
 };
-/** What reports rarely say but the model needs most: asked before scoring when the report did not give them. */
-const ASK_FIRST = ["Age", "Sex", "Chest Pain", "DM", "HTN", "BP", "Smoking", "FH", "DLP", "Dyspnea", "Airway"];
 const READ_MS = 2600;
 
-function show(value: FeatureValue, unit?: string): string {
-  if (typeof value === "boolean") {
-    return value ? "Yes" : "No";
-  }
-  return unit ? `${value} ${unit}` : String(value);
-}
 
-function Answer({
+export function Answer({
   feature,
   value,
   onChange,

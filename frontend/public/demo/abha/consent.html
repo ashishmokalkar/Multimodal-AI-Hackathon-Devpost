@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Share with CardioClarity</title>
+<style>
+  :root { --bg: #f4f7fb; --card: #ffffff; --ink: #0f172a; --muted: #475569; --line: #e2e8f0; --accent: #0f766e; --brand: #db2777; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #070b16; --card: #111a2e; --ink: #e9eefb; --muted: #9aa6c4; --line: #23304d; --accent: #5eead4; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 440px; margin: 0 auto; padding: 24px 16px 40px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 99px; background: #fff1dc; color: #a15c07; font-size: 12px; font-weight: 700; }
+  h1 { font-size: 22px; margin: 12px 0 4px; }
+  p { margin: 8px 0; color: var(--muted); }
+  ul { margin: 12px 0; padding: 0; list-style: none; }
+  li { padding: 10px 0; border-bottom: 1px solid var(--line); display: flex; gap: 10px; }
+  li b { color: var(--ink); }
+  .who { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .logo { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #ec4899, #8b5cf6); display: grid; place-items: center; color: #fff; font-size: 20px; }
+  .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  button { padding: 12px; border-radius: 12px; font: inherit; font-weight: 700; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+  button.yes { background: var(--accent); border-color: var(--accent); color: #fff; }
+  #done { display: none; margin-top: 14px; color: var(--accent); font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <span class="tag">DEMO · what your ABHA app will show</span>
+    <div class="who"><span class="logo">♥</span><div><b>CardioClarity Studio</b><br><small style="color:var(--muted)">asks to see your health records</small></div></div>
+    <h1>Share your records?</h1>
+    <p>In the real flow, scanning the clinic's QR code in your <b>ABHA app</b> (Ayushman Bharat Digital Mission) shows a request like this. Nothing is shared unless you approve.</p>
+    <ul>
+      <li>🧪 <span><b>Lab reports</b><br>Blood sugar, kidney tests, cholesterol, blood count</span></li>
+      <li>💓 <span><b>Vital signs</b><br>Blood pressure, pulse, height, weight</span></li>
+      <li>📋 <span><b>Diagnoses</b><br>Conditions your doctors have recorded</span></li>
+      <li>🫀 <span><b>Heart tests</b><br>ECG and echo reports</span></li>
+    </ul>
+    <p>For this visit only · used to estimate heart-artery risk · not stored.</p>
+    <div class="btns"><button type="button" onclick="answer()">Deny</button><button class="yes" type="button" onclick="answer()">Approve</button></div>
+    <p id="done">Demo only: nothing was shared. The live connection to Ayushman Bharat needs ABDM registration, which is our next step.</p>
+  </div>
+</main>
+<script>function answer() { document.getElementById("done").style.display = "block"; }</script>
+</body>
+</html>
